@@ -1,0 +1,22 @@
+{
+    "$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/ols.schema.json",
+    "collections": [
+        {
+            "name": "core",
+            "path": "/opt/homebrew/Cellar/odin/2026-05/libexec/core"
+        },
+        {
+            "name": "vendor",
+            "path": "/opt/homebrew/Cellar/odin/2026-05/libexec/vendor"
+        }
+    ],
+    "odin_command": "odin",
+    "enable_document_symbols": true,
+    "enable_hover": true,
+    "enable_snippets": true,
+    "enable_semantic_tokens": true,
+    "enable_inlay_hints": true,
+    "enable_checker_only_saved": true,
+    "checker_args": "-vet -strict-style",
+    "profile": "default"
+}
