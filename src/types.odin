@@ -90,6 +90,8 @@ Enemy :: struct {
 
 // ─── Items ────────────────────────────────────────────────────────────────────
 
+MAX_INVENTORY :: 9
+
 Item_Type :: enum {
 	Health_Potion,
 	Torch,
@@ -101,6 +103,11 @@ Item :: struct {
 	glyph:     rune,
 	color:     rl.Color,
 	picked_up: bool,
+}
+
+Inventory_Slot :: struct {
+	occupied: bool,
+	item:     Item,
 }
 
 // ─── Lighting (hook for S03) ──────────────────────────────────────────────────
@@ -116,6 +123,7 @@ Light_Source :: struct {
 Game_State :: enum {
 	Playing,
 	Game_Over,
+	Viewing_Inventory,
 }
 
 DMAP_UNREACHABLE :: 9999
@@ -129,6 +137,7 @@ Game :: struct {
 	rooms:         [dynamic]Room,
 	enemies:       [dynamic]Enemy,
 	items:         [dynamic]Item,
+	inventory:     [MAX_INVENTORY]Inventory_Slot,
 	light_sources: [dynamic]Light_Source,
 	depth:         int,
 	turn_count:    int,
