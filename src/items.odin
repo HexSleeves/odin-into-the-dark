@@ -53,6 +53,27 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 	return nil
 }
 
+// ─── Render items on visible tiles ────────────────────────────────────────────
+
+render_items :: proc(game: ^Game) {
+	for &item in game.items {
+		if item.picked_up { continue }
+
+		// Only render items on visible tiles
+		tile := tile_at(game, item.pos.x, item.pos.y)
+		if tile == nil || !tile.visible { continue }
+
+		ix := i32(item.pos.x * TILE_SIZE)
+		iy := i32(item.pos.y * TILE_SIZE)
+		font_size :: i32(TILE_SIZE)
+		glyph_buf: [2]u8
+		glyph_buf[0] = u8(item.glyph)
+		glyph_buf[1] = 0
+		glyph_cstr := cast(cstring)&glyph_buf[0]
+		rl.DrawText(glyph_cstr, ix, iy, font_size, item.color)
+	}
+}
+
 // ─── Spawn items into rooms ───────────────────────────────────────────────────
 
 spawn_items :: proc(game: ^Game) {

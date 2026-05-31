@@ -30,6 +30,12 @@ main :: proc() {
 				process_enemy_turns(game)
 				remove_dead_enemies(game)
 				compute_fov(game)
+
+				// Announce item on player's tile
+				it := item_at(game, game.player.pos.x, game.player.pos.y)
+				if it != nil {
+					add_message(game, fmt.tprintf("You see a %s here.", item_type_name(it.item_type)), rl.Color{255, 255, 100, 255})
+				}
 			}
 		} else if game.state == .Game_Over {
 			if rl.IsKeyPressed(.R) {

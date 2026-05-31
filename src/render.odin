@@ -183,6 +183,7 @@ render_game :: proc(game: ^Game) {
 	rl.ClearBackground(rl.BLACK)
 
 	render_map(game)
+	render_items(game)
 	render_enemies(game)
 	render_player(game)
 	render_hud(game)
