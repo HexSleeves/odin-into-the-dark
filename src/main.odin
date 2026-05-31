@@ -17,6 +17,7 @@ main :: proc() {
 	fmt.printfln("Seed: %v", game.seed)
 
 	compute_fov(game)
+	add_message(game, "Welcome to the depths. Tread carefully...", rl.Color{200, 200, 100, 255})
 
 	for !rl.WindowShouldClose() {
 		// ── Update ──
@@ -36,7 +37,7 @@ main :: proc() {
 				game^ = {}
 				game_reinit(game)
 				compute_fov(game)
-				fmt.printfln("[restart] new game started")
+				add_message(game, "A new journey begins...", rl.Color{200, 200, 100, 255})
 			}
 			if rl.IsKeyPressed(.ESCAPE) {
 				break

@@ -92,6 +92,5 @@ descend :: proc(game: ^Game) {
 	// Recompute FOV for new floor
 	compute_fov(game)
 
-	fmt.printfln("[descent] descended to depth %v (light_radius=%v, enemies=%v)",
-		game.depth, game.player.light_radius, len(game.enemies))
+	add_message(game, fmt.tprintf("You descend to depth %d...", game.depth), rl.Color{0, 200, 200, 255})
 }
