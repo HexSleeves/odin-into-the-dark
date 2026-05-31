@@ -16,6 +16,7 @@ item_make :: proc(itype: Item_Type, pos: Vec2) -> Item {
 			glyph = '!',
 			color = rl.Color{255, 80, 80, 255},
 			picked_up = false,
+			quantity = 1,
 		}
 	case .Torch:
 		return Item {
@@ -24,6 +25,7 @@ item_make :: proc(itype: Item_Type, pos: Vec2) -> Item {
 			glyph = 't',
 			color = rl.Color{255, 180, 50, 255},
 			picked_up = false,
+			quantity = 1,
 		}
 	}
 	// Unreachable but satisfies compiler
@@ -40,6 +42,22 @@ item_type_name :: proc(itype: Item_Type) -> string {
 		return "Torch"
 	}
 	return "Unknown"
+}
+
+// ─── Stack limits per item type ───────────────────────────────────────────────
+// Returns the maximum stack size. A value of 1 means the item does not stack.
+
+item_stack_limit :: proc(itype: Item_Type) -> int {
+	switch itype {
+	case .Health_Potion: return 3
+	case .Torch:         return 1
+	}
+	return 1
+}
+
+// Returns whether this item type is allowed to stack in inventory.
+item_is_stackable :: proc(itype: Item_Type) -> bool {
+	return item_stack_limit(itype) > 1
 }
 
 // ─── Find item at position ────────────────────────────────────────────────────
@@ -62,7 +80,27 @@ pickup_item :: proc(game: ^Game) -> bool {
 		return false
 	}
 
-	// Find first empty inventory slot
+	itype := it.item_type
+	stack_limit := item_stack_limit(itype)
+
+	// Only stackable items can merge into existing stacks
+	if item_is_stackable(itype) {
+		for i in 0 ..< MAX_INVENTORY {
+			slot := &game.inventory[i]
+			if slot.occupied && slot.item.item_type == itype && slot.item.quantity < stack_limit {
+				slot.item.quantity += 1
+				it.picked_up = true
+				add_message(
+					game,
+					fmt.tprintf("Picked up %s (%d/%d).", item_type_name(itype), slot.item.quantity, stack_limit),
+					rl.Color{100, 255, 100, 255},
+				)
+				return true
+			}
+		}
+	}
+
+	// Find first empty inventory slot for a new stack
 	slot_idx := -1
 	for i in 0 ..< MAX_INVENTORY {
 		if !game.inventory[i].occupied {
@@ -76,14 +114,15 @@ pickup_item :: proc(game: ^Game) -> bool {
 		return false
 	}
 
-	// Copy item into slot and mark map item as picked up
+	// Copy item into slot as a new stack of 1 and mark map item as picked up
 	game.inventory[slot_idx].occupied = true
 	game.inventory[slot_idx].item = it^
+	game.inventory[slot_idx].item.quantity = 1
 	it.picked_up = true
 
 	add_message(
 		game,
-		fmt.tprintf("Picked up %s.", item_type_name(it.item_type)),
+		fmt.tprintf("Picked up %s.", item_type_name(itype)),
 		rl.Color{100, 255, 100, 255},
 	)
 	return true
@@ -108,7 +147,7 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 		game.player.hp = min(game.player.hp + heal_amount, game.player.max_hp)
 		add_message(
 			game,
-			fmt.tprintf("You use the Health Potion. Restored %d HP.", actual_heal),
+			fmt.tprintf("You use a Health Potion. Restored %d HP.", actual_heal),
 			rl.Color{100, 255, 100, 255},
 		)
 	case .Torch:
@@ -116,13 +155,16 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 		game.player.light_radius = min(game.player.light_radius + radius_boost, 10)
 		add_message(
 			game,
-			"You use the Torch. Light radius increased.",
+			"You use a Torch. Light radius increased.",
 			rl.Color{255, 180, 50, 255},
 		)
 	}
 
-	// Clear the slot
-	game.inventory[slot_index] = {}
+	// Decrement stack quantity; clear slot only when empty
+	game.inventory[slot_index].item.quantity -= 1
+	if game.inventory[slot_index].item.quantity <= 0 {
+		game.inventory[slot_index] = {}
+	}
 	return true
 }
 
