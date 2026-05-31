@@ -19,6 +19,9 @@ main :: proc() {
 	compute_fov(game)
 	add_message(game, "Welcome to the depths. Tread carefully...", rl.Color{200, 200, 100, 255})
 
+	// Disable default escape key to allow inventory to be closed with ESC
+	rl.SetExitKey(rl.KeyboardKey.KEY_NULL)
+
 	for !rl.WindowShouldClose() {
 		// ── Update ──
 		if game.state == .Playing {
@@ -44,7 +47,11 @@ main :: proc() {
 				// Announce item on player's tile
 				it := item_at(game, game.player.pos.x, game.player.pos.y)
 				if it != nil {
-					add_message(game, fmt.tprintf("You see a %s here.", item_type_name(it.item_type)), rl.Color{255, 255, 100, 255})
+					add_message(
+						game,
+						fmt.tprintf("You see a %s here.", item_type_name(it.item_type)),
+						rl.Color{255, 255, 100, 255},
+					)
 				}
 			}
 		} else if game.state == .Game_Over {
@@ -64,7 +71,17 @@ main :: proc() {
 				game.state = .Playing
 			}
 			// Number keys 1-9 to use items
-			keys := [9]rl.KeyboardKey{.ONE, .TWO, .THREE, .FOUR, .FIVE, .SIX, .SEVEN, .EIGHT, .NINE}
+			keys := [9]rl.KeyboardKey {
+				.ONE,
+				.TWO,
+				.THREE,
+				.FOUR,
+				.FIVE,
+				.SIX,
+				.SEVEN,
+				.EIGHT,
+				.NINE,
+			}
 			for key, idx in keys {
 				if rl.IsKeyPressed(key) {
 					use_item(game, idx)

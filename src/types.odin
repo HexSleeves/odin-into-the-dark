@@ -4,16 +4,16 @@ import rl "vendor:raylib"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-TILE_SIZE      :: 16
-SCREEN_WIDTH   :: 1280
-SCREEN_HEIGHT  :: 960
-MAP_WIDTH      :: 80
-MAP_HEIGHT     :: 50
+TILE_SIZE :: 16
+SCREEN_WIDTH :: 1280
+SCREEN_HEIGHT :: 960
+MAP_WIDTH :: 80
+MAP_HEIGHT :: 50
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 
 MAX_MESSAGES :: 64
-MAX_MSG_LEN  :: 256
+MAX_MSG_LEN :: 256
 
 Message :: struct {
 	text:     [MAX_MSG_LEN]u8,

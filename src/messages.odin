@@ -4,11 +4,11 @@ import rl "vendor:raylib"
 
 // ─── Message panel layout ────────────────────────────────────────────────────
 
-MSG_PANEL_Y      :: i32(MAP_HEIGHT * TILE_SIZE + 48)
+MSG_PANEL_Y :: i32(MAP_HEIGHT * TILE_SIZE + 48)
 MSG_PANEL_HEIGHT :: i32(SCREEN_HEIGHT) - MSG_PANEL_Y
-MSG_FONT_SIZE    :: i32(14)
-MSG_LINE_HEIGHT  :: i32(16)
-MSG_MAX_VISIBLE  :: 7
+MSG_FONT_SIZE :: i32(14)
+MSG_LINE_HEIGHT :: i32(16)
+MSG_MAX_VISIBLE :: 7
 
 // ─── Add a message to the ring buffer ────────────────────────────────────────
 
@@ -48,7 +48,13 @@ render_messages :: proc(game: ^Game) {
 	log := &game.message_log
 
 	// Draw dark background for the message panel
-	rl.DrawRectangle(0, MSG_PANEL_Y, i32(SCREEN_WIDTH), MSG_PANEL_HEIGHT, rl.Color{15, 15, 20, 255})
+	rl.DrawRectangle(
+		0,
+		MSG_PANEL_Y,
+		i32(SCREEN_WIDTH),
+		MSG_PANEL_HEIGHT,
+		rl.Color{15, 15, 20, 255},
+	)
 
 	// Determine how many messages to show
 	visible_count := min(log.count, MSG_MAX_VISIBLE)
@@ -66,7 +72,7 @@ render_messages :: proc(game: ^Game) {
 		msg := &log.messages[msg_idx]
 
 		y := MSG_PANEL_Y + 4 + i32(i) * MSG_LINE_HEIGHT
-		text_cstr := transmute(cstring)&msg.text[0]
+		text_cstr := cast(cstring)&msg.text[0]
 		rl.DrawText(text_cstr, 8, y, MSG_FONT_SIZE, msg.color)
 	}
 }

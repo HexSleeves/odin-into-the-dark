@@ -5,24 +5,19 @@ import rl "vendor:raylib"
 
 // ─── Tile color constants ─────────────────────────────────────────────────────
 
-WALL_COLOR    :: rl.Color{40, 40, 45, 255}
-FLOOR_COLOR   :: rl.Color{139, 90, 43, 255}
-RUBBLE_COLOR  :: rl.Color{180, 160, 100, 255}
+WALL_COLOR :: rl.Color{40, 40, 45, 255}
+FLOOR_COLOR :: rl.Color{139, 90, 43, 255}
+RUBBLE_COLOR :: rl.Color{180, 160, 100, 255}
 DESCENT_COLOR :: rl.Color{0, 200, 200, 255}
-UNSEEN_COLOR  :: rl.Color{0, 0, 0, 255}
+UNSEEN_COLOR :: rl.Color{0, 0, 0, 255}
 
 // Dimming multiplier for explored-but-not-visible tiles (used in S03 FOV)
-EXPLORED_DIM  :: 0.4
+EXPLORED_DIM :: 0.4
 
 // ─── Tile color helpers ───────────────────────────────────────────────────────
 
 dim_color :: proc(c: rl.Color, factor: f32) -> rl.Color {
-	return rl.Color{
-		u8(f32(c.r) * factor),
-		u8(f32(c.g) * factor),
-		u8(f32(c.b) * factor),
-		c.a,
-	}
+	return rl.Color{u8(f32(c.r) * factor), u8(f32(c.g) * factor), u8(f32(c.b) * factor), c.a}
 }
 
 base_tile_color :: proc(type: Tile_Type) -> rl.Color {
@@ -89,11 +84,11 @@ render_player :: proc(game: ^Game) {
 
 render_enemies :: proc(game: ^Game) {
 	for &enemy in game.enemies {
-		if !enemy.alive { continue }
+		if !enemy.alive {continue}
 
 		// Only render enemies on visible tiles
 		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-		if tile == nil || !tile.visible { continue }
+		if tile == nil || !tile.visible {continue}
 
 		ex := i32(enemy.pos.x * TILE_SIZE)
 		ey := i32(enemy.pos.y * TILE_SIZE)
@@ -109,7 +104,7 @@ render_enemies :: proc(game: ^Game) {
 
 // ─── HUD rendering ────────────────────────────────────────────────────────────
 
-HUD_Y      :: i32(MAP_HEIGHT * TILE_SIZE + 4)
+HUD_Y :: i32(MAP_HEIGHT * TILE_SIZE + 4)
 HUD_HEIGHT :: i32(SCREEN_HEIGHT) - HUD_Y
 
 render_hud :: proc(game: ^Game) {
@@ -126,11 +121,22 @@ render_hud :: proc(game: ^Game) {
 	// Background (red)
 	rl.DrawRectangle(hp_x, hp_y, hp_bar_w, hp_bar_h, rl.Color{80, 20, 20, 255})
 	// Foreground (green)
-	rl.DrawRectangle(hp_x, hp_y, i32(f32(hp_bar_w) * hp_ratio), hp_bar_h, rl.Color{40, 180, 40, 255})
+	rl.DrawRectangle(
+		hp_x,
+		hp_y,
+		i32(f32(hp_bar_w) * hp_ratio),
+		hp_bar_h,
+		rl.Color{40, 180, 40, 255},
+	)
 
 	// HP text
-	rl.DrawText(rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
-		hp_x + 4, hp_y + 1, 14, rl.WHITE)
+	rl.DrawText(
+		rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
+		hp_x + 4,
+		hp_y + 1,
+		14,
+		rl.WHITE,
+	)
 
 	// Stats line
 	stats_y := hp_y + hp_bar_h + 4
@@ -138,12 +144,22 @@ render_hud :: proc(game: ^Game) {
 	// Count alive enemies
 	alive_count: i32 = 0
 	for &e in game.enemies {
-		if e.alive { alive_count += 1 }
+		if e.alive {alive_count += 1}
 	}
 
-	rl.DrawText(rl.TextFormat("Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv",
-		i32(game.depth), i32(game.player.light_radius), alive_count, i32(game.turn_count)),
-		hp_x, stats_y, 14, rl.Color{180, 180, 180, 255})
+	rl.DrawText(
+		rl.TextFormat(
+			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv",
+			i32(game.depth),
+			i32(game.player.light_radius),
+			alive_count,
+			i32(game.turn_count),
+		),
+		hp_x,
+		stats_y,
+		14,
+		rl.Color{180, 180, 180, 255},
+	)
 }
 
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
@@ -175,9 +191,21 @@ render_inventory :: proc(game: ^Game) {
 		y_pos := i32(180) + i32(idx) * 28
 		if game.inventory[idx].occupied {
 			name := item_type_name(game.inventory[idx].item.item_type)
-			rl.DrawText(fmt.ctprintf("%d. %s", idx + 1, name), slot_x, y_pos, slot_size, game.inventory[idx].item.color)
+			rl.DrawText(
+				fmt.ctprintf("%d. %s", idx + 1, name),
+				slot_x,
+				y_pos,
+				slot_size,
+				game.inventory[idx].item.color,
+			)
 		} else {
-			rl.DrawText(fmt.ctprintf("%d. [empty]", idx + 1), slot_x, y_pos, slot_size, empty_color)
+			rl.DrawText(
+				fmt.ctprintf("%d. [empty]", idx + 1),
+				slot_x,
+				y_pos,
+				slot_size,
+				empty_color,
+			)
 		}
 	}
 }

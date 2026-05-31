@@ -10,11 +10,19 @@ import rl "vendor:raylib"
 resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 	damage := game.player.attack
 	enemy.hp -= damage
-	add_message(game, fmt.tprintf("You hit the %s for %d damage.", enemy_type_name(enemy.enemy_type), damage), rl.Color{200, 200, 200, 255})
+	add_message(
+		game,
+		fmt.tprintf("You hit the %s for %d damage.", enemy_type_name(enemy.enemy_type), damage),
+		rl.Color{200, 200, 200, 255},
+	)
 
 	if enemy.hp <= 0 {
 		enemy.alive = false
-		add_message(game, fmt.tprintf("The %s is killed!", enemy_type_name(enemy.enemy_type)), rl.Color{0, 255, 0, 255})
+		add_message(
+			game,
+			fmt.tprintf("The %s is killed!", enemy_type_name(enemy.enemy_type)),
+			rl.Color{0, 255, 0, 255},
+		)
 	}
 }
 
@@ -22,7 +30,11 @@ resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 resolve_attack_enemy_on_player :: proc(game: ^Game, enemy: ^Enemy) {
 	damage := enemy.attack
 	game.player.hp -= damage
-	add_message(game, fmt.tprintf("The %s hits you for %d damage!", enemy_type_name(enemy.enemy_type), damage), rl.Color{255, 100, 100, 255})
+	add_message(
+		game,
+		fmt.tprintf("The %s hits you for %d damage!", enemy_type_name(enemy.enemy_type), damage),
+		rl.Color{255, 100, 100, 255},
+	)
 
 	if game.player.hp <= 0 {
 		game.state = .Game_Over

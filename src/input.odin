@@ -7,10 +7,10 @@ import rl "vendor:raylib"
 // ─── Input result ─────────────────────────────────────────────────────────────
 
 Input_Result :: enum {
-	None,        // no action taken
-	Moved,       // player moved — turn consumed
-	Descended,   // player descended to next floor
-	Quit,        // escape pressed — signal to close
+	None, // no action taken
+	Moved, // player moved — turn consumed
+	Descended, // player descended to next floor
+	Quit, // escape pressed — signal to close
 }
 
 // ─── Input handling ───────────────────────────────────────────────────────────
@@ -92,5 +92,9 @@ descend :: proc(game: ^Game) {
 	// Recompute FOV for new floor
 	compute_fov(game)
 
-	add_message(game, fmt.tprintf("You descend to depth %d...", game.depth), rl.Color{0, 200, 200, 255})
+	add_message(
+		game,
+		fmt.tprintf("You descend to depth %d...", game.depth),
+		rl.Color{0, 200, 200, 255},
+	)
 }

@@ -6,11 +6,11 @@ import "core:slice"
 
 // ─── Generation constants ─────────────────────────────────────────────────────
 
-MIN_ROOM_W   :: 4
-MAX_ROOM_W   :: 10
-MIN_ROOM_H   :: 3
-MAX_ROOM_H   :: 8
-MAX_ROOMS    :: 12
+MIN_ROOM_W :: 4
+MAX_ROOM_W :: 10
+MIN_ROOM_H :: 3
+MAX_ROOM_H :: 8
+MAX_ROOMS :: 12
 ROOM_PADDING :: 1
 
 // ─── Room helpers ─────────────────────────────────────────────────────────────
@@ -21,10 +21,10 @@ room_center :: proc(r: Room) -> Vec2 {
 
 rooms_overlap :: proc(a, b: Room, padding: int) -> bool {
 	// Rooms overlap when their padded rectangles intersect
-	if a.x1 - padding >= b.x2 + padding { return false }
-	if b.x1 - padding >= a.x2 + padding { return false }
-	if a.y1 - padding >= b.y2 + padding { return false }
-	if b.y1 - padding >= a.y2 + padding { return false }
+	if a.x1 - padding >= b.x2 + padding {return false}
+	if b.x1 - padding >= a.x2 + padding {return false}
+	if a.y1 - padding >= b.y2 + padding {return false}
+	if b.y1 - padding >= a.y2 + padding {return false}
 	return true
 }
 
@@ -78,7 +78,7 @@ generate_map :: proc(game: ^Game) {
 	for _ in 0 ..< MAX_ROOMS {
 		w := rand.int_max(MAX_ROOM_W - MIN_ROOM_W + 1) + MIN_ROOM_W
 		h := rand.int_max(MAX_ROOM_H - MIN_ROOM_H + 1) + MIN_ROOM_H
-		x := rand.int_max(MAP_WIDTH - w - 1) + 1   // leave 1-tile border
+		x := rand.int_max(MAP_WIDTH - w - 1) + 1 // leave 1-tile border
 		y := rand.int_max(MAP_HEIGHT - h - 1) + 1
 
 		new_room := Room{x, y, x + w, y + h}

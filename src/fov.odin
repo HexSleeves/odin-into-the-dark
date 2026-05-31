@@ -1,7 +1,6 @@
 package main
 
 import "core:fmt"
-import "core:math"
 
 // ─── FOV computation (recursive shadowcasting) ───────────────────────────────
 //
@@ -10,15 +9,15 @@ import "core:math"
 
 // Octant multipliers: each octant transforms (row, col) into (dx, dy)
 @(private = "file")
-OCTANT_MULTIPLIERS :: [8][4]int{
-	{1, 0, 0, 1},    // octant 0
-	{0, 1, 1, 0},    // octant 1
-	{0, -1, 1, 0},   // octant 2
-	{-1, 0, 0, 1},   // octant 3
-	{-1, 0, 0, -1},  // octant 4
-	{0, -1, -1, 0},  // octant 5
-	{0, 1, -1, 0},   // octant 6
-	{1, 0, 0, -1},   // octant 7
+OCTANT_MULTIPLIERS :: [8][4]int {
+	{1, 0, 0, 1}, // octant 0
+	{0, 1, 1, 0}, // octant 1
+	{0, -1, 1, 0}, // octant 2
+	{-1, 0, 0, 1}, // octant 3
+	{-1, 0, 0, -1}, // octant 4
+	{0, -1, -1, 0}, // octant 5
+	{0, 1, -1, 0}, // octant 6
+	{1, 0, 0, -1}, // octant 7
 }
 
 // ─── Public entry point ──────────────────────────────────────────────────────

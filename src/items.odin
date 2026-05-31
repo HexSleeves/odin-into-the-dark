@@ -10,19 +10,19 @@ import rl "vendor:raylib"
 item_make :: proc(itype: Item_Type, pos: Vec2) -> Item {
 	switch itype {
 	case .Health_Potion:
-		return Item{
-			pos       = pos,
+		return Item {
+			pos = pos,
 			item_type = .Health_Potion,
-			glyph     = '!',
-			color     = rl.Color{255, 80, 80, 255},
+			glyph = '!',
+			color = rl.Color{255, 80, 80, 255},
 			picked_up = false,
 		}
 	case .Torch:
-		return Item{
-			pos       = pos,
+		return Item {
+			pos = pos,
 			item_type = .Torch,
-			glyph     = 't',
-			color     = rl.Color{255, 180, 50, 255},
+			glyph = 't',
+			color = rl.Color{255, 180, 50, 255},
 			picked_up = false,
 		}
 	}
@@ -81,7 +81,11 @@ pickup_item :: proc(game: ^Game) -> bool {
 	game.inventory[slot_idx].item = it^
 	it.picked_up = true
 
-	add_message(game, fmt.tprintf("Picked up %s.", item_type_name(it.item_type)), rl.Color{100, 255, 100, 255})
+	add_message(
+		game,
+		fmt.tprintf("Picked up %s.", item_type_name(it.item_type)),
+		rl.Color{100, 255, 100, 255},
+	)
 	return true
 }
 
@@ -102,11 +106,19 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 		heal_amount :: 8
 		actual_heal := min(heal_amount, game.player.max_hp - game.player.hp)
 		game.player.hp = min(game.player.hp + heal_amount, game.player.max_hp)
-		add_message(game, fmt.tprintf("You use the Health Potion. Restored %d HP.", actual_heal), rl.Color{100, 255, 100, 255})
+		add_message(
+			game,
+			fmt.tprintf("You use the Health Potion. Restored %d HP.", actual_heal),
+			rl.Color{100, 255, 100, 255},
+		)
 	case .Torch:
 		radius_boost :: 3
 		game.player.light_radius = min(game.player.light_radius + radius_boost, 10)
-		add_message(game, "You use the Torch. Light radius increased.", rl.Color{255, 180, 50, 255})
+		add_message(
+			game,
+			"You use the Torch. Light radius increased.",
+			rl.Color{255, 180, 50, 255},
+		)
 	}
 
 	// Clear the slot
@@ -118,11 +130,11 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 
 render_items :: proc(game: ^Game) {
 	for &item in game.items {
-		if item.picked_up { continue }
+		if item.picked_up {continue}
 
 		// Only render items on visible tiles
 		tile := tile_at(game, item.pos.x, item.pos.y)
-		if tile == nil || !tile.visible { continue }
+		if tile == nil || !tile.visible {continue}
 
 		ix := i32(item.pos.x * TILE_SIZE)
 		iy := i32(item.pos.y * TILE_SIZE)
@@ -163,16 +175,16 @@ spawn_items :: proc(game: ^Game) {
 			pos := Vec2{ix, iy}
 
 			// Reject invalid positions
-			if !is_walkable(game, ix, iy) { continue }
-			if pos == game.player.pos { continue }
+			if !is_walkable(game, ix, iy) {continue}
+			if pos == game.player.pos {continue}
 
 			// Don't place on descent tile
 			t := tile_at(game, ix, iy)
-			if t != nil && t.type == .Descent { continue }
+			if t != nil && t.type == .Descent {continue}
 
 			// Don't stack on enemies or other items
-			if enemy_at(game, ix, iy) != nil { continue }
-			if item_at(game, ix, iy) != nil { continue }
+			if enemy_at(game, ix, iy) != nil {continue}
+			if item_at(game, ix, iy) != nil {continue}
 
 			// 50/50 choice between Health_Potion and Torch
 			itype: Item_Type = .Health_Potion if rand.int_max(2) == 0 else .Torch
@@ -185,5 +197,10 @@ spawn_items :: proc(game: ^Game) {
 		_ = placed // suppress unused warning
 	}
 
-	fmt.printfln("[items] spawned %v items across %v rooms (depth=%v)", total, len(game.rooms) - 1, game.depth)
+	fmt.printfln(
+		"[items] spawned %v items across %v rooms (depth=%v)",
+		total,
+		len(game.rooms) - 1,
+		game.depth,
+	)
 }
