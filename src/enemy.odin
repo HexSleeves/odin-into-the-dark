@@ -32,45 +32,64 @@ enemy_make :: proc(id: string, pos: Vec2) -> Enemy {
 spawn_enemies :: proc(game: ^Game) {
 	clear(&game.enemies)
 
-	if len(game.rooms) < 2 {
-		return
-	}
+	if len(game.rooms) >= 2 {
+		// Room-based spawning: skip room 0 (player's room), 1-2 enemies per room
+		total := 0
+		for i in 1 ..< len(game.rooms) {
+			room := game.rooms[i]
+			count := rand.int_max(2) + 1 // 1 or 2
 
-	total := 0
+			for _ in 0 ..< count {
+				for _ in 0 ..< 20 {
+					ex := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
+					ey := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+					pos := Vec2{ex, ey}
 
-	// Skip room 0 (player's room), spawn 1-2 enemies per room
-	for i in 1 ..< len(game.rooms) {
-		room := game.rooms[i]
-		count := rand.int_max(2) + 1 // 1 or 2
+					if !is_walkable(game, ex, ey) {continue}
+					if pos == game.player.pos {continue}
+					if enemy_at(game, ex, ey) != nil {continue}
 
-		for _ in 0 ..< count {
-			// Pick random floor position inside room
-			for _ in 0 ..< 20 {
-				ex := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-				ey := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
-				pos := Vec2{ex, ey}
-
-				// Don't spawn on non-walkable, player, or other enemies
-				if !is_walkable(game, ex, ey) {continue}
-				if pos == game.player.pos {continue}
-				if enemy_at(game, ex, ey) != nil {continue}
-
-				def := pick_enemy_def_for_depth(game.depth)
-				if def != nil {
-					append(&game.enemies, enemy_make_from_def(def, pos))
-					total += 1
+					def := pick_enemy_def_for_depth(game.depth)
+					if def != nil {
+						append(&game.enemies, enemy_make_from_def(def, pos))
+						total += 1
+					}
+					break
 				}
-				break
 			}
 		}
-	}
+		fmt.printfln(
+			"[enemy] spawned %v enemies across %v rooms (depth=%v)",
+			total,
+			len(game.rooms) - 1,
+			game.depth,
+		)
+	} else {
+		// Cave layout: scatter enemies on random floor tiles
+		target := 4 + game.depth * 2
+		if target > 20 {target = 20}
 
-	fmt.printfln(
-		"[enemy] spawned %v enemies across %v rooms (depth=%v)",
-		total,
-		len(game.rooms) - 1,
-		game.depth,
-	)
+		spawned := 0
+		for _ in 0 ..< target * 10 {
+			if spawned >= target {break}
+			x := rand.int_max(MAP_WIDTH - 2) + 1
+			y := rand.int_max(MAP_HEIGHT - 2) + 1
+			if !is_walkable(game, x, y) {continue}
+			pos := Vec2{x, y}
+			if pos == game.player.pos {continue}
+			if enemy_at(game, x, y) != nil {continue}
+			// Don't spawn on descent
+			t := tile_at(game, x, y)
+			if t != nil && t.type == .Descent {continue}
+
+			def := pick_enemy_def_for_depth(game.depth)
+			if def != nil {
+				append(&game.enemies, enemy_make_from_def(def, pos))
+				spawned += 1
+			}
+		}
+		fmt.printfln("[enemy] spawned %v enemies (cave, depth=%v)", spawned, game.depth)
+	}
 }
 
 // ─── Find enemy at position ──────────────────────────────────────────────────

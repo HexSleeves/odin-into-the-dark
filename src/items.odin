@@ -223,6 +223,30 @@ spawn_items :: proc(game: ^Game) {
 	clear(&game.items)
 
 	if len(game.rooms) < 2 {
+		// Cave layout: scatter items on random floor tiles
+		target := 3 + game.depth
+		if target > 10 {target = 10}
+
+		spawned := 0
+		for _ in 0 ..< target * 10 {
+			if spawned >= target {break}
+			x := rand.int_max(MAP_WIDTH - 2) + 1
+			y := rand.int_max(MAP_HEIGHT - 2) + 1
+			if !is_walkable(game, x, y) {continue}
+			pos := Vec2{x, y}
+			if pos == game.player.pos {continue}
+			t := tile_at(game, x, y)
+			if t != nil && t.type == .Descent {continue}
+			if enemy_at(game, x, y) != nil {continue}
+			if item_at(game, x, y) != nil {continue}
+
+			def := pick_item_def()
+			if def != nil {
+				append(&game.items, item_make_from_def(def, pos))
+				spawned += 1
+			}
+		}
+		fmt.printfln("[items] spawned %v items (cave, depth=%v)", spawned, game.depth)
 		return
 	}
 

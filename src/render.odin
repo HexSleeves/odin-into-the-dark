@@ -3,16 +3,49 @@ package main
 import "core:fmt"
 import rl "vendor:raylib"
 
-// ─── Tile color constants ─────────────────────────────────────────────────────
+// ─── Depth palette definitions ────────────────────────────────────────────────
 
-WALL_COLOR :: rl.Color{40, 40, 45, 255}
-FLOOR_COLOR :: rl.Color{139, 90, 43, 255}
-RUBBLE_COLOR :: rl.Color{180, 160, 100, 255}
-DESCENT_COLOR :: rl.Color{0, 200, 200, 255}
+PALETTE_MINE :: Floor_Palette{
+	wall    = rl.Color{40, 40, 45, 255},
+	floor   = rl.Color{139, 90, 43, 255},
+	rubble  = rl.Color{180, 160, 100, 255},
+	descent = rl.Color{0, 200, 200, 255},
+}
+
+PALETTE_STONE :: Floor_Palette{
+	wall    = rl.Color{50, 50, 55, 255},
+	floor   = rl.Color{100, 100, 110, 255},
+	rubble  = rl.Color{130, 130, 120, 255},
+	descent = rl.Color{0, 200, 200, 255},
+}
+
+PALETTE_CRYSTAL :: Floor_Palette{
+	wall    = rl.Color{30, 45, 60, 255},
+	floor   = rl.Color{50, 90, 100, 255},
+	rubble  = rl.Color{80, 140, 130, 255},
+	descent = rl.Color{0, 255, 200, 255},
+}
+
+PALETTE_DEEP :: Floor_Palette{
+	wall    = rl.Color{35, 20, 45, 255},
+	floor   = rl.Color{70, 40, 80, 255},
+	rubble  = rl.Color{110, 60, 120, 255},
+	descent = rl.Color{200, 100, 255, 255},
+}
+
 UNSEEN_COLOR :: rl.Color{0, 0, 0, 255}
 
 // Dimming multiplier for explored-but-not-visible tiles (used in S03 FOV)
 EXPLORED_DIM :: 0.4
+
+// ─── Palette selection ────────────────────────────────────────────────────────
+
+palette_for_depth :: proc(depth: int) -> Floor_Palette {
+	if depth <= 2 { return PALETTE_MINE }
+	if depth <= 4 { return PALETTE_STONE }
+	if depth <= 7 { return PALETTE_CRYSTAL }
+	return PALETTE_DEEP
+}
 
 // ─── Tile color helpers ───────────────────────────────────────────────────────
 
@@ -20,26 +53,34 @@ dim_color :: proc(c: rl.Color, factor: f32) -> rl.Color {
 	return rl.Color{u8(f32(c.r) * factor), u8(f32(c.g) * factor), u8(f32(c.b) * factor), c.a}
 }
 
-base_tile_color :: proc(type: Tile_Type) -> rl.Color {
+base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 	#partial switch type {
 	case .Wall:
-		return WALL_COLOR
+		return palette.wall
 	case .Floor:
-		return FLOOR_COLOR
+		return palette.floor
 	case .Rubble:
-		return RUBBLE_COLOR
+		return palette.rubble
 	case .Descent:
-		return DESCENT_COLOR
+		return palette.descent
+	case .Water:
+		return rl.Color{40, 80, 180, 255}
+	case .Gas_Vent:
+		return rl.Color{160, 180, 40, 255}
+	case .Unstable:
+		return rl.Color{180, 120, 60, 255}
+	case .Chasm:
+		return rl.Color{10, 10, 15, 255}
 	}
 	return UNSEEN_COLOR
 }
 
-get_tile_color :: proc(tile: Tile) -> rl.Color {
+get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
 	if tile.visible {
-		return dim_color(base_tile_color(tile.type), max(tile.light_level, 0.3))
+		return dim_color(base_tile_color(tile.type, palette), max(tile.light_level, 0.3))
 	}
 	if tile.explored {
-		return dim_color(base_tile_color(tile.type), EXPLORED_DIM)
+		return dim_color(base_tile_color(tile.type, palette), EXPLORED_DIM)
 	}
 	return UNSEEN_COLOR
 }
@@ -49,6 +90,7 @@ get_tile_color :: proc(tile: Tile) -> rl.Color {
 render_map :: proc(game: ^Game) {
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
+	palette := game.palette
 
 	for y in 0 ..< MAP_HEIGHT {
 		for x in 0 ..< MAP_WIDTH {
@@ -60,7 +102,7 @@ render_map :: proc(game: ^Game) {
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			tile := game.tiles[pos_to_idx(x, y)]
-			color := get_tile_color(tile)
+			color := get_tile_color(tile, palette)
 			rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), color)
 		}
 	}
@@ -181,7 +223,7 @@ render_hud :: proc(game: ^Game) {
 
 	rl.DrawText(
 		rl.TextFormat(
-			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  .=Wait",
+			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  M=Map  .=Wait",
 			i32(game.depth),
 			i32(game.player.light_radius),
 			alive_count,
@@ -438,6 +480,70 @@ render_tooltip :: proc(game: ^Game) {
 	)
 }
 
+// ─── Minimap overlay ──────────────────────────────────────────────────────────
+
+MINIMAP_TILE_SIZE :: i32(2) // each map tile = 2x2 pixels on minimap
+MINIMAP_MARGIN :: i32(8)
+
+render_minimap :: proc(game: ^Game) {
+	// Position: top-right corner
+	mm_w := i32(MAP_WIDTH) * MINIMAP_TILE_SIZE
+	mm_h := i32(MAP_HEIGHT) * MINIMAP_TILE_SIZE
+	mm_x := i32(SCREEN_WIDTH) - mm_w - MINIMAP_MARGIN
+	mm_y := MINIMAP_MARGIN
+
+	// Semi-transparent background
+	rl.DrawRectangle(mm_x - 2, mm_y - 2, mm_w + 4, mm_h + 4, rl.Color{0, 0, 0, 180})
+
+	// Draw tiles
+	for y in 0 ..< MAP_HEIGHT {
+		for x in 0 ..< MAP_WIDTH {
+			tile := game.tiles[pos_to_idx(x, y)]
+
+			px := mm_x + i32(x) * MINIMAP_TILE_SIZE
+			py := mm_y + i32(y) * MINIMAP_TILE_SIZE
+
+			if tile.visible {
+				c: rl.Color
+				#partial switch tile.type {
+				case .Wall:    c = rl.Color{80, 80, 90, 255}
+				case .Floor:   c = rl.Color{160, 120, 60, 255}
+				case .Rubble:  c = rl.Color{140, 130, 90, 255}
+				case .Descent: c = rl.Color{0, 255, 255, 255}
+				case:          c = rl.Color{120, 100, 80, 255}
+				}
+				rl.DrawRectangle(px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
+			} else if tile.explored {
+				c: rl.Color
+				#partial switch tile.type {
+				case .Wall:    c = rl.Color{30, 30, 35, 255}
+				case .Floor:   c = rl.Color{60, 45, 25, 255}
+				case .Rubble:  c = rl.Color{55, 50, 35, 255}
+				case .Descent: c = rl.Color{0, 80, 80, 255}
+				case:          c = rl.Color{50, 40, 30, 255}
+				}
+				rl.DrawRectangle(px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
+			}
+			// Unseen tiles: don't draw (background shows through)
+		}
+	}
+
+	// Draw enemies on visible tiles as red dots
+	for &enemy in game.enemies {
+		if !enemy.alive {continue}
+		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
+		if tile == nil || !tile.visible {continue}
+		ex := mm_x + i32(enemy.pos.x) * MINIMAP_TILE_SIZE
+		ey := mm_y + i32(enemy.pos.y) * MINIMAP_TILE_SIZE
+		rl.DrawRectangle(ex, ey, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, rl.Color{255, 60, 60, 255})
+	}
+
+	// Draw player as bright yellow dot
+	player_px := mm_x + i32(game.player.pos.x) * MINIMAP_TILE_SIZE
+	player_py := mm_y + i32(game.player.pos.y) * MINIMAP_TILE_SIZE
+	rl.DrawRectangle(player_px, player_py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, rl.Color{255, 255, 0, 255})
+}
+
 // ─── Top-level render call ────────────────────────────────────────────────────
 
 render_game :: proc(game: ^Game) {
@@ -455,6 +561,10 @@ render_game :: proc(game: ^Game) {
 
 	render_hud(game)
 	render_messages(game)
+
+	if game.show_minimap && game.state == .Playing {
+		render_minimap(game)
+	}
 
 	if game.state == .Playing {
 		render_tooltip(game)

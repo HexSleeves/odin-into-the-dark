@@ -43,7 +43,23 @@ main :: proc() {
 				compute_fov(game)
 				camera_update(game)
 				add_message(game, "You break free from the web.", rl.Color{200, 200, 100, 255})
+			} else if game.water_slow_active {
+				// Water: costs an extra turn
+				game.water_slow_active = false
+				game.turn_count += 1
+				process_enemy_turns(game)
+				process_enemy_abilities(game)
+				remove_dead_enemies(game)
+				tick_timed_effects(game)
+				compute_fov(game)
+				camera_update(game)
+				add_message(game, "You push through the water.", rl.Color{40, 80, 180, 255})
 			} else {
+			// M key: toggle minimap
+			if rl.IsKeyPressed(.M) {
+				game.show_minimap = !game.show_minimap
+			}
+
 			// G key: pick up item (instant, no turn cost)
 			if rl.IsKeyPressed(.G) {
 				pickup_item(game)
@@ -54,6 +70,7 @@ main :: proc() {
 				game.state = .Viewing_Inventory
 			}
 
+			game.prev_player_pos = game.player.pos
 			result := handle_input(game)
 			if result == .Quit {
 				break
@@ -65,6 +82,32 @@ main :: proc() {
 					game.web_tiles[pidx] = false // consume the web
 					game.skip_next_turn = true
 					add_message(game, "You are stuck in a web!", rl.Color{180, 180, 180, 255})
+				}
+
+				// Hazard tile effects
+				cur_tile := tile_at(game, game.player.pos.x, game.player.pos.y)
+				if cur_tile != nil {
+					if cur_tile.type == .Water {
+						game.water_slow_active = true
+						add_message(game, "You wade through water...", rl.Color{40, 80, 180, 255})
+					}
+					if cur_tile.type == .Gas_Vent {
+						game.player.hp -= 2
+						add_message(game, "Toxic gas burns you! (-2 HP)", rl.Color{160, 180, 40, 255})
+						if game.player.hp <= 0 {
+							game.state = .Game_Over
+							add_message(game, "You have been slain...", rl.Color{255, 0, 0, 255})
+						}
+					}
+				}
+
+				// Unstable collapse: previous tile collapses into chasm
+				if game.prev_player_pos.x != game.player.pos.x || game.prev_player_pos.y != game.player.pos.y {
+					prev_tile := tile_at(game, game.prev_player_pos.x, game.prev_player_pos.y)
+					if prev_tile != nil && prev_tile.type == .Unstable {
+						prev_tile.type = .Chasm
+						add_message(game, "The ground collapses behind you!", rl.Color{180, 120, 60, 255})
+					}
 				}
 
 				process_enemy_turns(game)

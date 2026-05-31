@@ -94,14 +94,8 @@ descend :: proc(game: ^Game) {
 	// Reduce light radius with depth (min 3)
 	game.player.light_radius = max(g_data.player.light_radius - game.depth + 1, 3)
 
-	// Regenerate the map (clears tiles, places rooms, spawns enemies)
+	// Regenerate the map (clears tiles, web_tiles, rooms, spawns enemies)
 	generate_map(game)
-
-	// Clear web tiles and skip state for new floor
-	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-		game.web_tiles[i] = false
-	}
-	game.skip_next_turn = false
 
 	// Recompute FOV and camera for new floor
 	compute_fov(game)

@@ -53,6 +53,10 @@ Tile_Type :: enum {
 	Floor,
 	Rubble,
 	Descent,
+	Water,
+	Gas_Vent,
+	Unstable,
+	Chasm,
 }
 
 Tile :: struct {
@@ -136,6 +140,15 @@ Light_Source :: struct {
 	remaining_turns: int,
 }
 
+// ─── Floor Palette (depth-themed tile colors) ────────────────────────────────
+
+Floor_Palette :: struct {
+	wall:    rl.Color,
+	floor:   rl.Color,
+	rubble:  rl.Color,
+	descent: rl.Color,
+}
+
 // ─── Game State ───────────────────────────────────────────────────────────────
 
 Game_State :: enum {
@@ -180,4 +193,11 @@ Game :: struct {
 	equipped_helmet: Equipment,
 	// Equipment mode in inventory
 	equipping: bool,
+	// Depth-based floor palette
+	palette: Floor_Palette,
+	// Minimap toggle
+	show_minimap: bool,
+	// Hazard state
+	water_slow_active: bool, // player in water, costs next turn
+	prev_player_pos:   Vec2, // track previous position for unstable collapse
 }
