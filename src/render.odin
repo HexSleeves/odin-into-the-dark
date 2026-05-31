@@ -59,7 +59,7 @@ render_player :: proc(game: ^Game) {
 	glyph_buf: [2]u8
 	glyph_buf[0] = u8(game.player.glyph)
 	glyph_buf[1] = 0
-	glyph_cstr := transmute(cstring)&glyph_buf[0]
+	glyph_cstr := cast(cstring)&glyph_buf[0]
 	rl.DrawText(glyph_cstr, px, py, font_size, game.player.color)
 }
 
