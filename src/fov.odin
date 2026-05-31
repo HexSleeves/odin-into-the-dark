@@ -32,7 +32,7 @@ compute_fov :: proc(game: ^Game) {
 	// Player's tile is always visible
 	px := game.player.pos.x
 	py := game.player.pos.y
-	radius := game.player.light_radius
+	radius := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
 
 	player_tile := tile_at(game, px, py)
 	if player_tile != nil {

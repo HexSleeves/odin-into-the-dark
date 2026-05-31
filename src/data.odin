@@ -18,13 +18,20 @@ json5_color_to_rl :: proc(c: Color_Array) -> rl.Color {
 
 // ── Enemy data ──
 
+Ability_Def :: struct {
+	type:     string,
+	cooldown: int,
+	range:    int,
+}
+
 Enemy_Def :: struct {
-	id:     string,
-	name:   string,
-	glyph:  string,
-	color:  Color_Array,
-	hp:     int,
-	attack: int,
+	id:      string,
+	name:    string,
+	glyph:   string,
+	color:   Color_Array,
+	hp:      int,
+	attack:  int,
+	ability: Ability_Def,
 }
 
 Spawn_Weight :: struct {
@@ -49,15 +56,17 @@ Item_Effect :: struct {
 	type:       string,
 	value:      int,
 	max_radius: int, // optional, used by light_boost
+	duration:   int, // optional, used by timed_light_boost
 }
 
 Item_Def :: struct {
-	id:          string,
-	name:        string,
-	glyph:       string,
-	color:       Color_Array,
-	stack_limit: int,
-	effect:      Item_Effect,
+	id:             string,
+	name:           string,
+	glyph:          string,
+	color:          Color_Array,
+	stack_limit:    int,
+	effect:         Item_Effect,
+	equipment_slot: string,
 }
 
 Item_Spawn_Weight :: struct {
@@ -169,6 +178,10 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		color = json5_color_to_rl(def.color),
 		alive = true,
 		name = def.name,
+		ability_type = def.ability.type,
+		ability_cooldown = 0,
+		ability_max_cd = def.ability.cooldown,
+		ability_range = def.ability.range,
 	}
 }
 
@@ -221,6 +234,8 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		picked_up = false,
 		quantity = 1,
 		name = def.name,
+		equipment_slot = def.equipment_slot,
+		stat_bonus = def.effect.value,
 	}
 }
 
@@ -273,6 +288,20 @@ apply_item_effect :: proc(game: ^Game, def: ^Item_Def) {
 			game,
 			fmt.tprintf("You use a %s. Light radius increased.", def.name),
 			rl.Color{255, 180, 50, 255},
+		)
+	} else if eff.type == "timed_light_boost" {
+		game.light_boost_bonus = eff.value
+		game.light_boost_turns = eff.duration
+		add_message(
+			game,
+			"You apply lantern oil. Light burns brighter!",
+			rl.Color{255, 200, 80, 255},
+		)
+	} else if eff.type == "equip" {
+		add_message(
+			game,
+			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
+			rl.Color{180, 180, 180, 255},
 		)
 	} else {
 		add_message(

@@ -66,6 +66,32 @@ render_map :: proc(game: ^Game) {
 	}
 }
 
+// ─── Web tile rendering ───────────────────────────────────────────────────────
+
+render_webs :: proc(game: ^Game) {
+	ox := i32(game.camera_x)
+	oy := i32(game.camera_y)
+
+	for y in 0 ..< MAP_HEIGHT {
+		for x in 0 ..< MAP_WIDTH {
+			idx := pos_to_idx(x, y)
+			if !game.web_tiles[idx] {continue}
+
+			tile := &game.tiles[idx]
+			if !tile.visible {continue}
+
+			sx := i32(x * TILE_SIZE) - ox
+			sy := i32(y * TILE_SIZE) - oy
+
+			// Cull off-screen
+			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
+			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
+
+			rl.DrawText("w", sx, sy, i32(TILE_SIZE), rl.Color{180, 180, 180, 150})
+		}
+	}
+}
+
 // ─── Player rendering ─────────────────────────────────────────────────────────
 
 render_player :: proc(game: ^Game) {
@@ -166,6 +192,40 @@ render_hud :: proc(game: ^Game) {
 		14,
 		rl.Color{180, 180, 180, 255},
 	)
+
+	// Oil buff indicator
+	if game.light_boost_turns > 0 {
+		oil_text := rl.TextFormat("Oil: %dt", i32(game.light_boost_turns))
+		oil_x := hp_x + hp_bar_w + 16
+		rl.DrawText(oil_text, oil_x, hp_y + 1, 14, rl.Color{255, 200, 80, 255})
+	}
+
+	// Equipment indicators (right side of HUD)
+	eq_x := i32(hp_x) + 600
+	if game.equipped_weapon.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Wpn: %s (+%d)", game.equipped_weapon.item.name, game.equipped_weapon.item.stat_bonus),
+			eq_x, hp_y + 1, 14, rl.Color{200, 150, 80, 255},
+		)
+	} else {
+		rl.DrawText("Wpn: ---", eq_x, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
+	}
+	if game.equipped_armor.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Arm: %s (+%d)", game.equipped_armor.item.name, game.equipped_armor.item.stat_bonus),
+			eq_x, hp_y + 18, 14, rl.Color{100, 160, 200, 255},
+		)
+	} else {
+		rl.DrawText("Arm: ---", eq_x, hp_y + 18, 14, rl.Color{80, 80, 80, 255})
+	}
+	if game.equipped_helmet.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Hlm: %s (+%d)", game.equipped_helmet.item.name, game.equipped_helmet.item.stat_bonus),
+			eq_x + 200, hp_y + 1, 14, rl.Color{200, 200, 50, 255},
+		)
+	} else {
+		rl.DrawText("Hlm: ---", eq_x + 200, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
+	}
 }
 
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
@@ -179,11 +239,29 @@ render_inventory :: proc(game: ^Game) {
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
 	rl.DrawText(title, title_x, 100, title_size, rl.WHITE)
 
-	subtitle := cstring("Press 1-9 to use | I or ESC to close")
+	subtitle := cstring("Press 1-9 to use | D=Drop | E=Equip | I or ESC to close")
 	subtitle_size :: i32(14)
 	sub_w := rl.MeasureText(subtitle, subtitle_size)
 	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
 	rl.DrawText(subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
+
+	// Drop mode indicator
+	if game.dropping {
+		drop_text := cstring("[DROP MODE] Press 1-9 to drop")
+		drop_size :: i32(16)
+		drop_w := rl.MeasureText(drop_text, drop_size)
+		drop_x := (i32(SCREEN_WIDTH) - drop_w) / 2
+		rl.DrawText(drop_text, drop_x, 160, drop_size, rl.Color{255, 200, 80, 255})
+	}
+
+	// Equip mode indicator
+	if game.equipping {
+		equip_text := cstring("[EQUIP MODE] Press 1-9 to equip")
+		equip_size :: i32(16)
+		equip_w := rl.MeasureText(equip_text, equip_size)
+		equip_x := (i32(SCREEN_WIDTH) - equip_w) / 2
+		rl.DrawText(equip_text, equip_x, 160, equip_size, rl.Color{100, 200, 255, 255})
+	}
 
 	slot_size :: i32(16)
 	slot_x :: i32(440)
@@ -220,6 +298,43 @@ render_inventory :: proc(game: ^Game) {
 				empty_color,
 			)
 		}
+	}
+
+	// Equipment section
+	eq_y := i32(180) + i32(MAX_INVENTORY) * 28 + 20
+	rl.DrawText("EQUIPMENT", slot_x, eq_y, 18, rl.Color{200, 200, 100, 255})
+	eq_y += 24
+
+	// Weapon
+	if game.equipped_weapon.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Weapon: %s (+%d atk)", game.equipped_weapon.item.name, game.equipped_weapon.item.stat_bonus),
+			slot_x, eq_y, slot_size, rl.Color{200, 150, 80, 255},
+		)
+	} else {
+		rl.DrawText("Weapon: [empty]", slot_x, eq_y, slot_size, empty_color)
+	}
+	eq_y += 22
+
+	// Armor
+	if game.equipped_armor.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Armor:  %s (+%d def)", game.equipped_armor.item.name, game.equipped_armor.item.stat_bonus),
+			slot_x, eq_y, slot_size, rl.Color{100, 160, 200, 255},
+		)
+	} else {
+		rl.DrawText("Armor:  [empty]", slot_x, eq_y, slot_size, empty_color)
+	}
+	eq_y += 22
+
+	// Helmet
+	if game.equipped_helmet.occupied {
+		rl.DrawText(
+			fmt.ctprintf("Helmet: %s (+%d light)", game.equipped_helmet.item.name, game.equipped_helmet.item.stat_bonus),
+			slot_x, eq_y, slot_size, rl.Color{200, 200, 50, 255},
+		)
+	} else {
+		rl.DrawText("Helmet: [empty]", slot_x, eq_y, slot_size, empty_color)
 	}
 }
 
@@ -332,6 +447,7 @@ render_game :: proc(game: ^Game) {
 	// Clip the map rendering to the viewport region so it doesn't bleed into HUD/messages
 	rl.BeginScissorMode(0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
 	render_map(game)
+	render_webs(game)
 	render_items(game)
 	render_enemies(game)
 	render_player(game)

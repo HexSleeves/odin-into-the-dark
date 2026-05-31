@@ -97,6 +97,12 @@ descend :: proc(game: ^Game) {
 	// Regenerate the map (clears tiles, places rooms, spawns enemies)
 	generate_map(game)
 
+	// Clear web tiles and skip state for new floor
+	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+		game.web_tiles[i] = false
+	}
+	game.skip_next_turn = false
+
 	// Recompute FOV and camera for new floor
 	compute_fov(game)
 	camera_update(game)

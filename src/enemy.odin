@@ -84,6 +84,105 @@ enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 	return nil
 }
 
+// ─── A* pathfinding ──────────────────────────────────────────────────────────
+// Returns the next step from `start` toward `goal`, navigating around walls.
+// Only walls block; other enemies are ignored (they move).
+// Uses fixed-size arrays sized for MAP_WIDTH×MAP_HEIGHT (4000 tiles).
+
+ASTAR_MAX_ITER :: 2000
+ASTAR_INF :: 999_999
+
+astar_next_step :: proc(game: ^Game, start, goal: Vec2) -> (next: Vec2, found: bool) {
+	MAP_SIZE :: MAP_WIDTH * MAP_HEIGHT
+
+	start_idx := pos_to_idx(start.x, start.y)
+	goal_idx := pos_to_idx(goal.x, goal.y)
+
+	if start_idx == goal_idx {
+		return start, false
+	}
+
+	g_score: [MAP_SIZE]int
+	f_score: [MAP_SIZE]int
+	came_from: [MAP_SIZE]int
+	in_open: [MAP_SIZE]bool
+	in_closed: [MAP_SIZE]bool
+
+	for i in 0 ..< MAP_SIZE {
+		g_score[i] = ASTAR_INF
+		f_score[i] = ASTAR_INF
+		came_from[i] = -1
+	}
+
+	g_score[start_idx] = 0
+	f_score[start_idx] = abs(start.x - goal.x) + abs(start.y - goal.y)
+	in_open[start_idx] = true
+
+	DX :: [4]int{0, 0, -1, 1}
+	DY :: [4]int{-1, 1, 0, 0}
+
+	for _ in 0 ..< ASTAR_MAX_ITER {
+		// Find open node with lowest f_score
+		current := -1
+		best_f := ASTAR_INF + 1
+		for i in 0 ..< MAP_SIZE {
+			if in_open[i] && f_score[i] < best_f {
+				best_f = f_score[i]
+				current = i
+			}
+		}
+
+		if current == -1 {
+			return start, false // Open set empty, no path
+		}
+
+		if current == goal_idx {
+			// Trace back from goal to the step right after start
+			step := goal_idx
+			for came_from[step] != start_idx && came_from[step] != -1 {
+				step = came_from[step]
+			}
+			if came_from[step] == start_idx {
+				return idx_to_pos(step), true
+			}
+			return start, false // Safety: broken chain
+		}
+
+		in_open[current] = false
+		in_closed[current] = true
+
+		cur_pos := idx_to_pos(current)
+		dx := DX
+		dy := DY
+
+		for dir in 0 ..< 4 {
+			nx := cur_pos.x + dx[dir]
+			ny := cur_pos.y + dy[dir]
+
+			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
+			if !is_walkable(game, nx, ny) {
+				// Allow the goal tile even if it's the player's position
+				// (player tile is always walkable floor, so this mainly guards walls)
+				if pos_to_idx(nx, ny) != goal_idx {continue}
+			}
+
+			neighbor_idx := pos_to_idx(nx, ny)
+			if in_closed[neighbor_idx] {continue}
+
+			tentative_g := g_score[current] + 1
+
+			if tentative_g < g_score[neighbor_idx] {
+				came_from[neighbor_idx] = current
+				g_score[neighbor_idx] = tentative_g
+				f_score[neighbor_idx] = tentative_g + abs(nx - goal.x) + abs(ny - goal.y)
+				in_open[neighbor_idx] = true
+			}
+		}
+	}
+
+	return start, false // Max iterations hit
+}
+
 // ─── Dijkstra map (BFS flood-fill from player) ──────────────────────────────
 
 compute_dijkstra_map :: proc(game: ^Game) {
@@ -160,39 +259,32 @@ process_enemy_turns :: proc(game: ^Game) {
 
 @(private = "file")
 chase_player :: proc(game: ^Game, enemy: ^Enemy) {
-	best_x := enemy.pos.x
-	best_y := enemy.pos.y
-	best_dist := game.dijkstra_map[pos_to_idx(enemy.pos.x, enemy.pos.y)]
-
+	// 1. Check if adjacent to player -> attack
 	DX :: [4]int{0, 0, -1, 1}
 	DY :: [4]int{-1, 1, 0, 0}
-
 	dx := DX
 	dy := DY
 	for dir in 0 ..< 4 {
 		nx := enemy.pos.x + dx[dir]
 		ny := enemy.pos.y + dy[dir]
-
-		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
-
 		if nx == game.player.pos.x && ny == game.player.pos.y {
 			resolve_attack_enemy_on_player(game, enemy)
 			return
 		}
-
-		if !is_walkable(game, nx, ny) {continue}
-		if enemy_at(game, nx, ny) != nil {continue}
-
-		dist := game.dijkstra_map[pos_to_idx(nx, ny)]
-		if dist < best_dist {
-			best_dist = dist
-			best_x = nx
-			best_y = ny
-		}
 	}
 
-	enemy.pos.x = best_x
-	enemy.pos.y = best_y
+	// 2. Use A* to find next step toward player
+	next, ok := astar_next_step(game, enemy.pos, game.player.pos)
+	if ok {
+		// 3. Only move if the tile isn't occupied by another enemy
+		if enemy_at(game, next.x, next.y) == nil {
+			enemy.pos = next
+		}
+		return
+	}
+
+	// 4. A* failed (unreachable) - fall back to wander
+	wander(game, enemy)
 }
 
 // ─── Wander behavior (random movement) ──────────────────────────────────────
@@ -218,6 +310,87 @@ wander :: proc(game: ^Game, enemy: ^Enemy) {
 
 	enemy.pos.x = nx
 	enemy.pos.y = ny
+}
+
+// ─── Process special abilities ───────────────────────────────────────────────
+
+process_enemy_abilities :: proc(game: ^Game) {
+	for &enemy in game.enemies {
+		if !enemy.alive {continue}
+		if enemy.ability_type == "" {continue}
+
+		// Decrement cooldown
+		if enemy.ability_cooldown > 0 {
+			enemy.ability_cooldown -= 1
+			continue
+		}
+
+		if enemy.ability_type == "web" {
+			// Web: place web on a floor tile adjacent to enemy if player is nearby
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist <= 3 {
+				DX :: [4]int{0, 0, -1, 1}
+				DY :: [4]int{-1, 1, 0, 0}
+				dx := DX
+				dy := DY
+				for dir in 0 ..< 4 {
+					wx := enemy.pos.x + dx[dir]
+					wy := enemy.pos.y + dy[dir]
+					if is_walkable(game, wx, wy) && !game.web_tiles[pos_to_idx(wx, wy)] {
+						game.web_tiles[pos_to_idx(wx, wy)] = true
+						enemy.ability_cooldown = enemy.ability_max_cd
+						add_message(
+							game,
+							fmt.tprintf("The %s spins a web!", enemy_display_name(&enemy)),
+							rl.Color{100, 200, 100, 255},
+						)
+						break
+					}
+				}
+			}
+		} else if enemy.ability_type == "pull" {
+			// Pull: if player is in LOS within range but not adjacent, pull 1 tile closer
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist >= 2 && dist <= enemy.ability_range {
+				etile := tile_at(game, enemy.pos.x, enemy.pos.y)
+				if etile != nil && etile.visible {
+					// Pull player 1 tile toward enemy along the longer axis
+					pull_dx := 0
+					pull_dy := 0
+					if enemy.pos.x > game.player.pos.x {
+						pull_dx = 1
+					} else if enemy.pos.x < game.player.pos.x {
+						pull_dx = -1
+					}
+					if enemy.pos.y > game.player.pos.y {
+						pull_dy = 1
+					} else if enemy.pos.y < game.player.pos.y {
+						pull_dy = -1
+					}
+
+					// Only pull along one axis (prefer the longer distance)
+					if abs(enemy.pos.x - game.player.pos.x) >= abs(enemy.pos.y - game.player.pos.y) {
+						pull_dy = 0
+					} else {
+						pull_dx = 0
+					}
+
+					new_x := game.player.pos.x + pull_dx
+					new_y := game.player.pos.y + pull_dy
+					if is_walkable(game, new_x, new_y) && enemy_at(game, new_x, new_y) == nil {
+						game.player.pos.x = new_x
+						game.player.pos.y = new_y
+						enemy.ability_cooldown = enemy.ability_max_cd
+						add_message(
+							game,
+							"The Deep Watcher pulls you closer!",
+							rl.Color{180, 50, 220, 255},
+						)
+					}
+				}
+			}
+		}
+	}
 }
 
 // ─── Remove dead enemies ────────────────────────────────────────────────────

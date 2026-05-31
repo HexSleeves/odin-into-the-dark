@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 
 // Player attacks enemy (bump-to-attack from input)
 resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
-	damage := game.player.attack
+	damage := effective_attack(game)
 	enemy.hp -= damage
 	add_message(
 		game,
@@ -29,7 +29,7 @@ resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 
 // Enemy attacks player
 resolve_attack_enemy_on_player :: proc(game: ^Game, enemy: ^Enemy) {
-	damage := enemy.attack
+	damage := max(enemy.attack - effective_defense(game), 1)
 	game.player.hp -= damage
 	add_message(
 		game,

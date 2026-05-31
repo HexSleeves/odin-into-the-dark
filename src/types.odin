@@ -77,15 +77,20 @@ Player :: struct {
 // ─── Enemies ──────────────────────────────────────────────────────────────────
 
 Enemy :: struct {
-	pos:        Vec2,
-	hp:         int,
-	max_hp:     int,
-	attack:     int,
-	enemy_type: string, // data-driven ID (e.g. "rat", "cave_crawler")
-	name:       string, // display name from data
-	glyph:      rune,
-	color:      rl.Color,
-	alive:      bool,
+	pos:              Vec2,
+	hp:               int,
+	max_hp:           int,
+	attack:           int,
+	enemy_type:       string, // data-driven ID (e.g. "rat", "cave_crawler")
+	name:             string, // display name from data
+	glyph:            rune,
+	color:            rl.Color,
+	alive:            bool,
+	// Special ability fields (data-driven)
+	ability_type:     string, // "web", "pull", or "" for none
+	ability_cooldown: int,    // current cooldown (decrements each turn)
+	ability_max_cd:   int,    // max cooldown for reset
+	ability_range:    int,    // range of the ability
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────
@@ -98,11 +103,27 @@ Item :: struct {
 	name:      string, // display name from data
 	glyph:     rune,
 	color:     rl.Color,
-	picked_up: bool,
-	quantity:  int,
+	picked_up:      bool,
+	quantity:       int,
+	equipment_slot: string, // "", "weapon", "armor", "helmet"
+	stat_bonus:     int,    // bonus value when equipped
 }
 
 Inventory_Slot :: struct {
+	occupied: bool,
+	item:     Item,
+}
+
+// ─── Equipment ────────────────────────────────────────────────────────────────
+
+Equipment_Slot :: enum {
+	None,
+	Weapon,
+	Armor,
+	Helmet,
+}
+
+Equipment :: struct {
 	occupied: bool,
 	item:     Item,
 }
@@ -145,4 +166,18 @@ Game :: struct {
 	// Camera offset: pixel position of top-left corner of the viewport in map-space
 	camera_x:      int,
 	camera_y:      int,
+	// Timed light boost (from lantern oil)
+	light_boost_bonus: int,
+	light_boost_turns: int,
+	// Inventory drop mode
+	dropping: bool,
+	// Web tiles (Cave Crawler ability)
+	web_tiles:      [MAP_WIDTH * MAP_HEIGHT]bool,
+	skip_next_turn: bool, // player stuck in web
+	// Equipment slots
+	equipped_weapon: Equipment,
+	equipped_armor:  Equipment,
+	equipped_helmet: Equipment,
+	// Equipment mode in inventory
+	equipping: bool,
 }

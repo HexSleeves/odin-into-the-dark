@@ -25,6 +25,7 @@
       color: [100, 200, 100, 255],
       hp: 10,
       attack: 4,
+      ability: { type: "web", cooldown: 4, range: 1 },
     },
     {
       id: "deep_watcher",
@@ -33,6 +34,7 @@
       color: [180, 50, 220, 255],
       hp: 15,
       attack: 6,
+      ability: { type: "pull", cooldown: 5, range: 4 },
     },
   ],
 

@@ -25,13 +25,69 @@
         max_radius: 10,
       },
     },
+    {
+      id: "lantern_oil",
+      name: "Lantern Oil",
+      glyph: "o",
+      color: [255, 200, 80, 255],
+      stack_limit: 3,
+      effect: {
+        type: "timed_light_boost",
+        value: 3,
+        duration: 15,
+        max_radius: 12,
+      },
+    },
+    {
+      id: "bandage",
+      name: "Bandage",
+      glyph: "+",
+      color: [200, 200, 200, 255],
+      stack_limit: 5,
+      effect: {
+        type: "heal",
+        value: 4,
+      },
+    },
+    {
+      id: "rusty_pickaxe",
+      name: "Rusty Pickaxe",
+      glyph: "P",
+      color: [180, 130, 80, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 2 },
+      equipment_slot: "weapon",
+    },
+    {
+      id: "leather_vest",
+      name: "Leather Vest",
+      glyph: "V",
+      color: [139, 90, 43, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 1 },
+      equipment_slot: "armor",
+    },
+    {
+      id: "miners_helmet",
+      name: "Miner's Helmet",
+      glyph: "H",
+      color: [200, 200, 50, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 1 },
+      equipment_slot: "helmet",
+    },
   ],
 
   // Spawn weights per item when placing in rooms.
   // Equal weight = equal chance. These are relative.
   spawn_weights: [
-    { id: "health_potion", weight: 50 },
-    { id: "torch", weight: 50 },
+    { id: "health_potion", weight: 35 },
+    { id: "torch", weight: 25 },
+    { id: "lantern_oil", weight: 20 },
+    { id: "bandage", weight: 20 },
+    { id: "rusty_pickaxe", weight: 8 },
+    { id: "leather_vest", weight: 8 },
+    { id: "miners_helmet", weight: 8 },
   ],
 
   // Probability (0-100) that a room gets an item
