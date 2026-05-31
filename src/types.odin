@@ -85,8 +85,11 @@ Game_State :: enum {
 	Game_Over,
 }
 
+DMAP_UNREACHABLE :: 9999
+
 Game :: struct {
 	tiles:         [MAP_WIDTH * MAP_HEIGHT]Tile,
+	dijkstra_map:  [MAP_WIDTH * MAP_HEIGHT]int,
 	map_width:     int,
 	map_height:    int,
 	player:        Player,

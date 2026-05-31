@@ -37,7 +37,7 @@ is_walkable :: proc(game: ^Game, x, y: int) -> bool {
 
 // ─── Game initialization ─────────────────────────────────────────────────────
 
-game_init :: proc() -> Game {
+game_init :: proc() -> ^Game {
 	// Derive seed from current time
 	seed := u64(time.time_to_unix_nano(time.now()))
 
@@ -46,7 +46,8 @@ game_init :: proc() -> Game {
 	// Initialize RNG (used later by proc-gen in S02; seeded now for R014)
 	rand.reset(seed)
 
-	game: Game
+	// Allocate on heap — Game struct is ~112KB with fixed-size arrays
+	game := new(Game)
 
 	game.seed = seed
 	game.map_width = MAP_WIDTH
@@ -72,15 +73,53 @@ game_init :: proc() -> Game {
 	game.light_sources = make([dynamic]Light_Source)
 
 	// Procedurally generate the mine floor (sets player pos, descent, rooms)
-	generate_map(&game)
+	generate_map(game)
 
 	return game
 }
 
+// ─── Reinitialize in place (for restart) ─────────────────────────────────────
+
+game_reinit :: proc(game: ^Game) {
+	seed := u64(time.time_to_unix_nano(time.now()))
+	fmt.printfln("[init] seed = %v", seed)
+	rand.reset(seed)
+
+	game.seed = seed
+	game.map_width = MAP_WIDTH
+	game.map_height = MAP_HEIGHT
+	game.depth = 1
+	game.turn_count = 0
+	game.state = .Playing
+
+	game.player = Player {
+		pos          = Vec2{0, 0},
+		hp           = 20,
+		max_hp       = 20,
+		attack       = 5,
+		light_radius = 8,
+		glyph        = '@',
+		color        = rl.YELLOW,
+	}
+
+	game.rooms = make([dynamic]Room)
+	game.enemies = make([dynamic]Enemy)
+	game.light_sources = make([dynamic]Light_Source)
+
+	generate_map(game)
+}
+
 // ─── Cleanup ──────────────────────────────────────────────────────────────────
 
-game_destroy :: proc(game: ^Game) {
+// Release dynamic allocations (rooms, enemies, light_sources)
+game_cleanup :: proc(game: ^Game) {
 	delete(game.rooms)
 	delete(game.enemies)
 	delete(game.light_sources)
+}
+
+// Full destroy — cleanup + free heap allocation
+game_destroy :: proc(game: ^Game) {
+	game_cleanup(game)
+	free(game)
 }

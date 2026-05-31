@@ -161,4 +161,7 @@ generate_map :: proc(game: ^Game) {
 		descent_pos.x,
 		descent_pos.y,
 	)
+
+	// (j) Spawn enemies in rooms (after map is complete)
+	spawn_enemies(game)
 }
