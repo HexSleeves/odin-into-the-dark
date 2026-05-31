@@ -1,6 +1,6 @@
 // Player starting stats
 {
-  hp: 20,
+  hp: 25,
   attack: 5,
   light_radius: 8,
   glyph: "@",

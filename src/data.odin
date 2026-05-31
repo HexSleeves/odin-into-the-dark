@@ -303,6 +303,12 @@ apply_item_effect :: proc(game: ^Game, def: ^Item_Def) {
 			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
 			rl.Color{180, 180, 180, 255},
 		)
+	} else if eff.type == "material" {
+		add_message(
+			game,
+			"Raw materials cannot be used directly. Find an anvil to craft.",
+			rl.Color{180, 180, 100, 255},
+		)
 	} else {
 		add_message(
 			game,

@@ -10,7 +10,7 @@
       stack_limit: 3,
       effect: {
         type: "heal",
-        value: 8,
+        value: 10,  // was 8 — scales with new 25 max HP (40%)
       },
     },
     {
@@ -21,7 +21,7 @@
       stack_limit: 1,
       effect: {
         type: "light_boost",
-        value: 3,
+        value: 2,        // was 3 — less dominant, still useful
         max_radius: 10,
       },
     },
@@ -34,7 +34,7 @@
       effect: {
         type: "timed_light_boost",
         value: 3,
-        duration: 15,
+        duration: 12,    // was 15 — shorter window of power
         max_radius: 12,
       },
     },
@@ -46,9 +46,10 @@
       stack_limit: 5,
       effect: {
         type: "heal",
-        value: 4,
+        value: 5,  // was 4 — slightly better, 20% of max HP
       },
     },
+    // ── Tier 1 Equipment (shallow floors) ──
     {
       id: "rusty_pickaxe",
       name: "Rusty Pickaxe",
@@ -76,20 +77,109 @@
       effect: { type: "equip", value: 1 },
       equipment_slot: "helmet",
     },
+    // ── Tier 2 Equipment (deeper floors) ──
+    {
+      id: "steel_pickaxe",
+      name: "Steel Pickaxe",
+      glyph: "P",
+      color: [160, 180, 200, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 4 },
+      equipment_slot: "weapon",
+    },
+    {
+      id: "chainmail",
+      name: "Chainmail",
+      glyph: "V",
+      color: [140, 150, 160, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 2 },
+      equipment_slot: "armor",
+    },
+    {
+      id: "crystal_lamp",
+      name: "Crystal Lamp",
+      glyph: "H",
+      color: [100, 200, 220, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 2 },
+      equipment_slot: "helmet",
+    },
+    // ── Materials (from mining) ──
+    {
+      id: "iron_ore",
+      name: "Iron Ore",
+      glyph: "*",
+      color: [200, 120, 50, 255],
+      stack_limit: 5,
+      effect: { type: "material", value: 0 },
+    },
+    {
+      id: "copper_ore",
+      name: "Copper Ore",
+      glyph: "*",
+      color: [80, 180, 80, 255],
+      stack_limit: 5,
+      effect: { type: "material", value: 0 },
+    },
+    {
+      id: "crystal_shard",
+      name: "Crystal Shard",
+      glyph: "*",
+      color: [100, 150, 255, 255],
+      stack_limit: 5,
+      effect: { type: "material", value: 0 },
+    },
+    {
+      id: "gold_nugget",
+      name: "Gold Nugget",
+      glyph: "*",
+      color: [255, 215, 0, 255],
+      stack_limit: 5,
+      effect: { type: "material", value: 0 },
+    },
+    // ── Crafted items ──
+    {
+      id: "copper_shield",
+      name: "Copper Shield",
+      glyph: "V",
+      color: [80, 180, 80, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 1 },
+      equipment_slot: "armor",
+    },
+    {
+      id: "crystal_torch",
+      name: "Crystal Torch",
+      glyph: "t",
+      color: [100, 150, 255, 255],
+      stack_limit: 1,
+      effect: { type: "light_boost", value: 3, max_radius: 14 },
+    },
+    {
+      id: "golden_amulet",
+      name: "Golden Amulet",
+      glyph: "a",
+      color: [255, 215, 0, 255],
+      stack_limit: 1,
+      effect: { type: "heal", value: 99 },
+    },
   ],
 
-  // Spawn weights per item when placing in rooms.
-  // Equal weight = equal chance. These are relative.
+  // Spawn weights — tier 1 equipment common, tier 2 rare
   spawn_weights: [
-    { id: "health_potion", weight: 35 },
-    { id: "torch", weight: 25 },
-    { id: "lantern_oil", weight: 20 },
-    { id: "bandage", weight: 20 },
-    { id: "rusty_pickaxe", weight: 8 },
-    { id: "leather_vest", weight: 8 },
-    { id: "miners_helmet", weight: 8 },
+    { id: "health_potion", weight: 30 },
+    { id: "torch", weight: 20 },
+    { id: "lantern_oil", weight: 18 },
+    { id: "bandage", weight: 22 },
+    { id: "rusty_pickaxe", weight: 6 },
+    { id: "leather_vest", weight: 6 },
+    { id: "miners_helmet", weight: 6 },
+    { id: "steel_pickaxe", weight: 3 },
+    { id: "chainmail", weight: 3 },
+    { id: "crystal_lamp", weight: 3 },
   ],
 
   // Probability (0-100) that a room gets an item
-  room_item_chance: 50,
+  room_item_chance: 55,  // was 50 — slightly more generous for deeper content
 }

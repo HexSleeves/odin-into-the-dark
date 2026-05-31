@@ -66,8 +66,8 @@ spawn_enemies :: proc(game: ^Game) {
 		)
 	} else {
 		// Cave layout: scatter enemies on random floor tiles
-		target := 4 + game.depth * 2
-		if target > 20 {target = 20}
+		target := 3 + game.depth + game.depth / 2  // slower scaling
+		if target > 15 {target = 15}
 
 		spawned := 0
 		for _ in 0 ..< target * 10 {

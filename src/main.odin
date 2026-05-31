@@ -55,6 +55,51 @@ main :: proc() {
 				camera_update(game)
 				add_message(game, "You push through the water.", rl.Color{40, 80, 180, 255})
 			} else {
+			// Mining mode takes priority over all other input
+			if game.mining_mode {
+				if rl.IsKeyPressed(.ESCAPE) {
+					game.mining_mode = false
+					add_message(game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
+				} else {
+					mdx, mdy: int
+					if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP)    { mdy = -1 }
+					if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN)  { mdy = 1 }
+					if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT)  { mdx = -1 }
+					if rl.IsKeyPressed(.D) || rl.IsKeyPressed(.RIGHT) { mdx = 1 }
+
+					if mdx != 0 || mdy != 0 {
+						game.mining_mode = false
+						if mine_wall(game, mdx, mdy) {
+							process_enemy_turns(game)
+							process_enemy_abilities(game)
+							remove_dead_enemies(game)
+							tick_timed_effects(game)
+							compute_fov(game)
+							camera_update(game)
+						}
+					}
+				}
+			} else {
+			// C key: open crafting if on anvil
+			if rl.IsKeyPressed(.C) {
+				cur := tile_at(game, game.player.pos.x, game.player.pos.y)
+				if cur != nil && cur.type == .Anvil {
+					game.state = .Viewing_Crafting
+				} else {
+					add_message(game, "You need to stand on an anvil to craft.", rl.Color{180, 180, 180, 255})
+				}
+			}
+
+			// X key: enter mining mode
+			if rl.IsKeyPressed(.X) {
+				if game.pickaxe_durability <= 0 {
+					add_message(game, "Your pickaxe is broken!", rl.Color{255, 100, 100, 255})
+				} else {
+					game.mining_mode = true
+					add_message(game, "Mine which direction? (WASD/arrows, ESC cancel)", rl.Color{200, 200, 100, 255})
+				}
+			}
+
 			// M key: toggle minimap
 			if rl.IsKeyPressed(.M) {
 				game.show_minimap = !game.show_minimap
@@ -68,6 +113,11 @@ main :: proc() {
 			// I key: open inventory screen
 			if rl.IsKeyPressed(.I) {
 				game.state = .Viewing_Inventory
+			}
+
+			// ? key: open help screen
+			if rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.RIGHT_SHIFT) {
+				game.state = .Viewing_Help
 			}
 
 			game.prev_player_pos = game.player.pos
@@ -92,8 +142,8 @@ main :: proc() {
 						add_message(game, "You wade through water...", rl.Color{40, 80, 180, 255})
 					}
 					if cur_tile.type == .Gas_Vent {
-						game.player.hp -= 2
-						add_message(game, "Toxic gas burns you! (-2 HP)", rl.Color{160, 180, 40, 255})
+						game.player.hp -= 3
+						add_message(game, "Toxic gas burns you! (-3 HP)", rl.Color{160, 180, 40, 255})
 						if game.player.hp <= 0 {
 							game.state = .Game_Over
 							add_message(game, "You have been slain...", rl.Color{255, 0, 0, 255})
@@ -135,6 +185,7 @@ main :: proc() {
 				compute_fov(game)
 				camera_update(game)
 			}
+			} // end else (not mining_mode)
 			} // end else (not skip_next_turn)
 		} else if game.state == .Game_Over {
 			if rl.IsKeyPressed(.R) {
@@ -189,6 +240,21 @@ main :: proc() {
 						use_item(game, idx)
 					}
 				}
+			}
+		} else if game.state == .Viewing_Crafting {
+			// ESC or C closes crafting
+			if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.C) {
+				game.state = .Playing
+			}
+
+			// Number keys 1-4 to craft
+			if rl.IsKeyPressed(.ONE)   { try_craft(game, 0) }
+			if rl.IsKeyPressed(.TWO)   { try_craft(game, 1) }
+			if rl.IsKeyPressed(.THREE) { try_craft(game, 2) }
+			if rl.IsKeyPressed(.FOUR)  { try_craft(game, 3) }
+		} else if game.state == .Viewing_Help {
+			if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.SLASH) {
+				game.state = .Playing
 			}
 		}
 

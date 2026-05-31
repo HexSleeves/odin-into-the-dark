@@ -57,6 +57,7 @@ Tile_Type :: enum {
 	Gas_Vent,
 	Unstable,
 	Chasm,
+	Anvil,
 }
 
 Tile :: struct {
@@ -149,12 +150,21 @@ Floor_Palette :: struct {
 	descent: rl.Color,
 }
 
+// ─── Mining ───────────────────────────────────────────────────────────────────
+
+Ore_Vein :: struct {
+	ore_type: string,   // "iron_ore", "copper_ore", "crystal_shard", "gold_nugget", or ""
+	color:    rl.Color, // visual tint for the wall
+}
+
 // ─── Game State ───────────────────────────────────────────────────────────────
 
 Game_State :: enum {
 	Playing,
 	Game_Over,
 	Viewing_Inventory,
+	Viewing_Crafting,
+	Viewing_Help,
 }
 
 DMAP_UNREACHABLE :: 9999
@@ -200,4 +210,9 @@ Game :: struct {
 	// Hazard state
 	water_slow_active: bool, // player in water, costs next turn
 	prev_player_pos:   Vec2, // track previous position for unstable collapse
+	// Mining system
+	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
+	mining_mode:        bool, // true when player pressed X and awaits direction
+	pickaxe_durability: int,  // current durability
+	pickaxe_max_dur:    int,  // max durability
 }

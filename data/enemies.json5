@@ -8,14 +8,14 @@
       glyph: "r",
       color: [150, 120, 80, 255],
       hp: 3,
-      attack: 1,
+      attack: 2,  // was 1 — now a minor threat, not ignorable
     },
     {
       id: "miner_husk",
       name: "Miner Husk",
       glyph: "H",
       color: [180, 180, 160, 255],
-      hp: 6,
+      hp: 8,     // was 6 — tougher mid-tier
       attack: 3,
     },
     {
@@ -23,55 +23,63 @@
       name: "Cave Crawler",
       glyph: "C",
       color: [100, 200, 100, 255],
-      hp: 10,
+      hp: 12,    // was 10 — beefier with ability
       attack: 4,
-      ability: { type: "web", cooldown: 4, range: 1 },
+      ability: { type: "web", cooldown: 5, range: 1 },  // cd was 4 — slightly slower
     },
     {
       id: "deep_watcher",
       name: "Deep Watcher",
       glyph: "W",
       color: [180, 50, 220, 255],
-      hp: 15,
+      hp: 18,    // was 15 — proper boss-tier
       attack: 6,
-      ability: { type: "pull", cooldown: 5, range: 4 },
+      ability: { type: "pull", cooldown: 6, range: 4 },  // cd was 5 — slightly slower
     },
   ],
 
-  // Spawn tables: for each depth range, weighted random selection.
-  // Weights don't need to sum to 100 — they're relative.
+  // Spawn tables: finer depth granularity for better pacing
   spawn_tables: [
     {
+      // Depth 1: mostly rats, intro floor
       depth_min: 1, depth_max: 1,
       weights: [
-        { id: "rat", weight: 80 },
-        { id: "miner_husk", weight: 20 },
+        { id: "rat", weight: 90 },
+        { id: "miner_husk", weight: 10 },
       ],
     },
     {
+      // Depth 2: husks start appearing
       depth_min: 2, depth_max: 2,
       weights: [
-        { id: "rat", weight: 40 },
+        { id: "rat", weight: 50 },
+        { id: "miner_husk", weight: 50 },
+      ],
+    },
+    {
+      // Depth 3-4: crawlers enter, husks dominate
+      depth_min: 3, depth_max: 4,
+      weights: [
+        { id: "rat", weight: 15 },
         { id: "miner_husk", weight: 40 },
-        { id: "cave_crawler", weight: 20 },
+        { id: "cave_crawler", weight: 45 },
       ],
     },
     {
-      depth_min: 3, depth_max: 3,
+      // Depth 5-7: deep watchers enter, mix of tough enemies
+      depth_min: 5, depth_max: 7,
       weights: [
-        { id: "rat", weight: 20 },
-        { id: "miner_husk", weight: 30 },
-        { id: "cave_crawler", weight: 35 },
-        { id: "deep_watcher", weight: 15 },
+        { id: "miner_husk", weight: 15 },
+        { id: "cave_crawler", weight: 45 },
+        { id: "deep_watcher", weight: 40 },
       ],
     },
     {
-      // Deep floors: harder enemies dominate
-      depth_min: 4, depth_max: 99,
+      // Depth 8+: deep watchers dominate, endgame gauntlet
+      depth_min: 8, depth_max: 99,
       weights: [
-        { id: "miner_husk", weight: 10 },
-        { id: "cave_crawler", weight: 40 },
-        { id: "deep_watcher", weight: 50 },
+        { id: "cave_crawler", weight: 30 },
+        { id: "deep_watcher", weight: 70 },
       ],
     },
   ],

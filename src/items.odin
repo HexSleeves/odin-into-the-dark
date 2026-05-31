@@ -134,6 +134,15 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 			)
 			return false
 		}
+		// Material items cannot be consumed directly
+		if def.effect.type == "material" {
+			add_message(
+				game,
+				"Raw materials cannot be used directly. Find an anvil to craft.",
+				rl.Color{180, 180, 100, 255},
+			)
+			return false
+		}
 		apply_item_effect(game, def)
 	} else {
 		add_message(game, "Nothing happens.", rl.Color{180, 180, 180, 255})
@@ -399,4 +408,98 @@ effective_defense :: proc(game: ^Game) -> int {
 effective_light_bonus :: proc(game: ^Game) -> int {
 	if game.equipped_helmet.occupied {return game.equipped_helmet.item.stat_bonus}
 	return 0
+}
+
+// ─── Crafting recipes ─────────────────────────────────────────────────────────
+
+Recipe :: struct {
+	name:         string,
+	material_id:  string,
+	material_qty: int,
+	result_id:    string, // "" means special (like pickaxe repair)
+	is_repair:    bool,
+}
+
+RECIPES :: [4]Recipe{
+	{ name = "Repair Pickaxe",  material_id = "iron_ore",      material_qty = 3, result_id = "",              is_repair = true },
+	{ name = "Copper Shield",   material_id = "copper_ore",    material_qty = 2, result_id = "copper_shield", is_repair = false },
+	{ name = "Crystal Torch",   material_id = "crystal_shard", material_qty = 2, result_id = "crystal_torch", is_repair = false },
+	{ name = "Golden Amulet",   material_id = "gold_nugget",   material_qty = 1, result_id = "golden_amulet", is_repair = false },
+}
+
+// Count how many of a material the player has in inventory
+count_material :: proc(game: ^Game, material_id: string) -> int {
+	total := 0
+	for i in 0 ..< MAX_INVENTORY {
+		if game.inventory[i].occupied && game.inventory[i].item.item_type == material_id {
+			total += game.inventory[i].item.quantity
+		}
+	}
+	return total
+}
+
+// Consume N of a material from inventory
+consume_material :: proc(game: ^Game, material_id: string, amount: int) {
+	remaining := amount
+	for i in 0 ..< MAX_INVENTORY {
+		if remaining <= 0 { break }
+		if !game.inventory[i].occupied { continue }
+		if game.inventory[i].item.item_type != material_id { continue }
+
+		take := min(game.inventory[i].item.quantity, remaining)
+		game.inventory[i].item.quantity -= take
+		remaining -= take
+		if game.inventory[i].item.quantity <= 0 {
+			game.inventory[i] = {}
+		}
+	}
+}
+
+try_craft :: proc(game: ^Game, recipe_index: int) {
+	if recipe_index < 0 || recipe_index >= len(RECIPES) { return }
+
+	recipes := RECIPES
+	recipe := recipes[recipe_index]
+	have := count_material(game, recipe.material_id)
+
+	if have < recipe.material_qty {
+		add_message(game, fmt.tprintf("Need %d %s (have %d).", recipe.material_qty, recipe.material_id, have), rl.Color{255, 100, 100, 255})
+		return
+	}
+
+	if recipe.is_repair {
+		// Repair pickaxe
+		game.pickaxe_durability = game.pickaxe_max_dur
+		consume_material(game, recipe.material_id, recipe.material_qty)
+		add_message(game, "Pickaxe repaired!", rl.Color{100, 255, 100, 255})
+		return
+	}
+
+	// Find empty inventory slot for crafted item
+	slot_idx := -1
+	for i in 0 ..< MAX_INVENTORY {
+		if !game.inventory[i].occupied {
+			slot_idx = i
+			break
+		}
+	}
+	if slot_idx < 0 {
+		add_message(game, "Inventory full! Cannot craft.", rl.Color{255, 100, 100, 255})
+		return
+	}
+
+	def := find_item_def(recipe.result_id)
+	if def == nil {
+		add_message(game, "Recipe error.", rl.Color{255, 100, 100, 255})
+		return
+	}
+
+	consume_material(game, recipe.material_id, recipe.material_qty)
+	crafted := item_make_from_def(def, Vec2{0, 0})
+	crafted.picked_up = true
+	game.inventory[slot_idx].occupied = true
+	game.inventory[slot_idx].item = crafted
+	game.inventory[slot_idx].item.quantity = 1
+
+	add_message(game, fmt.tprintf("Crafted %s!", def.name), rl.Color{100, 255, 100, 255})
 }

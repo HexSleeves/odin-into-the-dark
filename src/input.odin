@@ -91,8 +91,10 @@ handle_input :: proc(game: ^Game) -> Input_Result {
 descend :: proc(game: ^Game) {
 	game.depth += 1
 
-	// Reduce light radius with depth (min 3)
-	game.player.light_radius = max(g_data.player.light_radius - game.depth + 1, 3)
+	// Reduce light radius with depth (min 2 at depth 8+, min 3 otherwise)
+	min_light := 3
+	if game.depth >= 8 {min_light = 2}
+	game.player.light_radius = max(g_data.player.light_radius - game.depth + 1, min_light)
 
 	// Regenerate the map (clears tiles, web_tiles, rooms, spawns enemies)
 	generate_map(game)

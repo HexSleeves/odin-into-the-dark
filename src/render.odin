@@ -71,6 +71,8 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 		return rl.Color{180, 120, 60, 255}
 	case .Chasm:
 		return rl.Color{10, 10, 15, 255}
+	case .Anvil:
+		return rl.Color{160, 160, 170, 255}
 	}
 	return UNSEEN_COLOR
 }
@@ -104,6 +106,20 @@ render_map :: proc(game: ^Game) {
 			tile := game.tiles[pos_to_idx(x, y)]
 			color := get_tile_color(tile, palette)
 			rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), color)
+
+			// Ore vein indicator on walls
+			if tile.type == .Wall && (tile.visible || tile.explored) {
+				vein := game.ore_veins[pos_to_idx(x, y)]
+				if vein.ore_type != "" {
+					dot_x := sx + i32(TILE_SIZE) / 2 - 2
+					dot_y := sy + i32(TILE_SIZE) / 2 - 2
+					vein_color := vein.color
+					if !tile.visible {
+						vein_color = dim_color(vein.color, EXPLORED_DIM)
+					}
+					rl.DrawRectangle(dot_x, dot_y, 4, 4, vein_color)
+				}
+			}
 		}
 	}
 }
@@ -223,7 +239,7 @@ render_hud :: proc(game: ^Game) {
 
 	rl.DrawText(
 		rl.TextFormat(
-			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  M=Map  .=Wait",
+			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  X=Mine  M=Map  ?=Help",
 			i32(game.depth),
 			i32(game.player.light_radius),
 			alive_count,
@@ -240,6 +256,50 @@ render_hud :: proc(game: ^Game) {
 		oil_text := rl.TextFormat("Oil: %dt", i32(game.light_boost_turns))
 		oil_x := hp_x + hp_bar_w + 16
 		rl.DrawText(oil_text, oil_x, hp_y + 1, 14, rl.Color{255, 200, 80, 255})
+	}
+
+	// Pickaxe durability bar
+	pick_x := hp_x + hp_bar_w + 120
+	pick_bar_w :: i32(80)
+	pick_bar_h :: i32(12)
+	pick_y := hp_y + 2
+
+	// Background
+	rl.DrawRectangle(pick_x, pick_y, pick_bar_w, pick_bar_h, rl.Color{40, 30, 20, 255})
+
+	if game.pickaxe_durability > 0 {
+		pick_ratio := f32(game.pickaxe_durability) / f32(max(game.pickaxe_max_dur, 1))
+		// Color gradient: green -> yellow -> red
+		pick_color: rl.Color
+		if pick_ratio > 0.5 {
+			pick_color = rl.Color{80, 180, 80, 255} // green
+		} else if pick_ratio > 0.25 {
+			pick_color = rl.Color{200, 180, 50, 255} // yellow
+		} else {
+			pick_color = rl.Color{200, 60, 60, 255} // red
+		}
+		rl.DrawRectangle(pick_x, pick_y, i32(f32(pick_bar_w) * pick_ratio), pick_bar_h, pick_color)
+		rl.DrawText(
+			rl.TextFormat("Pick: %d/%d", i32(game.pickaxe_durability), i32(game.pickaxe_max_dur)),
+			pick_x + 2, pick_y, 12, rl.WHITE,
+		)
+	} else {
+		rl.DrawText("Pick: BROKEN", pick_x + 2, pick_y, 12, rl.Color{255, 80, 80, 255})
+	}
+
+	// Mining mode indicator (centered at top of screen)
+	if game.mining_mode {
+		mine_text := cstring("[MINING] Choose direction (WASD/arrows) | ESC cancel")
+		mine_w := rl.MeasureText(mine_text, 14)
+		rl.DrawText(mine_text, (i32(SCREEN_WIDTH) - mine_w) / 2, 2, 14, rl.Color{255, 200, 80, 255})
+	}
+
+	// Contextual hint: C=Craft when standing on anvil
+	cur := tile_at(game, game.player.pos.x, game.player.pos.y)
+	if cur != nil && cur.type == .Anvil {
+		anvil_text := cstring("[C=Craft]")
+		anvil_w := rl.MeasureText(anvil_text, 14)
+		rl.DrawText(anvil_text, (i32(SCREEN_WIDTH) - anvil_w) / 2, hud_y - 18, 14, rl.Color{160, 160, 170, 255})
 	}
 
 	// Equipment indicators (right side of HUD)
@@ -544,6 +604,110 @@ render_minimap :: proc(game: ^Game) {
 	rl.DrawRectangle(player_px, player_py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, rl.Color{255, 255, 0, 255})
 }
 
+// ─── Crafting overlay screen ──────────────────────────────────────────────────
+
+render_crafting :: proc(game: ^Game) {
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
+
+	title := cstring("CRAFTING")
+	title_size :: i32(30)
+	title_w := rl.MeasureText(title, title_size)
+	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
+	rl.DrawText(title, title_x, 100, title_size, rl.WHITE)
+
+	subtitle := cstring("Press 1-4 to craft | C or ESC to close")
+	subtitle_size :: i32(14)
+	sub_w := rl.MeasureText(subtitle, subtitle_size)
+	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
+	rl.DrawText(subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
+
+	recipes := RECIPES
+	slot_x :: i32(340)
+
+	for idx in 0 ..< len(recipes) {
+		recipe := recipes[idx]
+		y_pos := i32(180) + i32(idx) * 40
+
+		have := count_material(game, recipe.material_id)
+		can_craft := have >= recipe.material_qty
+
+		color := rl.Color{100, 255, 100, 255} if can_craft else rl.Color{150, 80, 80, 255}
+
+		// Get material display name
+		mat_def := find_item_def(recipe.material_id)
+		mat_name := recipe.material_id
+		if mat_def != nil { mat_name = mat_def.name }
+
+		rl.DrawText(
+			fmt.ctprintf("%d. %s  [%d/%d %s]", idx + 1, recipe.name, have, recipe.material_qty, mat_name),
+			slot_x, y_pos, 16, color,
+		)
+	}
+}
+
+// ─── Help screen overlay ──────────────────────────────────────────────────────
+
+render_help :: proc(game: ^Game) {
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 220})
+
+	title := cstring("CONTROLS & HELP")
+	title_size :: i32(28)
+	title_w := rl.MeasureText(title, title_size)
+	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
+	rl.DrawText(title, title_x, 60, title_size, rl.WHITE)
+
+	col1_x :: i32(180)
+	col2_x :: i32(580)
+	start_y :: i32(110)
+	line_h :: i32(22)
+	head_color :: rl.Color{255, 220, 100, 255}
+	key_color :: rl.Color{100, 200, 255, 255}
+	desc_color :: rl.Color{200, 200, 200, 255}
+
+	// ── Column 1: Movement & Actions ──
+	rl.DrawText("MOVEMENT", col1_x, start_y, 16, head_color)
+	rl.DrawText("WASD / Arrows    Move", col1_x, start_y + line_h * 1, 14, desc_color)
+	rl.DrawText(".  (period)      Wait a turn", col1_x, start_y + line_h * 2, 14, desc_color)
+	rl.DrawText("Walk into enemy  Attack", col1_x, start_y + line_h * 3, 14, desc_color)
+
+	rl.DrawText("ITEMS", col1_x, start_y + line_h * 5, 16, head_color)
+	rl.DrawText("G                Pick up item", col1_x, start_y + line_h * 6, 14, desc_color)
+	rl.DrawText("I                Open inventory", col1_x, start_y + line_h * 7, 14, desc_color)
+	rl.DrawText("  1-9            Use item", col1_x, start_y + line_h * 8, 14, desc_color)
+	rl.DrawText("  D + 1-9        Drop item", col1_x, start_y + line_h * 9, 14, desc_color)
+	rl.DrawText("  E + 1-9        Equip item", col1_x, start_y + line_h * 10, 14, desc_color)
+
+	rl.DrawText("MINING", col1_x, start_y + line_h * 12, 16, head_color)
+	rl.DrawText("X + direction    Mine adjacent wall", col1_x, start_y + line_h * 13, 14, desc_color)
+	rl.DrawText("C  (on anvil)    Open crafting", col1_x, start_y + line_h * 14, 14, desc_color)
+
+	// ── Column 2: UI & Info ──
+	rl.DrawText("DISPLAY", col2_x, start_y, 16, head_color)
+	rl.DrawText("M                Toggle minimap", col2_x, start_y + line_h * 1, 14, desc_color)
+	rl.DrawText("?                This help screen", col2_x, start_y + line_h * 2, 14, desc_color)
+	rl.DrawText("ESC              Close menu / Quit", col2_x, start_y + line_h * 3, 14, desc_color)
+	rl.DrawText("R  (game over)   Restart", col2_x, start_y + line_h * 4, 14, desc_color)
+
+	rl.DrawText("TILE LEGEND", col2_x, start_y + line_h * 6, 16, head_color)
+	rl.DrawText("@  You", col2_x, start_y + line_h * 7, 14, rl.YELLOW)
+	rl.DrawText(">  Descent to next depth", col2_x, start_y + line_h * 8, 14, rl.Color{0, 200, 200, 255})
+	rl.DrawText("*  Ore vein (colored dot on wall)", col2_x, start_y + line_h * 9, 14, rl.Color{200, 120, 50, 255})
+	rl.DrawText("~  Water (slows movement)", col2_x, start_y + line_h * 10, 14, rl.Color{40, 80, 180, 255})
+	rl.DrawText("!  Gas vent (damages you)", col2_x, start_y + line_h * 11, 14, rl.Color{160, 180, 40, 255})
+	rl.DrawText("^  Unstable ground (collapses)", col2_x, start_y + line_h * 12, 14, rl.Color{180, 120, 60, 255})
+	rl.DrawText("#  Anvil (stand on it, press C)", col2_x, start_y + line_h * 13, 14, rl.Color{160, 160, 170, 255})
+
+	rl.DrawText("TIPS", col2_x, start_y + line_h * 15, 16, head_color)
+	rl.DrawText("Mine walls to find ores!", col2_x, start_y + line_h * 16, 14, desc_color)
+	rl.DrawText("Craft at anvils with materials.", col2_x, start_y + line_h * 17, 14, desc_color)
+	rl.DrawText("Light shrinks as you go deeper.", col2_x, start_y + line_h * 18, 14, desc_color)
+
+	// Footer
+	footer := cstring("Press ESC or ? to close")
+	footer_w := rl.MeasureText(footer, 14)
+	rl.DrawText(footer, (i32(SCREEN_WIDTH) - footer_w) / 2, i32(SCREEN_HEIGHT) - 40, 14, rl.Color{120, 120, 120, 255})
+}
+
 // ─── Top-level render call ────────────────────────────────────────────────────
 
 render_game :: proc(game: ^Game) {
@@ -574,6 +738,12 @@ render_game :: proc(game: ^Game) {
 	}
 	if game.state == .Viewing_Inventory {
 		render_inventory(game)
+	}
+	if game.state == .Viewing_Crafting {
+		render_crafting(game)
+	}
+	if game.state == .Viewing_Help {
+		render_help(game)
 	}
 
 	rl.EndDrawing()
