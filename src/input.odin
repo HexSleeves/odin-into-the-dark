@@ -10,6 +10,7 @@ Input_Result :: enum {
 	None, // no action taken
 	Moved, // player moved — turn consumed
 	Descended, // player descended to next floor
+	Waited, // player skipped a turn (period key)
 	Quit, // escape pressed — signal to close
 }
 
@@ -19,6 +20,13 @@ handle_input :: proc(game: ^Game) -> Input_Result {
 	// Escape to quit
 	if rl.IsKeyPressed(.ESCAPE) {
 		return .Quit
+	}
+
+	// Period key: wait / skip turn
+	if rl.IsKeyPressed(.PERIOD) {
+		game.turn_count += 1
+		add_message(game, "You wait...", rl.Color{180, 180, 180, 255})
+		return .Waited
 	}
 
 	// Direction delta from WASD + arrow keys

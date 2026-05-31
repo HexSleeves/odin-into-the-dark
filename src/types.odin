@@ -5,8 +5,8 @@ import rl "vendor:raylib"
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 TILE_SIZE :: 16
-SCREEN_WIDTH :: 1280
-SCREEN_HEIGHT :: 960
+SCREEN_WIDTH :: 1080
+SCREEN_HEIGHT :: 720
 MAP_WIDTH :: 80
 MAP_HEIGHT :: 50
 
@@ -103,6 +103,7 @@ Item :: struct {
 	glyph:     rune,
 	color:     rl.Color,
 	picked_up: bool,
+	quantity:  int,
 }
 
 Inventory_Slot :: struct {
@@ -141,6 +142,7 @@ Game :: struct {
 	light_sources: [dynamic]Light_Source,
 	depth:         int,
 	turn_count:    int,
+	kills:         int,
 	seed:          u64,
 	state:         Game_State,
 	message_log:   MessageLog,

@@ -149,7 +149,7 @@ render_hud :: proc(game: ^Game) {
 
 	rl.DrawText(
 		rl.TextFormat(
-			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv",
+			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  .=Wait",
 			i32(game.depth),
 			i32(game.player.light_radius),
 			alive_count,
@@ -190,14 +190,25 @@ render_inventory :: proc(game: ^Game) {
 	for idx in 0 ..< MAX_INVENTORY {
 		y_pos := i32(180) + i32(idx) * 28
 		if game.inventory[idx].occupied {
-			name := item_type_name(game.inventory[idx].item.item_type)
-			rl.DrawText(
-				fmt.ctprintf("%d. %s", idx + 1, name),
-				slot_x,
-				y_pos,
-				slot_size,
-				game.inventory[idx].item.color,
-			)
+			it := game.inventory[idx].item
+			name := item_type_name(it.item_type)
+			if it.quantity > 1 {
+				rl.DrawText(
+					fmt.ctprintf("%d. %s x%d", idx + 1, name, it.quantity),
+					slot_x,
+					y_pos,
+					slot_size,
+					it.color,
+				)
+			} else {
+				rl.DrawText(
+					fmt.ctprintf("%d. %s", idx + 1, name),
+					slot_x,
+					y_pos,
+					slot_size,
+					it.color,
+				)
+			}
 		} else {
 			rl.DrawText(
 				fmt.ctprintf("%d. [empty]", idx + 1),
@@ -233,12 +244,23 @@ render_game_over :: proc(game: ^Game) {
 	depth_x := (i32(SCREEN_WIDTH) - depth_w) / 2
 	rl.DrawText(depth_text, depth_x, title_y + 50, depth_size, rl.Color{200, 200, 200, 255})
 
+	// Stats line (kills + turns)
+	stats_size :: i32(18)
+	stats_text := rl.TextFormat(
+		"Enemies slain: %d  |  Turns: %d",
+		i32(game.kills),
+		i32(game.turn_count),
+	)
+	stats_w := rl.MeasureText(stats_text, stats_size)
+	stats_x := (i32(SCREEN_WIDTH) - stats_w) / 2
+	rl.DrawText(stats_text, stats_x, title_y + 80, stats_size, rl.Color{180, 180, 180, 255})
+
 	// Restart prompt
 	restart := cstring("Press R to restart  |  ESC to quit")
 	restart_size :: i32(16)
 	restart_w := rl.MeasureText(restart, restart_size)
 	restart_x := (i32(SCREEN_WIDTH) - restart_w) / 2
-	rl.DrawText(restart, restart_x, title_y + 80, restart_size, rl.Color{150, 150, 150, 255})
+	rl.DrawText(restart, restart_x, title_y + 110, restart_size, rl.Color{150, 150, 150, 255})
 }
 
 // ─── Top-level render call ────────────────────────────────────────────────────

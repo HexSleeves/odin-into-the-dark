@@ -54,6 +54,11 @@ main :: proc() {
 					)
 				}
 			}
+			if result == .Waited {
+				process_enemy_turns(game)
+				remove_dead_enemies(game)
+				compute_fov(game)
+			}
 		} else if game.state == .Game_Over {
 			if rl.IsKeyPressed(.R) {
 				game_cleanup(game)

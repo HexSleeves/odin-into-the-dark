@@ -18,6 +18,7 @@ resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 
 	if enemy.hp <= 0 {
 		enemy.alive = false
+		game.kills += 1
 		add_message(
 			game,
 			fmt.tprintf("The %s is killed!", enemy_type_name(enemy.enemy_type)),
