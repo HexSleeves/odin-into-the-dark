@@ -4,8 +4,6 @@ import "core:fmt"
 import "core:math/rand"
 import "core:time"
 
-import rl "vendor:raylib"
-
 // ─── Map helpers ──────────────────────────────────────────────────────────────
 
 pos_to_idx :: proc(x, y: int) -> int {
@@ -102,8 +100,8 @@ game_reinit :: proc(game: ^Game) {
 init_player_from_data :: proc(game: ^Game) {
 	p := &g_data.player
 	p_glyph: rune = '@'
-	if len(p.glyph) > 0 { p_glyph = rune(p.glyph[0]) }
-	game.player = Player{
+	if len(p.glyph) > 0 {p_glyph = rune(p.glyph[0])}
+	game.player = Player {
 		pos          = Vec2{0, 0},
 		hp           = p.hp,
 		max_hp       = p.hp,
@@ -134,14 +132,14 @@ camera_update :: proc(game: ^Game) {
 	map_pixel_w := MAP_WIDTH * TILE_SIZE
 	map_pixel_h := MAP_HEIGHT * TILE_SIZE
 
-	if cam_x < 0 { cam_x = 0 }
-	if cam_y < 0 { cam_y = 0 }
-	if cam_x + vw > map_pixel_w { cam_x = map_pixel_w - vw }
-	if cam_y + vh > map_pixel_h { cam_y = map_pixel_h - vh }
+	if cam_x < 0 {cam_x = 0}
+	if cam_y < 0 {cam_y = 0}
+	if cam_x + vw > map_pixel_w {cam_x = map_pixel_w - vw}
+	if cam_y + vh > map_pixel_h {cam_y = map_pixel_h - vh}
 
 	// If map is smaller than viewport, center it
-	if map_pixel_w < vw { cam_x = -(vw - map_pixel_w) / 2 }
-	if map_pixel_h < vh { cam_y = -(vh - map_pixel_h) / 2 }
+	if map_pixel_w < vw {cam_x = -(vw - map_pixel_w) / 2}
+	if map_pixel_h < vh {cam_y = -(vh - map_pixel_h) / 2}
 
 	game.camera_x = cam_x
 	game.camera_y = cam_y

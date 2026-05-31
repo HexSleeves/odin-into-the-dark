@@ -56,8 +56,8 @@ render_map :: proc(game: ^Game) {
 			sy := i32(y * TILE_SIZE) - oy
 
 			// Cull tiles entirely outside the map viewport
-			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) { continue }
-			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) { continue }
+			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
+			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			tile := game.tiles[pos_to_idx(x, y)]
 			color := get_tile_color(tile)
@@ -87,10 +87,10 @@ render_enemies :: proc(game: ^Game) {
 	oy := i32(game.camera_y)
 
 	for &enemy in game.enemies {
-		if !enemy.alive { continue }
+		if !enemy.alive {continue}
 
 		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-		if tile == nil || !tile.visible { continue }
+		if tile == nil || !tile.visible {continue}
 
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
@@ -110,7 +110,13 @@ render_hud :: proc(game: ^Game) {
 	hud_y := i32(MAP_VIEW_HEIGHT)
 
 	// Background bar
-	rl.DrawRectangle(0, hud_y, i32(SCREEN_WIDTH), i32(HUD_REGION_HEIGHT), rl.Color{20, 20, 25, 255})
+	rl.DrawRectangle(
+		0,
+		hud_y,
+		i32(SCREEN_WIDTH),
+		i32(HUD_REGION_HEIGHT),
+		rl.Color{20, 20, 25, 255},
+	)
 
 	// HP bar
 	hp_ratio := f32(max(game.player.hp, 0)) / f32(game.player.max_hp)
@@ -122,12 +128,21 @@ render_hud :: proc(game: ^Game) {
 	// Background (red)
 	rl.DrawRectangle(hp_x, hp_y, hp_bar_w, hp_bar_h, rl.Color{80, 20, 20, 255})
 	// Foreground (green)
-	rl.DrawRectangle(hp_x, hp_y, i32(f32(hp_bar_w) * hp_ratio), hp_bar_h, rl.Color{40, 180, 40, 255})
+	rl.DrawRectangle(
+		hp_x,
+		hp_y,
+		i32(f32(hp_bar_w) * hp_ratio),
+		hp_bar_h,
+		rl.Color{40, 180, 40, 255},
+	)
 
 	// HP text
 	rl.DrawText(
 		rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
-		hp_x + 4, hp_y + 1, 14, rl.WHITE,
+		hp_x + 4,
+		hp_y + 1,
+		14,
+		rl.WHITE,
 	)
 
 	// Stats line
@@ -135,15 +150,21 @@ render_hud :: proc(game: ^Game) {
 
 	alive_count: i32 = 0
 	for &e in game.enemies {
-		if e.alive { alive_count += 1 }
+		if e.alive {alive_count += 1}
 	}
 
 	rl.DrawText(
 		rl.TextFormat(
 			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  .=Wait",
-			i32(game.depth), i32(game.player.light_radius), alive_count, i32(game.turn_count),
+			i32(game.depth),
+			i32(game.player.light_radius),
+			alive_count,
+			i32(game.turn_count),
 		),
-		hp_x, stats_y, 14, rl.Color{180, 180, 180, 255},
+		hp_x,
+		stats_y,
+		14,
+		rl.Color{180, 180, 180, 255},
 	)
 }
 
@@ -176,18 +197,27 @@ render_inventory :: proc(game: ^Game) {
 			if it.quantity > 1 {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s x%d", idx + 1, name, it.quantity),
-					slot_x, y_pos, slot_size, it.color,
+					slot_x,
+					y_pos,
+					slot_size,
+					it.color,
 				)
 			} else {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s", idx + 1, name),
-					slot_x, y_pos, slot_size, it.color,
+					slot_x,
+					y_pos,
+					slot_size,
+					it.color,
 				)
 			}
 		} else {
 			rl.DrawText(
 				fmt.ctprintf("%d. [empty]", idx + 1),
-				slot_x, y_pos, slot_size, empty_color,
+				slot_x,
+				y_pos,
+				slot_size,
+				empty_color,
 			)
 		}
 	}
@@ -215,7 +245,8 @@ render_game_over :: proc(game: ^Game) {
 	stats_size :: i32(18)
 	stats_text := rl.TextFormat(
 		"Enemies slain: %d  |  Turns: %d",
-		i32(game.kills), i32(game.turn_count),
+		i32(game.kills),
+		i32(game.turn_count),
 	)
 	stats_w := rl.MeasureText(stats_text, stats_size)
 	stats_x := (i32(SCREEN_WIDTH) - stats_w) / 2
@@ -242,7 +273,7 @@ render_tooltip :: proc(game: ^Game) {
 	mouse := rl.GetMousePosition()
 
 	// Only show tooltips when mouse is in the map viewport region
-	if int(mouse.y) >= MAP_VIEW_HEIGHT { return }
+	if int(mouse.y) >= MAP_VIEW_HEIGHT {return}
 
 	// Convert screen coordinates to tile coordinates using camera offset
 	tile_x := (int(mouse.x) + game.camera_x) / TILE_SIZE
@@ -277,13 +308,19 @@ render_tooltip :: proc(game: ^Game) {
 	box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
 	box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
 
-	if box_x + box_w > i32(SCREEN_WIDTH) { box_x = i32(SCREEN_WIDTH) - box_w }
-	if box_x < 0 { box_x = 0 }
-	if box_y < 0 { box_y = 0 }
-	if box_y + box_h > i32(SCREEN_HEIGHT) { box_y = i32(SCREEN_HEIGHT) - box_h }
+	if box_x + box_w > i32(SCREEN_WIDTH) {box_x = i32(SCREEN_WIDTH) - box_w}
+	if box_x < 0 {box_x = 0}
+	if box_y < 0 {box_y = 0}
+	if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}
 
 	rl.DrawRectangle(box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
-	rl.DrawText(tooltip_text, box_x + TOOLTIP_PAD_X, box_y + TOOLTIP_PAD_Y, TOOLTIP_FONT_SIZE, TOOLTIP_TEXT_COLOR)
+	rl.DrawText(
+		tooltip_text,
+		box_x + TOOLTIP_PAD_X,
+		box_y + TOOLTIP_PAD_Y,
+		TOOLTIP_FONT_SIZE,
+		TOOLTIP_TEXT_COLOR,
+	)
 }
 
 // ─── Top-level render call ────────────────────────────────────────────────────

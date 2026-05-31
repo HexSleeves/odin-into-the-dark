@@ -14,16 +14,16 @@ enemy_make :: proc(id: string, pos: Vec2) -> Enemy {
 	}
 	// Fallback: unknown enemy
 	fmt.eprintfln("[enemy] WARNING: unknown enemy id '%s'", id)
-	return Enemy{
-		pos        = pos,
-		hp         = 1,
-		max_hp     = 1,
-		attack     = 1,
+	return Enemy {
+		pos = pos,
+		hp = 1,
+		max_hp = 1,
+		attack = 1,
 		enemy_type = id,
-		name       = id,
-		glyph      = '?',
-		color      = rl.RED,
-		alive      = true,
+		name = id,
+		glyph = '?',
+		color = rl.RED,
+		alive = true,
 	}
 }
 
@@ -51,9 +51,9 @@ spawn_enemies :: proc(game: ^Game) {
 				pos := Vec2{ex, ey}
 
 				// Don't spawn on non-walkable, player, or other enemies
-				if !is_walkable(game, ex, ey) { continue }
-				if pos == game.player.pos { continue }
-				if enemy_at(game, ex, ey) != nil { continue }
+				if !is_walkable(game, ex, ey) {continue}
+				if pos == game.player.pos {continue}
+				if enemy_at(game, ex, ey) != nil {continue}
 
 				def := pick_enemy_def_for_depth(game.depth)
 				if def != nil {
@@ -122,11 +122,11 @@ compute_dijkstra_map :: proc(game: ^Game) {
 			nx := cur.x + dx[dir]
 			ny := cur.y + dy[dir]
 
-			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT { continue }
-			if !is_walkable(game, nx, ny) { continue }
+			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
+			if !is_walkable(game, nx, ny) {continue}
 
 			idx := pos_to_idx(nx, ny)
-			if game.dijkstra_map[idx] <= cur_dist + 1 { continue }
+			if game.dijkstra_map[idx] <= cur_dist + 1 {continue}
 
 			game.dijkstra_map[idx] = cur_dist + 1
 			queue[tail] = {nx, ny}
@@ -142,7 +142,7 @@ process_enemy_turns :: proc(game: ^Game) {
 	compute_dijkstra_map(game)
 
 	for &enemy in game.enemies {
-		if !enemy.alive { continue }
+		if !enemy.alive {continue}
 
 		// Check if this enemy's tile is currently visible to the player
 		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
@@ -173,15 +173,15 @@ chase_player :: proc(game: ^Game, enemy: ^Enemy) {
 		nx := enemy.pos.x + dx[dir]
 		ny := enemy.pos.y + dy[dir]
 
-		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT { continue }
+		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
 
 		if nx == game.player.pos.x && ny == game.player.pos.y {
 			resolve_attack_enemy_on_player(game, enemy)
 			return
 		}
 
-		if !is_walkable(game, nx, ny) { continue }
-		if enemy_at(game, nx, ny) != nil { continue }
+		if !is_walkable(game, nx, ny) {continue}
+		if enemy_at(game, nx, ny) != nil {continue}
 
 		dist := game.dijkstra_map[pos_to_idx(nx, ny)]
 		if dist < best_dist {
@@ -199,7 +199,7 @@ chase_player :: proc(game: ^Game, enemy: ^Enemy) {
 
 @(private = "file")
 wander :: proc(game: ^Game, enemy: ^Enemy) {
-	if rand.int_max(2) == 0 { return }
+	if rand.int_max(2) == 0 {return}
 
 	DX :: [4]int{0, 0, -1, 1}
 	DY :: [4]int{-1, 1, 0, 0}
@@ -211,10 +211,10 @@ wander :: proc(game: ^Game, enemy: ^Enemy) {
 	nx := enemy.pos.x + dx[dir]
 	ny := enemy.pos.y + dy[dir]
 
-	if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT { return }
-	if !is_walkable(game, nx, ny) { return }
-	if enemy_at(game, nx, ny) != nil { return }
-	if nx == game.player.pos.x && ny == game.player.pos.y { return }
+	if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {return}
+	if !is_walkable(game, nx, ny) {return}
+	if enemy_at(game, nx, ny) != nil {return}
+	if nx == game.player.pos.x && ny == game.player.pos.y {return}
 
 	enemy.pos.x = nx
 	enemy.pos.y = ny

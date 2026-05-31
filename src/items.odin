@@ -14,14 +14,14 @@ item_make :: proc(id: string, pos: Vec2) -> Item {
 	}
 	// Fallback: unknown item
 	fmt.eprintfln("[item] WARNING: unknown item id '%s'", id)
-	return Item{
-		pos       = pos,
+	return Item {
+		pos = pos,
 		item_type = id,
-		name      = id,
-		glyph     = '?',
-		color     = rl.WHITE,
+		name = id,
+		glyph = '?',
+		color = rl.WHITE,
 		picked_up = false,
-		quantity  = 1,
+		quantity = 1,
 	}
 }
 
@@ -71,7 +71,12 @@ pickup_item :: proc(game: ^Game) -> bool {
 				it.picked_up = true
 				add_message(
 					game,
-					fmt.tprintf("Picked up %s (%d/%d).", item_display_name(it), slot.item.quantity, stack_limit),
+					fmt.tprintf(
+						"Picked up %s (%d/%d).",
+						item_display_name(it),
+						slot.item.quantity,
+						stack_limit,
+					),
 					rl.Color{100, 255, 100, 255},
 				)
 				return true
@@ -140,11 +145,11 @@ render_items :: proc(game: ^Game) {
 	oy := i32(game.camera_y)
 
 	for &item in game.items {
-		if item.picked_up { continue }
+		if item.picked_up {continue}
 
 		// Only render items on visible tiles
 		tile := tile_at(game, item.pos.x, item.pos.y)
-		if tile == nil || !tile.visible { continue }
+		if tile == nil || !tile.visible {continue}
 
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
@@ -167,7 +172,7 @@ spawn_items :: proc(game: ^Game) {
 	}
 
 	room_chance := g_data.items.room_item_chance
-	if room_chance <= 0 { room_chance = 50 }
+	if room_chance <= 0 {room_chance = 50}
 
 	total := 0
 
@@ -187,14 +192,14 @@ spawn_items :: proc(game: ^Game) {
 			iy := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
 			pos := Vec2{ix, iy}
 
-			if !is_walkable(game, ix, iy) { continue }
-			if pos == game.player.pos { continue }
+			if !is_walkable(game, ix, iy) {continue}
+			if pos == game.player.pos {continue}
 
 			t := tile_at(game, ix, iy)
-			if t != nil && t.type == .Descent { continue }
+			if t != nil && t.type == .Descent {continue}
 
-			if enemy_at(game, ix, iy) != nil { continue }
-			if item_at(game, ix, iy) != nil { continue }
+			if enemy_at(game, ix, iy) != nil {continue}
+			if item_at(game, ix, iy) != nil {continue}
 
 			def := pick_item_def()
 			if def != nil {

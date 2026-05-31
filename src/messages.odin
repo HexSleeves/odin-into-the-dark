@@ -81,14 +81,14 @@ render_messages :: proc(game: ^Game) {
 
 // Get display name for an enemy (uses .name field populated from data)
 enemy_display_name :: proc(enemy: ^Enemy) -> string {
-	if len(enemy.name) > 0 { return enemy.name }
-	if len(enemy.enemy_type) > 0 { return enemy.enemy_type }
+	if len(enemy.name) > 0 {return enemy.name}
+	if len(enemy.enemy_type) > 0 {return enemy.enemy_type}
 	return "Unknown"
 }
 
 // Get display name for an item (uses .name field populated from data)
 item_display_name :: proc(item: ^Item) -> string {
-	if len(item.name) > 0 { return item.name }
-	if len(item.item_type) > 0 { return item.item_type }
+	if len(item.name) > 0 {return item.name}
+	if len(item.item_type) > 0 {return item.item_type}
 	return "Unknown"
 }
