@@ -70,6 +70,7 @@ game_init :: proc() -> ^Game {
 	// Initialize dynamic collections before generate_map uses them
 	game.rooms = make([dynamic]Room)
 	game.enemies = make([dynamic]Enemy)
+	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]Light_Source)
 
 	// Procedurally generate the mine floor (sets player pos, descent, rooms)
@@ -104,6 +105,7 @@ game_reinit :: proc(game: ^Game) {
 
 	game.rooms = make([dynamic]Room)
 	game.enemies = make([dynamic]Enemy)
+	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]Light_Source)
 
 	clear_messages(game)
@@ -117,6 +119,7 @@ game_reinit :: proc(game: ^Game) {
 game_cleanup :: proc(game: ^Game) {
 	delete(game.rooms)
 	delete(game.enemies)
+	delete(game.items)
 	delete(game.light_sources)
 }
 

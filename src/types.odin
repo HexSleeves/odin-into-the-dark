@@ -88,6 +88,21 @@ Enemy :: struct {
 	alive:      bool,
 }
 
+// ─── Items ────────────────────────────────────────────────────────────────────
+
+Item_Type :: enum {
+	Health_Potion,
+	Torch,
+}
+
+Item :: struct {
+	pos:       Vec2,
+	item_type: Item_Type,
+	glyph:     rune,
+	color:     rl.Color,
+	picked_up: bool,
+}
+
 // ─── Lighting (hook for S03) ──────────────────────────────────────────────────
 
 Light_Source :: struct {
@@ -113,6 +128,7 @@ Game :: struct {
 	player:        Player,
 	rooms:         [dynamic]Room,
 	enemies:       [dynamic]Enemy,
+	items:         [dynamic]Item,
 	light_sources: [dynamic]Light_Source,
 	depth:         int,
 	turn_count:    int,

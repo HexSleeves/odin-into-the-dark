@@ -164,4 +164,7 @@ generate_map :: proc(game: ^Game) {
 
 	// (j) Spawn enemies in rooms (after map is complete)
 	spawn_enemies(game)
+
+	// (k) Spawn items in rooms (after enemies are placed)
+	spawn_items(game)
 }
