@@ -35,62 +35,6 @@ is_walkable :: proc(game: ^Game, x, y: int) -> bool {
 	return false
 }
 
-// ─── Hardcoded test map ───────────────────────────────────────────────────────
-
-// carve_rect sets all tiles in the rectangle [x1,x2) x [y1,y2) to Floor.
-@(private = "file")
-carve_rect :: proc(game: ^Game, x1, y1, x2, y2: int) {
-	for y in y1 ..< y2 {
-		for x in x1 ..< x2 {
-			if x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT {
-				game.tiles[pos_to_idx(x, y)].type = .Floor
-			}
-		}
-	}
-}
-
-// carve_h_corridor sets a 1-tile-high horizontal corridor to Floor.
-@(private = "file")
-carve_h_corridor :: proc(game: ^Game, x1, x2, y: int) {
-	lo := min(x1, x2)
-	hi := max(x1, x2)
-	for x in lo ..= hi {
-		if x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT {
-			game.tiles[pos_to_idx(x, y)].type = .Floor
-		}
-	}
-}
-
-@(private = "file")
-generate_test_map :: proc(game: ^Game) {
-	// All tiles default to Wall (zero-value of Tile_Type).
-
-	// Room 1: 10x8 near center — top-left at (30, 20)
-	room1_x1 :: 30
-	room1_y1 :: 20
-	room1_x2 :: 40 // 30 + 10
-	room1_y2 :: 28 // 20 + 8
-	carve_rect(game, room1_x1, room1_y1, room1_x2, room1_y2)
-
-	// Room 2: 6x5 offset to the right — top-left at (50, 21)
-	room2_x1 :: 50
-	room2_y1 :: 21
-	room2_x2 :: 56 // 50 + 6
-	room2_y2 :: 26 // 21 + 5
-	carve_rect(game, room2_x1, room2_y1, room2_x2, room2_y2)
-
-	// Horizontal corridor connecting rooms at y=23
-	corridor_y :: 23
-	carve_h_corridor(game, room1_x2 - 1, room2_x1, corridor_y)
-
-	// Place a Rubble tile in each room
-	game.tiles[pos_to_idx(34, 24)].type = .Rubble // center-ish of room 1
-	game.tiles[pos_to_idx(53, 23)].type = .Rubble // center-ish of room 2
-
-	// Place the Descent tile in the second room
-	game.tiles[pos_to_idx(52, 24)].type = .Descent
-}
-
 // ─── Game initialization ─────────────────────────────────────────────────────
 
 game_init :: proc() -> Game {
@@ -111,12 +55,9 @@ game_init :: proc() -> Game {
 	game.turn_count = 0
 	game.state = .Playing
 
-	// Build the hardcoded test map (all tiles start as Wall via zero-init)
-	generate_test_map(&game)
-
-	// Place player on a floor tile in room 1
+	// Player defaults (position set by generate_map)
 	game.player = Player {
-		pos          = Vec2{32, 23},
+		pos          = Vec2{0, 0},
 		hp           = 20,
 		max_hp       = 20,
 		attack       = 5,
@@ -125,9 +66,13 @@ game_init :: proc() -> Game {
 		color        = rl.YELLOW,
 	}
 
-	// Empty dynamic collections (zero-init is fine, but be explicit)
+	// Initialize dynamic collections before generate_map uses them
+	game.rooms = make([dynamic]Room)
 	game.enemies = make([dynamic]Enemy)
 	game.light_sources = make([dynamic]Light_Source)
+
+	// Procedurally generate the mine floor (sets player pos, descent, rooms)
+	generate_map(&game)
 
 	return game
 }
@@ -135,6 +80,7 @@ game_init :: proc() -> Game {
 // ─── Cleanup ──────────────────────────────────────────────────────────────────
 
 game_destroy :: proc(game: ^Game) {
+	delete(game.rooms)
 	delete(game.enemies)
 	delete(game.light_sources)
 }

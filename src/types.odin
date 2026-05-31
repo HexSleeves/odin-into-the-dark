@@ -16,6 +16,12 @@ Vec2 :: struct {
 	x, y: int,
 }
 
+// ─── Room ─────────────────────────────────────────────────────────────────────
+
+Room :: struct {
+	x1, y1, x2, y2: int, // inclusive top-left, exclusive bottom-right
+}
+
 // ─── Tiles ────────────────────────────────────────────────────────────────────
 
 Tile_Type :: enum {
@@ -84,6 +90,7 @@ Game :: struct {
 	map_width:     int,
 	map_height:    int,
 	player:        Player,
+	rooms:         [dynamic]Room,
 	enemies:       [dynamic]Enemy,
 	light_sources: [dynamic]Light_Source,
 	depth:         int,
