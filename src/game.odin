@@ -113,6 +113,39 @@ game_reinit :: proc(game: ^Game) {
 	generate_map(game)
 }
 
+// ─── Camera ───────────────────────────────────────────────────────────────
+
+// Centers the viewport on the player, clamped to map edges.
+camera_update :: proc(game: ^Game) {
+	// Player pixel center
+	px := game.player.pos.x * TILE_SIZE + TILE_SIZE / 2
+	py := game.player.pos.y * TILE_SIZE + TILE_SIZE / 2
+
+	// Viewport pixel size (map region only, not HUD/messages)
+	vw := SCREEN_WIDTH
+	vh := MAP_VIEW_HEIGHT
+
+	// Center on player
+	cam_x := px - vw / 2
+	cam_y := py - vh / 2
+
+	// Clamp so we never show past map edges
+	map_pixel_w := MAP_WIDTH * TILE_SIZE
+	map_pixel_h := MAP_HEIGHT * TILE_SIZE
+
+	if cam_x < 0 { cam_x = 0 }
+	if cam_y < 0 { cam_y = 0 }
+	if cam_x + vw > map_pixel_w { cam_x = map_pixel_w - vw }
+	if cam_y + vh > map_pixel_h { cam_y = map_pixel_h - vh }
+
+	// If map is smaller than viewport, center it
+	if map_pixel_w < vw { cam_x = -(vw - map_pixel_w) / 2 }
+	if map_pixel_h < vh { cam_y = -(vh - map_pixel_h) / 2 }
+
+	game.camera_x = cam_x
+	game.camera_y = cam_y
+}
+
 // ─── Cleanup ──────────────────────────────────────────────────────────────────
 
 // Release dynamic allocations (rooms, enemies, light_sources)

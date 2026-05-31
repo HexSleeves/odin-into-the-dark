@@ -97,8 +97,9 @@ descend :: proc(game: ^Game) {
 	// Regenerate the map (clears tiles, places rooms, spawns enemies)
 	generate_map(game)
 
-	// Recompute FOV for new floor
+	// Recompute FOV and camera for new floor
 	compute_fov(game)
+	camera_update(game)
 
 	add_message(
 		game,

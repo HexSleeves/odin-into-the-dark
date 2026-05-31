@@ -171,6 +171,9 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 // ─── Render items on visible tiles ────────────────────────────────────────────
 
 render_items :: proc(game: ^Game) {
+	ox := i32(game.camera_x)
+	oy := i32(game.camera_y)
+
 	for &item in game.items {
 		if item.picked_up {continue}
 
@@ -178,8 +181,8 @@ render_items :: proc(game: ^Game) {
 		tile := tile_at(game, item.pos.x, item.pos.y)
 		if tile == nil || !tile.visible {continue}
 
-		ix := i32(item.pos.x * TILE_SIZE)
-		iy := i32(item.pos.y * TILE_SIZE)
+		ix := i32(item.pos.x * TILE_SIZE) - ox
+		iy := i32(item.pos.y * TILE_SIZE) - oy
 		font_size :: i32(TILE_SIZE)
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(item.glyph)

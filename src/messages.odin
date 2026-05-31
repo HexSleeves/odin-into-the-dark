@@ -4,8 +4,8 @@ import rl "vendor:raylib"
 
 // ─── Message panel layout ────────────────────────────────────────────────────
 
-MSG_PANEL_Y :: i32(MAP_HEIGHT * TILE_SIZE + 48)
-MSG_PANEL_HEIGHT :: i32(SCREEN_HEIGHT) - MSG_PANEL_Y
+MSG_PANEL_Y :: i32(MAP_VIEW_HEIGHT + HUD_REGION_HEIGHT)
+MSG_PANEL_HEIGHT :: i32(MSG_REGION_HEIGHT)
 MSG_FONT_SIZE :: i32(14)
 MSG_LINE_HEIGHT :: i32(16)
 MSG_MAX_VISIBLE :: 7

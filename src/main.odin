@@ -17,6 +17,7 @@ main :: proc() {
 	fmt.printfln("Seed: %v", game.seed)
 
 	compute_fov(game)
+	camera_update(game)
 	add_message(game, "Welcome to the depths. Tread carefully...", rl.Color{200, 200, 100, 255})
 
 	// Disable default escape key to allow inventory to be closed with ESC
@@ -43,6 +44,7 @@ main :: proc() {
 				process_enemy_turns(game)
 				remove_dead_enemies(game)
 				compute_fov(game)
+				camera_update(game)
 
 				// Announce item on player's tile
 				it := item_at(game, game.player.pos.x, game.player.pos.y)
@@ -58,6 +60,7 @@ main :: proc() {
 				process_enemy_turns(game)
 				remove_dead_enemies(game)
 				compute_fov(game)
+				camera_update(game)
 			}
 		} else if game.state == .Game_Over {
 			if rl.IsKeyPressed(.R) {
@@ -65,6 +68,7 @@ main :: proc() {
 				game^ = {}
 				game_reinit(game)
 				compute_fov(game)
+				camera_update(game)
 				add_message(game, "A new journey begins...", rl.Color{200, 200, 100, 255})
 			}
 			if rl.IsKeyPressed(.ESCAPE) {

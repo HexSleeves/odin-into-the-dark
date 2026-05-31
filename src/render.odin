@@ -36,31 +36,32 @@ base_tile_color :: proc(type: Tile_Type) -> rl.Color {
 
 get_tile_color :: proc(tile: Tile) -> rl.Color {
 	if tile.visible {
-		// Visible: full color modulated by light_level for falloff
 		return dim_color(base_tile_color(tile.type), max(tile.light_level, 0.3))
 	}
 	if tile.explored {
-		// Explored but not visible: dimmed
 		return dim_color(base_tile_color(tile.type), EXPLORED_DIM)
 	}
-	// Unseen
 	return UNSEEN_COLOR
 }
 
-// ─── Map rendering ────────────────────────────────────────────────────────────
+// ─── Map rendering (with camera offset) ───────────────────────────────────────
 
 render_map :: proc(game: ^Game) {
+	ox := i32(game.camera_x)
+	oy := i32(game.camera_y)
+
 	for y in 0 ..< MAP_HEIGHT {
 		for x in 0 ..< MAP_WIDTH {
+			sx := i32(x * TILE_SIZE) - ox
+			sy := i32(y * TILE_SIZE) - oy
+
+			// Cull tiles entirely outside the map viewport
+			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) { continue }
+			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) { continue }
+
 			tile := game.tiles[pos_to_idx(x, y)]
 			color := get_tile_color(tile)
-			rl.DrawRectangle(
-				i32(x * TILE_SIZE),
-				i32(y * TILE_SIZE),
-				i32(TILE_SIZE),
-				i32(TILE_SIZE),
-				color,
-			)
+			rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), color)
 		}
 	}
 }
@@ -68,10 +69,9 @@ render_map :: proc(game: ^Game) {
 // ─── Player rendering ─────────────────────────────────────────────────────────
 
 render_player :: proc(game: ^Game) {
-	px := i32(game.player.pos.x * TILE_SIZE)
-	py := i32(game.player.pos.y * TILE_SIZE)
+	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
+	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
 
-	// Draw '@' glyph centered in the tile
 	font_size :: i32(TILE_SIZE)
 	glyph_buf: [2]u8
 	glyph_buf[0] = u8(game.player.glyph)
@@ -83,15 +83,17 @@ render_player :: proc(game: ^Game) {
 // ─── Enemy rendering ──────────────────────────────────────────────────────────
 
 render_enemies :: proc(game: ^Game) {
+	ox := i32(game.camera_x)
+	oy := i32(game.camera_y)
+
 	for &enemy in game.enemies {
-		if !enemy.alive {continue}
+		if !enemy.alive { continue }
 
-		// Only render enemies on visible tiles
 		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-		if tile == nil || !tile.visible {continue}
+		if tile == nil || !tile.visible { continue }
 
-		ex := i32(enemy.pos.x * TILE_SIZE)
-		ey := i32(enemy.pos.y * TILE_SIZE)
+		ex := i32(enemy.pos.x * TILE_SIZE) - ox
+		ey := i32(enemy.pos.y * TILE_SIZE) - oy
 
 		font_size :: i32(TILE_SIZE)
 		glyph_buf: [2]u8
@@ -102,87 +104,66 @@ render_enemies :: proc(game: ^Game) {
 	}
 }
 
-// ─── HUD rendering ────────────────────────────────────────────────────────────
-
-HUD_Y :: i32(MAP_HEIGHT * TILE_SIZE + 4)
-HUD_HEIGHT :: i32(SCREEN_HEIGHT) - HUD_Y
+// ─── HUD rendering (fixed region below map viewport) ──────────────────────────
 
 render_hud :: proc(game: ^Game) {
+	hud_y := i32(MAP_VIEW_HEIGHT)
+
 	// Background bar
-	rl.DrawRectangle(0, HUD_Y, i32(SCREEN_WIDTH), HUD_HEIGHT, rl.Color{20, 20, 25, 255})
+	rl.DrawRectangle(0, hud_y, i32(SCREEN_WIDTH), i32(HUD_REGION_HEIGHT), rl.Color{20, 20, 25, 255})
 
 	// HP bar
 	hp_ratio := f32(max(game.player.hp, 0)) / f32(game.player.max_hp)
 	hp_bar_w :: i32(200)
 	hp_bar_h :: i32(16)
 	hp_x :: i32(8)
-	hp_y := HUD_Y + 4
+	hp_y := hud_y + 4
 
 	// Background (red)
 	rl.DrawRectangle(hp_x, hp_y, hp_bar_w, hp_bar_h, rl.Color{80, 20, 20, 255})
 	// Foreground (green)
-	rl.DrawRectangle(
-		hp_x,
-		hp_y,
-		i32(f32(hp_bar_w) * hp_ratio),
-		hp_bar_h,
-		rl.Color{40, 180, 40, 255},
-	)
+	rl.DrawRectangle(hp_x, hp_y, i32(f32(hp_bar_w) * hp_ratio), hp_bar_h, rl.Color{40, 180, 40, 255})
 
 	// HP text
 	rl.DrawText(
 		rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
-		hp_x + 4,
-		hp_y + 1,
-		14,
-		rl.WHITE,
+		hp_x + 4, hp_y + 1, 14, rl.WHITE,
 	)
 
 	// Stats line
 	stats_y := hp_y + hp_bar_h + 4
 
-	// Count alive enemies
 	alive_count: i32 = 0
 	for &e in game.enemies {
-		if e.alive {alive_count += 1}
+		if e.alive { alive_count += 1 }
 	}
 
 	rl.DrawText(
 		rl.TextFormat(
 			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  .=Wait",
-			i32(game.depth),
-			i32(game.player.light_radius),
-			alive_count,
-			i32(game.turn_count),
+			i32(game.depth), i32(game.player.light_radius), alive_count, i32(game.turn_count),
 		),
-		hp_x,
-		stats_y,
-		14,
-		rl.Color{180, 180, 180, 255},
+		hp_x, stats_y, 14, rl.Color{180, 180, 180, 255},
 	)
 }
 
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
 
 render_inventory :: proc(game: ^Game) {
-	// Semi-transparent dark overlay
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
 
-	// Title: "INVENTORY" centered
 	title := cstring("INVENTORY")
 	title_size :: i32(30)
 	title_w := rl.MeasureText(title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
 	rl.DrawText(title, title_x, 100, title_size, rl.WHITE)
 
-	// Subtitle
 	subtitle := cstring("Press 1-9 to use | I or ESC to close")
 	subtitle_size :: i32(14)
 	sub_w := rl.MeasureText(subtitle, subtitle_size)
 	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
 	rl.DrawText(subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
 
-	// Inventory slots
 	slot_size :: i32(16)
 	slot_x :: i32(440)
 	empty_color :: rl.Color{80, 80, 80, 255}
@@ -195,27 +176,18 @@ render_inventory :: proc(game: ^Game) {
 			if it.quantity > 1 {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s x%d", idx + 1, name, it.quantity),
-					slot_x,
-					y_pos,
-					slot_size,
-					it.color,
+					slot_x, y_pos, slot_size, it.color,
 				)
 			} else {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s", idx + 1, name),
-					slot_x,
-					y_pos,
-					slot_size,
-					it.color,
+					slot_x, y_pos, slot_size, it.color,
 				)
 			}
 		} else {
 			rl.DrawText(
 				fmt.ctprintf("%d. [empty]", idx + 1),
-				slot_x,
-				y_pos,
-				slot_size,
-				empty_color,
+				slot_x, y_pos, slot_size, empty_color,
 			)
 		}
 	}
@@ -224,46 +196,39 @@ render_inventory :: proc(game: ^Game) {
 // ─── Game Over screen ─────────────────────────────────────────────────────────
 
 render_game_over :: proc(game: ^Game) {
-	MAP_PIXEL_HEIGHT :: i32(MAP_HEIGHT * TILE_SIZE)
-
-	// Dim overlay over the map area
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 180})
 
-	// "GAME OVER" centered over map area
+	center_y := i32(MAP_VIEW_HEIGHT) / 2 - 60
+
 	title_size :: i32(40)
 	title := cstring("GAME OVER")
 	title_w := rl.MeasureText(title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	title_y := MAP_PIXEL_HEIGHT / 2 - 60
-	rl.DrawText(title, title_x, title_y, title_size, rl.RED)
+	rl.DrawText(title, title_x, center_y, title_size, rl.RED)
 
-	// Depth reached
 	depth_size :: i32(20)
 	depth_text := rl.TextFormat("Reached depth %d", i32(game.depth))
 	depth_w := rl.MeasureText(depth_text, depth_size)
 	depth_x := (i32(SCREEN_WIDTH) - depth_w) / 2
-	rl.DrawText(depth_text, depth_x, title_y + 50, depth_size, rl.Color{200, 200, 200, 255})
+	rl.DrawText(depth_text, depth_x, center_y + 50, depth_size, rl.Color{200, 200, 200, 255})
 
-	// Stats line (kills + turns)
 	stats_size :: i32(18)
 	stats_text := rl.TextFormat(
 		"Enemies slain: %d  |  Turns: %d",
-		i32(game.kills),
-		i32(game.turn_count),
+		i32(game.kills), i32(game.turn_count),
 	)
 	stats_w := rl.MeasureText(stats_text, stats_size)
 	stats_x := (i32(SCREEN_WIDTH) - stats_w) / 2
-	rl.DrawText(stats_text, stats_x, title_y + 80, stats_size, rl.Color{180, 180, 180, 255})
+	rl.DrawText(stats_text, stats_x, center_y + 80, stats_size, rl.Color{180, 180, 180, 255})
 
-	// Restart prompt
 	restart := cstring("Press R to restart  |  ESC to quit")
 	restart_size :: i32(16)
 	restart_w := rl.MeasureText(restart, restart_size)
 	restart_x := (i32(SCREEN_WIDTH) - restart_w) / 2
-	rl.DrawText(restart, restart_x, title_y + 110, restart_size, rl.Color{150, 150, 150, 255})
+	rl.DrawText(restart, restart_x, center_y + 110, restart_size, rl.Color{150, 150, 150, 255})
 }
 
-// ─── Mouse hover tooltip ──────────────────────────────────────────────────────
+// ─── Mouse hover tooltip (camera-aware) ───────────────────────────────────────
 
 TOOLTIP_BG_COLOR :: rl.Color{20, 20, 25, 230}
 TOOLTIP_TEXT_COLOR :: rl.WHITE
@@ -275,21 +240,23 @@ TOOLTIP_OFFSET_Y :: i32(-20)
 
 render_tooltip :: proc(game: ^Game) {
 	mouse := rl.GetMousePosition()
-	tile_x := int(mouse.x) / TILE_SIZE
-	tile_y := int(mouse.y) / TILE_SIZE
 
-	// Bounds check
+	// Only show tooltips when mouse is in the map viewport region
+	if int(mouse.y) >= MAP_VIEW_HEIGHT { return }
+
+	// Convert screen coordinates to tile coordinates using camera offset
+	tile_x := (int(mouse.x) + game.camera_x) / TILE_SIZE
+	tile_y := (int(mouse.y) + game.camera_y) / TILE_SIZE
+
 	if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
 		return
 	}
 
-	// Only show tooltips on visible tiles
 	tile := tile_at(game, tile_x, tile_y)
 	if tile == nil || !tile.visible {
 		return
 	}
 
-	// Determine tooltip text
 	tooltip_text: cstring
 
 	if game.player.pos.x == tile_x && game.player.pos.y == tile_y {
@@ -303,30 +270,18 @@ render_tooltip :: proc(game: ^Game) {
 		tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
 	}
 
-	// Measure text and compute tooltip rect
 	text_w := rl.MeasureText(tooltip_text, TOOLTIP_FONT_SIZE)
 	box_w := text_w + TOOLTIP_PAD_X * 2
 	box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
 
-	// Position with offset from mouse, clamped to screen
 	box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
 	box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
 
-	// Clamp to screen bounds
-	if box_x + box_w > i32(SCREEN_WIDTH) {
-		box_x = i32(SCREEN_WIDTH) - box_w
-	}
-	if box_x < 0 {
-		box_x = 0
-	}
-	if box_y < 0 {
-		box_y = 0
-	}
-	if box_y + box_h > i32(SCREEN_HEIGHT) {
-		box_y = i32(SCREEN_HEIGHT) - box_h
-	}
+	if box_x + box_w > i32(SCREEN_WIDTH) { box_x = i32(SCREEN_WIDTH) - box_w }
+	if box_x < 0 { box_x = 0 }
+	if box_y < 0 { box_y = 0 }
+	if box_y + box_h > i32(SCREEN_HEIGHT) { box_y = i32(SCREEN_HEIGHT) - box_h }
 
-	// Draw background and text
 	rl.DrawRectangle(box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
 	rl.DrawText(tooltip_text, box_x + TOOLTIP_PAD_X, box_y + TOOLTIP_PAD_Y, TOOLTIP_FONT_SIZE, TOOLTIP_TEXT_COLOR)
 }
@@ -337,12 +292,17 @@ render_game :: proc(game: ^Game) {
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.BLACK)
 
+	// Clip the map rendering to the viewport region so it doesn't bleed into HUD/messages
+	rl.BeginScissorMode(0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
 	render_map(game)
 	render_items(game)
 	render_enemies(game)
 	render_player(game)
+	rl.EndScissorMode()
+
 	render_hud(game)
 	render_messages(game)
+
 	if game.state == .Playing {
 		render_tooltip(game)
 	}
