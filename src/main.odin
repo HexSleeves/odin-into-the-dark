@@ -22,6 +22,16 @@ main :: proc() {
 	for !rl.WindowShouldClose() {
 		// ── Update ──
 		if game.state == .Playing {
+			// G key: pick up item (instant, no turn cost)
+			if rl.IsKeyPressed(.G) {
+				pickup_item(game)
+			}
+
+			// I key: open inventory screen
+			if rl.IsKeyPressed(.I) {
+				game.state = .Viewing_Inventory
+			}
+
 			result := handle_input(game)
 			if result == .Quit {
 				break
@@ -47,6 +57,18 @@ main :: proc() {
 			}
 			if rl.IsKeyPressed(.ESCAPE) {
 				break
+			}
+		} else if game.state == .Viewing_Inventory {
+			// I or Escape closes inventory
+			if rl.IsKeyPressed(.I) || rl.IsKeyPressed(.ESCAPE) {
+				game.state = .Playing
+			}
+			// Number keys 1-9 to use items
+			keys := [9]rl.KeyboardKey{.ONE, .TWO, .THREE, .FOUR, .FIVE, .SIX, .SEVEN, .EIGHT, .NINE}
+			for key, idx in keys {
+				if rl.IsKeyPressed(key) {
+					use_item(game, idx)
+				}
 			}
 		}
 

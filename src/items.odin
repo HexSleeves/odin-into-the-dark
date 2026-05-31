@@ -53,6 +53,67 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 	return nil
 }
 
+// ─── Pick up item at player position ──────────────────────────────────────────
+
+pickup_item :: proc(game: ^Game) -> bool {
+	it := item_at(game, game.player.pos.x, game.player.pos.y)
+	if it == nil {
+		add_message(game, "Nothing to pick up here.", rl.Color{180, 180, 180, 255})
+		return false
+	}
+
+	// Find first empty inventory slot
+	slot_idx := -1
+	for i in 0 ..< MAX_INVENTORY {
+		if !game.inventory[i].occupied {
+			slot_idx = i
+			break
+		}
+	}
+
+	if slot_idx < 0 {
+		add_message(game, "Inventory is full!", rl.Color{255, 100, 100, 255})
+		return false
+	}
+
+	// Copy item into slot and mark map item as picked up
+	game.inventory[slot_idx].occupied = true
+	game.inventory[slot_idx].item = it^
+	it.picked_up = true
+
+	add_message(game, fmt.tprintf("Picked up %s.", item_type_name(it.item_type)), rl.Color{100, 255, 100, 255})
+	return true
+}
+
+// ─── Use an item from inventory ───────────────────────────────────────────────
+
+use_item :: proc(game: ^Game, slot_index: int) -> bool {
+	if slot_index < 0 || slot_index >= MAX_INVENTORY {
+		return false
+	}
+	if !game.inventory[slot_index].occupied {
+		return false
+	}
+
+	itype := game.inventory[slot_index].item.item_type
+
+	switch itype {
+	case .Health_Potion:
+		heal_amount :: 8
+		actual_heal := min(heal_amount, game.player.max_hp - game.player.hp)
+		game.player.hp = min(game.player.hp + heal_amount, game.player.max_hp)
+		add_message(game, fmt.tprintf("You use the Health Potion. Restored %d HP.", actual_heal), rl.Color{100, 255, 100, 255})
+	case .Torch:
+		radius_boost :: 3
+		game.player.light_radius = min(game.player.light_radius + radius_boost, 10)
+		add_message(game, "You use the Torch. Light radius increased.", rl.Color{255, 180, 50, 255})
+	}
+
+	// Clear the slot
+	game.inventory[slot_index] = {}
+	return true
+}
+
 // ─── Render items on visible tiles ────────────────────────────────────────────
 
 render_items :: proc(game: ^Game) {
