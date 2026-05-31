@@ -1,5 +1,6 @@
 package main
 
+import "core:fmt"
 import rl "vendor:raylib"
 
 // ─── Tile color constants ─────────────────────────────────────────────────────
@@ -140,9 +141,45 @@ render_hud :: proc(game: ^Game) {
 		if e.alive { alive_count += 1 }
 	}
 
-	rl.DrawText(rl.TextFormat("Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d",
+	rl.DrawText(rl.TextFormat("Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv",
 		i32(game.depth), i32(game.player.light_radius), alive_count, i32(game.turn_count)),
 		hp_x, stats_y, 14, rl.Color{180, 180, 180, 255})
+}
+
+// ─── Inventory overlay screen ─────────────────────────────────────────────────
+
+render_inventory :: proc(game: ^Game) {
+	// Semi-transparent dark overlay
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
+
+	// Title: "INVENTORY" centered
+	title := cstring("INVENTORY")
+	title_size :: i32(30)
+	title_w := rl.MeasureText(title, title_size)
+	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
+	rl.DrawText(title, title_x, 100, title_size, rl.WHITE)
+
+	// Subtitle
+	subtitle := cstring("Press 1-9 to use | I or ESC to close")
+	subtitle_size :: i32(14)
+	sub_w := rl.MeasureText(subtitle, subtitle_size)
+	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
+	rl.DrawText(subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
+
+	// Inventory slots
+	slot_size :: i32(16)
+	slot_x :: i32(440)
+	empty_color :: rl.Color{80, 80, 80, 255}
+
+	for idx in 0 ..< MAX_INVENTORY {
+		y_pos := i32(180) + i32(idx) * 28
+		if game.inventory[idx].occupied {
+			name := item_type_name(game.inventory[idx].item.item_type)
+			rl.DrawText(fmt.ctprintf("%d. %s", idx + 1, name), slot_x, y_pos, slot_size, game.inventory[idx].item.color)
+		} else {
+			rl.DrawText(fmt.ctprintf("%d. [empty]", idx + 1), slot_x, y_pos, slot_size, empty_color)
+		}
+	}
 }
 
 // ─── Game Over screen ─────────────────────────────────────────────────────────
@@ -190,6 +227,9 @@ render_game :: proc(game: ^Game) {
 	render_messages(game)
 	if game.state == .Game_Over {
 		render_game_over(game)
+	}
+	if game.state == .Viewing_Inventory {
+		render_inventory(game)
 	}
 
 	rl.EndDrawing()
