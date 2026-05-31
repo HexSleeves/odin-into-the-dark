@@ -263,6 +263,74 @@ render_game_over :: proc(game: ^Game) {
 	rl.DrawText(restart, restart_x, title_y + 110, restart_size, rl.Color{150, 150, 150, 255})
 }
 
+// ─── Mouse hover tooltip ──────────────────────────────────────────────────────
+
+TOOLTIP_BG_COLOR :: rl.Color{20, 20, 25, 230}
+TOOLTIP_TEXT_COLOR :: rl.WHITE
+TOOLTIP_FONT_SIZE :: i32(14)
+TOOLTIP_PAD_X :: i32(6)
+TOOLTIP_PAD_Y :: i32(4)
+TOOLTIP_OFFSET_X :: i32(12)
+TOOLTIP_OFFSET_Y :: i32(-20)
+
+render_tooltip :: proc(game: ^Game) {
+	mouse := rl.GetMousePosition()
+	tile_x := int(mouse.x) / TILE_SIZE
+	tile_y := int(mouse.y) / TILE_SIZE
+
+	// Bounds check
+	if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
+		return
+	}
+
+	// Only show tooltips on visible tiles
+	tile := tile_at(game, tile_x, tile_y)
+	if tile == nil || !tile.visible {
+		return
+	}
+
+	// Determine tooltip text
+	tooltip_text: cstring
+
+	if game.player.pos.x == tile_x && game.player.pos.y == tile_y {
+		tooltip_text = fmt.ctprintf("You (%d/%d HP)", game.player.hp, game.player.max_hp)
+	} else {
+		enemy := enemy_at(game, tile_x, tile_y)
+		if enemy == nil {
+			return
+		}
+		name := enemy_type_name(enemy.enemy_type)
+		tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
+	}
+
+	// Measure text and compute tooltip rect
+	text_w := rl.MeasureText(tooltip_text, TOOLTIP_FONT_SIZE)
+	box_w := text_w + TOOLTIP_PAD_X * 2
+	box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
+
+	// Position with offset from mouse, clamped to screen
+	box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
+	box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
+
+	// Clamp to screen bounds
+	if box_x + box_w > i32(SCREEN_WIDTH) {
+		box_x = i32(SCREEN_WIDTH) - box_w
+	}
+	if box_x < 0 {
+		box_x = 0
+	}
+	if box_y < 0 {
+		box_y = 0
+	}
+	if box_y + box_h > i32(SCREEN_HEIGHT) {
+		box_y = i32(SCREEN_HEIGHT) - box_h
+	}
+
+	// Draw background and text
+	rl.DrawRectangle(box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
+	rl.DrawText(tooltip_text, box_x + TOOLTIP_PAD_X, box_y + TOOLTIP_PAD_Y, TOOLTIP_FONT_SIZE, TOOLTIP_TEXT_COLOR)
+}
+
 // ─── Top-level render call ────────────────────────────────────────────────────
 
 render_game :: proc(game: ^Game) {
@@ -275,6 +343,9 @@ render_game :: proc(game: ^Game) {
 	render_player(game)
 	render_hud(game)
 	render_messages(game)
+	if game.state == .Playing {
+		render_tooltip(game)
+	}
 	if game.state == .Game_Over {
 		render_game_over(game)
 	}
