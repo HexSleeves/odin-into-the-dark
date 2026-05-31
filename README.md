@@ -29,13 +29,13 @@ Or build first, then run the binary:
 
 ## Controls
 
-| Key              | Action |
-|------------------|--------|
-| W / ↑            | Move up |
-| S / ↓            | Move down |
-| A / ←            | Move left |
-| D / →            | Move right |
-| Escape           | Quit |
+| Key    | Action     |
+| ------ | ---------- |
+| W / ↑  | Move up    |
+| S / ↓  | Move down  |
+| A / ←  | Move left  |
+| D / →  | Move right |
+| Escape | Quit       |
 
 ## Current State
 
