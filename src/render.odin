@@ -148,15 +148,17 @@ render_hud :: proc(game: ^Game) {
 // ─── Game Over screen ─────────────────────────────────────────────────────────
 
 render_game_over :: proc(game: ^Game) {
-	// Dim overlay
+	MAP_PIXEL_HEIGHT :: i32(MAP_HEIGHT * TILE_SIZE)
+
+	// Dim overlay over the map area
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 180})
 
-	// "GAME OVER" centered
+	// "GAME OVER" centered over map area
 	title_size :: i32(40)
 	title := cstring("GAME OVER")
 	title_w := rl.MeasureText(title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	title_y := i32(SCREEN_HEIGHT) / 2 - 60
+	title_y := MAP_PIXEL_HEIGHT / 2 - 60
 	rl.DrawText(title, title_x, title_y, title_size, rl.RED)
 
 	// Depth reached
@@ -184,6 +186,7 @@ render_game :: proc(game: ^Game) {
 	render_enemies(game)
 	render_player(game)
 	render_hud(game)
+	render_messages(game)
 	if game.state == .Game_Over {
 		render_game_over(game)
 	}

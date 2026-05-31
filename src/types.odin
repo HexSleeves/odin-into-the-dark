@@ -6,9 +6,27 @@ import rl "vendor:raylib"
 
 TILE_SIZE      :: 16
 SCREEN_WIDTH   :: 1280
-SCREEN_HEIGHT  :: 800
+SCREEN_HEIGHT  :: 960
 MAP_WIDTH      :: 80
 MAP_HEIGHT     :: 50
+
+// ─── Message Log ──────────────────────────────────────────────────────────────
+
+MAX_MESSAGES :: 64
+MAX_MSG_LEN  :: 256
+
+Message :: struct {
+	text:     [MAX_MSG_LEN]u8,
+	text_len: int,
+	color:    rl.Color,
+	turn:     int,
+}
+
+MessageLog :: struct {
+	messages: [MAX_MESSAGES]Message,
+	head:     int,
+	count:    int,
+}
 
 // ─── Vector ───────────────────────────────────────────────────────────────────
 
@@ -100,4 +118,5 @@ Game :: struct {
 	turn_count:    int,
 	seed:          u64,
 	state:         Game_State,
+	message_log:   MessageLog,
 }

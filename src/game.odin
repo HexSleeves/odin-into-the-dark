@@ -106,6 +106,8 @@ game_reinit :: proc(game: ^Game) {
 	game.enemies = make([dynamic]Enemy)
 	game.light_sources = make([dynamic]Light_Source)
 
+	clear_messages(game)
+
 	generate_map(game)
 }
 
