@@ -172,7 +172,7 @@ render_inventory :: proc(game: ^Game) {
 		y_pos := i32(180) + i32(idx) * 28
 		if game.inventory[idx].occupied {
 			it := game.inventory[idx].item
-			name := item_type_name(it.item_type)
+			name := item_display_name(&it)
 			if it.quantity > 1 {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s x%d", idx + 1, name, it.quantity),
@@ -266,7 +266,7 @@ render_tooltip :: proc(game: ^Game) {
 		if enemy == nil {
 			return
 		}
-		name := enemy_type_name(enemy.enemy_type)
+		name := enemy_display_name(enemy)
 		tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
 	}
 

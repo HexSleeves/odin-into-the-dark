@@ -92,7 +92,7 @@ descend :: proc(game: ^Game) {
 	game.depth += 1
 
 	// Reduce light radius with depth (min 3)
-	game.player.light_radius = max(8 - game.depth + 1, 3)
+	game.player.light_radius = max(g_data.player.light_radius - game.depth + 1, 3)
 
 	// Regenerate the map (clears tiles, places rooms, spawns enemies)
 	generate_map(game)

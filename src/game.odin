@@ -56,16 +56,8 @@ game_init :: proc() -> ^Game {
 	game.turn_count = 0
 	game.state = .Playing
 
-	// Player defaults (position set by generate_map)
-	game.player = Player {
-		pos          = Vec2{0, 0},
-		hp           = 20,
-		max_hp       = 20,
-		attack       = 5,
-		light_radius = 8,
-		glyph        = '@',
-		color        = rl.YELLOW,
-	}
+	// Player defaults from data (position set by generate_map)
+	init_player_from_data(game)
 
 	// Initialize dynamic collections before generate_map uses them
 	game.rooms = make([dynamic]Room)
@@ -93,15 +85,7 @@ game_reinit :: proc(game: ^Game) {
 	game.turn_count = 0
 	game.state = .Playing
 
-	game.player = Player {
-		pos          = Vec2{0, 0},
-		hp           = 20,
-		max_hp       = 20,
-		attack       = 5,
-		light_radius = 8,
-		glyph        = '@',
-		color        = rl.YELLOW,
-	}
+	init_player_from_data(game)
 
 	game.rooms = make([dynamic]Room)
 	game.enemies = make([dynamic]Enemy)
@@ -111,6 +95,23 @@ game_reinit :: proc(game: ^Game) {
 	clear_messages(game)
 
 	generate_map(game)
+}
+
+// ─── Initialize player from data ─────────────────────────────────────────────
+
+init_player_from_data :: proc(game: ^Game) {
+	p := &g_data.player
+	p_glyph: rune = '@'
+	if len(p.glyph) > 0 { p_glyph = rune(p.glyph[0]) }
+	game.player = Player{
+		pos          = Vec2{0, 0},
+		hp           = p.hp,
+		max_hp       = p.hp,
+		attack       = p.attack,
+		light_radius = p.light_radius,
+		glyph        = p_glyph,
+		color        = json5_color_to_rl(p.color),
+	}
 }
 
 // ─── Camera ───────────────────────────────────────────────────────────────

@@ -11,6 +11,12 @@ main :: proc() {
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 
+	// Load all external data files (enemies, items, player)
+	if !data_load_all() {
+		fmt.eprintln("[FATAL] Failed to load data files. Exiting.")
+		return
+	}
+
 	game := game_init()
 	defer game_destroy(game)
 
@@ -51,7 +57,7 @@ main :: proc() {
 				if it != nil {
 					add_message(
 						game,
-						fmt.tprintf("You see a %s here.", item_type_name(it.item_type)),
+						fmt.tprintf("You see a %s here.", item_display_name(it)),
 						rl.Color{255, 255, 100, 255},
 					)
 				}

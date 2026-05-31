@@ -1,0 +1,8 @@
+// Player starting stats
+{
+  hp: 20,
+  attack: 5,
+  light_radius: 8,
+  glyph: "@",
+  color: [255, 255, 0, 255],
+}

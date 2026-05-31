@@ -1,0 +1,76 @@
+// Enemy definitions for Into the Depths
+// Stats, visuals, and depth-based spawn weights
+{
+  enemies: [
+    {
+      id: "rat",
+      name: "Rat",
+      glyph: "r",
+      color: [150, 120, 80, 255],
+      hp: 3,
+      attack: 1,
+    },
+    {
+      id: "miner_husk",
+      name: "Miner Husk",
+      glyph: "H",
+      color: [180, 180, 160, 255],
+      hp: 6,
+      attack: 3,
+    },
+    {
+      id: "cave_crawler",
+      name: "Cave Crawler",
+      glyph: "C",
+      color: [100, 200, 100, 255],
+      hp: 10,
+      attack: 4,
+    },
+    {
+      id: "deep_watcher",
+      name: "Deep Watcher",
+      glyph: "W",
+      color: [180, 50, 220, 255],
+      hp: 15,
+      attack: 6,
+    },
+  ],
+
+  // Spawn tables: for each depth range, weighted random selection.
+  // Weights don't need to sum to 100 — they're relative.
+  spawn_tables: [
+    {
+      depth_min: 1, depth_max: 1,
+      weights: [
+        { id: "rat", weight: 80 },
+        { id: "miner_husk", weight: 20 },
+      ],
+    },
+    {
+      depth_min: 2, depth_max: 2,
+      weights: [
+        { id: "rat", weight: 40 },
+        { id: "miner_husk", weight: 40 },
+        { id: "cave_crawler", weight: 20 },
+      ],
+    },
+    {
+      depth_min: 3, depth_max: 3,
+      weights: [
+        { id: "rat", weight: 20 },
+        { id: "miner_husk", weight: 30 },
+        { id: "cave_crawler", weight: 35 },
+        { id: "deep_watcher", weight: 15 },
+      ],
+    },
+    {
+      // Deep floors: harder enemies dominate
+      depth_min: 4, depth_max: 99,
+      weights: [
+        { id: "miner_husk", weight: 10 },
+        { id: "cave_crawler", weight: 40 },
+        { id: "deep_watcher", weight: 50 },
+      ],
+    },
+  ],
+}

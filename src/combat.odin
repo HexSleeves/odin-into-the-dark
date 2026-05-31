@@ -12,7 +12,7 @@ resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 	enemy.hp -= damage
 	add_message(
 		game,
-		fmt.tprintf("You hit the %s for %d damage.", enemy_type_name(enemy.enemy_type), damage),
+		fmt.tprintf("You hit the %s for %d damage.", enemy_display_name(enemy), damage),
 		rl.Color{200, 200, 200, 255},
 	)
 
@@ -21,7 +21,7 @@ resolve_attack_player_on_enemy :: proc(game: ^Game, enemy: ^Enemy) {
 		game.kills += 1
 		add_message(
 			game,
-			fmt.tprintf("The %s is killed!", enemy_type_name(enemy.enemy_type)),
+			fmt.tprintf("The %s is killed!", enemy_display_name(enemy)),
 			rl.Color{0, 255, 0, 255},
 		)
 	}
@@ -33,7 +33,7 @@ resolve_attack_enemy_on_player :: proc(game: ^Game, enemy: ^Enemy) {
 	game.player.hp -= damage
 	add_message(
 		game,
-		fmt.tprintf("The %s hits you for %d damage!", enemy_type_name(enemy.enemy_type), damage),
+		fmt.tprintf("The %s hits you for %d damage!", enemy_display_name(enemy), damage),
 		rl.Color{255, 100, 100, 255},
 	)
 

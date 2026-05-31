@@ -76,19 +76,13 @@ Player :: struct {
 
 // ─── Enemies ──────────────────────────────────────────────────────────────────
 
-Enemy_Type :: enum {
-	Rat,
-	Miner_Husk,
-	Cave_Crawler,
-	Deep_Watcher,
-}
-
 Enemy :: struct {
 	pos:        Vec2,
 	hp:         int,
 	max_hp:     int,
 	attack:     int,
-	enemy_type: Enemy_Type,
+	enemy_type: string, // data-driven ID (e.g. "rat", "cave_crawler")
+	name:       string, // display name from data
 	glyph:      rune,
 	color:      rl.Color,
 	alive:      bool,
@@ -98,14 +92,10 @@ Enemy :: struct {
 
 MAX_INVENTORY :: 9
 
-Item_Type :: enum {
-	Health_Potion,
-	Torch,
-}
-
 Item :: struct {
 	pos:       Vec2,
-	item_type: Item_Type,
+	item_type: string, // data-driven ID (e.g. "health_potion", "torch")
+	name:      string, // display name from data
 	glyph:     rune,
 	color:     rl.Color,
 	picked_up: bool,
