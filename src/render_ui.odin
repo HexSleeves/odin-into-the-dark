@@ -516,56 +516,58 @@ render_help :: proc(game: ^Game) {
 	rl.DrawText("?                This help screen", col2_x, start_y + line_h * 2, 14, desc_color)
 	rl.DrawText("ESC              Close menu / Quit", col2_x, start_y + line_h * 3, 14, desc_color)
 	rl.DrawText("R  (game over)   Restart", col2_x, start_y + line_h * 4, 14, desc_color)
+	rl.DrawText("F5               Save game", col2_x, start_y + line_h * 5, 14, key_color)
+	rl.DrawText("F9               Load game", col2_x, start_y + line_h * 6, 14, key_color)
 
-	rl.DrawText("TILE LEGEND", col2_x, start_y + line_h * 6, 16, head_color)
-	rl.DrawText("@  You", col2_x, start_y + line_h * 7, 14, rl.YELLOW)
+	rl.DrawText("TILE LEGEND", col2_x, start_y + line_h * 8, 16, head_color)
+	rl.DrawText("@  You", col2_x, start_y + line_h * 9, 14, rl.YELLOW)
 	rl.DrawText(
 		">  Descent to next depth",
 		col2_x,
-		start_y + line_h * 8,
+		start_y + line_h * 10,
 		14,
 		rl.Color{0, 200, 200, 255},
 	)
 	rl.DrawText(
 		"*  Ore vein (colored dot on wall)",
 		col2_x,
-		start_y + line_h * 9,
+		start_y + line_h * 11,
 		14,
 		rl.Color{200, 120, 50, 255},
 	)
 	rl.DrawText(
 		"~  Water (slows movement)",
 		col2_x,
-		start_y + line_h * 10,
+		start_y + line_h * 12,
 		14,
 		rl.Color{40, 80, 180, 255},
 	)
 	rl.DrawText(
 		"!  Gas vent (damages you)",
 		col2_x,
-		start_y + line_h * 11,
+		start_y + line_h * 13,
 		14,
 		rl.Color{160, 180, 40, 255},
 	)
 	rl.DrawText(
 		"^  Unstable ground (collapses)",
 		col2_x,
-		start_y + line_h * 12,
+		start_y + line_h * 14,
 		14,
 		rl.Color{180, 120, 60, 255},
 	)
 	rl.DrawText(
 		"#  Anvil (stand on it, press C)",
 		col2_x,
-		start_y + line_h * 13,
+		start_y + line_h * 15,
 		14,
 		rl.Color{160, 160, 170, 255},
 	)
 
-	rl.DrawText("TIPS", col2_x, start_y + line_h * 15, 16, head_color)
-	rl.DrawText("Mine walls to find ores!", col2_x, start_y + line_h * 16, 14, desc_color)
-	rl.DrawText("Craft at anvils with materials.", col2_x, start_y + line_h * 17, 14, desc_color)
-	rl.DrawText("Light shrinks as you go deeper.", col2_x, start_y + line_h * 18, 14, desc_color)
+	rl.DrawText("TIPS", col2_x, start_y + line_h * 17, 16, head_color)
+	rl.DrawText("Mine walls to find ores!", col2_x, start_y + line_h * 18, 14, desc_color)
+	rl.DrawText("Craft at anvils with materials.", col2_x, start_y + line_h * 19, 14, desc_color)
+	rl.DrawText("Light shrinks as you go deeper.", col2_x, start_y + line_h * 20, 14, desc_color)
 
 	// Footer
 	footer := cstring("Press ESC or ? to close")

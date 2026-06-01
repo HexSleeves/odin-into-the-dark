@@ -48,3 +48,7 @@ main
 game
 
 .firecrawl/
+
+# Game runtime files
+savegame.dat
+scores.json

@@ -36,6 +36,15 @@ main :: proc() {
 	rl.SetExitKey(rl.KeyboardKey.KEY_NULL)
 
 	for !rl.WindowShouldClose() {
+		// ── F9: Load game (works from any state) ──
+		if rl.IsKeyPressed(.F9) {
+			if load_game(game) {
+				death_sound_played = false
+			} else {
+				add_message(game, "No save file found.", rl.Color{255, 180, 50, 255})
+			}
+		}
+
 		// ── Update ──
 		if game.state == .Playing {
 			// Web: skip player's turn if stuck
@@ -158,6 +167,15 @@ main :: proc() {
 							add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
 						} else {
 							add_message(game, "Sound: OFF", rl.Color{180, 180, 180, 255})
+						}
+					}
+
+					// F5 key: save game
+					if rl.IsKeyPressed(.F5) {
+						if save_game(game) {
+							add_message(game, "Game saved.", rl.Color{100, 255, 100, 255})
+						} else {
+							add_message(game, "Save failed!", rl.Color{255, 100, 100, 255})
 						}
 					}
 
@@ -410,5 +428,10 @@ main :: proc() {
 
 		// ── Draw ──
 		render_game(game)
+	}
+
+	// ── Auto-save on quit if game is in progress ──
+	if game.state == .Playing {
+		save_game(game)
 	}
 }
