@@ -55,7 +55,7 @@ render_inventory :: proc(game: ^Game) {
 			it := game.inventory[idx].item
 			name := item_display_name(&it)
 			text_x := slot_x
-			if g_sprites.loaded {
+			if game.use_sprites {
 				spr := get_item_sprite(it.item_type)
 				draw_sprite(spr, slot_x, y_pos, rl.WHITE)
 				text_x = slot_x + 20
@@ -127,7 +127,7 @@ render_inventory :: proc(game: ^Game) {
 		}
 		if es.slot.occupied {
 			eq_text_x := slot_x
-			if g_sprites.loaded {
+			if game.use_sprites {
 				spr := get_item_sprite(es.slot.item.item_type)
 				draw_sprite(spr, slot_x, eq_y, rl.WHITE)
 				eq_text_x = slot_x + 20
@@ -618,8 +618,10 @@ render_help :: proc(game: ^Game) {
 	rl.DrawText("?                This help screen", col2_x, start_y + line_h * 2, 14, desc_color)
 	rl.DrawText("ESC              Close menu / Quit", col2_x, start_y + line_h * 3, 14, desc_color)
 	rl.DrawText("R  (game over)   Restart", col2_x, start_y + line_h * 4, 14, desc_color)
-	rl.DrawText("F5               Save game", col2_x, start_y + line_h * 5, 14, key_color)
-	rl.DrawText("F9               Load game", col2_x, start_y + line_h * 6, 14, key_color)
+	rl.DrawText("F1               Toggle sound", col2_x, start_y + line_h * 5, 14, key_color)
+	rl.DrawText("F2               Toggle ASCII/Sprites", col2_x, start_y + line_h * 6, 14, key_color)
+	rl.DrawText("F5               Save game", col2_x, start_y + line_h * 7, 14, key_color)
+	rl.DrawText("F9               Load game", col2_x, start_y + line_h * 8, 14, key_color)
 
 	rl.DrawText("TILE LEGEND", col2_x, start_y + line_h * 8, 16, head_color)
 	rl.DrawText("@  You", col2_x, start_y + line_h * 9, 14, rl.YELLOW)

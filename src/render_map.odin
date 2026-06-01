@@ -119,7 +119,6 @@ render_map :: proc(game: ^Game) {
 			if !tile.visible && !tile.explored {
 				rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), UNSEEN_COLOR)
 			} else {
-				spr := get_tile_sprite(tile.type)
 				base := base_tile_color(tile.type, palette)
 				tint: rl.Color
 				if tile.visible {
@@ -129,7 +128,14 @@ render_map :: proc(game: ^Game) {
 					dim := f32(EXPLORED_DIM)
 					tint = rl.Color{u8(f32(base.r) * dim), u8(f32(base.g) * dim), u8(f32(base.b) * dim), 255}
 				}
-				draw_sprite(spr, sx, sy, tint)
+
+				if game.use_sprites {
+					spr := get_tile_sprite(tile.type)
+					draw_sprite(spr, sx, sy, tint)
+				} else {
+					// ASCII mode: colored rectangle
+					rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), tint)
+				}
 
 				// Ore vein overlay on walls
 				if tile.type == .Wall {
@@ -139,7 +145,13 @@ render_map :: proc(game: ^Game) {
 						if !tile.visible {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
-						draw_sprite(g_sprites.spr_ore_vein, sx, sy, ore_tint)
+						if game.use_sprites {
+							draw_sprite(get_named_sprite("tile", "ore_vein"), sx, sy, ore_tint)
+						} else {
+							dot_x := sx + i32(TILE_SIZE) / 2 - 3
+							dot_y := sy + i32(TILE_SIZE) / 2 - 3
+							rl.DrawRectangle(dot_x, dot_y, 6, 6, ore_tint)
+						}
 					}
 				}
 			}
@@ -168,7 +180,11 @@ render_webs :: proc(game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-			draw_sprite(g_sprites.spr_web, sx, sy, rl.Color{180, 180, 180, 150})
+			if game.use_sprites {
+				draw_sprite(get_named_sprite("tile", "web"), sx, sy, rl.Color{180, 180, 180, 150})
+			} else {
+				rl.DrawText("w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
+			}
 		}
 	}
 }
@@ -183,8 +199,8 @@ render_player :: proc(game: ^Game) {
 	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
 	py += bob_offset
 
-	if g_sprites.loaded {
-		draw_sprite(g_sprites.spr_player, px, py)
+	if game.use_sprites {
+		draw_sprite(get_named_sprite("character", "player"), px, py, game.player.color)
 	} else {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
@@ -212,7 +228,7 @@ render_enemies :: proc(game: ^Game) {
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
 
-		if g_sprites.loaded {
+		if game.use_sprites {
 			spr := get_enemy_sprite(enemy.enemy_type)
 			draw_sprite(spr, ex, ey, enemy.color)
 		} else {

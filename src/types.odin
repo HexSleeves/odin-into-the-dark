@@ -214,4 +214,6 @@ Game :: struct {
 	// Smooth camera (S02)
 	camera_target_x:    int, // target camera position (computed)
 	camera_target_y:    int,
+	// Render mode
+	use_sprites:        bool, // true = tileset sprites, false = ASCII mode
 }

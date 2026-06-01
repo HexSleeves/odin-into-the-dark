@@ -218,7 +218,7 @@ render_items :: proc(game: ^Game) {
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
 
-		if g_sprites.loaded {
+		if game.use_sprites {
 			spr := get_item_sprite(item.item_type)
 			draw_sprite(spr, ix, iy, item.color)
 		} else {

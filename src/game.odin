@@ -24,6 +24,7 @@ game_init :: proc() -> ^Game {
 	game.depth = 1
 	game.turn_count = 0
 	game.state = .Playing
+	game.use_sprites = g_sprites.loaded
 
 	// Player defaults from data (position set by generate_map)
 	init_player_from_data(game)
@@ -60,6 +61,7 @@ game_reinit :: proc(game: ^Game) {
 	game.depth = 1
 	game.turn_count = 0
 	game.state = .Playing
+	game.use_sprites = g_sprites.loaded
 
 	init_player_from_data(game)
 

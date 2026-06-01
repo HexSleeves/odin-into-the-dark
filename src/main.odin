@@ -178,6 +178,16 @@ main :: proc() {
 						}
 					}
 
+					// F2 key: toggle ASCII / Sprite mode
+					if rl.IsKeyPressed(.F2) {
+						game.use_sprites = !game.use_sprites
+						if game.use_sprites {
+							add_message(game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
+						} else {
+							add_message(game, "Render: ASCII", rl.Color{180, 180, 180, 255})
+						}
+					}
+
 					// F5 key: save game
 					if rl.IsKeyPressed(.F5) {
 						if save_game(game) {
