@@ -96,7 +96,12 @@ main :: proc() {
 							game.mining_mode = false
 							if mine_wall(game, mdx, mdy) {
 								play_sfx(.Mine)
-								spawn_mine_particles(game.player.pos.x + mdx, game.player.pos.y + mdy, game.camera_x, game.camera_y)
+								spawn_mine_particles(
+									game.player.pos.x + mdx,
+									game.player.pos.y + mdy,
+									game.camera_x,
+									game.camera_y,
+								)
 								hp_before_mine := game.player.hp
 								process_enemy_turns(game)
 								process_enemy_abilities(game)
@@ -183,7 +188,12 @@ main :: proc() {
 					if rl.IsKeyPressed(.G) {
 						if pickup_item(game) {
 							play_sfx(.Pickup)
-							spawn_pickup_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
+							spawn_pickup_particles(
+								game.player.pos.x,
+								game.player.pos.y,
+								game.camera_x,
+								game.camera_y,
+							)
 						}
 					}
 
@@ -208,7 +218,12 @@ main :: proc() {
 					if result == .Moved {
 						// Combat hit particles when a kill happened this turn
 						if game.kills > kills_before {
-							spawn_hit_particles(game.prev_player_pos.x, game.prev_player_pos.y, game.camera_x, game.camera_y)
+							spawn_hit_particles(
+								game.prev_player_pos.x,
+								game.prev_player_pos.y,
+								game.camera_x,
+								game.camera_y,
+							)
 						}
 						play_sfx(.Footstep)
 						// Check if player stepped on web
@@ -329,7 +344,12 @@ main :: proc() {
 		} else if game.state == .Game_Over {
 			if !death_sound_played {
 				play_sfx(.Death)
-				spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
+				spawn_death_particles(
+					game.player.pos.x,
+					game.player.pos.y,
+					game.camera_x,
+					game.camera_y,
+				)
 				death_sound_played = true
 			}
 			if !game.score_saved {

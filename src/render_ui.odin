@@ -347,7 +347,10 @@ render_game_over :: proc(game: ^Game) {
 	rl.DrawText(title, (sw - title_w) / 2, 40, title_size, rl.RED)
 
 	// Death cause
-	cause_text := fmt.ctprintf("%s", game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death")
+	cause_text := fmt.ctprintf(
+		"%s",
+		game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death",
+	)
 	cause_size :: i32(18)
 	cause_w := rl.MeasureText(cause_text, cause_size)
 	rl.DrawText(cause_text, (sw - cause_w) / 2, 82, cause_size, rl.WHITE)

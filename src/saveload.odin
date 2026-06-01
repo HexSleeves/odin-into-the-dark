@@ -48,7 +48,7 @@ Save_Item :: struct {
 	glyph:          rune,
 	color:          rl.Color,
 	picked_up:      bool,
-	quantity:        int,
+	quantity:       int,
 	equipment_slot: Save_String,
 	stat_bonus:     int,
 	durability:     int,
@@ -89,10 +89,8 @@ Save_Data :: struct {
 	// Dynamic arrays flattened to fixed-size + count
 	enemy_count:        int,
 	enemies:            [MAX_SAVE_ENEMIES]Save_Enemy,
-
 	item_count:         int,
 	items:              [MAX_SAVE_ITEMS]Save_Item,
-
 	room_count:         int,
 	rooms:              [MAX_SAVE_ROOMS]Room,
 
@@ -163,32 +161,32 @@ save_to_string :: proc(s: ^Save_String) -> string {
 
 item_to_save :: proc(item: ^Item) -> Save_Item {
 	return Save_Item {
-		pos            = item.pos,
-		item_type      = string_to_save(item.item_type),
-		name           = string_to_save(item.name),
-		glyph          = item.glyph,
-		color          = item.color,
-		picked_up      = item.picked_up,
-		quantity        = item.quantity,
+		pos = item.pos,
+		item_type = string_to_save(item.item_type),
+		name = string_to_save(item.name),
+		glyph = item.glyph,
+		color = item.color,
+		picked_up = item.picked_up,
+		quantity = item.quantity,
 		equipment_slot = string_to_save(item.equipment_slot),
-		stat_bonus     = item.stat_bonus,
-		durability     = item.durability,
+		stat_bonus = item.stat_bonus,
+		durability = item.durability,
 		max_durability = item.max_durability,
 	}
 }
 
 save_to_item :: proc(si: ^Save_Item) -> Item {
 	return Item {
-		pos            = si.pos,
-		item_type      = save_to_string(&si.item_type),
-		name           = save_to_string(&si.name),
-		glyph          = si.glyph,
-		color          = si.color,
-		picked_up      = si.picked_up,
-		quantity        = si.quantity,
+		pos = si.pos,
+		item_type = save_to_string(&si.item_type),
+		name = save_to_string(&si.name),
+		glyph = si.glyph,
+		color = si.color,
+		picked_up = si.picked_up,
+		quantity = si.quantity,
 		equipment_slot = save_to_string(&si.equipment_slot),
-		stat_bonus     = si.stat_bonus,
-		durability     = si.durability,
+		stat_bonus = si.stat_bonus,
+		durability = si.durability,
 		max_durability = si.max_durability,
 	}
 }
@@ -355,19 +353,19 @@ load_game :: proc(game: ^Game) -> bool {
 		append(
 			&game.enemies,
 			Enemy {
-				pos              = se.pos,
-				hp               = se.hp,
-				max_hp           = se.max_hp,
-				attack           = se.attack,
-				enemy_type       = save_to_string(&se.enemy_type),
-				name             = save_to_string(&se.name),
-				glyph            = se.glyph,
-				color            = se.color,
-				alive            = se.alive,
-				ability_type     = save_to_string(&se.ability_type),
+				pos = se.pos,
+				hp = se.hp,
+				max_hp = se.max_hp,
+				attack = se.attack,
+				enemy_type = save_to_string(&se.enemy_type),
+				name = save_to_string(&se.name),
+				glyph = se.glyph,
+				color = se.color,
+				alive = se.alive,
+				ability_type = save_to_string(&se.ability_type),
 				ability_cooldown = se.ability_cooldown,
-				ability_max_cd   = se.ability_max_cd,
-				ability_range    = se.ability_range,
+				ability_max_cd = se.ability_max_cd,
+				ability_range = se.ability_range,
 			},
 		)
 	}

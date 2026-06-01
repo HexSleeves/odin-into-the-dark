@@ -20,7 +20,12 @@ Game_Audio :: struct {
 g_audio: Game_Audio
 
 @(private = "file")
-generate_tone :: proc(frequency: f32, duration: f32, volume: f32, sample_rate: u32 = 44100) -> rl.Wave {
+generate_tone :: proc(
+	frequency: f32,
+	duration: f32,
+	volume: f32,
+	sample_rate: u32 = 44100,
+) -> rl.Wave {
 	frame_count := u32(duration * f32(sample_rate))
 	samples := make([]i16, frame_count)
 	for i in 0 ..< frame_count {
@@ -33,8 +38,8 @@ generate_tone :: proc(frequency: f32, duration: f32, volume: f32, sample_rate: u
 		frameCount = u32(frame_count),
 		sampleRate = u32(sample_rate),
 		sampleSize = 16,
-		channels   = 1,
-		data       = rawptr(raw_data(samples)),
+		channels = 1,
+		data = rawptr(raw_data(samples)),
 	}
 }
 
@@ -53,8 +58,8 @@ generate_noise :: proc(duration: f32, volume: f32, sample_rate: u32 = 44100) -> 
 		frameCount = u32(frame_count),
 		sampleRate = u32(sample_rate),
 		sampleSize = 16,
-		channels   = 1,
-		data       = rawptr(raw_data(samples)),
+		channels = 1,
+		data = rawptr(raw_data(samples)),
 	}
 }
 
