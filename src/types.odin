@@ -2,24 +2,7 @@ package main
 
 import rl "vendor:raylib"
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-TILE_SIZE :: 16
-SCREEN_WIDTH :: 1080
-SCREEN_HEIGHT :: 720
-MAP_WIDTH :: 80
-MAP_HEIGHT :: 50
-
-// ─── UI Layout ────────────────────────────────────────────────────────────────
-// Screen is split top-to-bottom: map viewport → HUD → message log.
-HUD_REGION_HEIGHT :: 44
-MSG_REGION_HEIGHT :: 120
-MAP_VIEW_HEIGHT :: SCREEN_HEIGHT - HUD_REGION_HEIGHT - MSG_REGION_HEIGHT
-
 // ─── Message Log ──────────────────────────────────────────────────────────────
-
-MAX_MESSAGES :: 64
-MAX_MSG_LEN :: 256
 
 Message :: struct {
 	text:     [MAX_MSG_LEN]u8,
@@ -93,27 +76,25 @@ Enemy :: struct {
 	alive:            bool,
 	// Special ability fields (data-driven)
 	ability_type:     string, // "web", "pull", or "" for none
-	ability_cooldown: int,    // current cooldown (decrements each turn)
-	ability_max_cd:   int,    // max cooldown for reset
-	ability_range:    int,    // range of the ability
+	ability_cooldown: int, // current cooldown (decrements each turn)
+	ability_max_cd:   int, // max cooldown for reset
+	ability_range:    int, // range of the ability
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────
 
-MAX_INVENTORY :: 9
-
 Item :: struct {
-	pos:       Vec2,
-	item_type: string, // data-driven ID (e.g. "health_potion", "torch")
-	name:      string, // display name from data
-	glyph:     rune,
-	color:     rl.Color,
+	pos:            Vec2,
+	item_type:      string, // data-driven ID (e.g. "health_potion", "torch")
+	name:           string, // display name from data
+	glyph:          rune,
+	color:          rl.Color,
 	picked_up:      bool,
 	quantity:       int,
 	equipment_slot: string, // "", "weapon", "armor", "helmet"
-	stat_bonus:     int,    // bonus value when equipped
-	durability:     int,    // current durability (0 = broken, -1 = no durability)
-	max_durability: int,    // max durability (0 = item has no durability)
+	stat_bonus:     int, // bonus value when equipped
+	durability:     int, // current durability (0 = broken, -1 = no durability)
+	max_durability: int, // max durability (0 = item has no durability)
 }
 
 Inventory_Slot :: struct {
@@ -155,7 +136,7 @@ Floor_Palette :: struct {
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
 Ore_Vein :: struct {
-	ore_type: string,   // "iron_ore", "copper_ore", "crystal_shard", "gold_nugget", or ""
+	ore_type: string, // "iron_ore", "copper_ore", "crystal_shard", "gold_nugget", or ""
 	color:    rl.Color, // visual tint for the wall
 }
 
@@ -169,54 +150,52 @@ Game_State :: enum {
 	Viewing_Help,
 }
 
-DMAP_UNREACHABLE :: 9999
-
 Game :: struct {
-	tiles:         [MAP_WIDTH * MAP_HEIGHT]Tile,
-	dijkstra_map:  [MAP_WIDTH * MAP_HEIGHT]int,
-	map_width:     int,
-	map_height:    int,
-	player:        Player,
-	rooms:         [dynamic]Room,
-	enemies:       [dynamic]Enemy,
-	items:         [dynamic]Item,
-	inventory:     [MAX_INVENTORY]Inventory_Slot,
-	light_sources: [dynamic]Light_Source,
-	depth:         int,
-	turn_count:    int,
-	kills:         int,
-	seed:          u64,
-	state:         Game_State,
-	message_log:   MessageLog,
+	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
+	dijkstra_map:       [MAP_WIDTH * MAP_HEIGHT]int,
+	map_width:          int,
+	map_height:         int,
+	player:             Player,
+	rooms:              [dynamic]Room,
+	enemies:            [dynamic]Enemy,
+	items:              [dynamic]Item,
+	inventory:          [MAX_INVENTORY]Inventory_Slot,
+	light_sources:      [dynamic]Light_Source,
+	depth:              int,
+	turn_count:         int,
+	kills:              int,
+	seed:               u64,
+	state:              Game_State,
+	message_log:        MessageLog,
 	// Camera offset: pixel position of top-left corner of the viewport in map-space
-	camera_x:      int,
-	camera_y:      int,
+	camera_x:           int,
+	camera_y:           int,
 	// Timed light boost (from lantern oil)
-	light_boost_bonus: int,
-	light_boost_turns: int,
+	light_boost_bonus:  int,
+	light_boost_turns:  int,
 	// Inventory drop mode
-	dropping: bool,
+	dropping:           bool,
 	// Web tiles (Cave Crawler ability)
-	web_tiles:      [MAP_WIDTH * MAP_HEIGHT]bool,
-	skip_next_turn: bool, // player stuck in web
+	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
+	skip_next_turn:     bool, // player stuck in web
 	// Equipment slots
-	equipped_weapon: Equipment,
-	equipped_armor:  Equipment,
-	equipped_helmet: Equipment,
+	equipped_weapon:    Equipment,
+	equipped_armor:     Equipment,
+	equipped_helmet:    Equipment,
 	// Equipment mode in inventory
-	equipping: bool,
+	equipping:          bool,
 	// Depth-based floor palette
-	palette: Floor_Palette,
+	palette:            Floor_Palette,
 	// Minimap toggle
-	show_minimap: bool,
+	show_minimap:       bool,
 	// Hazard state
-	water_slow_active: bool, // player in water, costs next turn
-	prev_player_pos:   Vec2, // track previous position for unstable collapse
+	water_slow_active:  bool, // player in water, costs next turn
+	prev_player_pos:    Vec2, // track previous position for unstable collapse
 	// Mining system
 	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
 	mining_mode:        bool, // true when player pressed X and awaits direction
-	pickaxe_durability: int,  // current durability (legacy, kept for compat)
-	pickaxe_max_dur:    int,  // max durability (legacy, kept for compat)
+	pickaxe_durability: int, // current durability (legacy, kept for compat)
+	pickaxe_max_dur:    int, // max durability (legacy, kept for compat)
 	// Inventory inspect cursor
-	inspect_slot:       int,  // currently highlighted slot in inventory (-1 = none)
+	inspect_slot:       int, // currently highlighted slot in inventory (-1 = none)
 }

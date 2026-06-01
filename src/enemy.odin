@@ -66,7 +66,7 @@ spawn_enemies :: proc(game: ^Game) {
 		)
 	} else {
 		// Cave layout: scatter enemies on random floor tiles
-		target := 3 + game.depth + game.depth / 2  // slower scaling
+		target := 3 + game.depth + game.depth / 2 // slower scaling
 		if target > 15 {target = 15}
 
 		spawned := 0
@@ -388,7 +388,8 @@ process_enemy_abilities :: proc(game: ^Game) {
 					}
 
 					// Only pull along one axis (prefer the longer distance)
-					if abs(enemy.pos.x - game.player.pos.x) >= abs(enemy.pos.y - game.player.pos.y) {
+					if abs(enemy.pos.x - game.player.pos.x) >=
+					   abs(enemy.pos.y - game.player.pos.y) {
 						pull_dy = 0
 					} else {
 						pull_dx = 0

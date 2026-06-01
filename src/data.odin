@@ -67,7 +67,7 @@ Item_Def :: struct {
 	stack_limit:    int,
 	effect:         Item_Effect,
 	equipment_slot: string,
-	durability:     int,  // max durability (0 = no durability tracking)
+	durability:     int, // max durability (0 = no durability tracking)
 }
 
 Item_Spawn_Weight :: struct {

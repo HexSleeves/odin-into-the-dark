@@ -3,36 +3,6 @@ package main
 import "core:fmt"
 import "core:math/rand"
 import "core:time"
-import rl "vendor:raylib"
-
-// ─── Map helpers ──────────────────────────────────────────────────────────────
-
-pos_to_idx :: proc(x, y: int) -> int {
-	return y * MAP_WIDTH + x
-}
-
-idx_to_pos :: proc(idx: int) -> Vec2 {
-	return Vec2{idx % MAP_WIDTH, idx / MAP_WIDTH}
-}
-
-tile_at :: proc(game: ^Game, x, y: int) -> ^Tile {
-	if x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT {
-		return nil
-	}
-	return &game.tiles[pos_to_idx(x, y)]
-}
-
-is_walkable :: proc(game: ^Game, x, y: int) -> bool {
-	t := tile_at(game, x, y)
-	if t == nil {
-		return false
-	}
-	#partial switch t.type {
-	case .Floor, .Rubble, .Descent, .Water, .Gas_Vent, .Unstable, .Anvil:
-		return true
-	}
-	return false
-}
 
 // ─── Game initialization ─────────────────────────────────────────────────────
 
@@ -110,36 +80,6 @@ game_reinit :: proc(game: ^Game) {
 	give_starter_gear(game)
 }
 
-// ─── Starter gear ─────────────────────────────────────────────────────────────
-
-give_starter_gear :: proc(game: ^Game) {
-	// Equip a Rusty Pickaxe directly into the weapon slot
-	pick_def := find_item_def("rusty_pickaxe")
-	if pick_def != nil {
-		pick := item_make_from_def(pick_def, Vec2{0, 0})
-		pick.picked_up = true
-		game.equipped_weapon = Equipment{occupied = true, item = pick}
-	}
-
-	// Put a Torch in inventory slot 0
-	torch_def := find_item_def("torch")
-	if torch_def != nil {
-		torch := item_make_from_def(torch_def, Vec2{0, 0})
-		torch.picked_up = true
-		game.inventory[0] = Inventory_Slot{occupied = true, item = torch}
-		game.inventory[0].item.quantity = 1
-	}
-
-	// Put 2 Bandages in inventory slot 1
-	band_def := find_item_def("bandage")
-	if band_def != nil {
-		band := item_make_from_def(band_def, Vec2{0, 0})
-		band.picked_up = true
-		game.inventory[1] = Inventory_Slot{occupied = true, item = band}
-		game.inventory[1].item.quantity = 2
-	}
-}
-
 // ─── Initialize player from data ─────────────────────────────────────────────
 
 init_player_from_data :: proc(game: ^Game) {
@@ -188,69 +128,6 @@ camera_update :: proc(game: ^Game) {
 
 	game.camera_x = cam_x
 	game.camera_y = cam_y
-}
-
-// ─── Mining ───────────────────────────────────────────────────────────────────
-
-mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
-	tx := game.player.pos.x + dx
-	ty := game.player.pos.y + dy
-
-	// Check bounds
-	if tx < 0 || tx >= MAP_WIDTH || ty < 0 || ty >= MAP_HEIGHT { return false }
-
-	t := tile_at(game, tx, ty)
-	if t == nil || t.type != .Wall {
-		add_message(game, "Nothing to mine there.", rl.Color{180, 180, 180, 255})
-		return false
-	}
-
-	// Check pickaxe — need an equipped weapon with durability
-	if !game.equipped_weapon.occupied {
-		add_message(game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
-		return false
-	}
-	wpn := &game.equipped_weapon.item
-	if wpn.max_durability > 0 && wpn.durability <= 0 {
-		add_message(game, fmt.tprintf("Your %s is broken!", wpn.name), rl.Color{255, 100, 100, 255})
-		return false
-	}
-
-	// Mine the wall
-	idx := pos_to_idx(tx, ty)
-	vein := game.ore_veins[idx]
-
-	// Convert wall to rubble
-	t.type = .Rubble
-
-	// If ore vein, spawn material item
-	if vein.ore_type != "" {
-		def := find_item_def(vein.ore_type)
-		if def != nil {
-			ore_item := item_make_from_def(def, Vec2{tx, ty})
-			append(&game.items, ore_item)
-			add_message(game, fmt.tprintf("You found %s!", def.name), vein.color)
-		} else {
-			add_message(game, "You mine through a vein, but nothing useful falls out.", rl.Color{180, 160, 100, 255})
-		}
-		game.ore_veins[idx] = {} // clear the vein
-	} else {
-		add_message(game, "You mine through the wall.", rl.Color{180, 160, 100, 255})
-	}
-
-	// Decrease equipped weapon durability
-	if wpn.max_durability > 0 {
-		wpn.durability -= 1
-		if wpn.durability <= 0 {
-			add_message(game, fmt.tprintf("Your %s breaks!", wpn.name), rl.Color{255, 80, 80, 255})
-		} else if wpn.durability <= 5 {
-			add_message(game, fmt.tprintf("%s wearing down... (%d/%d)", wpn.name, wpn.durability, wpn.max_durability), rl.Color{255, 180, 50, 255})
-		}
-	}
-
-	// Consume a turn
-	game.turn_count += 1
-	return true
 }
 
 // ─── Cleanup ──────────────────────────────────────────────────────────────────

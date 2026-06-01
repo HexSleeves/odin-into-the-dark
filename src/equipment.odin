@@ -1,0 +1,150 @@
+package main
+
+import "core:fmt"
+import rl "vendor:raylib"
+
+// ─── Starter gear ─────────────────────────────────────────────────────────────
+
+give_starter_gear :: proc(game: ^Game) {
+	// Equip a Rusty Pickaxe directly into the weapon slot
+	pick_def := find_item_def("rusty_pickaxe")
+	if pick_def != nil {
+		pick := item_make_from_def(pick_def, Vec2{0, 0})
+		pick.picked_up = true
+		game.equipped_weapon = Equipment {
+			occupied = true,
+			item     = pick,
+		}
+	}
+
+	// Put a Torch in inventory slot 0
+	torch_def := find_item_def("torch")
+	if torch_def != nil {
+		torch := item_make_from_def(torch_def, Vec2{0, 0})
+		torch.picked_up = true
+		game.inventory[0] = Inventory_Slot {
+			occupied = true,
+			item     = torch,
+		}
+		game.inventory[0].item.quantity = 1
+	}
+
+	// Put 2 Bandages in inventory slot 1
+	band_def := find_item_def("bandage")
+	if band_def != nil {
+		band := item_make_from_def(band_def, Vec2{0, 0})
+		band.picked_up = true
+		game.inventory[1] = Inventory_Slot {
+			occupied = true,
+			item     = band,
+		}
+		game.inventory[1].item.quantity = 2
+	}
+}
+
+// ─── Equipment: equip / unequip / stat queries ────────────────────────────────
+
+equip_item :: proc(game: ^Game, slot_index: int) -> bool {
+	if slot_index < 0 || slot_index >= MAX_INVENTORY {return false}
+	if !game.inventory[slot_index].occupied {return false}
+
+	item := &game.inventory[slot_index].item
+	if item.equipment_slot == "" {
+		add_message(game, "That item cannot be equipped.", rl.Color{180, 180, 180, 255})
+		return false
+	}
+
+	// Determine which equipment slot
+	equip_slot: ^Equipment
+	if item.equipment_slot ==
+	   "weapon" {equip_slot = &game.equipped_weapon} else if item.equipment_slot == "armor" {equip_slot = &game.equipped_armor} else if item.equipment_slot == "helmet" {equip_slot = &game.equipped_helmet} else {
+		add_message(game, "Unknown equipment slot.", rl.Color{180, 180, 180, 255})
+		return false
+	}
+
+	// If slot already occupied, swap: put equipped item back in inventory
+	if equip_slot.occupied {
+		empty := -1
+		for i in 0 ..< MAX_INVENTORY {
+			if !game.inventory[i].occupied {empty = i; break}
+		}
+		if empty < 0 {
+			add_message(
+				game,
+				"No inventory space to swap equipment!",
+				rl.Color{255, 100, 100, 255},
+			)
+			return false
+		}
+		// Put old equipment back
+		game.inventory[empty].occupied = true
+		game.inventory[empty].item = equip_slot.item
+		game.inventory[empty].item.quantity = 1
+		add_message(
+			game,
+			fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
+			rl.Color{180, 180, 100, 255},
+		)
+	}
+
+	// Equip the new item
+	equip_slot.occupied = true
+	equip_slot.item = item^
+	add_message(
+		game,
+		fmt.tprintf("You equip the %s.", item_display_name(item)),
+		rl.Color{100, 200, 255, 255},
+	)
+
+	// Remove from inventory
+	game.inventory[slot_index] = {}
+
+	return true
+}
+
+unequip_slot :: proc(game: ^Game, slot_name: string) -> bool {
+	equip_slot: ^Equipment
+	if slot_name ==
+	   "weapon" {equip_slot = &game.equipped_weapon} else if slot_name == "armor" {equip_slot = &game.equipped_armor} else if slot_name == "helmet" {equip_slot = &game.equipped_helmet} else {return false}
+
+	if !equip_slot.occupied {return false}
+
+	// Find empty inventory slot
+	empty := -1
+	for i in 0 ..< MAX_INVENTORY {
+		if !game.inventory[i].occupied {empty = i; break}
+	}
+	if empty < 0 {
+		add_message(game, "Inventory full! Cannot unequip.", rl.Color{255, 100, 100, 255})
+		return false
+	}
+
+	game.inventory[empty].occupied = true
+	game.inventory[empty].item = equip_slot.item
+	game.inventory[empty].item.quantity = 1
+	add_message(
+		game,
+		fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
+		rl.Color{180, 180, 100, 255},
+	)
+	equip_slot^ = {}
+	return true
+}
+
+// ─── Effective stat queries (used by combat + fov) ────────────────────────────
+
+effective_attack :: proc(game: ^Game) -> int {
+	bonus := 0
+	if game.equipped_weapon.occupied {bonus = game.equipped_weapon.item.stat_bonus}
+	return game.player.attack + bonus
+}
+
+effective_defense :: proc(game: ^Game) -> int {
+	if game.equipped_armor.occupied {return game.equipped_armor.item.stat_bonus}
+	return 0
+}
+
+effective_light_bonus :: proc(game: ^Game) -> int {
+	if game.equipped_helmet.occupied {return game.equipped_helmet.item.stat_bonus}
+	return 0
+}
