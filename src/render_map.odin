@@ -96,17 +96,26 @@ get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
 	return UNSEEN_COLOR
 }
 
+visible_tile_bounds :: proc(game: ^Game) -> (x0, y0, x1, y1: int) {
+	x0 = max(0, game.camera_x / TILE_SIZE)
+	y0 = max(0, game.camera_y / TILE_SIZE)
+	x1 = min(MAP_WIDTH - 1, (game.camera_x + SCREEN_WIDTH) / TILE_SIZE)
+	y1 = min(MAP_HEIGHT - 1, (game.camera_y + MAP_VIEW_HEIGHT) / TILE_SIZE)
+	return
+}
+
 // ─── Map rendering (with camera offset) ───────────────────────────────────────
 
 render_map :: proc(game: ^Game) {
-	game.anim_frame += 1
+	game.vfx.anim_frame += 1
 
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 	palette := palette_for_depth(game.depth)
 
-	for y in 0 ..< MAP_HEIGHT {
-		for x in 0 ..< MAP_WIDTH {
+	x0, y0, x1, y1 := visible_tile_bounds(game)
+	for y in y0 ..= y1 {
+		for x in x0 ..= x1 {
 			sx := i32(x * TILE_SIZE) - ox
 			sy := i32(y * TILE_SIZE) - oy
 
@@ -129,7 +138,7 @@ render_map :: proc(game: ^Game) {
 					tint = rl.Color{u8(f32(base.r) * dim), u8(f32(base.g) * dim), u8(f32(base.b) * dim), 255}
 				}
 
-				if game.use_sprites {
+				if game.ui.use_sprites {
 					spr := get_tile_sprite(tile.type)
 					draw_sprite(spr, sx, sy, tint)
 				} else {
@@ -145,7 +154,7 @@ render_map :: proc(game: ^Game) {
 						if !tile.visible {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
-						if game.use_sprites {
+						if game.ui.use_sprites {
 							draw_sprite(get_named_sprite("tile", "ore_vein"), sx, sy, ore_tint)
 						} else {
 							dot_x := sx + i32(TILE_SIZE) / 2 - 3
@@ -165,8 +174,9 @@ render_webs :: proc(game: ^Game) {
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 
-	for y in 0 ..< MAP_HEIGHT {
-		for x in 0 ..< MAP_WIDTH {
+	x0, y0, x1, y1 := visible_tile_bounds(game)
+	for y in y0 ..= y1 {
+		for x in x0 ..= x1 {
 			idx := pos_to_idx(x, y)
 			if !game.web_tiles[idx] {continue}
 
@@ -180,7 +190,7 @@ render_webs :: proc(game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-			if game.use_sprites {
+			if game.ui.use_sprites {
 				draw_sprite(get_named_sprite("tile", "web"), sx, sy, rl.Color{180, 180, 180, 150})
 			} else {
 				rl.DrawText("w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
@@ -195,11 +205,11 @@ render_player :: proc(game: ^Game) {
 	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
 	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
 
-	bob_phase := f32(game.anim_frame) * 0.06
+	bob_phase := f32(game.vfx.anim_frame) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
 	py += bob_offset
 
-	if game.use_sprites {
+	if game.ui.use_sprites {
 		draw_sprite(get_named_sprite("character", "player"), px, py, game.player.color)
 	} else {
 		glyph_buf: [2]u8
@@ -224,11 +234,11 @@ render_enemies :: proc(game: ^Game) {
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
 
-		bob_phase := f32(game.anim_frame + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
+		bob_phase := f32(game.vfx.anim_frame + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
 
-		if game.use_sprites {
+		if game.ui.use_sprites {
 			spr := get_enemy_sprite(enemy.enemy_type)
 			draw_sprite(spr, ex, ey, enemy.color)
 		} else {

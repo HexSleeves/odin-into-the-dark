@@ -23,7 +23,7 @@ render_game :: proc(game: ^Game) {
 	render_hud(game)
 	render_messages(game)
 
-	if game.show_minimap && game.state == .Playing {
+	if game.ui.show_minimap && game.state == .Playing {
 		render_minimap(game)
 	}
 
@@ -47,17 +47,17 @@ render_game :: proc(game: ^Game) {
 	}
 
 	// Screen flash overlay (S02)
-	if game.flash_alpha > 0.01 {
-		alpha := u8(game.flash_alpha * 255.0)
+	if game.vfx.flash_alpha > 0.01 {
+		alpha := u8(game.vfx.flash_alpha * 255.0)
 		rl.DrawRectangle(
 			0,
 			0,
 			i32(SCREEN_WIDTH),
 			i32(SCREEN_HEIGHT),
-			rl.Color{game.flash_color.r, game.flash_color.g, game.flash_color.b, alpha},
+			rl.Color{game.vfx.flash_color.r, game.vfx.flash_color.g, game.vfx.flash_color.b, alpha},
 		)
-		game.flash_alpha *= 0.85
-		if game.flash_alpha < 0.01 {game.flash_alpha = 0}
+		game.vfx.flash_alpha *= 0.85
+		if game.vfx.flash_alpha < 0.01 {game.vfx.flash_alpha = 0}
 	}
 
 	rl.EndDrawing()

@@ -342,15 +342,17 @@ generate_cave :: proc(game: ^Game) {
 		}
 	}
 
-	fmt.printfln(
-		"[gen] cave: seed=%v floor_tiles=%v player=(%v,%v) descent=(%v,%v)",
-		game.seed,
-		floor_count,
-		game.player.pos.x,
-		game.player.pos.y,
-		descent_pos.x,
-		descent_pos.y,
-	)
+	if DEBUG_LOGS {
+		fmt.printfln(
+			"[gen] cave: seed=%v floor_tiles=%v player=(%v,%v) descent=(%v,%v)",
+			game.seed,
+			floor_count,
+			game.player.pos.x,
+			game.player.pos.y,
+			descent_pos.x,
+			descent_pos.y,
+		)
+	}
 }
 
 // ─── Mixed generator (rooms + organic erosion) ────────────────────────────────
@@ -414,14 +416,16 @@ generate_mixed :: proc(game: ^Game) {
 		}
 		game.tiles[pos_to_idx(descent_pos.x, descent_pos.y)].type = .Descent
 
-		fmt.printfln(
-			"[gen] mixed: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
-			game.seed,
-			len(game.rooms),
-			game.player.pos.x,
-			game.player.pos.y,
-			descent_pos.x,
-			descent_pos.y,
-		)
+		if DEBUG_LOGS {
+			fmt.printfln(
+				"[gen] mixed: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
+				game.seed,
+				len(game.rooms),
+				game.player.pos.x,
+				game.player.pos.y,
+				descent_pos.x,
+				descent_pos.y,
+			)
+		}
 	}
 }

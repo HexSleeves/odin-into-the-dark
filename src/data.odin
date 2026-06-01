@@ -136,12 +136,14 @@ data_load_all :: proc() -> bool {
 	g_data.player = player
 	g_data.loaded = true
 
-	fmt.printfln(
-		"[data] loaded %v enemies, %v spawn tables, %v items",
-		len(g_data.enemies.enemies),
-		len(g_data.enemies.spawn_tables),
-		len(g_data.items.items),
-	)
+	if DEBUG_LOGS {
+		fmt.printfln(
+			"[data] loaded %v enemies, %v spawn tables, %v items",
+			len(g_data.enemies.enemies),
+			len(g_data.enemies.spawn_tables),
+			len(g_data.items.items),
+		)
+	}
 
 	return true
 }

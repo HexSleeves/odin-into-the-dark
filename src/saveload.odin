@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: "savegame.dat"
-SAVE_VERSION :: u32(2)
+SAVE_VERSION :: u32(3)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
 MAX_SAVE_ENEMIES :: 64
@@ -110,8 +110,6 @@ Save_Data :: struct {
 	light_boost_turns:  int,
 	skip_next_turn:     bool,
 	water_slow_active:  bool,
-	pickaxe_durability: int,
-	pickaxe_max_dur:    int,
 }
 
 // ─── String conversion helpers ────────────────────────────────────────────────
@@ -212,8 +210,6 @@ save_game :: proc(game: ^Game) -> bool {
 	data.light_boost_turns = game.light_boost_turns
 	data.skip_next_turn = game.skip_next_turn
 	data.water_slow_active = game.water_slow_active
-	data.pickaxe_durability = game.pickaxe_durability
-	data.pickaxe_max_dur = game.pickaxe_max_dur
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
@@ -331,8 +327,6 @@ load_game :: proc(game: ^Game) -> bool {
 	game.light_boost_turns = data.light_boost_turns
 	game.skip_next_turn = data.skip_next_turn
 	game.water_slow_active = data.water_slow_active
-	game.pickaxe_durability = data.pickaxe_durability
-	game.pickaxe_max_dur = data.pickaxe_max_dur
 	game.state = .Playing
 
 	// ── Restore ore veins ──
@@ -409,14 +403,16 @@ load_game :: proc(game: ^Game) -> bool {
 	clear_messages(game)
 	add_message(game, "Game loaded.", rl.Color{100, 255, 100, 255})
 
-	// Reset UI modes
-	game.mining_mode = false
-	game.dropping = false
-	game.equipping = false
-	game.show_minimap = false
-	game.inspect_slot = -1
-	game.flash_alpha = 0
-	game.anim_frame = 0
+	// Reset transient UI modes on load
+	game.ui.mining_mode = false
+	game.ui.dropping = false
+	game.ui.equipping = false
+	game.ui.show_minimap = false
+	game.ui.inspect_slot = -1
+	// use_sprites intentionally NOT reset — player render preference is sticky
+
+	// Reset VFX (all fields zero is correct)
+	game.vfx = {}
 
 	// ── Delete save file (roguelike: one load per save) ──
 	os.remove(SAVE_FILE)

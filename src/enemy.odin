@@ -58,12 +58,14 @@ spawn_enemies :: proc(game: ^Game) {
 				}
 			}
 		}
-		fmt.printfln(
-			"[enemy] spawned %v enemies across %v rooms (depth=%v)",
-			total,
-			len(game.rooms) - 1,
-			game.depth,
-		)
+		if DEBUG_LOGS {
+			fmt.printfln(
+				"[enemy] spawned %v enemies across %v rooms (depth=%v)",
+				total,
+				len(game.rooms) - 1,
+				game.depth,
+			)
+		}
 	} else {
 		// Cave layout: scatter enemies on random floor tiles
 		target := 3 + game.depth + game.depth / 2 // slower scaling
@@ -88,7 +90,9 @@ spawn_enemies :: proc(game: ^Game) {
 				spawned += 1
 			}
 		}
-		fmt.printfln("[enemy] spawned %v enemies (cave, depth=%v)", spawned, game.depth)
+		if DEBUG_LOGS {
+			fmt.printfln("[enemy] spawned %v enemies (cave, depth=%v)", spawned, game.depth)
+		}
 	}
 }
 
@@ -101,105 +105,6 @@ enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 		}
 	}
 	return nil
-}
-
-// ─── A* pathfinding ──────────────────────────────────────────────────────────
-// Returns the next step from `start` toward `goal`, navigating around walls.
-// Only walls block; other enemies are ignored (they move).
-// Uses fixed-size arrays sized for MAP_WIDTH×MAP_HEIGHT (4000 tiles).
-
-ASTAR_MAX_ITER :: 2000
-ASTAR_INF :: 999_999
-
-astar_next_step :: proc(game: ^Game, start, goal: Vec2) -> (next: Vec2, found: bool) {
-	MAP_SIZE :: MAP_WIDTH * MAP_HEIGHT
-
-	start_idx := pos_to_idx(start.x, start.y)
-	goal_idx := pos_to_idx(goal.x, goal.y)
-
-	if start_idx == goal_idx {
-		return start, false
-	}
-
-	g_score: [MAP_SIZE]int
-	f_score: [MAP_SIZE]int
-	came_from: [MAP_SIZE]int
-	in_open: [MAP_SIZE]bool
-	in_closed: [MAP_SIZE]bool
-
-	for i in 0 ..< MAP_SIZE {
-		g_score[i] = ASTAR_INF
-		f_score[i] = ASTAR_INF
-		came_from[i] = -1
-	}
-
-	g_score[start_idx] = 0
-	f_score[start_idx] = abs(start.x - goal.x) + abs(start.y - goal.y)
-	in_open[start_idx] = true
-
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
-
-	for _ in 0 ..< ASTAR_MAX_ITER {
-		// Find open node with lowest f_score
-		current := -1
-		best_f := ASTAR_INF + 1
-		for i in 0 ..< MAP_SIZE {
-			if in_open[i] && f_score[i] < best_f {
-				best_f = f_score[i]
-				current = i
-			}
-		}
-
-		if current == -1 {
-			return start, false // Open set empty, no path
-		}
-
-		if current == goal_idx {
-			// Trace back from goal to the step right after start
-			step := goal_idx
-			for came_from[step] != start_idx && came_from[step] != -1 {
-				step = came_from[step]
-			}
-			if came_from[step] == start_idx {
-				return idx_to_pos(step), true
-			}
-			return start, false // Safety: broken chain
-		}
-
-		in_open[current] = false
-		in_closed[current] = true
-
-		cur_pos := idx_to_pos(current)
-		dx := DX
-		dy := DY
-
-		for dir in 0 ..< 4 {
-			nx := cur_pos.x + dx[dir]
-			ny := cur_pos.y + dy[dir]
-
-			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
-			if !is_walkable(game, nx, ny) {
-				// Allow the goal tile even if it's the player's position
-				// (player tile is always walkable floor, so this mainly guards walls)
-				if pos_to_idx(nx, ny) != goal_idx {continue}
-			}
-
-			neighbor_idx := pos_to_idx(nx, ny)
-			if in_closed[neighbor_idx] {continue}
-
-			tentative_g := g_score[current] + 1
-
-			if tentative_g < g_score[neighbor_idx] {
-				came_from[neighbor_idx] = current
-				g_score[neighbor_idx] = tentative_g
-				f_score[neighbor_idx] = tentative_g + abs(nx - goal.x) + abs(ny - goal.y)
-				in_open[neighbor_idx] = true
-			}
-		}
-	}
-
-	return start, false // Max iterations hit
 }
 
 // ─── Dijkstra map (BFS flood-fill from player) ──────────────────────────────
@@ -292,17 +197,34 @@ chase_player :: proc(game: ^Game, enemy: ^Enemy) {
 		}
 	}
 
-	// 2. Use A* to find next step toward player
-	next, ok := astar_next_step(game, enemy.pos, game.player.pos)
-	if ok {
-		// 3. Only move if the tile isn't occupied by another enemy
-		if enemy_at(game, next.x, next.y) == nil {
-			enemy.pos = next
-		}
+	// 2. Follow the precomputed Dijkstra map downhill toward the player.
+	current_dist := game.dijkstra_map[pos_to_idx(enemy.pos.x, enemy.pos.y)]
+	if current_dist >= DMAP_UNREACHABLE {
+		wander(game, enemy)
 		return
 	}
 
-	// 4. A* failed (unreachable) - fall back to wander
+	best_pos := enemy.pos
+	best_dist := current_dist
+	for dir in 0 ..< 4 {
+		nx := enemy.pos.x + dx[dir]
+		ny := enemy.pos.y + dy[dir]
+		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
+		if !is_walkable(game, nx, ny) {continue}
+		if enemy_at(game, nx, ny) != nil {continue}
+
+		n_dist := game.dijkstra_map[pos_to_idx(nx, ny)]
+		if n_dist < best_dist {
+			best_dist = n_dist
+			best_pos = Vec2{nx, ny}
+		}
+	}
+
+	if best_pos != enemy.pos {
+		enemy.pos = best_pos
+		return
+	}
+
 	wander(game, enemy)
 }
 

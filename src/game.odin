@@ -10,7 +10,9 @@ game_init :: proc() -> ^Game {
 	// Derive seed from current time
 	seed := u64(time.time_to_unix_nano(time.now()))
 
-	fmt.printfln("[init] seed = %v", seed)
+	if DEBUG_LOGS {
+		fmt.printfln("[init] seed = %v", seed)
+	}
 
 	// Initialize RNG (used later by proc-gen in S02; seeded now for R014)
 	rand.reset(seed)
@@ -24,7 +26,8 @@ game_init :: proc() -> ^Game {
 	game.depth = 1
 	game.turn_count = 0
 	game.state = .Playing
-	game.use_sprites = g_sprites.loaded
+	game.ui.use_sprites = g_sprites.loaded
+	game.ui.inspect_slot = -1
 
 	// Player defaults from data (position set by generate_map)
 	init_player_from_data(game)
@@ -34,10 +37,6 @@ game_init :: proc() -> ^Game {
 	game.enemies = make([dynamic]Enemy)
 	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]Light_Source)
-
-	// Mining defaults
-	game.pickaxe_durability = 20
-	game.pickaxe_max_dur = 20
 
 	// Procedurally generate the mine floor (sets player pos, descent, rooms)
 	generate_map(game)
@@ -52,7 +51,9 @@ game_init :: proc() -> ^Game {
 
 game_reinit :: proc(game: ^Game) {
 	seed := u64(time.time_to_unix_nano(time.now()))
-	fmt.printfln("[init] seed = %v", seed)
+	if DEBUG_LOGS {
+		fmt.printfln("[init] seed = %v", seed)
+	}
 	rand.reset(seed)
 
 	game.seed = seed
@@ -61,7 +62,8 @@ game_reinit :: proc(game: ^Game) {
 	game.depth = 1
 	game.turn_count = 0
 	game.state = .Playing
-	game.use_sprites = g_sprites.loaded
+	game.ui.use_sprites = g_sprites.loaded
+	game.ui.inspect_slot = -1
 
 	init_player_from_data(game)
 
@@ -71,10 +73,6 @@ game_reinit :: proc(game: ^Game) {
 	game.light_sources = make([dynamic]Light_Source)
 
 	clear_messages(game)
-
-	// Mining defaults
-	game.pickaxe_durability = 20
-	game.pickaxe_max_dur = 20
 
 	generate_map(game)
 

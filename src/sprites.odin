@@ -90,6 +90,9 @@ sprites_init :: proc() {
 	size := sprite_data.sprite_size
 	if size <= 0 { size = SPRITE_SIZE }
 	g_sprites.tile_size = size
+	g_sprites.tile_map = make(map[string]Sprite)
+	g_sprites.char_map = make(map[string]Sprite)
+	g_sprites.item_map = make(map[string]Sprite)
 
 	// Build tile sprite map
 	for id, pos in sprite_data.tiles {
@@ -111,12 +114,14 @@ sprites_init :: proc() {
 	tile_count := len(sprite_data.tiles)
 	char_count := len(sprite_data.characters)
 	item_count := len(sprite_data.items)
-	fmt.printfln(
-		"[sprites] loaded '%s' (%dx%d) — %d tiles, %d chars, %d items",
-		tileset_path,
-		g_sprites.texture.width, g_sprites.texture.height,
-		tile_count, char_count, item_count,
-	)
+	if DEBUG_LOGS {
+		fmt.printfln(
+			"[sprites] loaded '%s' (%dx%d) — %d tiles, %d chars, %d items",
+			tileset_path,
+			g_sprites.texture.width, g_sprites.texture.height,
+			tile_count, char_count, item_count,
+		)
+	}
 }
 
 sprites_cleanup :: proc() {

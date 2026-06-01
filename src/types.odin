@@ -141,6 +141,25 @@ Ore_Vein :: struct {
 	color:    rl.Color, // visual tint for the wall
 }
 
+// ─── VFX State ────────────────────────────────────────────────────────────────
+
+VFX_State :: struct {
+	flash_color:    rl.Color, // current screen flash color
+	flash_alpha:    f32, // fades each render frame (0-1)
+	anim_frame:     int, // global frame counter (increments each render)
+}
+
+// ─── UI State ─────────────────────────────────────────────────────────────────
+
+UI_State :: struct {
+	show_minimap: bool,
+	dropping:     bool, // inventory drop mode
+	equipping:    bool, // inventory equip mode
+	inspect_slot: int, // highlighted slot in inventory (-1 = none)
+	mining_mode:  bool, // true when player pressed X and awaits direction
+	use_sprites:  bool, // true = tileset sprites, false = ASCII mode
+}
+
 // ─── Game State ───────────────────────────────────────────────────────────────
 
 Game_State :: enum {
@@ -153,67 +172,50 @@ Game_State :: enum {
 }
 
 Game :: struct {
-	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
-	dijkstra_map:       [MAP_WIDTH * MAP_HEIGHT]int,
-	map_width:          int,
-	map_height:         int,
-	player:             Player,
-	rooms:              [dynamic]Room,
-	enemies:            [dynamic]Enemy,
-	items:              [dynamic]Item,
-	inventory:          [MAX_INVENTORY]Inventory_Slot,
-	light_sources:      [dynamic]Light_Source,
-	depth:              int,
-	turn_count:         int,
-	kills:              int,
-	seed:               u64,
-	state:              Game_State,
-	message_log:        MessageLog,
+	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
+	dijkstra_map:      [MAP_WIDTH * MAP_HEIGHT]int,
+	map_width:         int,
+	map_height:        int,
+	player:            Player,
+	rooms:             [dynamic]Room,
+	enemies:           [dynamic]Enemy,
+	items:             [dynamic]Item,
+	inventory:         [MAX_INVENTORY]Inventory_Slot,
+	light_sources:     [dynamic]Light_Source,
+	depth:             int,
+	turn_count:        int,
+	kills:             int,
+	seed:              u64,
+	state:             Game_State,
+	message_log:       MessageLog,
 	// Camera offset: pixel position of top-left corner of the viewport in map-space
-	camera_x:           int,
-	camera_y:           int,
+	camera_x:          int,
+	camera_y:          int,
+	// Smooth camera target (computed)
+	camera_target_x:   int,
+	camera_target_y:   int,
 	// Timed light boost (from lantern oil)
-	light_boost_bonus:  int,
-	light_boost_turns:  int,
-	// Inventory drop mode
-	dropping:           bool,
+	light_boost_bonus: int,
+	light_boost_turns: int,
 	// Web tiles (Cave Crawler ability)
-	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
-	skip_next_turn:     bool, // player stuck in web
+	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
+	skip_next_turn:    bool, // player stuck in web
 	// Equipment slots
-	equipped_weapon:    Equipment,
-	equipped_armor:     Equipment,
-	equipped_helmet:    Equipment,
-	// Equipment mode in inventory
-	equipping:          bool,
+	equipped_weapon:   Equipment,
+	equipped_armor:    Equipment,
+	equipped_helmet:   Equipment,
 	// Depth-based floor palette
-	palette:            Floor_Palette,
-	// Minimap toggle
-	show_minimap:       bool,
+	palette:           Floor_Palette,
 	// Hazard state
-	water_slow_active:  bool, // player in water, costs next turn
-	prev_player_pos:    Vec2, // track previous position for unstable collapse
+	water_slow_active: bool, // player in water, costs next turn
+	prev_player_pos:   Vec2, // track previous position for unstable collapse
 	// Mining system
-	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
-	mining_mode:        bool, // true when player pressed X and awaits direction
-	pickaxe_durability: int, // current durability (legacy, kept for compat)
-	pickaxe_max_dur:    int, // max durability (legacy, kept for compat)
-	// Inventory inspect cursor
-	inspect_slot:       int, // currently highlighted slot in inventory (-1 = none)
+	ore_veins:         [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
 	// Death tracking
-	death_cause:        string,
-	score_saved:        bool,
-	last_score_rank:    int,
-	// Animation state
-	anim_frame:         int, // global frame counter (increments each render)
-	// Visual effects (S02)
-	flash_color:        rl.Color, // current screen flash color
-	flash_alpha:        f32, // current flash alpha (0-1), fades each frame
-	fade_alpha:         f32, // floor transition fade (0-1, 1=fully black)
-	fade_direction:     int, // 1=fading in (to black), -1=fading out, 0=inactive
-	// Smooth camera (S02)
-	camera_target_x:    int, // target camera position (computed)
-	camera_target_y:    int,
-	// Render mode
-	use_sprites:        bool, // true = tileset sprites, false = ASCII mode
+	death_cause:       string,
+	score_saved:       bool,
+	last_score_rank:   int,
+	// UI and VFX
+	ui:                UI_State,
+	vfx:               VFX_State,
 }

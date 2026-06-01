@@ -218,7 +218,7 @@ render_items :: proc(game: ^Game) {
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
 
-		if game.use_sprites {
+		if game.ui.use_sprites {
 			spr := get_item_sprite(item.item_type)
 			draw_sprite(spr, ix, iy, item.color)
 		} else {
@@ -261,7 +261,9 @@ spawn_items :: proc(game: ^Game) {
 				spawned += 1
 			}
 		}
-		fmt.printfln("[items] spawned %v items (cave, depth=%v)", spawned, game.depth)
+		if DEBUG_LOGS {
+			fmt.printfln("[items] spawned %v items (cave, depth=%v)", spawned, game.depth)
+		}
 		return
 	}
 
@@ -307,10 +309,12 @@ spawn_items :: proc(game: ^Game) {
 		_ = placed
 	}
 
-	fmt.printfln(
-		"[items] spawned %v items across %v rooms (depth=%v)",
-		total,
-		len(game.rooms) - 1,
-		game.depth,
-	)
+	if DEBUG_LOGS {
+		fmt.printfln(
+			"[items] spawned %v items across %v rooms (depth=%v)",
+			total,
+			len(game.rooms) - 1,
+			game.depth,
+		)
+	}
 }

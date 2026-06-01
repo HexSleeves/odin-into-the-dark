@@ -48,13 +48,15 @@ compute_fov :: proc(game: ^Game) {
 	}
 
 	// Diagnostic: count visible tiles
-	visible_count := 0
-	for &tile in game.tiles {
-		if tile.visible {
-			visible_count += 1
+	if DEBUG_LOGS {
+		visible_count := 0
+		for &tile in game.tiles {
+			if tile.visible {
+				visible_count += 1
+			}
 		}
+		fmt.printfln("[fov] recomputed: %v tiles visible (radius=%v)", visible_count, radius)
 	}
-	fmt.printfln("[fov] recomputed: %v tiles visible (radius=%v)", visible_count, radius)
 }
 
 // ─── Recursive shadowcasting for one octant ──────────────────────────────────

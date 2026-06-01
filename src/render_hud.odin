@@ -117,7 +117,7 @@ render_hud :: proc(game: ^Game) {
 	}
 
 	// Mining mode indicator (centered at top of screen)
-	if game.mining_mode {
+	if game.ui.mining_mode {
 		mine_text := cstring("[MINING] Choose direction (WASD/arrows) | ESC cancel")
 		mine_w := rl.MeasureText(mine_text, 14)
 		rl.DrawText(

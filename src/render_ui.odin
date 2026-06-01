@@ -21,7 +21,7 @@ render_inventory :: proc(game: ^Game) {
 	rl.DrawText(subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
 
 	// Drop mode indicator
-	if game.dropping {
+	if game.ui.dropping {
 		drop_text := cstring("[DROP MODE] Press 1-9 to drop")
 		drop_size :: i32(16)
 		drop_w := rl.MeasureText(drop_text, drop_size)
@@ -30,7 +30,7 @@ render_inventory :: proc(game: ^Game) {
 	}
 
 	// Equip mode indicator
-	if game.equipping {
+	if game.ui.equipping {
 		equip_text := cstring("[EQUIP MODE] Press 1-9 to equip")
 		equip_size :: i32(16)
 		equip_w := rl.MeasureText(equip_text, equip_size)
@@ -46,7 +46,7 @@ render_inventory :: proc(game: ^Game) {
 		y_pos := i32(180) + i32(idx) * 28
 
 		// Highlight selected slot
-		if idx == game.inspect_slot {
+		if idx == game.ui.inspect_slot {
 			rl.DrawRectangle(slot_x - 4, y_pos - 2, 260, 22, rl.Color{60, 60, 80, 200})
 			rl.DrawText(">", slot_x - 14, y_pos, slot_size, rl.Color{255, 220, 100, 255})
 		}
@@ -55,7 +55,7 @@ render_inventory :: proc(game: ^Game) {
 			it := game.inventory[idx].item
 			name := item_display_name(&it)
 			text_x := slot_x
-			if game.use_sprites {
+			if game.ui.use_sprites {
 				spr := get_item_sprite(it.item_type)
 				draw_sprite(spr, slot_x, y_pos, rl.WHITE)
 				text_x = slot_x + 20
@@ -121,13 +121,13 @@ render_inventory :: proc(game: ^Game) {
 	}
 	for es in equip_slots {
 		// Highlight if cursor is on this equipment slot
-		if game.inspect_slot == es.idx {
+		if game.ui.inspect_slot == es.idx {
 			rl.DrawRectangle(slot_x - 4, eq_y - 2, 260, 22, rl.Color{60, 60, 80, 200})
 			rl.DrawText(">", slot_x - 14, eq_y, slot_size, rl.Color{255, 220, 100, 255})
 		}
 		if es.slot.occupied {
 			eq_text_x := slot_x
-			if game.use_sprites {
+			if game.ui.use_sprites {
 				spr := get_item_sprite(es.slot.item.item_type)
 				draw_sprite(spr, slot_x, eq_y, rl.WHITE)
 				eq_text_x = slot_x + 20
@@ -157,15 +157,15 @@ render_inventory :: proc(game: ^Game) {
 	// ── Inspect detail panel (right side) ──
 	// Determine which item to inspect
 	inspect_item: ^Item = nil
-	if game.inspect_slot >= 0 && game.inspect_slot < MAX_INVENTORY {
-		if game.inventory[game.inspect_slot].occupied {
-			inspect_item = &game.inventory[game.inspect_slot].item
+	if game.ui.inspect_slot >= 0 && game.ui.inspect_slot < MAX_INVENTORY {
+		if game.inventory[game.ui.inspect_slot].occupied {
+			inspect_item = &game.inventory[game.ui.inspect_slot].item
 		}
-	} else if game.inspect_slot == MAX_INVENTORY && game.equipped_weapon.occupied {
+	} else if game.ui.inspect_slot == MAX_INVENTORY && game.equipped_weapon.occupied {
 		inspect_item = &game.equipped_weapon.item
-	} else if game.inspect_slot == MAX_INVENTORY + 1 && game.equipped_armor.occupied {
+	} else if game.ui.inspect_slot == MAX_INVENTORY + 1 && game.equipped_armor.occupied {
 		inspect_item = &game.equipped_armor.item
-	} else if game.inspect_slot == MAX_INVENTORY + 2 && game.equipped_helmet.occupied {
+	} else if game.ui.inspect_slot == MAX_INVENTORY + 2 && game.equipped_helmet.occupied {
 		inspect_item = &game.equipped_helmet.item
 	}
 

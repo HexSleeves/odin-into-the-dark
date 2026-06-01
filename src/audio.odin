@@ -18,6 +18,11 @@ Game_Audio :: struct {
 	enabled: bool,
 }
 
+Generated_Wave :: struct {
+	wave:    rl.Wave,
+	samples: []i16,
+}
+
 g_audio: Game_Audio
 
 @(private = "file")
@@ -26,7 +31,7 @@ generate_tone :: proc(
 	duration: f32,
 	volume: f32,
 	sample_rate: u32 = 44100,
-) -> rl.Wave {
+) -> Generated_Wave {
 	frame_count := u32(duration * f32(sample_rate))
 	samples := make([]i16, frame_count)
 	for i in 0 ..< frame_count {
@@ -35,17 +40,20 @@ generate_tone :: proc(
 		sample := math.sin(2.0 * math.PI * frequency * t) * volume * envelope
 		samples[i] = i16(sample * 32000.0)
 	}
-	return rl.Wave {
-		frameCount = u32(frame_count),
-		sampleRate = u32(sample_rate),
-		sampleSize = 16,
-		channels = 1,
-		data = rawptr(raw_data(samples)),
+	return Generated_Wave {
+		wave = rl.Wave {
+			frameCount = u32(frame_count),
+			sampleRate = u32(sample_rate),
+			sampleSize = 16,
+			channels = 1,
+			data = rawptr(raw_data(samples)),
+		},
+		samples = samples,
 	}
 }
 
 @(private = "file")
-generate_noise :: proc(duration: f32, volume: f32, sample_rate: u32 = 44100) -> rl.Wave {
+generate_noise :: proc(duration: f32, volume: f32, sample_rate: u32 = 44100) -> Generated_Wave {
 	frame_count := u32(duration * f32(sample_rate))
 	samples := make([]i16, frame_count)
 	seed: u32 = 12345
@@ -55,13 +63,24 @@ generate_noise :: proc(duration: f32, volume: f32, sample_rate: u32 = 44100) -> 
 		envelope := 1.0 - f32(i) / f32(frame_count)
 		samples[i] = i16(noise * volume * envelope * 32000.0)
 	}
-	return rl.Wave {
-		frameCount = u32(frame_count),
-		sampleRate = u32(sample_rate),
-		sampleSize = 16,
-		channels = 1,
-		data = rawptr(raw_data(samples)),
+	return Generated_Wave {
+		wave = rl.Wave {
+			frameCount = u32(frame_count),
+			sampleRate = u32(sample_rate),
+			sampleSize = 16,
+			channels = 1,
+			data = rawptr(raw_data(samples)),
+		},
+		samples = samples,
 	}
+}
+
+@(private = "file")
+load_generated_sound :: proc(gw: Generated_Wave, volume: f32) -> rl.Sound {
+	sound := rl.LoadSoundFromWave(gw.wave)
+	delete(gw.samples)
+	rl.SetSoundVolume(sound, volume)
+	return sound
 }
 
 audio_init :: proc() {
@@ -72,34 +91,15 @@ audio_init :: proc() {
 	}
 	g_audio.enabled = true
 
-	w := generate_noise(0.05, 0.15)
-	g_audio.sounds[.Footstep] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Footstep], 0.3)
-
-	w = generate_tone(200, 0.1, 0.5)
-	g_audio.sounds[.Hit] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Hit], 0.5)
-
-	w = generate_tone(800, 0.08, 0.4)
-	g_audio.sounds[.Mine] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Mine], 0.4)
-
-	w = generate_tone(1200, 0.12, 0.3)
-	g_audio.sounds[.Pickup] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Pickup], 0.4)
-
-	w = generate_tone(80, 0.5, 0.6)
-	g_audio.sounds[.Death] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Death], 0.6)
-
-	w = generate_tone(300, 0.3, 0.4)
-	g_audio.sounds[.Descent] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Descent], 0.5)
+	g_audio.sounds[.Footstep] = load_generated_sound(generate_noise(0.05, 0.15), 0.3)
+	g_audio.sounds[.Hit] = load_generated_sound(generate_tone(200, 0.1, 0.5), 0.5)
+	g_audio.sounds[.Mine] = load_generated_sound(generate_tone(800, 0.08, 0.4), 0.4)
+	g_audio.sounds[.Pickup] = load_generated_sound(generate_tone(1200, 0.12, 0.3), 0.4)
+	g_audio.sounds[.Death] = load_generated_sound(generate_tone(80, 0.5, 0.6), 0.6)
+	g_audio.sounds[.Descent] = load_generated_sound(generate_tone(300, 0.3, 0.4), 0.5)
 
 	// Water: bubbly low-frequency noise splash
-	w = generate_noise(0.12, 0.25)
-	g_audio.sounds[.Water] = rl.LoadSoundFromWave(w)
-	rl.SetSoundVolume(g_audio.sounds[.Water], 0.35)
+	g_audio.sounds[.Water] = load_generated_sound(generate_noise(0.12, 0.25), 0.35)
 }
 
 audio_cleanup :: proc() {
