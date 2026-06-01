@@ -29,7 +29,7 @@ main :: proc() {
 	fmt.printfln("Seed: %v", game.seed)
 
 	compute_fov(game)
-	camera_update(game)
+	camera_update(game, snap = true)
 	add_message(game, "Welcome to the depths. Tread carefully...", rl.Color{200, 200, 100, 255})
 
 	// Disable default escape key to allow inventory to be closed with ESC
@@ -42,23 +42,33 @@ main :: proc() {
 			if game.skip_next_turn {
 				game.skip_next_turn = false
 				game.turn_count += 1
+				hp_before_web := game.player.hp
 				process_enemy_turns(game)
 				process_enemy_abilities(game)
 				remove_dead_enemies(game)
 				tick_timed_effects(game)
 				compute_fov(game)
 				camera_update(game)
+				if game.player.hp < hp_before_web {
+					game.flash_color = rl.Color{255, 0, 0, 255}
+					game.flash_alpha = 0.3
+				}
 				add_message(game, "You break free from the web.", rl.Color{200, 200, 100, 255})
 			} else if game.water_slow_active {
 				// Water: costs an extra turn
 				game.water_slow_active = false
 				game.turn_count += 1
+				hp_before_water := game.player.hp
 				process_enemy_turns(game)
 				process_enemy_abilities(game)
 				remove_dead_enemies(game)
 				tick_timed_effects(game)
 				compute_fov(game)
 				camera_update(game)
+				if game.player.hp < hp_before_water {
+					game.flash_color = rl.Color{255, 0, 0, 255}
+					game.flash_alpha = 0.3
+				}
 				add_message(game, "You push through the water.", rl.Color{40, 80, 180, 255})
 			} else {
 				// Mining mode takes priority over all other input
@@ -77,12 +87,18 @@ main :: proc() {
 							game.mining_mode = false
 							if mine_wall(game, mdx, mdy) {
 								play_sfx(.Mine)
+								spawn_mine_particles(game.player.pos.x + mdx, game.player.pos.y + mdy, game.camera_x, game.camera_y)
+								hp_before_mine := game.player.hp
 								process_enemy_turns(game)
 								process_enemy_abilities(game)
 								remove_dead_enemies(game)
 								tick_timed_effects(game)
 								compute_fov(game)
 								camera_update(game)
+								if game.player.hp < hp_before_mine {
+									game.flash_color = rl.Color{255, 0, 0, 255}
+									game.flash_alpha = 0.3
+								}
 							}
 						}
 					}
@@ -149,6 +165,7 @@ main :: proc() {
 					if rl.IsKeyPressed(.G) {
 						if pickup_item(game) {
 							play_sfx(.Pickup)
+							spawn_pickup_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
 						}
 					}
 
@@ -165,11 +182,16 @@ main :: proc() {
 					}
 
 					game.prev_player_pos = game.player.pos
+					kills_before := game.kills
 					result := handle_input(game)
 					if result == .Quit {
 						break
 					}
 					if result == .Moved {
+						// Combat hit particles when a kill happened this turn
+						if game.kills > kills_before {
+							spawn_hit_particles(game.prev_player_pos.x, game.prev_player_pos.y, game.camera_x, game.camera_y)
+						}
 						play_sfx(.Footstep)
 						// Check if player stepped on web
 						pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
@@ -196,6 +218,8 @@ main :: proc() {
 							}
 							if cur_tile.type == .Gas_Vent {
 								game.player.hp -= 3
+								game.flash_color = rl.Color{160, 180, 40, 255}
+								game.flash_alpha = 0.4
 								add_message(
 									game,
 									"Toxic gas burns you! (-3 HP)",
@@ -231,12 +255,17 @@ main :: proc() {
 							}
 						}
 
+						hp_before_move := game.player.hp
 						process_enemy_turns(game)
 						process_enemy_abilities(game)
 						remove_dead_enemies(game)
 						tick_timed_effects(game)
 						compute_fov(game)
 						camera_update(game)
+						if game.player.hp < hp_before_move {
+							game.flash_color = rl.Color{255, 0, 0, 255}
+							game.flash_alpha = 0.3
+						}
 
 						// Announce item on player's tile
 						it := item_at(game, game.player.pos.x, game.player.pos.y)
@@ -249,27 +278,40 @@ main :: proc() {
 						}
 					}
 					if result == .Waited {
+						hp_before_wait := game.player.hp
 						process_enemy_turns(game)
 						process_enemy_abilities(game)
 						remove_dead_enemies(game)
 						tick_timed_effects(game)
 						compute_fov(game)
 						camera_update(game)
+						if game.player.hp < hp_before_wait {
+							game.flash_color = rl.Color{255, 0, 0, 255}
+							game.flash_alpha = 0.3
+						}
 					}
 					if result == .Descended {
 						play_sfx(.Descent)
+						game.flash_color = rl.Color{255, 255, 255, 255}
+						game.flash_alpha = 0.5
+						hp_before_desc := game.player.hp
 						process_enemy_turns(game)
 						process_enemy_abilities(game)
 						remove_dead_enemies(game)
 						tick_timed_effects(game)
 						compute_fov(game)
 						camera_update(game)
+						if game.player.hp < hp_before_desc {
+							game.flash_color = rl.Color{255, 0, 0, 255}
+							game.flash_alpha = 0.3
+						}
 					}
 				} // end else (not mining_mode)
 			} // end else (not skip_next_turn)
 		} else if game.state == .Game_Over {
 			if !death_sound_played {
 				play_sfx(.Death)
+				spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
 				death_sound_played = true
 			}
 			if !game.score_saved {
@@ -290,7 +332,7 @@ main :: proc() {
 				game^ = {}
 				game_reinit(game)
 				compute_fov(game)
-				camera_update(game)
+				camera_update(game, snap = true)
 				game.score_saved = false
 				game.death_cause = ""
 				game.last_score_rank = -1

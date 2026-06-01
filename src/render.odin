@@ -5,6 +5,8 @@ import rl "vendor:raylib"
 // ─── Top-level render call ────────────────────────────────────────────────────
 
 render_game :: proc(game: ^Game) {
+	update_particles()
+
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.BLACK)
 
@@ -15,6 +17,7 @@ render_game :: proc(game: ^Game) {
 	render_items(game)
 	render_enemies(game)
 	render_player(game)
+	render_particles()
 	rl.EndScissorMode()
 
 	render_hud(game)
@@ -38,6 +41,20 @@ render_game :: proc(game: ^Game) {
 	}
 	if game.state == .Viewing_Help {
 		render_help(game)
+	}
+
+	// Screen flash overlay (S02)
+	if game.flash_alpha > 0.01 {
+		alpha := u8(game.flash_alpha * 255.0)
+		rl.DrawRectangle(
+			0,
+			0,
+			i32(SCREEN_WIDTH),
+			i32(SCREEN_HEIGHT),
+			rl.Color{game.flash_color.r, game.flash_color.g, game.flash_color.b, alpha},
+		)
+		game.flash_alpha *= 0.85
+		if game.flash_alpha < 0.01 {game.flash_alpha = 0}
 	}
 
 	rl.EndDrawing()

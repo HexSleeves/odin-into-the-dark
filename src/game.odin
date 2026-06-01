@@ -100,7 +100,8 @@ init_player_from_data :: proc(game: ^Game) {
 // ─── Camera ───────────────────────────────────────────────────────────────
 
 // Centers the viewport on the player, clamped to map edges.
-camera_update :: proc(game: ^Game) {
+// snap=true jumps instantly (use on init/restart); snap=false lerps smoothly.
+camera_update :: proc(game: ^Game, snap: bool = false) {
 	// Player pixel center
 	px := game.player.pos.x * TILE_SIZE + TILE_SIZE / 2
 	py := game.player.pos.y * TILE_SIZE + TILE_SIZE / 2
@@ -126,8 +127,23 @@ camera_update :: proc(game: ^Game) {
 	if map_pixel_w < vw {cam_x = -(vw - map_pixel_w) / 2}
 	if map_pixel_h < vh {cam_y = -(vh - map_pixel_h) / 2}
 
-	game.camera_x = cam_x
-	game.camera_y = cam_y
+	game.camera_target_x = cam_x
+	game.camera_target_y = cam_y
+
+	if snap {
+		game.camera_x = cam_x
+		game.camera_y = cam_y
+	} else {
+		// Smooth lerp toward target
+		LERP_SPEED :: 0.2
+		diff_x := cam_x - game.camera_x
+		diff_y := cam_y - game.camera_y
+		game.camera_x += int(f32(diff_x) * LERP_SPEED)
+		game.camera_y += int(f32(diff_y) * LERP_SPEED)
+		// Snap if very close to prevent jitter
+		if abs(diff_x) <= 1 {game.camera_x = cam_x}
+		if abs(diff_y) <= 1 {game.camera_y = cam_y}
+	}
 }
 
 // ─── Cleanup ──────────────────────────────────────────────────────────────────

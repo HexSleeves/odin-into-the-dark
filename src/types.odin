@@ -202,4 +202,14 @@ Game :: struct {
 	death_cause:        string,
 	score_saved:        bool,
 	last_score_rank:    int,
+	// Animation state
+	anim_frame:         int, // global frame counter (increments each render)
+	// Visual effects (S02)
+	flash_color:        rl.Color, // current screen flash color
+	flash_alpha:        f32, // current flash alpha (0-1), fades each frame
+	fade_alpha:         f32, // floor transition fade (0-1, 1=fully black)
+	fade_direction:     int, // 1=fading in (to black), -1=fading out, 0=inactive
+	// Smooth camera (S02)
+	camera_target_x:    int, // target camera position (computed)
+	camera_target_y:    int,
 }

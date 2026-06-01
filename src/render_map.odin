@@ -1,6 +1,7 @@
 package main
 
 import "core:fmt"
+import "core:math"
 import rl "vendor:raylib"
 
 // ─── Depth palette definitions ────────────────────────────────────────────────
@@ -90,6 +91,8 @@ get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
 // ─── Map rendering (with camera offset) ───────────────────────────────────────
 
 render_map :: proc(game: ^Game) {
+	game.anim_frame += 1
+
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 	palette := game.palette
@@ -156,6 +159,11 @@ render_player :: proc(game: ^Game) {
 	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
 	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
 
+	// Subtle idle bob for player (0.5 pixel amplitude — player should feel solid)
+	bob_phase := f32(game.anim_frame) * 0.06
+	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
+	py += bob_offset
+
 	font_size :: i32(TILE_SIZE)
 	glyph_buf: [2]u8
 	glyph_buf[0] = u8(game.player.glyph)
@@ -178,6 +186,11 @@ render_enemies :: proc(game: ^Game) {
 
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
+
+		// Idle bob: 1-2 pixel sine wave, phase offset by position so enemies bob independently
+		bob_phase := f32(game.anim_frame + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
+		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
+		ey += bob_offset
 
 		font_size :: i32(TILE_SIZE)
 		glyph_buf: [2]u8
