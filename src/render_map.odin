@@ -27,6 +27,13 @@ PALETTE_CRYSTAL :: Floor_Palette {
 	descent = rl.Color{0, 255, 200, 255},
 }
 
+PALETTE_FLOODED :: Floor_Palette {
+	wall    = rl.Color{25, 40, 55, 255},
+	floor   = rl.Color{35, 65, 80, 255},
+	rubble  = rl.Color{50, 90, 85, 255},
+	descent = rl.Color{0, 200, 255, 255},
+}
+
 PALETTE_DEEP :: Floor_Palette {
 	wall    = rl.Color{35, 20, 45, 255},
 	floor   = rl.Color{70, 40, 80, 255},
@@ -44,7 +51,8 @@ EXPLORED_DIM :: 0.4
 palette_for_depth :: proc(depth: int) -> Floor_Palette {
 	if depth <= 2 {return PALETTE_MINE}
 	if depth <= 4 {return PALETTE_STONE}
-	if depth <= 7 {return PALETTE_CRYSTAL}
+	if depth == 5 {return PALETTE_CRYSTAL}
+	if depth <= 7 {return PALETTE_FLOODED}
 	return PALETTE_DEEP
 }
 

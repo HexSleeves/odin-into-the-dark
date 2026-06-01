@@ -79,6 +79,7 @@ Enemy :: struct {
 	ability_cooldown: int, // current cooldown (decrements each turn)
 	ability_max_cd:   int, // max cooldown for reset
 	ability_range:    int, // range of the ability
+	is_boss:          bool,
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────
@@ -145,6 +146,7 @@ Ore_Vein :: struct {
 Game_State :: enum {
 	Playing,
 	Game_Over,
+	Victory,
 	Viewing_Inventory,
 	Viewing_Crafting,
 	Viewing_Help,

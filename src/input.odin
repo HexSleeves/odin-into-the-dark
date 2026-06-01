@@ -89,6 +89,12 @@ handle_input :: proc(game: ^Game) -> Input_Result {
 // ─── Descent to next floor ───────────────────────────────────────────────────
 
 descend :: proc(game: ^Game) {
+	// Victory condition: escaping from depth 12
+	if game.depth >= 12 {
+		game.state = .Victory
+		return
+	}
+
 	game.depth += 1
 
 	// Reduce light radius with depth (min 2 at depth 8+, min 3 otherwise)

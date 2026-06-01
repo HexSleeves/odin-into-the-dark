@@ -471,6 +471,93 @@ render_crafting :: proc(game: ^Game) {
 	}
 }
 
+// ─── Victory screen overlay ──────────────────────────────────────────────────
+
+render_victory :: proc(game: ^Game) {
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 220})
+
+	sw := i32(SCREEN_WIDTH)
+
+	// Title
+	title := cstring("VICTORY!")
+	title_size :: i32(48)
+	title_w := rl.MeasureText(title, title_size)
+	rl.DrawText(title, (sw - title_w) / 2, 80, title_size, rl.Color{255, 215, 0, 255})
+
+	// Subtitle
+	sub := cstring("You have conquered the depths!")
+	sub_size :: i32(20)
+	sub_w := rl.MeasureText(sub, sub_size)
+	rl.DrawText(sub, (sw - sub_w) / 2, 140, sub_size, rl.Color{200, 200, 100, 255})
+
+	// Stats
+	stats_y :: i32(190)
+	center_x := sw / 2
+
+	rl.DrawText(
+		rl.TextFormat("Depth Reached: %d", i32(game.depth)),
+		center_x - 100, stats_y, 18, rl.Color{200, 200, 200, 255},
+	)
+	rl.DrawText(
+		rl.TextFormat("Enemies Slain: %d", i32(game.kills)),
+		center_x - 100, stats_y + 25, 18, rl.Color{200, 200, 200, 255},
+	)
+	rl.DrawText(
+		rl.TextFormat("Turns Survived: %d", i32(game.turn_count)),
+		center_x - 100, stats_y + 50, 18, rl.Color{200, 200, 200, 255},
+	)
+	rl.DrawText(
+		rl.TextFormat("HP Remaining: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
+		center_x - 100, stats_y + 75, 18, rl.Color{100, 255, 100, 255},
+	)
+
+	// High Scores
+	hs_title := cstring("HIGH SCORES")
+	hs_size :: i32(18)
+	hs_w := rl.MeasureText(hs_title, hs_size)
+	rl.DrawText(hs_title, (sw - hs_w) / 2, stats_y + 115, hs_size, rl.Color{255, 220, 50, 255})
+
+	table := load_scores()
+	row_h :: i32(22)
+	base_y := stats_y + 140
+	row_size :: i32(14)
+
+	if table.count == 0 {
+		empty := cstring("No scores yet.")
+		empty_w := rl.MeasureText(empty, row_size)
+		rl.DrawText(empty, (sw - empty_w) / 2, base_y, row_size, rl.Color{120, 120, 120, 255})
+	} else {
+		for i in 0 ..< table.count {
+			y := base_y + i32(i) * row_h
+			s := table.scores[i]
+
+			is_current := (i == game.last_score_rank)
+			color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+			prefix := ">" if is_current else " "
+
+			cause_display := s.cause if len(s.cause) > 0 else "Unknown"
+
+			row_text := fmt.ctprintf(
+				"%s #%d  Depth %d  Kills %d  Turns %d  %s",
+				prefix,
+				i + 1,
+				s.depth,
+				s.kills,
+				s.turns,
+				cause_display,
+			)
+			row_w := rl.MeasureText(row_text, row_size)
+			rl.DrawText(row_text, (sw - row_w) / 2, y, row_size, color)
+		}
+	}
+
+	// Footer
+	footer := cstring("Press R to play again  |  ESC to quit")
+	footer_size :: i32(16)
+	footer_w := rl.MeasureText(footer, footer_size)
+	rl.DrawText(footer, (sw - footer_w) / 2, i32(SCREEN_HEIGHT) - 30, footer_size, rl.Color{150, 150, 150, 255})
+}
+
 // ─── Help screen overlay ──────────────────────────────────────────────────────
 
 render_help :: proc(game: ^Game) {

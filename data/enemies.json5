@@ -36,6 +36,43 @@
       attack: 6,
       ability: { type: "pull", cooldown: 6, range: 4 },  // cd was 5 — slightly slower
     },
+    {
+      id: "toxic_spore",
+      name: "Toxic Spore",
+      glyph: "S",
+      color: [120, 200, 40, 255],
+      hp: 5,
+      attack: 2,
+      ability: { type: "poison_cloud", cooldown: 0, range: 0 },
+    },
+    {
+      id: "shadow_stalker",
+      name: "Shadow Stalker",
+      glyph: "s",
+      color: [80, 40, 120, 255],
+      hp: 14,
+      attack: 5,
+      ability: { type: "teleport", cooldown: 3, range: 5 },
+    },
+    // Bosses
+    {
+      id: "mine_guardian",
+      name: "Mine Guardian",
+      glyph: "G",
+      color: [220, 180, 60, 255],
+      hp: 50,
+      attack: 8,
+      ability: { type: "slam", cooldown: 3, range: 1 },
+    },
+    {
+      id: "abyssal_lord",
+      name: "Abyssal Lord",
+      glyph: "A",
+      color: [150, 30, 200, 255],
+      hp: 75,
+      attack: 10,
+      ability: { type: "darkness", cooldown: 4, range: 6 },
+    },
   ],
 
   // Spawn tables: finer depth granularity for better pacing
@@ -57,29 +94,34 @@
       ],
     },
     {
-      // Depth 3-4: crawlers enter, husks dominate
+      // Depth 3-4: crawlers enter, toxic spores appear
       depth_min: 3, depth_max: 4,
       weights: [
-        { id: "rat", weight: 15 },
-        { id: "miner_husk", weight: 40 },
-        { id: "cave_crawler", weight: 45 },
+        { id: "rat", weight: 10 },
+        { id: "miner_husk", weight: 30 },
+        { id: "cave_crawler", weight: 35 },
+        { id: "toxic_spore", weight: 25 },
       ],
     },
     {
-      // Depth 5-7: deep watchers enter, mix of tough enemies
+      // Depth 5-7: deep watchers enter, shadow stalkers appear
       depth_min: 5, depth_max: 7,
       weights: [
-        { id: "miner_husk", weight: 15 },
-        { id: "cave_crawler", weight: 45 },
-        { id: "deep_watcher", weight: 40 },
+        { id: "miner_husk", weight: 10 },
+        { id: "cave_crawler", weight: 30 },
+        { id: "deep_watcher", weight: 30 },
+        { id: "toxic_spore", weight: 15 },
+        { id: "shadow_stalker", weight: 15 },
       ],
     },
     {
-      // Depth 8+: deep watchers dominate, endgame gauntlet
+      // Depth 8+: endgame gauntlet with shadow stalkers
       depth_min: 8, depth_max: 99,
       weights: [
-        { id: "cave_crawler", weight: 30 },
-        { id: "deep_watcher", weight: 70 },
+        { id: "cave_crawler", weight: 20 },
+        { id: "deep_watcher", weight: 40 },
+        { id: "shadow_stalker", weight: 30 },
+        { id: "toxic_spore", weight: 10 },
       ],
     },
   ],

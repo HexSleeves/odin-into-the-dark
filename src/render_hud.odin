@@ -190,4 +190,26 @@ render_hud :: proc(game: ^Game) {
 	} else {
 		rl.DrawText("Hlm: ---", eq_x + 200, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
 	}
+
+	// Boss health bar
+	for &enemy in game.enemies {
+		if !enemy.alive || !enemy.is_boss {continue}
+
+		boss_bar_w :: i32(300)
+		boss_bar_h :: i32(16)
+		boss_bar_x := (i32(SCREEN_WIDTH) - boss_bar_w) / 2
+		boss_bar_y := i32(18)
+
+		rl.DrawRectangle(boss_bar_x - 2, boss_bar_y - 2, boss_bar_w + 4, boss_bar_h + 4, rl.Color{10, 10, 15, 200})
+		rl.DrawRectangle(boss_bar_x, boss_bar_y, boss_bar_w, boss_bar_h, rl.Color{60, 20, 20, 255})
+
+		ratio := f32(max(enemy.hp, 0)) / f32(enemy.max_hp)
+		rl.DrawRectangle(boss_bar_x, boss_bar_y, i32(f32(boss_bar_w) * ratio), boss_bar_h, rl.Color{200, 40, 40, 255})
+
+		rl.DrawText(
+			fmt.ctprintf("%s  %d/%d", enemy.name, enemy.hp, enemy.max_hp),
+			boss_bar_x + 4, boss_bar_y + 1, 14, rl.WHITE,
+		)
+		break
+	}
 }

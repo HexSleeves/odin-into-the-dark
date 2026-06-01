@@ -409,6 +409,53 @@ process_enemy_abilities :: proc(game: ^Game) {
 					}
 				}
 			}
+		} else if enemy.ability_type == "teleport" {
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist >= 3 && dist <= enemy.ability_range {
+				tile := tile_at(game, enemy.pos.x, enemy.pos.y)
+				if tile != nil && tile.visible {
+					DX :: [4]int{0, 0, -1, 1}
+					DY :: [4]int{-1, 1, 0, 0}
+					dx := DX
+					dy := DY
+					for dir in 0 ..< 4 {
+						tx := game.player.pos.x + dx[dir]
+						ty := game.player.pos.y + dy[dir]
+						if is_walkable(game, tx, ty) && enemy_at(game, tx, ty) == nil {
+							enemy.pos = Vec2{tx, ty}
+							enemy.ability_cooldown = enemy.ability_max_cd
+							add_message(
+								game,
+								fmt.tprintf("The %s appears from the shadows!", enemy_display_name(&enemy)),
+								rl.Color{80, 40, 120, 255},
+							)
+							break
+						}
+					}
+				}
+			}
+		} else if enemy.ability_type == "slam" {
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist <= 2 {
+				if dist == 1 {
+					game.player.hp -= 4
+					add_message(game, "The Mine Guardian slams the ground! (-4 HP)", rl.Color{220, 180, 60, 255})
+					if game.player.hp <= 0 {
+						game.death_cause = "Crushed by the Mine Guardian"
+						game.state = .Game_Over
+						add_message(game, "You have been slain...", rl.Color{255, 0, 0, 255})
+					}
+				}
+				enemy.ability_cooldown = enemy.ability_max_cd
+			}
+		} else if enemy.ability_type == "darkness" {
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist <= enemy.ability_range {
+				game.light_boost_bonus = max(game.light_boost_bonus - 2, -3)
+				game.light_boost_turns = max(game.light_boost_turns, 5)
+				enemy.ability_cooldown = enemy.ability_max_cd
+				add_message(game, "The Abyssal Lord shrouds you in darkness!", rl.Color{150, 30, 200, 255})
+			}
 		}
 	}
 }
@@ -419,6 +466,13 @@ remove_dead_enemies :: proc(game: ^Game) {
 	i := 0
 	for i < len(game.enemies) {
 		if !game.enemies[i].alive {
+			if game.enemies[i].ability_type == "poison_cloud" {
+				t := tile_at(game, game.enemies[i].pos.x, game.enemies[i].pos.y)
+				if t != nil && (t.type == .Floor || t.type == .Rubble) {
+					t.type = .Gas_Vent
+					add_message(game, fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name), rl.Color{120, 200, 40, 255})
+				}
+			}
 			unordered_remove(&game.enemies, i)
 		} else {
 			i += 1

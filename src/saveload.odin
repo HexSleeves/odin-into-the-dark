@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: "savegame.dat"
-SAVE_VERSION :: u32(1)
+SAVE_VERSION :: u32(2)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
 MAX_SAVE_ENEMIES :: 64
@@ -39,6 +39,7 @@ Save_Enemy :: struct {
 	ability_cooldown: int,
 	ability_max_cd:   int,
 	ability_range:    int,
+	is_boss:          bool,
 }
 
 Save_Item :: struct {
@@ -149,7 +150,7 @@ save_to_string :: proc(s: ^Save_String) -> string {
 	}
 
 	// Known constant strings (string literals — always valid)
-	known := [?]string{"web", "pull", "weapon", "armor", "helmet", "material"}
+	known := [?]string{"web", "pull", "poison_cloud", "teleport", "slam", "darkness", "weapon", "armor", "helmet", "material"}
 	for k in known {
 		if k == temp {return k}
 	}
@@ -240,6 +241,7 @@ save_game :: proc(game: ^Game) -> bool {
 			ability_cooldown = e.ability_cooldown,
 			ability_max_cd   = e.ability_max_cd,
 			ability_range    = e.ability_range,
+			is_boss          = e.is_boss,
 		}
 	}
 
@@ -366,6 +368,7 @@ load_game :: proc(game: ^Game) -> bool {
 				ability_cooldown = se.ability_cooldown,
 				ability_max_cd = se.ability_max_cd,
 				ability_range = se.ability_range,
+				is_boss = se.is_boss,
 			},
 		)
 	}

@@ -379,6 +379,34 @@ main :: proc() {
 			if rl.IsKeyPressed(.ESCAPE) {
 				break
 			}
+		} else if game.state == .Victory {
+			if !game.score_saved {
+				game.score_saved = true
+				game.death_cause = "Victory!"
+				table := load_scores()
+				entry := Score_Entry {
+					depth = game.depth,
+					kills = game.kills,
+					turns = game.turn_count,
+					cause = "Victory!",
+				}
+				game.last_score_rank = insert_score(&table, entry)
+				save_scores(&table)
+			}
+			if rl.IsKeyPressed(.R) {
+				game_cleanup(game)
+				game^ = {}
+				game_reinit(game)
+				compute_fov(game)
+				camera_update(game, snap = true)
+				game.score_saved = false
+				game.death_cause = ""
+				game.last_score_rank = -1
+				add_message(game, "A new journey begins...", rl.Color{200, 200, 100, 255})
+			}
+			if rl.IsKeyPressed(.ESCAPE) {
+				break
+			}
 		} else if game.state == .Viewing_Inventory {
 			// I or Escape closes inventory (reset drop/equip mode)
 			if rl.IsKeyPressed(.I) || rl.IsKeyPressed(.ESCAPE) {

@@ -91,6 +91,9 @@ generate_map :: proc(game: ^Game) {
 	// Spawn 1 anvil per floor
 	spawn_anvil(game)
 
+	// Spawn boss on milestone depths
+	spawn_boss(game)
+
 	// Clear hazard state
 	game.water_slow_active = false
 
@@ -195,9 +198,14 @@ generate_rooms :: proc(game: ^Game) {
 spawn_hazards :: proc(game: ^Game) {
 	depth := game.depth
 
-	// Water: depths 1+, 3-6 tiles
+	// Water: depths 1+, 3-6 tiles (15-25 in flooded cavern)
 	if depth >= 1 {
-		count := rand.int_max(4) + 3
+		count: int
+		if depth >= 6 && depth <= 7 {
+			count = rand.int_max(11) + 15
+		} else {
+			count = rand.int_max(4) + 3
+		}
 		placed := 0
 		for _ in 0 ..< count * 20 {
 			if placed >= count {break}
@@ -343,5 +351,44 @@ spawn_anvil :: proc(game: ^Game) {
 		game.tiles[idx].type = .Anvil
 		fmt.printfln("[gen] anvil at (%v,%v)", x, y)
 		return
+	}
+}
+
+// ─── Boss spawning (depth-gated) ─────────────────────────────────────────────
+
+spawn_boss :: proc(game: ^Game) {
+	boss_id: string
+	if game.depth == 5 {
+		boss_id = "mine_guardian"
+	} else if game.depth == 10 {
+		boss_id = "abyssal_lord"
+	} else {
+		return
+	}
+
+	for y in 0 ..< MAP_HEIGHT {
+		for x in 0 ..< MAP_WIDTH {
+			if game.tiles[pos_to_idx(x, y)].type == .Descent {
+				DX :: [4]int{0, 0, -1, 1}
+				DY :: [4]int{-1, 1, 0, 0}
+				dx := DX
+				dy := DY
+				for dir in 0 ..< 4 {
+					bx := x + dx[dir]
+					by := y + dy[dir]
+					if is_walkable(game, bx, by) && enemy_at(game, bx, by) == nil {
+						def := find_enemy_def(boss_id)
+						if def != nil {
+							boss := enemy_make_from_def(def, Vec2{bx, by})
+							boss.is_boss = true
+							append(&game.enemies, boss)
+							fmt.printfln("[gen] boss '%s' spawned at (%v,%v)", boss_id, bx, by)
+						}
+						return
+					}
+				}
+				return
+			}
+		}
 	}
 }

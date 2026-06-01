@@ -42,6 +42,9 @@ render_game :: proc(game: ^Game) {
 	if game.state == .Viewing_Help {
 		render_help(game)
 	}
+	if game.state == .Victory {
+		render_victory(game)
+	}
 
 	// Screen flash overlay (S02)
 	if game.flash_alpha > 0.01 {
