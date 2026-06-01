@@ -243,6 +243,7 @@ main :: proc() {
 						if cur_tile != nil {
 							if cur_tile.type == .Water {
 								game.water_slow_active = true
+								play_sfx(.Water)
 								add_message(
 									game,
 									"You wade through water...",

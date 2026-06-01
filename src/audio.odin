@@ -10,6 +10,7 @@ Sound_Type :: enum {
 	Pickup,
 	Death,
 	Descent,
+	Water,
 }
 
 Game_Audio :: struct {
@@ -94,6 +95,11 @@ audio_init :: proc() {
 	w = generate_tone(300, 0.3, 0.4)
 	g_audio.sounds[.Descent] = rl.LoadSoundFromWave(w)
 	rl.SetSoundVolume(g_audio.sounds[.Descent], 0.5)
+
+	// Water: bubbly low-frequency noise splash
+	w = generate_noise(0.12, 0.25)
+	g_audio.sounds[.Water] = rl.LoadSoundFromWave(w)
+	rl.SetSoundVolume(g_audio.sounds[.Water], 0.35)
 }
 
 audio_cleanup :: proc() {

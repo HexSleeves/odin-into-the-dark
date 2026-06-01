@@ -14,6 +14,69 @@ Input_Result :: enum {
 	Quit, // escape pressed — signal to close
 }
 
+// ─── Key repeat for held movement keys ────────────────────────────────────────
+// Initial delay before repeat starts, then faster repeat rate.
+
+KEY_REPEAT_DELAY :: f32(0.20)  // seconds before repeat starts
+KEY_REPEAT_RATE  :: f32(0.08)  // seconds between repeats
+
+@(private = "file")
+move_hold_time: f32 = 0       // how long a movement key has been held
+@(private = "file")
+move_repeat_timer: f32 = 0    // time until next repeat fires
+@(private = "file")
+last_move_dx: int = 0
+@(private = "file")
+last_move_dy: int = 0
+
+// Check if a movement direction should fire this frame (initial press OR held repeat)
+@(private = "file")
+check_move_direction :: proc() -> (dx, dy: int, fired: bool) {
+	dt := rl.GetFrameTime()
+
+	// Read current direction from held keys
+	cur_dx, cur_dy: int
+	if rl.IsKeyDown(.W) || rl.IsKeyDown(.UP)    { cur_dy = -1 }
+	if rl.IsKeyDown(.S) || rl.IsKeyDown(.DOWN)   { cur_dy = 1 }
+	if rl.IsKeyDown(.A) || rl.IsKeyDown(.LEFT)   { cur_dx = -1 }
+	if rl.IsKeyDown(.D) || rl.IsKeyDown(.RIGHT)  { cur_dx = 1 }
+
+	// Nothing held — reset state
+	if cur_dx == 0 && cur_dy == 0 {
+		move_hold_time = 0
+		move_repeat_timer = 0
+		last_move_dx = 0
+		last_move_dy = 0
+		return 0, 0, false
+	}
+
+	// Direction changed — treat as fresh press
+	if cur_dx != last_move_dx || cur_dy != last_move_dy {
+		last_move_dx = cur_dx
+		last_move_dy = cur_dy
+		move_hold_time = 0
+		move_repeat_timer = 0
+		return cur_dx, cur_dy, true  // fire immediately on direction change
+	}
+
+	// Same direction held — accumulate time
+	move_hold_time += dt
+
+	// First press already fired (hold_time was 0 last frame) — wait for delay
+	if move_hold_time < KEY_REPEAT_DELAY {
+		return 0, 0, false
+	}
+
+	// Past delay — check repeat timer
+	move_repeat_timer += dt
+	if move_repeat_timer >= KEY_REPEAT_RATE {
+		move_repeat_timer -= KEY_REPEAT_RATE
+		return cur_dx, cur_dy, true
+	}
+
+	return 0, 0, false
+}
+
 // ─── Input handling ───────────────────────────────────────────────────────────
 
 handle_input :: proc(game: ^Game) -> Input_Result {
@@ -22,35 +85,18 @@ handle_input :: proc(game: ^Game) -> Input_Result {
 		return .Quit
 	}
 
-	// Period key: wait / skip turn
+	// Period key: wait / skip turn (no repeat)
 	if rl.IsKeyPressed(.PERIOD) {
 		game.turn_count += 1
 		add_message(game, "You wait...", rl.Color{180, 180, 180, 255})
 		return .Waited
 	}
 
-	// Direction delta from WASD + arrow keys
-	dx, dy: int
+	// Direction with key repeat support
+	dx, dy, has_input := check_move_direction()
 
-	// Up
-	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
-		dy = -1
-	}
-	// Down
-	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
-		dy = 1
-	}
-	// Left
-	if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT) {
-		dx = -1
-	}
-	// Right
-	if rl.IsKeyPressed(.D) || rl.IsKeyPressed(.RIGHT) {
-		dx = 1
-	}
-
-	// No movement key pressed
-	if dx == 0 && dy == 0 {
+	// No movement input this frame
+	if !has_input {
 		return .None
 	}
 
