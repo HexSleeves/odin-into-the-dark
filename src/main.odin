@@ -92,9 +92,15 @@ main :: proc() {
 
 			// X key: enter mining mode
 			if rl.IsKeyPressed(.X) {
-				if game.pickaxe_durability <= 0 {
-					add_message(game, "Your pickaxe is broken!", rl.Color{255, 100, 100, 255})
+				can_mine := false
+				if !game.equipped_weapon.occupied {
+					add_message(game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
+				} else if game.equipped_weapon.item.max_durability > 0 && game.equipped_weapon.item.durability <= 0 {
+					add_message(game, fmt.tprintf("Your %s is broken!", game.equipped_weapon.item.name), rl.Color{255, 100, 100, 255})
 				} else {
+					can_mine = true
+				}
+				if can_mine {
 					game.mining_mode = true
 					add_message(game, "Mine which direction? (WASD/arrows, ESC cancel)", rl.Color{200, 200, 100, 255})
 				}
@@ -113,6 +119,7 @@ main :: proc() {
 			// I key: open inventory screen
 			if rl.IsKeyPressed(.I) {
 				game.state = .Viewing_Inventory
+				game.inspect_slot = 0
 			}
 
 			// ? key: open help screen
@@ -205,6 +212,14 @@ main :: proc() {
 				game.state = .Playing
 				game.dropping = false
 				game.equipping = false
+				game.inspect_slot = -1
+			}
+			// Up/Down arrows to move inspect cursor (0-8 = inventory, 9/10/11 = weapon/armor/helmet)
+			if rl.IsKeyPressed(.UP) || rl.IsKeyPressed(.W) {
+				game.inspect_slot = max(game.inspect_slot - 1, 0)
+			}
+			if rl.IsKeyPressed(.DOWN) || rl.IsKeyPressed(.S) {
+				game.inspect_slot = min(game.inspect_slot + 1, MAX_INVENTORY + 2) // 9=weapon, 10=armor, 11=helmet
 			}
 			// D key toggles drop mode
 			if rl.IsKeyPressed(.D) {

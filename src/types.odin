@@ -112,6 +112,8 @@ Item :: struct {
 	quantity:       int,
 	equipment_slot: string, // "", "weapon", "armor", "helmet"
 	stat_bonus:     int,    // bonus value when equipped
+	durability:     int,    // current durability (0 = broken, -1 = no durability)
+	max_durability: int,    // max durability (0 = item has no durability)
 }
 
 Inventory_Slot :: struct {
@@ -213,6 +215,8 @@ Game :: struct {
 	// Mining system
 	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
 	mining_mode:        bool, // true when player pressed X and awaits direction
-	pickaxe_durability: int,  // current durability
-	pickaxe_max_dur:    int,  // max durability
+	pickaxe_durability: int,  // current durability (legacy, kept for compat)
+	pickaxe_max_dur:    int,  // max durability (legacy, kept for compat)
+	// Inventory inspect cursor
+	inspect_slot:       int,  // currently highlighted slot in inventory (-1 = none)
 }

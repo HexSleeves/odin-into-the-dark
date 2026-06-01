@@ -468,10 +468,14 @@ try_craft :: proc(game: ^Game, recipe_index: int) {
 	}
 
 	if recipe.is_repair {
-		// Repair pickaxe
-		game.pickaxe_durability = game.pickaxe_max_dur
+		// Repair equipped weapon durability
+		if !game.equipped_weapon.occupied || game.equipped_weapon.item.max_durability <= 0 {
+			add_message(game, "No weapon to repair.", rl.Color{255, 100, 100, 255})
+			return
+		}
+		game.equipped_weapon.item.durability = game.equipped_weapon.item.max_durability
 		consume_material(game, recipe.material_id, recipe.material_qty)
-		add_message(game, "Pickaxe repaired!", rl.Color{100, 255, 100, 255})
+		add_message(game, fmt.tprintf("%s repaired!", game.equipped_weapon.item.name), rl.Color{100, 255, 100, 255})
 		return
 	}
 

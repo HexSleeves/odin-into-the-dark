@@ -267,8 +267,9 @@ render_hud :: proc(game: ^Game) {
 	// Background
 	rl.DrawRectangle(pick_x, pick_y, pick_bar_w, pick_bar_h, rl.Color{40, 30, 20, 255})
 
-	if game.pickaxe_durability > 0 {
-		pick_ratio := f32(game.pickaxe_durability) / f32(max(game.pickaxe_max_dur, 1))
+	if game.equipped_weapon.occupied && game.equipped_weapon.item.max_durability > 0 {
+		wpn := game.equipped_weapon.item
+		pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
 		// Color gradient: green -> yellow -> red
 		pick_color: rl.Color
 		if pick_ratio > 0.5 {
@@ -278,13 +279,17 @@ render_hud :: proc(game: ^Game) {
 		} else {
 			pick_color = rl.Color{200, 60, 60, 255} // red
 		}
-		rl.DrawRectangle(pick_x, pick_y, i32(f32(pick_bar_w) * pick_ratio), pick_bar_h, pick_color)
-		rl.DrawText(
-			rl.TextFormat("Pick: %d/%d", i32(game.pickaxe_durability), i32(game.pickaxe_max_dur)),
-			pick_x + 2, pick_y, 12, rl.WHITE,
-		)
-	} else {
-		rl.DrawText("Pick: BROKEN", pick_x + 2, pick_y, 12, rl.Color{255, 80, 80, 255})
+		if wpn.durability > 0 {
+			rl.DrawRectangle(pick_x, pick_y, i32(f32(pick_bar_w) * pick_ratio), pick_bar_h, pick_color)
+			rl.DrawText(
+				rl.TextFormat("Pick: %d/%d", i32(wpn.durability), i32(wpn.max_durability)),
+				pick_x + 2, pick_y, 12, rl.WHITE,
+			)
+		} else {
+			rl.DrawText("Pick: BROKEN", pick_x + 2, pick_y, 12, rl.Color{255, 80, 80, 255})
+		}
+	} else if !game.equipped_weapon.occupied {
+		rl.DrawText("Pick: ---", pick_x + 2, pick_y, 12, rl.Color{80, 80, 80, 255})
 	}
 
 	// Mining mode indicator (centered at top of screen)
@@ -341,7 +346,7 @@ render_inventory :: proc(game: ^Game) {
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
 	rl.DrawText(title, title_x, 100, title_size, rl.WHITE)
 
-	subtitle := cstring("Press 1-9 to use | D=Drop | E=Equip | I or ESC to close")
+	subtitle := cstring("1-9=Use | D=Drop | E=Equip | Up/Down=Inspect | I/ESC=Close")
 	subtitle_size :: i32(14)
 	sub_w := rl.MeasureText(subtitle, subtitle_size)
 	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
@@ -371,6 +376,13 @@ render_inventory :: proc(game: ^Game) {
 
 	for idx in 0 ..< MAX_INVENTORY {
 		y_pos := i32(180) + i32(idx) * 28
+
+		// Highlight selected slot
+		if idx == game.inspect_slot {
+			rl.DrawRectangle(slot_x - 4, y_pos - 2, 260, 22, rl.Color{60, 60, 80, 200})
+			rl.DrawText(">", slot_x - 14, y_pos, slot_size, rl.Color{255, 220, 100, 255})
+		}
+
 		if game.inventory[idx].occupied {
 			it := game.inventory[idx].item
 			name := item_display_name(&it)
@@ -407,36 +419,140 @@ render_inventory :: proc(game: ^Game) {
 	rl.DrawText("EQUIPMENT", slot_x, eq_y, 18, rl.Color{200, 200, 100, 255})
 	eq_y += 24
 
-	// Weapon
-	if game.equipped_weapon.occupied {
-		rl.DrawText(
-			fmt.ctprintf("Weapon: %s (+%d atk)", game.equipped_weapon.item.name, game.equipped_weapon.item.stat_bonus),
-			slot_x, eq_y, slot_size, rl.Color{200, 150, 80, 255},
-		)
-	} else {
-		rl.DrawText("Weapon: [empty]", slot_x, eq_y, slot_size, empty_color)
+	// Equipment slots with cursor support (slots 9, 10, 11)
+	equip_slots := [3]struct{label: cstring, slot: ^Equipment, color: rl.Color, idx: int}{
+		{label = "Weapon:", slot = &game.equipped_weapon, color = rl.Color{200, 150, 80, 255}, idx = MAX_INVENTORY},
+		{label = "Armor: ", slot = &game.equipped_armor,  color = rl.Color{100, 160, 200, 255}, idx = MAX_INVENTORY + 1},
+		{label = "Helmet:", slot = &game.equipped_helmet, color = rl.Color{200, 200, 50, 255},  idx = MAX_INVENTORY + 2},
 	}
-	eq_y += 22
-
-	// Armor
-	if game.equipped_armor.occupied {
-		rl.DrawText(
-			fmt.ctprintf("Armor:  %s (+%d def)", game.equipped_armor.item.name, game.equipped_armor.item.stat_bonus),
-			slot_x, eq_y, slot_size, rl.Color{100, 160, 200, 255},
-		)
-	} else {
-		rl.DrawText("Armor:  [empty]", slot_x, eq_y, slot_size, empty_color)
+	for es in equip_slots {
+		// Highlight if cursor is on this equipment slot
+		if game.inspect_slot == es.idx {
+			rl.DrawRectangle(slot_x - 4, eq_y - 2, 260, 22, rl.Color{60, 60, 80, 200})
+			rl.DrawText(">", slot_x - 14, eq_y, slot_size, rl.Color{255, 220, 100, 255})
+		}
+		if es.slot.occupied {
+			bonus_label: cstring
+			if es.idx == MAX_INVENTORY     { bonus_label = "atk" }
+			else if es.idx == MAX_INVENTORY + 1 { bonus_label = "def" }
+			else                                  { bonus_label = "light" }
+			rl.DrawText(
+				fmt.ctprintf("%s %s (+%d %s)", es.label, es.slot.item.name, es.slot.item.stat_bonus, bonus_label),
+				slot_x, eq_y, slot_size, es.color,
+			)
+		} else {
+			rl.DrawText(fmt.ctprintf("%s [empty]", es.label), slot_x, eq_y, slot_size, empty_color)
+		}
+		eq_y += 22
 	}
-	eq_y += 22
 
-	// Helmet
-	if game.equipped_helmet.occupied {
-		rl.DrawText(
-			fmt.ctprintf("Helmet: %s (+%d light)", game.equipped_helmet.item.name, game.equipped_helmet.item.stat_bonus),
-			slot_x, eq_y, slot_size, rl.Color{200, 200, 50, 255},
-		)
-	} else {
-		rl.DrawText("Helmet: [empty]", slot_x, eq_y, slot_size, empty_color)
+	// ── Inspect detail panel (right side) ──
+	// Determine which item to inspect
+	inspect_item: ^Item = nil
+	if game.inspect_slot >= 0 && game.inspect_slot < MAX_INVENTORY {
+		if game.inventory[game.inspect_slot].occupied {
+			inspect_item = &game.inventory[game.inspect_slot].item
+		}
+	} else if game.inspect_slot == MAX_INVENTORY && game.equipped_weapon.occupied {
+		inspect_item = &game.equipped_weapon.item
+	} else if game.inspect_slot == MAX_INVENTORY + 1 && game.equipped_armor.occupied {
+		inspect_item = &game.equipped_armor.item
+	} else if game.inspect_slot == MAX_INVENTORY + 2 && game.equipped_helmet.occupied {
+		inspect_item = &game.equipped_helmet.item
+	}
+
+	if inspect_item != nil {
+		it := inspect_item
+		def := find_item_def(it.item_type)
+
+		panel_x :: i32(720)
+		panel_y :: i32(175)
+		panel_w :: i32(320)
+		panel_h :: i32(280)
+
+		rl.DrawRectangle(panel_x, panel_y, panel_w, panel_h, rl.Color{30, 30, 40, 230})
+		rl.DrawRectangleLines(panel_x, panel_y, panel_w, panel_h, rl.Color{80, 80, 100, 255})
+
+		dy := panel_y + 8
+
+		// Item name
+		rl.DrawText(fmt.ctprintf("%s", it.name), panel_x + 10, dy, 18, it.color)
+		dy += 24
+
+		// Type/category
+		if it.equipment_slot != "" {
+			rl.DrawText(fmt.ctprintf("Type: Equipment (%s)", it.equipment_slot), panel_x + 10, dy, 14, rl.Color{150, 150, 150, 255})
+		} else if def != nil && def.effect.type == "material" {
+			rl.DrawText("Type: Crafting Material", panel_x + 10, dy, 14, rl.Color{150, 150, 150, 255})
+		} else if def != nil && def.effect.type == "heal" {
+			rl.DrawText("Type: Consumable (Healing)", panel_x + 10, dy, 14, rl.Color{150, 150, 150, 255})
+		} else if def != nil && (def.effect.type == "light_boost" || def.effect.type == "timed_light_boost") {
+			rl.DrawText("Type: Consumable (Light)", panel_x + 10, dy, 14, rl.Color{150, 150, 150, 255})
+		} else {
+			rl.DrawText("Type: Item", panel_x + 10, dy, 14, rl.Color{150, 150, 150, 255})
+		}
+		dy += 20
+
+		// Effect description
+		if def != nil {
+			if def.effect.type == "heal" {
+				rl.DrawText(fmt.ctprintf("Heals %d HP", def.effect.value), panel_x + 10, dy, 14, rl.Color{100, 255, 100, 255})
+				dy += 18
+			} else if def.effect.type == "light_boost" {
+				rl.DrawText(fmt.ctprintf("Permanently +%d light radius", def.effect.value), panel_x + 10, dy, 14, rl.Color{255, 200, 80, 255})
+				dy += 18
+			} else if def.effect.type == "timed_light_boost" {
+				rl.DrawText(fmt.ctprintf("+%d light for %d turns", def.effect.value, def.effect.duration), panel_x + 10, dy, 14, rl.Color{255, 200, 80, 255})
+				dy += 18
+			} else if def.effect.type == "equip" {
+				if it.equipment_slot == "weapon" {
+					rl.DrawText(fmt.ctprintf("+%d Attack", it.stat_bonus), panel_x + 10, dy, 14, rl.Color{200, 150, 80, 255})
+				} else if it.equipment_slot == "armor" {
+					rl.DrawText(fmt.ctprintf("+%d Defense", it.stat_bonus), panel_x + 10, dy, 14, rl.Color{100, 160, 200, 255})
+				} else if it.equipment_slot == "helmet" {
+					rl.DrawText(fmt.ctprintf("+%d Light Radius", it.stat_bonus), panel_x + 10, dy, 14, rl.Color{200, 200, 50, 255})
+				}
+				dy += 18
+			} else if def.effect.type == "material" {
+				rl.DrawText("Used for crafting at anvils.", panel_x + 10, dy, 14, rl.Color{180, 180, 100, 255})
+				dy += 18
+			}
+		}
+
+		// Stack info
+		if it.quantity > 1 {
+			rl.DrawText(fmt.ctprintf("Quantity: %d", it.quantity), panel_x + 10, dy, 14, rl.Color{180, 180, 180, 255})
+			dy += 18
+		}
+
+		// Durability bar (for equipment)
+		if it.max_durability > 0 {
+			dy += 6
+			rl.DrawText("Durability:", panel_x + 10, dy, 14, rl.Color{180, 180, 180, 255})
+			dy += 18
+			bar_w :: i32(200)
+			bar_h :: i32(14)
+			bar_x := panel_x + 10
+			ratio := f32(it.durability) / f32(max(it.max_durability, 1))
+			// Background
+			rl.DrawRectangle(bar_x, dy, bar_w, bar_h, rl.Color{40, 30, 20, 255})
+			// Fill
+			bar_color: rl.Color
+			if ratio > 0.5      { bar_color = rl.Color{80, 180, 80, 255} }
+			else if ratio > 0.25 { bar_color = rl.Color{200, 180, 50, 255} }
+			else                  { bar_color = rl.Color{200, 60, 60, 255} }
+			if it.durability > 0 {
+				rl.DrawRectangle(bar_x, dy, i32(f32(bar_w) * ratio), bar_h, bar_color)
+			}
+			rl.DrawText(
+				fmt.ctprintf("%d / %d", it.durability, it.max_durability),
+				bar_x + 4, dy + 1, 12, rl.WHITE,
+			)
+			dy += 20
+			if it.durability <= 0 {
+				rl.DrawText("BROKEN - Repair at an anvil!", panel_x + 10, dy, 14, rl.Color{255, 80, 80, 255})
+			}
+		}
 	}
 }
 

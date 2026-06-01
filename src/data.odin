@@ -67,6 +67,7 @@ Item_Def :: struct {
 	stack_limit:    int,
 	effect:         Item_Effect,
 	equipment_slot: string,
+	durability:     int,  // max durability (0 = no durability tracking)
 }
 
 Item_Spawn_Weight :: struct {
@@ -236,6 +237,8 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		name = def.name,
 		equipment_slot = def.equipment_slot,
 		stat_bonus = def.effect.value,
+		durability = def.durability,
+		max_durability = def.durability,
 	}
 }
 

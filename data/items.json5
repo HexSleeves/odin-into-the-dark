@@ -58,6 +58,7 @@
       stack_limit: 1,
       effect: { type: "equip", value: 2 },
       equipment_slot: "weapon",
+      durability: 20,
     },
     {
       id: "leather_vest",
@@ -86,6 +87,7 @@
       stack_limit: 1,
       effect: { type: "equip", value: 4 },
       equipment_slot: "weapon",
+      durability: 35,
     },
     {
       id: "chainmail",

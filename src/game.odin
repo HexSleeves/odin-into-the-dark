@@ -205,9 +205,14 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 		return false
 	}
 
-	// Check pickaxe
-	if game.pickaxe_durability <= 0 {
-		add_message(game, "Your pickaxe is broken!", rl.Color{255, 100, 100, 255})
+	// Check pickaxe — need an equipped weapon with durability
+	if !game.equipped_weapon.occupied {
+		add_message(game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
+		return false
+	}
+	wpn := &game.equipped_weapon.item
+	if wpn.max_durability > 0 && wpn.durability <= 0 {
+		add_message(game, fmt.tprintf("Your %s is broken!", wpn.name), rl.Color{255, 100, 100, 255})
 		return false
 	}
 
@@ -233,12 +238,14 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 		add_message(game, "You mine through the wall.", rl.Color{180, 160, 100, 255})
 	}
 
-	// Decrease pickaxe durability
-	game.pickaxe_durability -= 1
-	if game.pickaxe_durability <= 0 {
-		add_message(game, "Your pickaxe breaks!", rl.Color{255, 80, 80, 255})
-	} else if game.pickaxe_durability <= 5 {
-		add_message(game, fmt.tprintf("Pickaxe wearing down... (%d/%d)", game.pickaxe_durability, game.pickaxe_max_dur), rl.Color{255, 180, 50, 255})
+	// Decrease equipped weapon durability
+	if wpn.max_durability > 0 {
+		wpn.durability -= 1
+		if wpn.durability <= 0 {
+			add_message(game, fmt.tprintf("Your %s breaks!", wpn.name), rl.Color{255, 80, 80, 255})
+		} else if wpn.durability <= 5 {
+			add_message(game, fmt.tprintf("%s wearing down... (%d/%d)", wpn.name, wpn.durability, wpn.max_durability), rl.Color{255, 180, 50, 255})
+		}
 	}
 
 	// Consume a turn
