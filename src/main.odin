@@ -53,6 +53,8 @@ main :: proc() {
 		// ── Update ──
 		quit := false
 		switch game.state {
+		case .Title_Screen:
+			quit = update_title_screen(game)
 		case .Playing:
 			quit = update_playing(game)
 		case .Game_Over:
@@ -65,6 +67,8 @@ main :: proc() {
 			update_viewing_crafting(game)
 		case .Viewing_Help:
 			update_viewing_help(game)
+		case .Viewing_Scores:
+			update_viewing_scores(game)
 		}
 		if quit {
 			break
@@ -121,6 +125,72 @@ restart_game :: proc(game: ^Game) {
 }
 
 // ─── Per-state update handlers ────────────────────────────────────────────────
+
+TITLE_OPTION_COUNT :: 5
+TITLE_NEW_GAME :: 0
+TITLE_CONTINUE :: 1
+TITLE_HIGH_SCORES :: 2
+TITLE_HELP :: 3
+TITLE_QUIT :: 4
+
+update_title_screen :: proc(game: ^Game) -> (quit: bool) {
+	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
+		game.ui.title_choice = (game.ui.title_choice + TITLE_OPTION_COUNT - 1) % TITLE_OPTION_COUNT
+	}
+	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
+		game.ui.title_choice = (game.ui.title_choice + 1) % TITLE_OPTION_COUNT
+	}
+
+	if rl.IsKeyPressed(.N) {
+		game.ui.title_choice = TITLE_NEW_GAME
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.C) {
+		game.ui.title_choice = TITLE_CONTINUE
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.H) {
+		game.ui.title_choice = TITLE_HIGH_SCORES
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.SLASH) && (rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {
+		game.ui.title_choice = TITLE_HELP
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.Q) || rl.IsKeyPressed(.ESCAPE) {
+		return true
+	}
+
+	if rl.IsKeyPressed(.ENTER) || rl.IsKeyPressed(.SPACE) {
+		return activate_title_choice(game)
+	}
+
+	return false
+}
+
+activate_title_choice :: proc(game: ^Game) -> (quit: bool) {
+	switch game.ui.title_choice {
+	case TITLE_NEW_GAME:
+		death_sound_played = false
+		restart_game(game)
+	case TITLE_CONTINUE:
+		if save_exists() {
+			if load_game(game) {
+				death_sound_played = false
+			} else {
+				add_message(game, "Save file could not be loaded.", rl.Color{255, 180, 50, 255})
+			}
+		}
+	case TITLE_HIGH_SCORES:
+		game.state = .Viewing_Scores
+	case TITLE_HELP:
+		game.ui.return_to_title = true
+		game.state = .Viewing_Help
+	case TITLE_QUIT:
+		return true
+	}
+	return false
+}
 
 update_playing :: proc(game: ^Game) -> (quit: bool) {
 	if handle_forced_turn(game) {return}
@@ -267,6 +337,7 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 	// ? key: open help screen
 	if (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.LEFT_SHIFT)) ||
 	   (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.RIGHT_SHIFT)) {
+		game.ui.return_to_title = false
 		game.state = .Viewing_Help
 		return true
 	}
@@ -498,6 +569,17 @@ update_viewing_crafting :: proc(game: ^Game) {
 
 update_viewing_help :: proc(game: ^Game) {
 	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.SLASH) {
-		game.state = .Playing
+		if game.ui.return_to_title {
+			game.ui.return_to_title = false
+			game.state = .Title_Screen
+		} else {
+			game.state = .Playing
+		}
+	}
+}
+
+update_viewing_scores :: proc(game: ^Game) {
+	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.H) {
+		game.state = .Title_Screen
 	}
 }

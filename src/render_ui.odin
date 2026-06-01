@@ -3,6 +3,87 @@ package main
 import "core:fmt"
 import rl "vendor:raylib"
 
+// ─── Shared overlay helpers ───────────────────────────────────────────────────
+
+draw_centered_text :: proc(text: cstring, y, size: i32, color: rl.Color) {
+	text_w := rl.MeasureText(text, size)
+	x := (i32(SCREEN_WIDTH) - text_w) / 2
+	rl.DrawText(text, x, y, size, color)
+}
+
+draw_score_rows :: proc(base_y, row_size, row_h: i32, highlight_rank: int = -1) {
+	table := load_scores()
+	if table.count == 0 {
+		draw_centered_text("No scores yet.", base_y, row_size, rl.Color{120, 120, 120, 255})
+		return
+	}
+
+	for i in 0 ..< table.count {
+		y := base_y + i32(i) * row_h
+		s := table.scores[i]
+		is_current := (i == highlight_rank)
+		color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+		prefix := ">" if is_current else " "
+		cause_display := s.cause if len(s.cause) > 0 else "Unknown"
+		row_text := fmt.ctprintf(
+			"%s #%d  Depth %d  Kills %d  Turns %d  %s",
+			prefix,
+			i + 1,
+			s.depth,
+			s.kills,
+			s.turns,
+			cause_display,
+		)
+		draw_centered_text(row_text, y, row_size, color)
+	}
+}
+
+// ─── Title and Scores screens ────────────────────────────────────────────────
+
+render_title_screen :: proc(game: ^Game) {
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 230})
+
+	draw_centered_text("INTO THE DEPTHS", 110, 48, rl.Color{255, 230, 120, 255})
+	draw_centered_text("A turn-based mining roguelike", 166, 18, rl.Color{180, 180, 180, 255})
+
+	options := [TITLE_OPTION_COUNT]cstring {
+		"New Game",
+		"Continue",
+		"High Scores",
+		"Help",
+		"Quit",
+	}
+
+	has_save := save_exists()
+	base_y :: i32(245)
+	row_h :: i32(38)
+	for label, idx in options {
+		y := base_y + i32(idx) * row_h
+		disabled := idx == TITLE_CONTINUE && !has_save
+		selected := idx == game.ui.title_choice
+		color := rl.Color{90, 90, 90, 255} if disabled else rl.Color{220, 220, 220, 255}
+		if selected && !disabled {
+			color = rl.Color{255, 220, 100, 255}
+		}
+		text := fmt.ctprintf("%s %s", ">" if selected else " ", label)
+		draw_centered_text(text, y, 24, color)
+	}
+
+	if !has_save {
+		draw_centered_text("No save file found — Continue is disabled", base_y + row_h * TITLE_OPTION_COUNT + 12, 14, rl.Color{120, 120, 120, 255})
+	}
+
+	draw_centered_text("Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit", i32(SCREEN_HEIGHT) - 48, 14, rl.Color{150, 150, 150, 255})
+}
+
+render_high_scores :: proc(game: ^Game) {
+	_ = game
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 230})
+	draw_centered_text("HIGH SCORES", 80, 34, rl.Color{255, 220, 50, 255})
+	draw_score_rows(145, 16, 28)
+	draw_centered_text("Press ESC or H to return", i32(SCREEN_HEIGHT) - 40, 16, rl.Color{150, 150, 150, 255})
+}
+
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
 
 render_inventory :: proc(game: ^Game) {

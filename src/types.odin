@@ -152,23 +152,27 @@ VFX_State :: struct {
 // ─── UI State ─────────────────────────────────────────────────────────────────
 
 UI_State :: struct {
-	show_minimap: bool,
-	dropping:     bool, // inventory drop mode
-	equipping:    bool, // inventory equip mode
-	inspect_slot: int, // highlighted slot in inventory (-1 = none)
-	mining_mode:  bool, // true when player pressed X and awaits direction
-	use_sprites:  bool, // true = tileset sprites, false = ASCII mode
+	show_minimap:  bool,
+	dropping:      bool, // inventory drop mode
+	equipping:     bool, // inventory equip mode
+	inspect_slot:  int, // highlighted slot in inventory (-1 = none)
+	mining_mode:   bool, // true when player pressed X and awaits direction
+	use_sprites:   bool, // true = tileset sprites, false = ASCII mode
+	title_choice:  int, // selected title menu option
+	return_to_title: bool, // modal overlays should return to title instead of gameplay
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────
 
 Game_State :: enum {
+	Title_Screen,
 	Playing,
 	Game_Over,
 	Victory,
 	Viewing_Inventory,
 	Viewing_Crafting,
 	Viewing_Help,
+	Viewing_Scores,
 }
 
 Game :: struct {

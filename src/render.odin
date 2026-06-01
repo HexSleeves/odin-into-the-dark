@@ -27,6 +27,9 @@ render_game :: proc(game: ^Game) {
 		render_minimap(game)
 	}
 
+	if game.state == .Title_Screen {
+		render_title_screen(game)
+	}
 	if game.state == .Playing {
 		render_tooltip(game)
 	}
@@ -41,6 +44,9 @@ render_game :: proc(game: ^Game) {
 	}
 	if game.state == .Viewing_Help {
 		render_help(game)
+	}
+	if game.state == .Viewing_Scores {
+		render_high_scores(game)
 	}
 	if game.state == .Victory {
 		render_victory(game)
