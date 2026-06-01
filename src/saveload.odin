@@ -9,6 +9,7 @@ import rl "vendor:raylib"
 
 SAVE_FILE :: "savegame.dat"
 SAVE_VERSION :: u32(3)
+SAVE_VERSION_V2 :: u32(2)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
 MAX_SAVE_ENEMIES :: 64
@@ -110,6 +111,44 @@ Save_Data :: struct {
 	light_boost_turns:  int,
 	skip_next_turn:     bool,
 	water_slow_active:  bool,
+}
+
+// v2 save files used the same prefix as v3, followed by two legacy pickaxe
+// durability fields that are now stored on the equipped pickaxe item instead.
+Save_Data_V2 :: struct {
+	// Fixed-size tile arrays (Tile has no strings — safe)
+	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+
+	// Player (no strings — safe)
+	player:             Player,
+
+	// Dynamic arrays flattened to fixed-size + count
+	enemy_count:        int,
+	enemies:            [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:         int,
+	items:              [MAX_SAVE_ITEMS]Save_Item,
+	room_count:         int,
+	rooms:              [MAX_SAVE_ROOMS]Room,
+
+	// Inventory and equipment
+	inventory:          [MAX_INVENTORY]Save_Inventory_Slot,
+	equipped_weapon:    Save_Equipment,
+	equipped_armor:     Save_Equipment,
+	equipped_helmet:    Save_Equipment,
+
+	// Scalar game state
+	depth:              int,
+	turn_count:         int,
+	kills:              int,
+	seed:               u64,
+	light_boost_bonus:  int,
+	light_boost_turns:  int,
+	skip_next_turn:     bool,
+	water_slow_active:  bool,
+	pickaxe_durability: int, // ignored during v2 -> v3 migration
+	pickaxe_max_dur:    int, // ignored during v2 -> v3 migration
 }
 
 // ─── String conversion helpers ────────────────────────────────────────────────
@@ -291,6 +330,41 @@ save_game :: proc(game: ^Game) -> bool {
 	return write_err == nil
 }
 
+load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok: bool) {
+	if header.magic != SAVE_MAGIC {return nil, false}
+
+	data_offset :: size_of(Save_Header)
+
+	if header.version == SAVE_VERSION {
+		expected_size := size_of(Save_Header) + size_of(Save_Data)
+		if len(buf) != expected_size {return nil, false}
+
+		data = new(Save_Data)
+		if data == nil {return nil, false}
+		mem.copy(data, &buf[data_offset], size_of(Save_Data))
+		return data, true
+	}
+
+	if header.version == SAVE_VERSION_V2 {
+		expected_size := size_of(Save_Header) + size_of(Save_Data_V2)
+		if len(buf) != expected_size {return nil, false}
+
+		old := new(Save_Data_V2)
+		if old == nil {return nil, false}
+		defer free(old)
+		mem.copy(old, &buf[data_offset], size_of(Save_Data_V2))
+
+		data = new(Save_Data)
+		if data == nil {return nil, false}
+		// v3 is the byte-for-byte prefix of v2. The trailing legacy pickaxe
+		// durability fields are intentionally discarded.
+		mem.copy(data, old, size_of(Save_Data))
+		return data, true
+	}
+
+	return nil, false
+}
+
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
 load_game :: proc(game: ^Game) -> bool {
@@ -298,19 +372,16 @@ load_game :: proc(game: ^Game) -> bool {
 	if read_err != nil {return false}
 	defer delete(buf, context.allocator)
 
-	expected_size := size_of(Save_Header) + size_of(Save_Data)
-	if len(buf) != expected_size {return false}
+	if len(buf) < size_of(Save_Header) {return false}
 
 	// ── Validate header ──
 	header: Save_Header
 	mem.copy(&header, &buf[0], size_of(Save_Header))
-	if header.magic != SAVE_MAGIC || header.version != SAVE_VERSION {return false}
 
-	// ── Deserialize into heap-allocated Save_Data ──
-	data := new(Save_Data)
-	if data == nil {return false}
+	// ── Deserialize current save data, or migrate supported legacy layouts ──
+	data, data_ok := load_save_data(header, buf)
+	if !data_ok {return false}
 	defer free(data)
-	mem.copy(data, &buf[size_of(Save_Header)], size_of(Save_Data))
 
 	// ── Clean up existing dynamic arrays ──
 	game_cleanup(game)
