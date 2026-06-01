@@ -198,4 +198,8 @@ Game :: struct {
 	pickaxe_max_dur:    int, // max durability (legacy, kept for compat)
 	// Inventory inspect cursor
 	inspect_slot:       int, // currently highlighted slot in inventory (-1 = none)
+	// Death tracking
+	death_cause:        string,
+	score_saved:        bool,
+	last_score_rank:    int,
 }

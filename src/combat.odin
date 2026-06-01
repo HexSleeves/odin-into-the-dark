@@ -38,6 +38,7 @@ resolve_attack_enemy_on_player :: proc(game: ^Game, enemy: ^Enemy) {
 	)
 
 	if game.player.hp <= 0 {
+		game.death_cause = fmt.tprintf("Killed by a %s", enemy_display_name(enemy))
 		game.state = .Game_Over
 		add_message(game, "You have been slain...", rl.Color{255, 0, 0, 255})
 	}

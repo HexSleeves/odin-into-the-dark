@@ -4,12 +4,18 @@ import "core:fmt"
 
 import rl "vendor:raylib"
 
+@(private = "file")
+death_sound_played: bool
+
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 main :: proc() {
 	rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
+
+	audio_init()
+	defer audio_cleanup()
 
 	// Load all external data files (enemies, items, player)
 	if !data_load_all() {
@@ -70,6 +76,7 @@ main :: proc() {
 						if mdx != 0 || mdy != 0 {
 							game.mining_mode = false
 							if mine_wall(game, mdx, mdy) {
+								play_sfx(.Mine)
 								process_enemy_turns(game)
 								process_enemy_abilities(game)
 								remove_dead_enemies(game)
@@ -128,9 +135,21 @@ main :: proc() {
 						game.show_minimap = !game.show_minimap
 					}
 
+					// F1 key: toggle audio
+					if rl.IsKeyPressed(.F1) {
+						audio_toggle()
+						if g_audio.enabled {
+							add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
+						} else {
+							add_message(game, "Sound: OFF", rl.Color{180, 180, 180, 255})
+						}
+					}
+
 					// G key: pick up item (instant, no turn cost)
 					if rl.IsKeyPressed(.G) {
-						pickup_item(game)
+						if pickup_item(game) {
+							play_sfx(.Pickup)
+						}
 					}
 
 					// I key: open inventory screen
@@ -151,6 +170,7 @@ main :: proc() {
 						break
 					}
 					if result == .Moved {
+						play_sfx(.Footstep)
 						// Check if player stepped on web
 						pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
 						if game.web_tiles[pidx] {
@@ -182,6 +202,7 @@ main :: proc() {
 									rl.Color{160, 180, 40, 255},
 								)
 								if game.player.hp <= 0 {
+									game.death_cause = "Suffocated by toxic gas"
 									game.state = .Game_Over
 									add_message(
 										game,
@@ -235,15 +256,44 @@ main :: proc() {
 						compute_fov(game)
 						camera_update(game)
 					}
+					if result == .Descended {
+						play_sfx(.Descent)
+						process_enemy_turns(game)
+						process_enemy_abilities(game)
+						remove_dead_enemies(game)
+						tick_timed_effects(game)
+						compute_fov(game)
+						camera_update(game)
+					}
 				} // end else (not mining_mode)
 			} // end else (not skip_next_turn)
 		} else if game.state == .Game_Over {
+			if !death_sound_played {
+				play_sfx(.Death)
+				death_sound_played = true
+			}
+			if !game.score_saved {
+				game.score_saved = true
+				table := load_scores()
+				entry := Score_Entry {
+					depth = game.depth,
+					kills = game.kills,
+					turns = game.turn_count,
+					cause = game.death_cause,
+				}
+				game.last_score_rank = insert_score(&table, entry)
+				save_scores(&table)
+			}
 			if rl.IsKeyPressed(.R) {
+				death_sound_played = false
 				game_cleanup(game)
 				game^ = {}
 				game_reinit(game)
 				compute_fov(game)
 				camera_update(game)
+				game.score_saved = false
+				game.death_cause = ""
+				game.last_score_rank = -1
 				add_message(game, "A new journey begins...", rl.Color{200, 200, 100, 255})
 			}
 			if rl.IsKeyPressed(.ESCAPE) {

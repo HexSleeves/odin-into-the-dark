@@ -336,37 +336,85 @@ render_inventory :: proc(game: ^Game) {
 // ─── Game Over screen ─────────────────────────────────────────────────────────
 
 render_game_over :: proc(game: ^Game) {
-	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 180})
+	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 220})
 
-	center_y := i32(MAP_VIEW_HEIGHT) / 2 - 60
+	sw := i32(SCREEN_WIDTH)
 
-	title_size :: i32(40)
+	// Title
 	title := cstring("GAME OVER")
+	title_size :: i32(36)
 	title_w := rl.MeasureText(title, title_size)
-	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	rl.DrawText(title, title_x, center_y, title_size, rl.RED)
+	rl.DrawText(title, (sw - title_w) / 2, 40, title_size, rl.RED)
 
-	depth_size :: i32(20)
-	depth_text := rl.TextFormat("Reached depth %d", i32(game.depth))
-	depth_w := rl.MeasureText(depth_text, depth_size)
-	depth_x := (i32(SCREEN_WIDTH) - depth_w) / 2
-	rl.DrawText(depth_text, depth_x, center_y + 50, depth_size, rl.Color{200, 200, 200, 255})
+	// Death cause
+	cause_text := fmt.ctprintf("%s", game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death")
+	cause_size :: i32(18)
+	cause_w := rl.MeasureText(cause_text, cause_size)
+	rl.DrawText(cause_text, (sw - cause_w) / 2, 82, cause_size, rl.WHITE)
 
-	stats_size :: i32(18)
+	// Run stats
 	stats_text := rl.TextFormat(
-		"Enemies slain: %d  |  Turns: %d",
+		"Depth: %d  |  Kills: %d  |  Turns: %d",
+		i32(game.depth),
 		i32(game.kills),
 		i32(game.turn_count),
 	)
+	stats_size :: i32(16)
 	stats_w := rl.MeasureText(stats_text, stats_size)
-	stats_x := (i32(SCREEN_WIDTH) - stats_w) / 2
-	rl.DrawText(stats_text, stats_x, center_y + 80, stats_size, rl.Color{180, 180, 180, 255})
+	rl.DrawText(stats_text, (sw - stats_w) / 2, 110, stats_size, rl.Color{180, 180, 180, 255})
 
-	restart := cstring("Press R to restart  |  ESC to quit")
-	restart_size :: i32(16)
-	restart_w := rl.MeasureText(restart, restart_size)
-	restart_x := (i32(SCREEN_WIDTH) - restart_w) / 2
-	rl.DrawText(restart, restart_x, center_y + 110, restart_size, rl.Color{150, 150, 150, 255})
+	// High Scores header
+	hs_title := cstring("HIGH SCORES")
+	hs_size :: i32(18)
+	hs_w := rl.MeasureText(hs_title, hs_size)
+	rl.DrawText(hs_title, (sw - hs_w) / 2, 145, hs_size, rl.Color{255, 220, 50, 255})
+
+	// Load and display score table
+	table := load_scores()
+	row_h :: i32(22)
+	base_y :: i32(170)
+	row_size :: i32(14)
+
+	if table.count == 0 {
+		empty := cstring("No scores yet.")
+		empty_w := rl.MeasureText(empty, row_size)
+		rl.DrawText(empty, (sw - empty_w) / 2, base_y, row_size, rl.Color{120, 120, 120, 255})
+	} else {
+		for i in 0 ..< table.count {
+			y := base_y + i32(i) * row_h
+			s := table.scores[i]
+
+			is_current := (i == game.last_score_rank)
+			color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+			prefix := ">" if is_current else " "
+
+			cause_display := s.cause if len(s.cause) > 0 else "Unknown"
+
+			row_text := fmt.ctprintf(
+				"%s #%d  Depth %d  Kills %d  Turns %d  %s",
+				prefix,
+				i + 1,
+				s.depth,
+				s.kills,
+				s.turns,
+				cause_display,
+			)
+			row_w := rl.MeasureText(row_text, row_size)
+			rl.DrawText(row_text, (sw - row_w) / 2, y, row_size, color)
+		}
+	}
+
+	// Footer
+	footer := cstring("Press R to restart  |  ESC to quit")
+	footer_size :: i32(16)
+	footer_w := rl.MeasureText(footer, footer_size)
+	rl.DrawText(
+		footer,
+		(sw - footer_w) / 2,
+		i32(SCREEN_HEIGHT) - 30,
+		footer_size,
+		rl.Color{150, 150, 150, 255},
+	)
 }
 
 // ─── Crafting overlay screen ──────────────────────────────────────────────────
