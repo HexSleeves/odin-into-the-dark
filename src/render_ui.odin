@@ -54,10 +54,16 @@ render_inventory :: proc(game: ^Game) {
 		if game.inventory[idx].occupied {
 			it := game.inventory[idx].item
 			name := item_display_name(&it)
+			text_x := slot_x
+			if g_sprites.loaded {
+				spr := get_item_sprite(it.item_type)
+				draw_sprite(spr, slot_x, y_pos, rl.WHITE)
+				text_x = slot_x + 20
+			}
 			if it.quantity > 1 {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s x%d", idx + 1, name, it.quantity),
-					slot_x,
+					text_x,
 					y_pos,
 					slot_size,
 					it.color,
@@ -65,7 +71,7 @@ render_inventory :: proc(game: ^Game) {
 			} else {
 				rl.DrawText(
 					fmt.ctprintf("%d. %s", idx + 1, name),
-					slot_x,
+					text_x,
 					y_pos,
 					slot_size,
 					it.color,
@@ -120,6 +126,12 @@ render_inventory :: proc(game: ^Game) {
 			rl.DrawText(">", slot_x - 14, eq_y, slot_size, rl.Color{255, 220, 100, 255})
 		}
 		if es.slot.occupied {
+			eq_text_x := slot_x
+			if g_sprites.loaded {
+				spr := get_item_sprite(es.slot.item.item_type)
+				draw_sprite(spr, slot_x, eq_y, rl.WHITE)
+				eq_text_x = slot_x + 20
+			}
 			bonus_label: cstring
 			if es.idx ==
 			   MAX_INVENTORY {bonus_label = "atk"} else if es.idx == MAX_INVENTORY + 1 {bonus_label = "def"} else {bonus_label = "light"}
@@ -131,7 +143,7 @@ render_inventory :: proc(game: ^Game) {
 					es.slot.item.stat_bonus,
 					bonus_label,
 				),
-				slot_x,
+				eq_text_x,
 				eq_y,
 				slot_size,
 				es.color,

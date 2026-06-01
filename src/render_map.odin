@@ -44,7 +44,7 @@ PALETTE_DEEP :: Floor_Palette {
 UNSEEN_COLOR :: rl.Color{0, 0, 0, 255}
 
 // Dimming multiplier for explored-but-not-visible tiles (used in S03 FOV)
-EXPLORED_DIM :: 0.4
+EXPLORED_DIM :: 0.55
 
 // ─── Palette selection ────────────────────────────────────────────────────────
 
@@ -88,7 +88,7 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 
 get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
 	if tile.visible {
-		return dim_color(base_tile_color(tile.type, palette), max(tile.light_level, 0.3))
+		return dim_color(base_tile_color(tile.type, palette), max(tile.light_level, 0.5))
 	}
 	if tile.explored {
 		return dim_color(base_tile_color(tile.type, palette), EXPLORED_DIM)
@@ -103,7 +103,7 @@ render_map :: proc(game: ^Game) {
 
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
-	palette := game.palette
+	palette := palette_for_depth(game.depth)
 
 	for y in 0 ..< MAP_HEIGHT {
 		for x in 0 ..< MAP_WIDTH {
@@ -115,20 +115,32 @@ render_map :: proc(game: ^Game) {
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			tile := game.tiles[pos_to_idx(x, y)]
-			color := get_tile_color(tile, palette)
-			rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), color)
 
-			// Ore vein indicator on walls
-			if tile.type == .Wall && (tile.visible || tile.explored) {
-				vein := game.ore_veins[pos_to_idx(x, y)]
-				if vein.ore_type != "" {
-					dot_x := sx + i32(TILE_SIZE) / 2 - 2
-					dot_y := sy + i32(TILE_SIZE) / 2 - 2
-					vein_color := vein.color
-					if !tile.visible {
-						vein_color = dim_color(vein.color, EXPLORED_DIM)
+			if !tile.visible && !tile.explored {
+				rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), UNSEEN_COLOR)
+			} else {
+				spr := get_tile_sprite(tile.type)
+				base := base_tile_color(tile.type, palette)
+				tint: rl.Color
+				if tile.visible {
+					brightness := max(tile.light_level, 0.5)
+					tint = rl.Color{u8(f32(base.r) * brightness), u8(f32(base.g) * brightness), u8(f32(base.b) * brightness), 255}
+				} else {
+					dim := f32(EXPLORED_DIM)
+					tint = rl.Color{u8(f32(base.r) * dim), u8(f32(base.g) * dim), u8(f32(base.b) * dim), 255}
+				}
+				draw_sprite(spr, sx, sy, tint)
+
+				// Ore vein overlay on walls
+				if tile.type == .Wall {
+					vein := game.ore_veins[pos_to_idx(x, y)]
+					if vein.ore_type != "" {
+						ore_tint := vein.color
+						if !tile.visible {
+							ore_tint = dim_color(vein.color, EXPLORED_DIM)
+						}
+						draw_sprite(g_sprites.spr_ore_vein, sx, sy, ore_tint)
 					}
-					rl.DrawRectangle(dot_x, dot_y, 4, 4, vein_color)
 				}
 			}
 		}
@@ -156,7 +168,7 @@ render_webs :: proc(game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-			rl.DrawText("w", sx, sy, i32(TILE_SIZE), rl.Color{180, 180, 180, 150})
+			draw_sprite(g_sprites.spr_web, sx, sy, rl.Color{180, 180, 180, 150})
 		}
 	}
 }
@@ -167,17 +179,18 @@ render_player :: proc(game: ^Game) {
 	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
 	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
 
-	// Subtle idle bob for player (0.5 pixel amplitude — player should feel solid)
 	bob_phase := f32(game.anim_frame) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
 	py += bob_offset
 
-	font_size :: i32(TILE_SIZE)
-	glyph_buf: [2]u8
-	glyph_buf[0] = u8(game.player.glyph)
-	glyph_buf[1] = 0
-	glyph_cstr := cast(cstring)&glyph_buf[0]
-	rl.DrawText(glyph_cstr, px, py, font_size, game.player.color)
+	if g_sprites.loaded {
+		draw_sprite(g_sprites.spr_player, px, py)
+	} else {
+		glyph_buf: [2]u8
+		glyph_buf[0] = u8(game.player.glyph)
+		glyph_buf[1] = 0
+		rl.DrawText(cast(cstring)&glyph_buf[0], px, py, i32(TILE_SIZE), game.player.color)
+	}
 }
 
 // ─── Enemy rendering ──────────────────────────────────────────────────────────
@@ -195,17 +208,19 @@ render_enemies :: proc(game: ^Game) {
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
 
-		// Idle bob: 1-2 pixel sine wave, phase offset by position so enemies bob independently
 		bob_phase := f32(game.anim_frame + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
 
-		font_size :: i32(TILE_SIZE)
-		glyph_buf: [2]u8
-		glyph_buf[0] = u8(enemy.glyph)
-		glyph_buf[1] = 0
-		glyph_cstr := cast(cstring)&glyph_buf[0]
-		rl.DrawText(glyph_cstr, ex, ey, font_size, enemy.color)
+		if g_sprites.loaded {
+			spr := get_enemy_sprite(enemy.enemy_type)
+			draw_sprite(spr, ex, ey, enemy.color)
+		} else {
+			glyph_buf: [2]u8
+			glyph_buf[0] = u8(enemy.glyph)
+			glyph_buf[1] = 0
+			rl.DrawText(cast(cstring)&glyph_buf[0], ex, ey, i32(TILE_SIZE), enemy.color)
+		}
 	}
 }
 

@@ -2,9 +2,10 @@ package main
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-TILE_SIZE :: 16
-SCREEN_WIDTH :: 1080
-SCREEN_HEIGHT :: 720
+TILE_SIZE :: 32       // render size (sprites are 16x16, drawn at 32x32)
+SPRITE_SIZE :: 16     // source sprite size in spritesheet
+SCREEN_WIDTH :: 1280
+SCREEN_HEIGHT :: 900
 MAP_WIDTH :: 80
 MAP_HEIGHT :: 50
 

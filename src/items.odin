@@ -217,12 +217,18 @@ render_items :: proc(game: ^Game) {
 
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
-		font_size :: i32(TILE_SIZE)
-		glyph_buf: [2]u8
-		glyph_buf[0] = u8(item.glyph)
-		glyph_buf[1] = 0
-		glyph_cstr := cast(cstring)&glyph_buf[0]
-		rl.DrawText(glyph_cstr, ix, iy, font_size, item.color)
+
+		if g_sprites.loaded {
+			spr := get_item_sprite(item.item_type)
+			draw_sprite(spr, ix, iy, item.color)
+		} else {
+			font_size :: i32(TILE_SIZE)
+			glyph_buf: [2]u8
+			glyph_buf[0] = u8(item.glyph)
+			glyph_buf[1] = 0
+			glyph_cstr := cast(cstring)&glyph_buf[0]
+			rl.DrawText(glyph_cstr, ix, iy, font_size, item.color)
+		}
 	}
 }
 

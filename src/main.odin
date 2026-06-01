@@ -17,6 +17,9 @@ main :: proc() {
 	audio_init()
 	defer audio_cleanup()
 
+	sprites_init()
+	defer sprites_cleanup()
+
 	// Load all external data files (enemies, items, player)
 	if !data_load_all() {
 		fmt.eprintln("[FATAL] Failed to load data files. Exiting.")
