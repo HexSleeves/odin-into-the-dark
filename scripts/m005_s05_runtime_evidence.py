@@ -19,6 +19,7 @@ ALLOWED_INPUTS = (
     "src/generation.odin",
     "src/mining.odin",
     "src/main.odin",
+    "src/actions.odin",
     "src/input.odin",
     "src/items.odin",
     "src/equipment.odin",
@@ -177,16 +178,17 @@ def main() -> int:
     count_material = proc_block("src/mining.odin", "count_material")
     consume_material = proc_block("src/mining.odin", "consume_material")
     try_craft = proc_block("src/mining.odin", "try_craft")
-    handle_mining_input = proc_block("src/main.odin", "handle_mining_input")
-    read_cardinal_press = proc_block("src/main.odin", "read_cardinal_press")
-    handle_playing_hotkeys = proc_block("src/main.odin", "handle_playing_hotkeys")
-    start_mining_mode = proc_block("src/main.odin", "start_mining_mode")
-    update_viewing_crafting = proc_block("src/main.odin", "update_viewing_crafting")
-    handle_player_action = proc_block("src/main.odin", "handle_player_action")
-    handle_player_moved = proc_block("src/main.odin", "handle_player_moved")
-    update_game_over = proc_block("src/main.odin", "update_game_over")
+    handle_mining_input = proc_block("src/input.odin", "handle_mining_input")
+    read_cardinal_press = proc_block("src/input.odin", "read_cardinal_press")
+    handle_playing_hotkeys = proc_block("src/input.odin", "handle_playing_hotkeys")
+    start_mining_mode = proc_block("src/actions.odin", "start_mining_mode")
+    update_viewing_crafting = proc_block("src/input.odin", "update_viewing_crafting")
+    handle_player_action = proc_block("src/actions.odin", "handle_player_action")
+    handle_player_moved = proc_block("src/actions.odin", "handle_player_moved")
+    update_game_over = proc_block("src/input.odin", "update_game_over")
     handle_input = proc_block("src/input.odin", "handle_input")
-    descend = proc_block("src/input.odin", "descend")
+    descend = proc_block("src/actions.odin", "descend")
+    advance_turn = proc_block("src/actions.odin", "advance_turn")
     pickup_item = proc_block("src/items.odin", "pickup_item")
     use_item = proc_block("src/items.odin", "use_item")
     render_map = proc_block("src/render_map.odin", "render_map")
@@ -383,14 +385,14 @@ def main() -> int:
     )
     require(
         "regression.r005_r006_fov_and_explored_memory_preserved",
-        has_all(main_text, ["compute_fov(game)", "camera_update(game)"])
+        has_all(advance_turn, ["compute_fov(game)", "camera_update(game)"])
         and has_all(descend, ["compute_fov(game)", "camera_update(game, snap = true)"])
         and has_all(render_map, ["tile.visible", "tile.explored", "EXPLORED_DIM"]),
         "FOV recompute and explored dim rendering must remain wired",
     )
     require(
         "regression.r007_r008_enemy_ai_and_combat_preserved",
-        has_all(main_text, ["process_enemy_turns(game)", "process_enemy_abilities(game)", "remove_dead_enemies(game)"])
+        has_all(advance_turn, ["process_enemy_turns(game)", "process_enemy_abilities(game)", "remove_dead_enemies(game)"])
         and has_all(handle_input, ["enemy_at(game, target_x, target_y)", "resolve_attack_player_on_enemy(game, target_enemy)", "game.turn_count += 1"]),
         "enemy turn processing and bump-to-attack must remain wired",
     )

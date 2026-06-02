@@ -39,6 +39,8 @@ game_init :: proc() -> ^Game {
 	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]Light_Source)
 
+	input_manager_init(&game.input)
+
 	// Procedurally generate the mine floor (sets player pos, descent, rooms)
 	generate_map(game)
 
@@ -74,6 +76,8 @@ game_reinit :: proc(game: ^Game) {
 	game.light_sources = make([dynamic]Light_Source)
 
 	clear_messages(game)
+
+	input_manager_init(&game.input)
 
 	generate_map(game)
 

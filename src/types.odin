@@ -191,6 +191,7 @@ Game :: struct {
 	kills:             int,
 	seed:              u64,
 	state:             Game_State,
+	input:             Input_Manager,
 	message_log:       MessageLog,
 	// Camera offset: pixel position of top-left corner of the viewport in map-space
 	camera_x:          int,

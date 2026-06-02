@@ -5,131 +5,68 @@ import rl "vendor:raylib"
 // ─── Input result ─────────────────────────────────────────────────────────────
 
 Input_Result :: enum {
-	None, // no action taken
-	Moved, // player moved — turn consumed
-	Descended, // player descended to next floor
-	Waited, // player skipped a turn (period key)
-	Quit, // escape pressed — signal to close
+	None,       // no action taken
+	Moved,      // player moved — turn consumed
+	Descended,  // player descended to next floor
+	Waited,     // player skipped a turn (period key)
+	Quit,       // escape pressed — signal to close
 }
 
-// ─── Key repeat for held movement keys ────────────────────────────────────────
-// Initial delay before repeat starts, then faster repeat rate.
-
-KEY_REPEAT_DELAY :: f32(0.20) // seconds before repeat starts
-KEY_REPEAT_RATE :: f32(0.08) // seconds between repeats
-
-@(private = "file")
-move_hold_time: f32 = 0 // how long a movement key has been held
-@(private = "file")
-move_repeat_timer: f32 = 0 // time until next repeat fires
-@(private = "file")
-last_move_dx: int = 0
-@(private = "file")
-last_move_dy: int = 0
-
-// Check if a movement direction should fire this frame (initial press OR held repeat)
-@(private = "file")
-check_move_direction :: proc() -> (dx, dy: int, fired: bool) {
-	dt := rl.GetFrameTime()
-
-	// Read current direction from held keys
-	cur_dx, cur_dy: int
-	if rl.IsKeyDown(.W) || rl.IsKeyDown(.UP) {cur_dy = -1}
-	if rl.IsKeyDown(.S) || rl.IsKeyDown(.DOWN) {cur_dy = 1}
-	if rl.IsKeyDown(.A) || rl.IsKeyDown(.LEFT) {cur_dx = -1}
-	if rl.IsKeyDown(.D) || rl.IsKeyDown(.RIGHT) {cur_dx = 1}
-
-	// Nothing held — reset state
-	if cur_dx == 0 && cur_dy == 0 {
-		move_hold_time = 0
-		move_repeat_timer = 0
-		last_move_dx = 0
-		last_move_dy = 0
-		return 0, 0, false
-	}
-
-	// Direction changed — treat as fresh press
-	if cur_dx != last_move_dx || cur_dy != last_move_dy {
-		last_move_dx = cur_dx
-		last_move_dy = cur_dy
-		move_hold_time = 0
-		move_repeat_timer = 0
-		return cur_dx, cur_dy, true // fire immediately on direction change
-	}
-
-	// Same direction held — accumulate time
-	move_hold_time += dt
-
-	// First press already fired (hold_time was 0 last frame) — wait for delay
-	if move_hold_time < KEY_REPEAT_DELAY {
-		return 0, 0, false
-	}
-
-	// Past delay — check repeat timer
-	move_repeat_timer += dt
-	if move_repeat_timer >= KEY_REPEAT_RATE {
-		move_repeat_timer -= KEY_REPEAT_RATE
-		return cur_dx, cur_dy, true
-	}
-
-	return 0, 0, false
-}
-
-
-read_cardinal_press :: proc() -> (dx, dy: int) {
-	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {dy = -1}
-	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {dy = 1}
-	if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT) {dx = -1}
-	if rl.IsKeyPressed(.D) || rl.IsKeyPressed(.RIGHT) {dx = 1}
+read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
+	if action_pressed(im, .Move_North) {dy = -1}
+	if action_pressed(im, .Move_South) {dy = 1}
+	if action_pressed(im, .Move_East)  {dx = 1}
+	if action_pressed(im, .Move_West)  {dx = -1}
 	return
 }
 
 // ─── Input handling ───────────────────────────────────────────────────────────
 
-handle_input :: proc(game: ^Game) -> Input_Result {
-	// Escape to quit
-	if rl.IsKeyPressed(.ESCAPE) {
+handle_input :: proc(game: ^Game, im: ^Input_Manager) -> Input_Result {
+	if action_pressed(im, .Quit) {
 		return .Quit
 	}
 
-	// Period key: wait / skip turn (no repeat)
-	if rl.IsKeyPressed(.PERIOD) {
+	if action_pressed(im, .Wait) {
 		game.turn_count += 1
 		add_message(game, "You wait...", rl.Color{180, 180, 180, 255})
 		return .Waited
 	}
 
-	// Direction with key repeat support
-	dx, dy, has_input := check_move_direction()
+	// Four independent repeat states — direction change fires immediately
+	fired_n := check_repeat(im, .Move_North)
+	fired_s := check_repeat(im, .Move_South)
+	fired_e := check_repeat(im, .Move_East)
+	fired_w := check_repeat(im, .Move_West)
 
-	// No movement input this frame
-	if !has_input {
+	dx, dy: int
+	if fired_n {dy = -1}
+	if fired_s {dy = 1}
+	if fired_e {dx = 1}
+	if fired_w {dx = -1}
+
+	if dx == 0 && dy == 0 {
 		return .None
 	}
 
-	// Compute target position
 	target_x := game.player.pos.x + dx
 	target_y := game.player.pos.y + dy
 
-	// Wall collision check
 	if !is_walkable(game, target_x, target_y) {
 		return .None
 	}
 
-	// Check for enemy at target — bump to attack
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
 		resolve_attack_player_on_enemy(game, target_enemy)
 		game.turn_count += 1
-		return .Moved // attack consumes a turn
+		return .Moved
 	}
 
-	// Move player and consume a turn
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
 	game.turn_count += 1
 
-	// Check if player stepped on Descent tile
 	t := tile_at(game, target_x, target_y)
 	if t != nil && t.type == .Descent {
 		descend(game)
@@ -140,7 +77,6 @@ handle_input :: proc(game: ^Game) -> Input_Result {
 }
 
 handle_forced_turn :: proc(game: ^Game) -> bool {
-	// Web: skip player's turn if stuck
 	if game.skip_next_turn {
 		game.skip_next_turn = false
 		game.turn_count += 1
@@ -150,7 +86,6 @@ handle_forced_turn :: proc(game: ^Game) -> bool {
 		return true
 	}
 
-	// Water: costs an extra turn
 	if game.water_slow_active {
 		game.water_slow_active = false
 		game.turn_count += 1
@@ -163,16 +98,16 @@ handle_forced_turn :: proc(game: ^Game) -> bool {
 	return false
 }
 
-handle_mining_input :: proc(game: ^Game) -> bool {
+handle_mining_input :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 	if !game.ui.mining_mode {return false}
 
-	if rl.IsKeyPressed(.ESCAPE) {
+	if action_pressed(im, .Quit) {
 		game.ui.mining_mode = false
 		add_message(game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
 		return true
 	}
 
-	mdx, mdy := read_cardinal_press()
+	mdx, mdy := read_cardinal_press(im)
 	if mdx != 0 || mdy != 0 {
 		game.ui.mining_mode = false
 		if mine_wall(game, mdx, mdy) {
@@ -191,9 +126,8 @@ handle_mining_input :: proc(game: ^Game) -> bool {
 	return true
 }
 
-handle_playing_hotkeys :: proc(game: ^Game) -> bool {
-	// C key: open crafting if on anvil
-	if rl.IsKeyPressed(.C) {
+handle_playing_hotkeys :: proc(game: ^Game, im: ^Input_Manager) -> bool {
+	if action_pressed(im, .Crafting) {
 		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 		if cur != nil && cur.type == .Anvil {
 			game.state = .Viewing_Crafting
@@ -202,19 +136,16 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 		add_message(game, "You need to stand on an anvil to craft.", rl.Color{180, 180, 180, 255})
 	}
 
-	// X key: enter mining mode
-	if rl.IsKeyPressed(.X) {
+	if action_pressed(im, .Mine) {
 		start_mining_mode(game)
 		return true
 	}
 
-	// M key: toggle minimap
-	if rl.IsKeyPressed(.M) {
+	if action_pressed(im, .Toggle_Map) {
 		game.ui.show_minimap = !game.ui.show_minimap
 	}
 
-	// F1 key: toggle audio
-	if rl.IsKeyPressed(.F1) {
+	if action_pressed(im, .Toggle_Audio) {
 		audio_toggle()
 		if g_audio.enabled {
 			add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
@@ -223,8 +154,7 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 		}
 	}
 
-	// F2 key: toggle ASCII / Sprite mode
-	if rl.IsKeyPressed(.F2) {
+	if action_pressed(im, .Toggle_Sprites) {
 		game.ui.use_sprites = !game.ui.use_sprites
 		if game.ui.use_sprites {
 			add_message(game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
@@ -233,8 +163,7 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 		}
 	}
 
-	// F5 key: save game
-	if rl.IsKeyPressed(.F5) {
+	if action_pressed(im, .Save) {
 		if save_game(game) {
 			add_message(game, "Game saved.", rl.Color{100, 255, 100, 255})
 		} else {
@@ -242,8 +171,7 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 		}
 	}
 
-	// G key: pick up item (instant, no turn cost)
-	if rl.IsKeyPressed(.G) {
+	if action_pressed(im, .Pickup) {
 		if pickup_item(game) {
 			play_sfx(.Pickup)
 			spawn_pickup_particles(
@@ -255,16 +183,13 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 		}
 	}
 
-	// I key: open inventory screen
-	if rl.IsKeyPressed(.I) {
+	if action_pressed(im, .Inventory) {
 		game.state = .Viewing_Inventory
 		game.ui.inspect_slot = 0
 		return true
 	}
 
-	// ? key: open help screen
-	if (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.LEFT_SHIFT)) ||
-	   (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.RIGHT_SHIFT)) {
+	if action_pressed(im, .Help) {
 		game.ui.return_to_title = false
 		game.state = .Viewing_Help
 		return true
@@ -285,35 +210,34 @@ TITLE_HIGH_SCORES :: 2
 TITLE_HELP :: 3
 TITLE_QUIT :: 4
 
-update_title_screen :: proc(game: ^Game) -> (quit: bool) {
-	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
+update_title_screen :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+	if action_pressed(im, .Menu_Up) {
 		game.ui.title_choice = (game.ui.title_choice + TITLE_OPTION_COUNT - 1) % TITLE_OPTION_COUNT
 	}
-	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
+	if action_pressed(im, .Menu_Down) {
 		game.ui.title_choice = (game.ui.title_choice + 1) % TITLE_OPTION_COUNT
 	}
 
-	if rl.IsKeyPressed(.N) {
+	if action_pressed(im, .Menu_New_Game) {
 		game.ui.title_choice = TITLE_NEW_GAME
 		return activate_title_choice(game)
 	}
-	if rl.IsKeyPressed(.C) {
+	if action_pressed(im, .Menu_Continue) {
 		game.ui.title_choice = TITLE_CONTINUE
 		return activate_title_choice(game)
 	}
-	if rl.IsKeyPressed(.H) {
+	if action_pressed(im, .Menu_High_Scores) {
 		game.ui.title_choice = TITLE_HIGH_SCORES
 		return activate_title_choice(game)
 	}
-	if rl.IsKeyPressed(.SLASH) && (rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {
+	if action_pressed(im, .Help) {
 		game.ui.title_choice = TITLE_HELP
 		return activate_title_choice(game)
 	}
-	if rl.IsKeyPressed(.Q) || rl.IsKeyPressed(.ESCAPE) {
+	if action_pressed(im, .Menu_Quit) || action_pressed(im, .Menu_Back) {
 		return true
 	}
-
-	if rl.IsKeyPressed(.ENTER) || rl.IsKeyPressed(.SPACE) {
+	if action_pressed(im, .Menu_Confirm) {
 		return activate_title_choice(game)
 	}
 
@@ -344,8 +268,8 @@ activate_title_choice :: proc(game: ^Game) -> (quit: bool) {
 	return false
 }
 
-handle_global_input :: proc(game: ^Game) {
-	if rl.IsKeyPressed(.F9) {
+handle_global_input :: proc(game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Load) {
 		if load_game(game) {
 			death_sound_played = false
 		} else {
@@ -354,14 +278,14 @@ handle_global_input :: proc(game: ^Game) {
 	}
 }
 
-update_playing :: proc(game: ^Game) -> (quit: bool) {
+update_playing :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if handle_forced_turn(game) {return}
-	if handle_mining_input(game) {return}
-	if handle_playing_hotkeys(game) {return}
+	if handle_mining_input(game, im) {return}
+	if handle_playing_hotkeys(game, im) {return}
 	return handle_player_action(game)
 }
 
-update_game_over :: proc(game: ^Game) -> (quit: bool) {
+update_game_over :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !death_sound_played {
 		play_sfx(.Death)
 		spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
@@ -370,59 +294,58 @@ update_game_over :: proc(game: ^Game) -> (quit: bool) {
 	if !game.score_saved {
 		save_run_score(game)
 	}
-	if rl.IsKeyPressed(.R) {
+	if action_pressed(im, .Restart) {
 		death_sound_played = false
 		restart_game(game)
 	}
-	if rl.IsKeyPressed(.ESCAPE) {
+	if action_pressed(im, .Quit) {
 		return true
 	}
 	return
 }
 
-update_victory :: proc(game: ^Game) -> (quit: bool) {
+update_victory :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !game.score_saved {
 		game.death_cause = "Victory!"
 		save_run_score(game)
 	}
-	if rl.IsKeyPressed(.R) {
+	if action_pressed(im, .Restart) {
 		restart_game(game)
 	}
-	if rl.IsKeyPressed(.ESCAPE) {
+	if action_pressed(im, .Quit) {
 		return true
 	}
 	return
 }
 
-update_viewing_inventory :: proc(game: ^Game) {
-	// I or Escape closes inventory (reset drop/equip mode)
-	if rl.IsKeyPressed(.I) || rl.IsKeyPressed(.ESCAPE) {
+update_viewing_inventory :: proc(game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Inventory) || action_pressed(im, .Menu_Back) {
 		game.state = .Playing
 		game.ui.dropping = false
 		game.ui.equipping = false
 		game.ui.inspect_slot = -1
 	}
-	// Up/Down arrows to move inspect cursor (0-8 = inventory, 9/10/11 = weapon/armor/helmet)
-	if rl.IsKeyPressed(.UP) || rl.IsKeyPressed(.W) {
+	if action_pressed(im, .Menu_Up) {
 		game.ui.inspect_slot = max(game.ui.inspect_slot - 1, 0)
 	}
-	if rl.IsKeyPressed(.DOWN) || rl.IsKeyPressed(.S) {
+	if action_pressed(im, .Menu_Down) {
 		game.ui.inspect_slot = min(game.ui.inspect_slot + 1, MAX_INVENTORY + 2)
 	}
-	// D key toggles drop mode
-	if rl.IsKeyPressed(.D) {
+	if action_pressed(im, .Inv_Drop_Mode) {
 		game.ui.dropping = !game.ui.dropping
 		game.ui.equipping = false
 	}
-	// E key toggles equip mode
-	if rl.IsKeyPressed(.E) {
+	if action_pressed(im, .Inv_Equip_Mode) {
 		game.ui.equipping = !game.ui.equipping
 		game.ui.dropping = false
 	}
-	// Number keys 1-9 to use, drop, or equip items
-	keys := [9]rl.KeyboardKey{.ONE, .TWO, .THREE, .FOUR, .FIVE, .SIX, .SEVEN, .EIGHT, .NINE}
-	for key, idx in keys {
-		if rl.IsKeyPressed(key) {
+	inv_actions := [9]Game_Action{
+		.Inv_Slot_1, .Inv_Slot_2, .Inv_Slot_3,
+		.Inv_Slot_4, .Inv_Slot_5, .Inv_Slot_6,
+		.Inv_Slot_7, .Inv_Slot_8, .Inv_Slot_9,
+	}
+	for act, idx in inv_actions {
+		if action_pressed(im, act) {
 			if game.ui.dropping {
 				drop_item(game, idx)
 				game.ui.dropping = false
@@ -436,20 +359,18 @@ update_viewing_inventory :: proc(game: ^Game) {
 	}
 }
 
-update_viewing_crafting :: proc(game: ^Game) {
-	// ESC or C closes crafting
-	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.C) {
+update_viewing_crafting :: proc(game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Menu_Back) || action_pressed(im, .Crafting) {
 		game.state = .Playing
 	}
-	// Number keys 1-4 to craft
-	if rl.IsKeyPressed(.ONE) {try_craft(game, 0)}
-	if rl.IsKeyPressed(.TWO) {try_craft(game, 1)}
-	if rl.IsKeyPressed(.THREE) {try_craft(game, 2)}
-	if rl.IsKeyPressed(.FOUR) {try_craft(game, 3)}
+	if action_pressed(im, .Craft_1) {try_craft(game, 0)}
+	if action_pressed(im, .Craft_2) {try_craft(game, 1)}
+	if action_pressed(im, .Craft_3) {try_craft(game, 2)}
+	if action_pressed(im, .Craft_4) {try_craft(game, 3)}
 }
 
-update_viewing_help :: proc(game: ^Game) {
-	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.SLASH) {
+update_viewing_help :: proc(game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Menu_Back) || action_pressed(im, .Help) {
 		if game.ui.return_to_title {
 			game.ui.return_to_title = false
 			game.state = .Title_Screen
@@ -459,8 +380,8 @@ update_viewing_help :: proc(game: ^Game) {
 	}
 }
 
-update_viewing_scores :: proc(game: ^Game) {
-	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.H) {
+update_viewing_scores :: proc(game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Menu_Back) || action_pressed(im, .Menu_High_Scores) {
 		game.state = .Title_Screen
 	}
 }

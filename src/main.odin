@@ -38,27 +38,27 @@ main :: proc() {
 	rl.SetExitKey(rl.KeyboardKey.KEY_NULL)
 
 	for !rl.WindowShouldClose() {
-		handle_global_input(game)
+		handle_global_input(game, &game.input)
 
 		// ── Update ──
 		quit := false
 		switch game.state {
 		case .Title_Screen:
-			quit = update_title_screen(game)
+			quit = update_title_screen(game, &game.input)
 		case .Playing:
-			quit = update_playing(game)
+			quit = update_playing(game, &game.input)
 		case .Game_Over:
-			quit = update_game_over(game)
+			quit = update_game_over(game, &game.input)
 		case .Victory:
-			quit = update_victory(game)
+			quit = update_victory(game, &game.input)
 		case .Viewing_Inventory:
-			update_viewing_inventory(game)
+			update_viewing_inventory(game, &game.input)
 		case .Viewing_Crafting:
-			update_viewing_crafting(game)
+			update_viewing_crafting(game, &game.input)
 		case .Viewing_Help:
-			update_viewing_help(game)
+			update_viewing_help(game, &game.input)
 		case .Viewing_Scores:
-			update_viewing_scores(game)
+			update_viewing_scores(game, &game.input)
 		}
 		if quit {
 			break

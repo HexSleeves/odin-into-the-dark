@@ -28,7 +28,7 @@ handle_player_moved :: proc(game: ^Game, kills_before: int) {
 handle_player_action :: proc(game: ^Game) -> (quit: bool) {
 	game.prev_player_pos = game.player.pos
 	kills_before := game.kills
-	result := handle_input(game)
+	result := handle_input(game, &game.input)
 
 	switch result {
 	case .Quit:
