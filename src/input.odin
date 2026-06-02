@@ -272,3 +272,195 @@ handle_playing_hotkeys :: proc(game: ^Game) -> bool {
 
 	return false
 }
+
+// ─── Per-state update handlers ────────────────────────────────────────────────
+
+@(private = "file")
+death_sound_played: bool
+
+TITLE_OPTION_COUNT :: 5
+TITLE_NEW_GAME :: 0
+TITLE_CONTINUE :: 1
+TITLE_HIGH_SCORES :: 2
+TITLE_HELP :: 3
+TITLE_QUIT :: 4
+
+update_title_screen :: proc(game: ^Game) -> (quit: bool) {
+	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {
+		game.ui.title_choice = (game.ui.title_choice + TITLE_OPTION_COUNT - 1) % TITLE_OPTION_COUNT
+	}
+	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {
+		game.ui.title_choice = (game.ui.title_choice + 1) % TITLE_OPTION_COUNT
+	}
+
+	if rl.IsKeyPressed(.N) {
+		game.ui.title_choice = TITLE_NEW_GAME
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.C) {
+		game.ui.title_choice = TITLE_CONTINUE
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.H) {
+		game.ui.title_choice = TITLE_HIGH_SCORES
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.SLASH) && (rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {
+		game.ui.title_choice = TITLE_HELP
+		return activate_title_choice(game)
+	}
+	if rl.IsKeyPressed(.Q) || rl.IsKeyPressed(.ESCAPE) {
+		return true
+	}
+
+	if rl.IsKeyPressed(.ENTER) || rl.IsKeyPressed(.SPACE) {
+		return activate_title_choice(game)
+	}
+
+	return false
+}
+
+activate_title_choice :: proc(game: ^Game) -> (quit: bool) {
+	switch game.ui.title_choice {
+	case TITLE_NEW_GAME:
+		death_sound_played = false
+		restart_game(game)
+	case TITLE_CONTINUE:
+		if save_exists() {
+			if load_game(game) {
+				death_sound_played = false
+			} else {
+				add_message(game, "Save file could not be loaded.", rl.Color{255, 180, 50, 255})
+			}
+		}
+	case TITLE_HIGH_SCORES:
+		game.state = .Viewing_Scores
+	case TITLE_HELP:
+		game.ui.return_to_title = true
+		game.state = .Viewing_Help
+	case TITLE_QUIT:
+		return true
+	}
+	return false
+}
+
+handle_global_input :: proc(game: ^Game) {
+	if rl.IsKeyPressed(.F9) {
+		if load_game(game) {
+			death_sound_played = false
+		} else {
+			add_message(game, "No save file found.", rl.Color{255, 180, 50, 255})
+		}
+	}
+}
+
+update_playing :: proc(game: ^Game) -> (quit: bool) {
+	if handle_forced_turn(game) {return}
+	if handle_mining_input(game) {return}
+	if handle_playing_hotkeys(game) {return}
+	return handle_player_action(game)
+}
+
+update_game_over :: proc(game: ^Game) -> (quit: bool) {
+	if !death_sound_played {
+		play_sfx(.Death)
+		spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
+		death_sound_played = true
+	}
+	if !game.score_saved {
+		save_run_score(game)
+	}
+	if rl.IsKeyPressed(.R) {
+		death_sound_played = false
+		restart_game(game)
+	}
+	if rl.IsKeyPressed(.ESCAPE) {
+		return true
+	}
+	return
+}
+
+update_victory :: proc(game: ^Game) -> (quit: bool) {
+	if !game.score_saved {
+		game.death_cause = "Victory!"
+		save_run_score(game)
+	}
+	if rl.IsKeyPressed(.R) {
+		restart_game(game)
+	}
+	if rl.IsKeyPressed(.ESCAPE) {
+		return true
+	}
+	return
+}
+
+update_viewing_inventory :: proc(game: ^Game) {
+	// I or Escape closes inventory (reset drop/equip mode)
+	if rl.IsKeyPressed(.I) || rl.IsKeyPressed(.ESCAPE) {
+		game.state = .Playing
+		game.ui.dropping = false
+		game.ui.equipping = false
+		game.ui.inspect_slot = -1
+	}
+	// Up/Down arrows to move inspect cursor (0-8 = inventory, 9/10/11 = weapon/armor/helmet)
+	if rl.IsKeyPressed(.UP) || rl.IsKeyPressed(.W) {
+		game.ui.inspect_slot = max(game.ui.inspect_slot - 1, 0)
+	}
+	if rl.IsKeyPressed(.DOWN) || rl.IsKeyPressed(.S) {
+		game.ui.inspect_slot = min(game.ui.inspect_slot + 1, MAX_INVENTORY + 2)
+	}
+	// D key toggles drop mode
+	if rl.IsKeyPressed(.D) {
+		game.ui.dropping = !game.ui.dropping
+		game.ui.equipping = false
+	}
+	// E key toggles equip mode
+	if rl.IsKeyPressed(.E) {
+		game.ui.equipping = !game.ui.equipping
+		game.ui.dropping = false
+	}
+	// Number keys 1-9 to use, drop, or equip items
+	keys := [9]rl.KeyboardKey{.ONE, .TWO, .THREE, .FOUR, .FIVE, .SIX, .SEVEN, .EIGHT, .NINE}
+	for key, idx in keys {
+		if rl.IsKeyPressed(key) {
+			if game.ui.dropping {
+				drop_item(game, idx)
+				game.ui.dropping = false
+			} else if game.ui.equipping {
+				equip_item(game, idx)
+				game.ui.equipping = false
+			} else {
+				use_item(game, idx)
+			}
+		}
+	}
+}
+
+update_viewing_crafting :: proc(game: ^Game) {
+	// ESC or C closes crafting
+	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.C) {
+		game.state = .Playing
+	}
+	// Number keys 1-4 to craft
+	if rl.IsKeyPressed(.ONE) {try_craft(game, 0)}
+	if rl.IsKeyPressed(.TWO) {try_craft(game, 1)}
+	if rl.IsKeyPressed(.THREE) {try_craft(game, 2)}
+	if rl.IsKeyPressed(.FOUR) {try_craft(game, 3)}
+}
+
+update_viewing_help :: proc(game: ^Game) {
+	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.SLASH) {
+		if game.ui.return_to_title {
+			game.ui.return_to_title = false
+			game.state = .Title_Screen
+		} else {
+			game.state = .Playing
+		}
+	}
+}
+
+update_viewing_scores :: proc(game: ^Game) {
+	if rl.IsKeyPressed(.ESCAPE) || rl.IsKeyPressed(.H) {
+		game.state = .Title_Screen
+	}
+}
