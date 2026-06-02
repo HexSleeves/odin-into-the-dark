@@ -60,7 +60,9 @@ logger_init_from_env :: proc(logger: ^Game_Logger) {
 
 	options: log.Options
 	if logger.config.include_source {
-		options = log.Options{.Level, .Short_File_Path, .Line, .Procedure, .Terminal_Color} | log.Full_Timestamp_Opts
+		options =
+			log.Options{.Level, .Short_File_Path, .Line, .Procedure, .Terminal_Color} |
+			log.Full_Timestamp_Opts
 	} else {
 		options = log.Options{.Level, .Terminal_Color} | log.Full_Timestamp_Opts
 	}
@@ -85,7 +87,12 @@ logger_init_from_env :: proc(logger: ^Game_Logger) {
 			)
 		} else {
 			logger.file_handle = file
-			logger.file = log.create_file_logger(file, logger.config.file_level, file_options, "itd")
+			logger.file = log.create_file_logger(
+				file,
+				logger.config.file_level,
+				file_options,
+				"itd",
+			)
 			logger.file_ready = true
 		}
 	}
@@ -109,7 +116,10 @@ logger_destroy :: proc(logger: ^Game_Logger) {
 // ─── Configuration ───────────────────────────────────────────────────────────
 
 logger_config_from_env :: proc() -> Game_Logger_Config {
-	base_level, enabled := logger_parse_level(os.get_env("ITD_LOG_LEVEL", context.temp_allocator), log.Level.Info)
+	base_level, enabled := logger_parse_level(
+		os.get_env("ITD_LOG_LEVEL", context.temp_allocator),
+		log.Level.Info,
+	)
 	console_level, console_enabled_from_level := logger_parse_level(
 		os.get_env("ITD_LOG_CONSOLE_LEVEL", context.temp_allocator),
 		base_level,
@@ -125,19 +135,22 @@ logger_config_from_env :: proc() -> Game_Logger_Config {
 	}
 
 	return Game_Logger_Config {
-		enabled         = enabled,
+		enabled = enabled,
 		console_enabled = enabled &&
-		                  console_enabled_from_level &&
-		                  logger_parse_bool(os.get_env("ITD_LOG_CONSOLE", context.temp_allocator), true),
-		file_enabled    = enabled &&
-		                  file_enabled_from_level &&
-		                  logger_parse_bool(os.get_env("ITD_LOG_FILE", context.temp_allocator), true),
-		console_level   = console_level,
-		file_level      = file_level,
-		file_path       = file_path,
-		channels        = logger_parse_channels(os.get_env("ITD_LOG_CHANNELS", context.temp_allocator)),
-		include_source  = logger_parse_bool(os.get_env("ITD_LOG_SOURCE", context.temp_allocator), true),
-		flush_file      = logger_parse_bool(os.get_env("ITD_LOG_FLUSH", context.temp_allocator), true),
+		console_enabled_from_level &&
+		logger_parse_bool(os.get_env("ITD_LOG_CONSOLE", context.temp_allocator), true),
+		file_enabled = enabled &&
+		file_enabled_from_level &&
+		logger_parse_bool(os.get_env("ITD_LOG_FILE", context.temp_allocator), true),
+		console_level = console_level,
+		file_level = file_level,
+		file_path = file_path,
+		channels = logger_parse_channels(os.get_env("ITD_LOG_CHANNELS", context.temp_allocator)),
+		include_source = logger_parse_bool(
+			os.get_env("ITD_LOG_SOURCE", context.temp_allocator),
+			true,
+		),
+		flush_file = logger_parse_bool(os.get_env("ITD_LOG_FLUSH", context.temp_allocator), true),
 	}
 }
 
@@ -162,7 +175,13 @@ logger_parse_bool :: proc(value: string, fallback: bool) -> bool {
 	return fallback
 }
 
-logger_parse_level :: proc(value: string, fallback: log.Level) -> (level: log.Level, enabled: bool) {
+logger_parse_level :: proc(
+	value: string,
+	fallback: log.Level,
+) -> (
+	level: log.Level,
+	enabled: bool,
+) {
 	trimmed := logger_trim_ascii(value)
 	if trimmed == "" {return fallback, true}
 
@@ -181,7 +200,7 @@ logger_parse_level :: proc(value: string, fallback: log.Level) -> (level: log.Le
 logger_parse_channels :: proc(value: string) -> Game_Log_Channels {
 	trimmed := logger_trim_ascii(value)
 	if trimmed == "" || logger_ascii_equal_fold(trimmed, "all") {
-		return Game_Log_Channels{
+		return Game_Log_Channels {
 			.App,
 			.Init,
 			.Data,
@@ -272,24 +291,49 @@ logger_channel_label :: proc(channel: Game_Log_Channel) -> string {
 
 // ─── Logging API ─────────────────────────────────────────────────────────────
 
-logger_debugf :: proc(channel: Game_Log_Channel, fmt_str: string, args: ..any, location := #caller_location) {
-	logger_logf(&g_logger, log.Level.Debug, channel, fmt_str, ..args, location=location)
+logger_debugf :: proc(
+	channel: Game_Log_Channel,
+	fmt_str: string,
+	args: ..any,
+	location := #caller_location,
+) {
+	logger_logf(&g_logger, log.Level.Debug, channel, fmt_str, ..args, location = location)
 }
 
-logger_infof :: proc(channel: Game_Log_Channel, fmt_str: string, args: ..any, location := #caller_location) {
-	logger_logf(&g_logger, log.Level.Info, channel, fmt_str, ..args, location=location)
+logger_infof :: proc(
+	channel: Game_Log_Channel,
+	fmt_str: string,
+	args: ..any,
+	location := #caller_location,
+) {
+	logger_logf(&g_logger, log.Level.Info, channel, fmt_str, ..args, location = location)
 }
 
-logger_warnf :: proc(channel: Game_Log_Channel, fmt_str: string, args: ..any, location := #caller_location) {
-	logger_logf(&g_logger, log.Level.Warning, channel, fmt_str, ..args, location=location)
+logger_warnf :: proc(
+	channel: Game_Log_Channel,
+	fmt_str: string,
+	args: ..any,
+	location := #caller_location,
+) {
+	logger_logf(&g_logger, log.Level.Warning, channel, fmt_str, ..args, location = location)
 }
 
-logger_errorf :: proc(channel: Game_Log_Channel, fmt_str: string, args: ..any, location := #caller_location) {
-	logger_logf(&g_logger, log.Level.Error, channel, fmt_str, ..args, location=location)
+logger_errorf :: proc(
+	channel: Game_Log_Channel,
+	fmt_str: string,
+	args: ..any,
+	location := #caller_location,
+) {
+	logger_logf(&g_logger, log.Level.Error, channel, fmt_str, ..args, location = location)
 }
 
-logger_fatalf :: proc(channel: Game_Log_Channel, fmt_str: string, args: ..any, location := #caller_location) {
-	logger_logf(&g_logger, log.Level.Fatal, channel, fmt_str, ..args, location=location)
+logger_fatalf :: proc(
+	channel: Game_Log_Channel,
+	fmt_str: string,
+	args: ..any,
+	location := #caller_location,
+) {
+	logger_logf(&g_logger, log.Level.Fatal, channel, fmt_str, ..args, location = location)
 }
 
 logger_logf :: proc(
@@ -308,7 +352,13 @@ logger_logf :: proc(
 	message = fmt.tprintf("%s%s", message, fmt.tprintf(fmt_str, ..args))
 
 	if logger.console_ready && level >= logger.config.console_level {
-		logger.console.procedure(logger.console.data, level, message, logger.console.options, location)
+		logger.console.procedure(
+			logger.console.data,
+			level,
+			message,
+			logger.console.options,
+			location,
+		)
 	}
 
 	if logger.file_ready && level >= logger.config.file_level {
@@ -319,7 +369,11 @@ logger_logf :: proc(
 	}
 }
 
-logger_should_log :: proc(logger: ^Game_Logger, level: log.Level, channel: Game_Log_Channel) -> bool {
+logger_should_log :: proc(
+	logger: ^Game_Logger,
+	level: log.Level,
+	channel: Game_Log_Channel,
+) -> bool {
 	if logger == nil || !logger.config.enabled || !(channel in logger.config.channels) {
 		return false
 	}
