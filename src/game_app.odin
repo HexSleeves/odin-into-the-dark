@@ -6,9 +6,11 @@ import eng "./engine"
 // ─── Into the Depths app adapter ─────────────────────────────────────────────
 
 Into_The_Depths_App_State :: struct {
-	game:    ^Game,
-	content: Content_Manager,
-	saves:   Save_Manager,
+	game:              ^Game,
+	content:           Content_Manager,
+	saves:             Save_Manager,
+	scene_manager:     eng.Scene_Manager,
+	scene_descriptors: [GAME_SCENE_COUNT]eng.Engine_Scene,
 }
 
 game_engine_config :: proc() -> eng.Engine_Config {
@@ -74,6 +76,13 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	state.game = game_init()
+	if !game_scene_manager_init(&state.scene_manager, state.scene_descriptors[:], state.game) {
+		logger_fatalf(.App, "Failed to initialize scene manager. Exiting.")
+		game_destroy(state.game)
+		free(state)
+		app.state = nil
+		return false
+	}
 
 	game := state.game
 	logger_debugf(.Init, "seed = %v", game.seed)
@@ -93,7 +102,7 @@ game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 
 	game := state.game
 	handle_global_input(game, &game.input)
-	return scene_update(game)
+	return game_scene_manager_update(&state.scene_manager, game)
 }
 
 game_app_render :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
@@ -101,7 +110,7 @@ game_app_render :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	if state == nil || state.game == nil {
 		return
 	}
-	render_game(state.game)
+	game_scene_manager_render(&state.scene_manager, state.game)
 }
 
 game_app_autosave :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
