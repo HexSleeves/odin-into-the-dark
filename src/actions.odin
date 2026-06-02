@@ -2,9 +2,10 @@ package main
 
 import "core:fmt"
 import rl "vendor:raylib"
+import eng "./engine"
 
 
-handle_player_moved :: proc(game: ^Game, kills_before: int) {
+handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int) {
 	// Combat hit particles when a kill happened this turn
 	if game.kills > kills_before {
 		spawn_hit_particles(
@@ -14,10 +15,10 @@ handle_player_moved :: proc(game: ^Game, kills_before: int) {
 			game.camera_y,
 		)
 	}
-	play_sfx(.Footstep)
+	audio_manager_play_sfx(game_engine_audio_manager(engine), .Footstep)
 
 	consume_web_if_present(game)
-	apply_current_tile_effects(game)
+	apply_current_tile_effects(engine, game)
 	collapse_unstable_previous_tile(game)
 
 	hp_before := game.player.hp
@@ -25,7 +26,7 @@ handle_player_moved :: proc(game: ^Game, kills_before: int) {
 	announce_item_under_player(game)
 }
 
-handle_player_action :: proc(game: ^Game) -> (quit: bool) {
+handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 	game.prev_player_pos = game.player.pos
 	kills_before := game.kills
 	result := handle_input(game, &game.input)
@@ -34,20 +35,20 @@ handle_player_action :: proc(game: ^Game) -> (quit: bool) {
 	case .Quit:
 		return true
 	case .Moved:
-		handle_player_moved(game, kills_before)
+		handle_player_moved(engine, game, kills_before)
 	case .Waited:
 		hp_before := game.player.hp
 		advance_turn(game, hp_before)
 	case .Descended:
-		handle_player_descended(game)
+		handle_player_descended(engine, game)
 	case .None:
 	}
 
 	return false
 }
 
-handle_player_descended :: proc(game: ^Game) {
-	play_sfx(.Descent)
+handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
+	audio_manager_play_sfx(game_engine_audio_manager(engine), .Descent)
 	game.vfx.flash_color = rl.Color{255, 255, 255, 255}
 	game.vfx.flash_alpha = 0.5
 	hp_before := game.player.hp
@@ -160,13 +161,13 @@ consume_web_if_present :: proc(game: ^Game) {
 	}
 }
 
-apply_current_tile_effects :: proc(game: ^Game) {
+apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 	cur_tile := tile_at(game, game.player.pos.x, game.player.pos.y)
 	if cur_tile == nil {return}
 
 	if cur_tile.type == .Water {
 		game.water_slow_active = true
-		play_sfx(.Water)
+		audio_manager_play_sfx(game_engine_audio_manager(engine), .Water)
 		add_message(game, "You wade through water...", rl.Color{40, 80, 180, 255})
 	}
 

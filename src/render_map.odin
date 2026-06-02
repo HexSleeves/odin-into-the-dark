@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Depth palette definitions ────────────────────────────────────────────────
 
@@ -106,9 +107,10 @@ visible_tile_bounds :: proc(game: ^Game) -> (x0, y0, x1, y1: int) {
 
 // ─── Map rendering (with camera offset) ───────────────────────────────────────
 
-render_map :: proc(game: ^Game) {
+render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 	game.vfx.anim_frame += 1
 
+	sprites := game_engine_sprite_manager(engine)
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 	palette := palette_for_depth(game.depth)
@@ -139,8 +141,8 @@ render_map :: proc(game: ^Game) {
 				}
 
 				if game.ui.use_sprites {
-					spr := get_tile_sprite(tile.type)
-					draw_sprite(spr, sx, sy, tint)
+					spr := sprite_manager_tile(sprites, tile.type)
+					sprite_manager_draw(sprites, spr, sx, sy, tint)
 				} else {
 					// ASCII mode: colored rectangle
 					rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), tint)
@@ -155,7 +157,8 @@ render_map :: proc(game: ^Game) {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
 						if game.ui.use_sprites {
-							draw_sprite(get_named_sprite("tile", "ore_vein"), sx, sy, ore_tint)
+							spr := sprite_manager_named(sprites, "tile", "ore_vein")
+							sprite_manager_draw(sprites, spr, sx, sy, ore_tint)
 						} else {
 							dot_x := sx + i32(TILE_SIZE) / 2 - 3
 							dot_y := sy + i32(TILE_SIZE) / 2 - 3
@@ -170,7 +173,8 @@ render_map :: proc(game: ^Game) {
 
 // ─── Web tile rendering ───────────────────────────────────────────────────────
 
-render_webs :: proc(game: ^Game) {
+render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
+	sprites := game_engine_sprite_manager(engine)
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 
@@ -191,7 +195,8 @@ render_webs :: proc(game: ^Game) {
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			if game.ui.use_sprites {
-				draw_sprite(get_named_sprite("tile", "web"), sx, sy, rl.Color{180, 180, 180, 150})
+				spr := sprite_manager_named(sprites, "tile", "web")
+				sprite_manager_draw(sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
 			} else {
 				rl.DrawText("w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
 			}
@@ -201,7 +206,8 @@ render_webs :: proc(game: ^Game) {
 
 // ─── Player rendering ─────────────────────────────────────────────────────────
 
-render_player :: proc(game: ^Game) {
+render_player :: proc(engine: ^eng.Engine, game: ^Game) {
+	sprites := game_engine_sprite_manager(engine)
 	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
 	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
 
@@ -210,7 +216,8 @@ render_player :: proc(game: ^Game) {
 	py += bob_offset
 
 	if game.ui.use_sprites {
-		draw_sprite(get_named_sprite("character", "player"), px, py, game.player.color)
+		spr := sprite_manager_named(sprites, "character", "player")
+		sprite_manager_draw(sprites, spr, px, py, game.player.color)
 	} else {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
@@ -221,7 +228,8 @@ render_player :: proc(game: ^Game) {
 
 // ─── Enemy rendering ──────────────────────────────────────────────────────────
 
-render_enemies :: proc(game: ^Game) {
+render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
+	sprites := game_engine_sprite_manager(engine)
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 
@@ -239,8 +247,8 @@ render_enemies :: proc(game: ^Game) {
 		ey += bob_offset
 
 		if game.ui.use_sprites {
-			spr := get_enemy_sprite(enemy.enemy_type)
-			draw_sprite(spr, ex, ey, enemy.color)
+			spr := sprite_manager_enemy(sprites, enemy.enemy_type)
+			sprite_manager_draw(sprites, spr, ex, ey, enemy.color)
 		} else {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(enemy.glyph)

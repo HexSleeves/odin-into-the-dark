@@ -4,8 +4,8 @@ package engine
 
 Engine_Scene_Id :: int
 
-Engine_Scene_Callback :: proc(ctx: rawptr)
-Engine_Scene_Update_Callback :: proc(ctx: rawptr) -> bool
+Engine_Scene_Callback :: proc(engine: ^Engine, ctx: rawptr)
+Engine_Scene_Update_Callback :: proc(engine: ^Engine, ctx: rawptr) -> bool
 
 Engine_Scene :: struct {
 	id:     Engine_Scene_Id,
@@ -39,8 +39,8 @@ scene_manager_active_id :: proc(manager: ^Scene_Manager) -> Engine_Scene_Id {
 	return manager.scenes[manager.active_index].id
 }
 
-scene_manager_set_active :: proc(manager: ^Scene_Manager, id: Engine_Scene_Id) -> bool {
-	if manager == nil {
+scene_manager_set_active :: proc(manager: ^Scene_Manager, engine: ^Engine, id: Engine_Scene_Id) -> bool {
+	if manager == nil || engine == nil {
 		return false
 	}
 
@@ -56,7 +56,7 @@ scene_manager_set_active :: proc(manager: ^Scene_Manager, id: Engine_Scene_Id) -
 	if manager.has_active {
 		current := &manager.scenes[manager.active_index]
 		if current.exit != nil {
-			current.exit(current.ctx)
+			current.exit(engine, current.ctx)
 		}
 	}
 
@@ -65,14 +65,14 @@ scene_manager_set_active :: proc(manager: ^Scene_Manager, id: Engine_Scene_Id) -
 
 	next := &manager.scenes[manager.active_index]
 	if next.enter != nil {
-		next.enter(next.ctx)
+		next.enter(engine, next.ctx)
 	}
 
 	return true
 }
 
-scene_manager_update :: proc(manager: ^Scene_Manager) -> bool {
-	if manager == nil || !manager.has_active {
+scene_manager_update :: proc(manager: ^Scene_Manager, engine: ^Engine) -> bool {
+	if manager == nil || engine == nil || !manager.has_active {
 		return false
 	}
 
@@ -80,17 +80,17 @@ scene_manager_update :: proc(manager: ^Scene_Manager) -> bool {
 	if scene.update == nil {
 		return false
 	}
-	return scene.update(scene.ctx)
+	return scene.update(engine, scene.ctx)
 }
 
-scene_manager_render :: proc(manager: ^Scene_Manager) {
-	if manager == nil || !manager.has_active {
+scene_manager_render :: proc(manager: ^Scene_Manager, engine: ^Engine) {
+	if manager == nil || engine == nil || !manager.has_active {
 		return
 	}
 
 	scene := &manager.scenes[manager.active_index]
 	if scene.render != nil {
-		scene.render(scene.ctx)
+		scene.render(engine, scene.ctx)
 	}
 }
 

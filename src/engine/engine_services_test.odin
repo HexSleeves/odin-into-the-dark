@@ -52,3 +52,33 @@ engine_services_lifecycle_invokes_configured_callbacks :: proc(t: ^testing.T) {
 	testing.expect(t, !services.runtime_assets_initialized)
 	testing.expect_value(t, engine_services_test_counter, 4)
 }
+
+@(test)
+engine_services_registers_and_replaces_service_contexts :: proc(t: ^testing.T) {
+	services := engine_services_make(engine_services_default_config())
+	first: int = 11
+	second: int = 22
+
+	testing.expect(t, engine_services_register(&services, 7, rawptr(&first)))
+	testing.expect(t, engine_services_has(&services, 7))
+	testing.expect(t, engine_services_get(&services, 7) == rawptr(&first))
+
+	testing.expect(t, engine_services_register(&services, 7, rawptr(&second)))
+	testing.expect(t, engine_services_get(&services, 7) == rawptr(&second))
+	testing.expect_value(t, services.service_count, 1)
+}
+
+@(test)
+engine_services_rejects_invalid_or_overflow_registrations :: proc(t: ^testing.T) {
+	services := engine_services_make(engine_services_default_config())
+
+	testing.expect(t, !engine_services_register(nil, 1, rawptr(uintptr(1))))
+	testing.expect(t, !engine_services_register(&services, -1, rawptr(uintptr(1))))
+	testing.expect(t, !engine_services_has(&services, -1))
+	testing.expect(t, engine_services_get(&services, -1) == nil)
+
+	for i in 0 ..< ENGINE_SERVICE_MAX {
+		testing.expect(t, engine_services_register(&services, Engine_Service_Id(i), rawptr(uintptr(i + 1))))
+	}
+	testing.expect(t, !engine_services_register(&services, Engine_Service_Id(ENGINE_SERVICE_MAX + 1), rawptr(uintptr(99))))
+}

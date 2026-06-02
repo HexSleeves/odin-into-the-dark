@@ -1,10 +1,11 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Top-level render call ────────────────────────────────────────────────────
 
-render_game :: proc(game: ^Game) {
+render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	update_particles()
 
 	rl.BeginDrawing()
@@ -12,11 +13,11 @@ render_game :: proc(game: ^Game) {
 
 	// Clip the map rendering to the viewport region so it doesn't bleed into HUD/messages
 	rl.BeginScissorMode(0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
-	render_map(game)
-	render_webs(game)
-	render_items(game)
-	render_enemies(game)
-	render_player(game)
+	render_map(engine, game)
+	render_webs(engine, game)
+	render_items(engine, game)
+	render_enemies(engine, game)
+	render_player(engine, game)
 	render_particles()
 	rl.EndScissorMode()
 
@@ -28,7 +29,7 @@ render_game :: proc(game: ^Game) {
 	}
 
 	if game.state == .Title_Screen {
-		render_title_screen(game)
+		render_title_screen(engine, game)
 	}
 	if game.state == .Playing {
 		render_tooltip(game)
@@ -37,7 +38,7 @@ render_game :: proc(game: ^Game) {
 		render_game_over(game)
 	}
 	if game.state == .Viewing_Inventory {
-		render_inventory(game)
+		render_inventory(engine, game)
 	}
 	if game.state == .Viewing_Crafting {
 		render_crafting(game)

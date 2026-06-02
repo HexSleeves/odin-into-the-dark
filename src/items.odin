@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:math/rand"
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Item factory (data-driven) ───────────────────────────────────────────────
 
@@ -204,7 +205,8 @@ drop_item :: proc(game: ^Game, slot_index: int) -> bool {
 
 // ─── Render items on visible tiles ────────────────────────────────────────────
 
-render_items :: proc(game: ^Game) {
+render_items :: proc(engine: ^eng.Engine, game: ^Game) {
+	sprites := game_engine_sprite_manager(engine)
 	ox := i32(game.camera_x)
 	oy := i32(game.camera_y)
 
@@ -219,8 +221,8 @@ render_items :: proc(game: ^Game) {
 		iy := i32(item.pos.y * TILE_SIZE) - oy
 
 		if game.ui.use_sprites {
-			spr := get_item_sprite(item.item_type)
-			draw_sprite(spr, ix, iy, item.color)
+			spr := sprite_manager_item(sprites, item.item_type)
+			sprite_manager_draw(sprites, spr, ix, iy, item.color)
 		} else {
 			font_size :: i32(TILE_SIZE)
 			glyph_buf: [2]u8

@@ -1,6 +1,7 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Input result ─────────────────────────────────────────────────────────────
 
@@ -98,7 +99,7 @@ handle_forced_turn :: proc(game: ^Game) -> bool {
 	return false
 }
 
-handle_mining_input :: proc(game: ^Game, im: ^Input_Manager) -> bool {
+handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool {
 	if !game.ui.mining_mode {return false}
 
 	if action_pressed(im, .Quit) {
@@ -111,7 +112,7 @@ handle_mining_input :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 	if mdx != 0 || mdy != 0 {
 		game.ui.mining_mode = false
 		if mine_wall(game, mdx, mdy) {
-			play_sfx(.Mine)
+			audio_manager_play_sfx(game_engine_audio_manager(engine), .Mine)
 			spawn_mine_particles(
 				game.player.pos.x + mdx,
 				game.player.pos.y + mdy,
@@ -126,7 +127,7 @@ handle_mining_input :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 	return true
 }
 
-handle_playing_hotkeys :: proc(game: ^Game, im: ^Input_Manager) -> bool {
+handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool {
 	if action_pressed(im, .Crafting) {
 		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 		if cur != nil && cur.type == .Anvil {
@@ -146,8 +147,9 @@ handle_playing_hotkeys :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 	}
 
 	if action_pressed(im, .Toggle_Audio) {
-		audio_toggle()
-		if g_audio.enabled {
+		audio := game_engine_audio_manager(engine)
+		enabled := audio_manager_toggle(audio)
+		if enabled {
 			add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
 		} else {
 			add_message(game, "Sound: OFF", rl.Color{180, 180, 180, 255})
@@ -164,7 +166,8 @@ handle_playing_hotkeys :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 	}
 
 	if action_pressed(im, .Save) {
-		if save_game(game) {
+		saves := game_engine_save_manager(engine)
+		if save_manager_save_game(saves, game) {
 			add_message(game, "Game saved.", rl.Color{100, 255, 100, 255})
 		} else {
 			add_message(game, "Save failed!", rl.Color{255, 100, 100, 255})
@@ -173,7 +176,7 @@ handle_playing_hotkeys :: proc(game: ^Game, im: ^Input_Manager) -> bool {
 
 	if action_pressed(im, .Pickup) {
 		if pickup_item(game) {
-			play_sfx(.Pickup)
+			audio_manager_play_sfx(game_engine_audio_manager(engine), .Pickup)
 			spawn_pickup_particles(
 				game.player.pos.x,
 				game.player.pos.y,
@@ -210,7 +213,7 @@ TITLE_HIGH_SCORES :: 2
 TITLE_HELP :: 3
 TITLE_QUIT :: 4
 
-update_title_screen :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+update_title_screen :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if action_pressed(im, .Menu_Up) {
 		game.ui.title_choice = (game.ui.title_choice + TITLE_OPTION_COUNT - 1) % TITLE_OPTION_COUNT
 	}
@@ -220,38 +223,39 @@ update_title_screen :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 
 	if action_pressed(im, .Menu_New_Game) {
 		game.ui.title_choice = TITLE_NEW_GAME
-		return activate_title_choice(game)
+		return activate_title_choice(engine, game)
 	}
 	if action_pressed(im, .Menu_Continue) {
 		game.ui.title_choice = TITLE_CONTINUE
-		return activate_title_choice(game)
+		return activate_title_choice(engine, game)
 	}
 	if action_pressed(im, .Menu_High_Scores) {
 		game.ui.title_choice = TITLE_HIGH_SCORES
-		return activate_title_choice(game)
+		return activate_title_choice(engine, game)
 	}
 	if action_pressed(im, .Help) {
 		game.ui.title_choice = TITLE_HELP
-		return activate_title_choice(game)
+		return activate_title_choice(engine, game)
 	}
 	if action_pressed(im, .Menu_Quit) || action_pressed(im, .Menu_Back) {
 		return true
 	}
 	if action_pressed(im, .Menu_Confirm) {
-		return activate_title_choice(game)
+		return activate_title_choice(engine, game)
 	}
 
 	return false
 }
 
-activate_title_choice :: proc(game: ^Game) -> (quit: bool) {
+activate_title_choice :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 	switch game.ui.title_choice {
 	case TITLE_NEW_GAME:
 		death_sound_played = false
 		restart_game(game)
 	case TITLE_CONTINUE:
-		if save_exists() {
-			if load_game(game) {
+		saves := game_engine_save_manager(engine)
+		if save_manager_save_exists(saves) {
+			if save_manager_load_game(saves, game) {
 				death_sound_played = false
 			} else {
 				add_message(game, "Save file could not be loaded.", rl.Color{255, 180, 50, 255})
@@ -268,9 +272,10 @@ activate_title_choice :: proc(game: ^Game) -> (quit: bool) {
 	return false
 }
 
-handle_global_input :: proc(game: ^Game, im: ^Input_Manager) {
+handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Load) {
-		if load_game(game) {
+		saves := game_engine_save_manager(engine)
+		if save_manager_load_game(saves, game) {
 			death_sound_played = false
 		} else {
 			add_message(game, "No save file found.", rl.Color{255, 180, 50, 255})
@@ -278,16 +283,16 @@ handle_global_input :: proc(game: ^Game, im: ^Input_Manager) {
 	}
 }
 
-update_playing :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if handle_forced_turn(game) {return}
-	if handle_mining_input(game, im) {return}
-	if handle_playing_hotkeys(game, im) {return}
-	return handle_player_action(game)
+	if handle_mining_input(engine, game, im) {return}
+	if handle_playing_hotkeys(engine, game, im) {return}
+	return handle_player_action(engine, game)
 }
 
-update_game_over :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !death_sound_played {
-		play_sfx(.Death)
+		audio_manager_play_sfx(game_engine_audio_manager(engine), .Death)
 		spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
 		death_sound_played = true
 	}

@@ -2,6 +2,7 @@ package main
 
 import "core:fmt"
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Shared overlay helpers ───────────────────────────────────────────────────
 
@@ -40,7 +41,7 @@ draw_score_rows :: proc(base_y, row_size, row_h: i32, highlight_rank: int = -1) 
 
 // ─── Title and Scores screens ────────────────────────────────────────────────
 
-render_title_screen :: proc(game: ^Game) {
+render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 230})
 
 	draw_centered_text("INTO THE DEPTHS", 110, 48, rl.Color{255, 230, 120, 255})
@@ -54,7 +55,8 @@ render_title_screen :: proc(game: ^Game) {
 		"Quit",
 	}
 
-	has_save := save_exists()
+	saves := game_engine_save_manager(engine)
+	has_save := save_manager_save_exists(saves)
 	base_y :: i32(245)
 	row_h :: i32(38)
 	for label, idx in options {
@@ -86,7 +88,8 @@ render_high_scores :: proc(game: ^Game) {
 
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
 
-render_inventory :: proc(game: ^Game) {
+render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
+	sprites := game_engine_sprite_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
 
 	title := cstring("INVENTORY")
@@ -137,8 +140,8 @@ render_inventory :: proc(game: ^Game) {
 			name := item_display_name(&it)
 			text_x := slot_x
 			if game.ui.use_sprites {
-				spr := get_item_sprite(it.item_type)
-				draw_sprite(spr, slot_x, y_pos, rl.WHITE)
+				spr := sprite_manager_item(sprites, it.item_type)
+				sprite_manager_draw(sprites, spr, slot_x, y_pos, rl.WHITE)
 				text_x = slot_x + 20
 			}
 			if it.quantity > 1 {
@@ -209,8 +212,8 @@ render_inventory :: proc(game: ^Game) {
 		if es.slot.occupied {
 			eq_text_x := slot_x
 			if game.ui.use_sprites {
-				spr := get_item_sprite(es.slot.item.item_type)
-				draw_sprite(spr, slot_x, eq_y, rl.WHITE)
+				spr := sprite_manager_item(sprites, es.slot.item.item_type)
+				sprite_manager_draw(sprites, spr, slot_x, eq_y, rl.WHITE)
 				eq_text_x = slot_x + 20
 			}
 			bonus_label: cstring
