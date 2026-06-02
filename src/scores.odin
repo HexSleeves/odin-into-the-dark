@@ -1,7 +1,6 @@
 package main
 
 import "core:encoding/json"
-import "core:fmt"
 import "core:os"
 
 // ─── High Score Table ─────────────────────────────────────────────────────────
@@ -35,7 +34,7 @@ load_scores :: proc() -> Score_Table {
 
 	parse_err := json.unmarshal(data, &result)
 	if parse_err != nil {
-		fmt.eprintfln("[scores] WARNING: parse failed for %s: %v", SCORES_FILE, parse_err)
+		logger_warnf(.Scores, "parse failed for %s: %v", SCORES_FILE, parse_err)
 		return {}
 	}
 
@@ -45,14 +44,14 @@ load_scores :: proc() -> Score_Table {
 save_scores :: proc(table: ^Score_Table) {
 	data, marshal_err := json.marshal(table^, allocator = context.allocator)
 	if marshal_err != nil {
-		fmt.eprintfln("[scores] ERROR: marshal failed: %v", marshal_err)
+		logger_errorf(.Scores, "marshal failed: %v", marshal_err)
 		return
 	}
 	defer delete(data, context.allocator)
 
 	write_err := os.write_entire_file(SCORES_FILE, data)
 	if write_err != nil {
-		fmt.eprintfln("[scores] ERROR: write failed for %s: %v", SCORES_FILE, write_err)
+		logger_errorf(.Scores, "write failed for %s: %v", SCORES_FILE, write_err)
 	}
 }
 

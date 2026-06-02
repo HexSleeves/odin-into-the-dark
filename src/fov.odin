@@ -1,6 +1,6 @@
 package main
 
-import "core:fmt"
+import "core:log"
 
 // ─── FOV computation (recursive shadowcasting) ───────────────────────────────
 //
@@ -48,14 +48,14 @@ compute_fov :: proc(game: ^Game) {
 	}
 
 	// Diagnostic: count visible tiles
-	if DEBUG_LOGS {
+	if logger_should_log(&g_logger, log.Level.Debug, .Fov) {
 		visible_count := 0
 		for &tile in game.tiles {
 			if tile.visible {
 				visible_count += 1
 			}
 		}
-		fmt.printfln("[fov] recomputed: %v tiles visible (radius=%v)", visible_count, radius)
+		logger_debugf(.Fov, "recomputed: %v tiles visible (radius=%v)", visible_count, radius)
 	}
 }
 

@@ -1,12 +1,13 @@
 package main
 
-import "core:fmt"
-
 import rl "vendor:raylib"
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 main :: proc() {
+	logger_init_from_env(&g_logger)
+	defer logger_destroy(&g_logger)
+
 	rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
@@ -19,16 +20,14 @@ main :: proc() {
 
 	// Load all external data files (enemies, items, player)
 	if !data_load_all() {
-		fmt.eprintln("[FATAL] Failed to load data files. Exiting.")
+		logger_fatalf(.App, "Failed to load data files. Exiting.")
 		return
 	}
 
 	game := game_init()
 	defer game_destroy(game)
 
-	if DEBUG_LOGS {
-		fmt.printfln("Seed: %v", game.seed)
-	}
+	logger_debugf(.Init, "seed = %v", game.seed)
 
 	compute_fov(game)
 	camera_update(game, snap = true)

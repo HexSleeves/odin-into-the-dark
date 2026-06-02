@@ -107,14 +107,14 @@ g_data: Data_Registry
 load_json5 :: proc($T: typeid, path: string) -> (result: T, ok: bool) {
 	data, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {
-		fmt.eprintfln("[data] ERROR: could not read %s: %v", path, read_err)
+		logger_errorf(.Data, "could not read %s: %v", path, read_err)
 		return {}, false
 	}
 	defer delete(data, context.allocator)
 
 	parse_err := json.unmarshal(data, &result, spec = .JSON5)
 	if parse_err != nil {
-		fmt.eprintfln("[data] ERROR: parse failed for %s: %v", path, parse_err)
+		logger_errorf(.Data, "parse failed for %s: %v", path, parse_err)
 		return {}, false
 	}
 
@@ -136,14 +136,13 @@ data_load_all :: proc() -> bool {
 	g_data.player = player
 	g_data.loaded = true
 
-	if DEBUG_LOGS {
-		fmt.printfln(
-			"[data] loaded %v enemies, %v spawn tables, %v items",
-			len(g_data.enemies.enemies),
-			len(g_data.enemies.spawn_tables),
-			len(g_data.items.items),
-		)
-	}
+	logger_debugf(
+		.Data,
+		"loaded %v enemies, %v spawn tables, %v items",
+		len(g_data.enemies.enemies),
+		len(g_data.enemies.spawn_tables),
+		len(g_data.items.items),
+	)
 
 	return true
 }

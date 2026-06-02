@@ -13,7 +13,7 @@ item_make :: proc(id: string, pos: Vec2) -> Item {
 		return item_make_from_def(def, pos)
 	}
 	// Fallback: unknown item
-	fmt.eprintfln("[item] WARNING: unknown item id '%s'", id)
+	logger_warnf(.Items, "unknown item id '%s'", id)
 	return Item {
 		pos = pos,
 		item_type = id,
@@ -261,9 +261,7 @@ spawn_items :: proc(game: ^Game) {
 				spawned += 1
 			}
 		}
-		if DEBUG_LOGS {
-			fmt.printfln("[items] spawned %v items (cave, depth=%v)", spawned, game.depth)
-		}
+		logger_debugf(.Items, "spawned %v items (cave, depth=%v)", spawned, game.depth)
 		return
 	}
 
@@ -309,12 +307,11 @@ spawn_items :: proc(game: ^Game) {
 		_ = placed
 	}
 
-	if DEBUG_LOGS {
-		fmt.printfln(
-			"[items] spawned %v items across %v rooms (depth=%v)",
-			total,
-			len(game.rooms) - 1,
-			game.depth,
-		)
-	}
+	logger_debugf(
+		.Items,
+		"spawned %v items across %v rooms (depth=%v)",
+		total,
+		len(game.rooms) - 1,
+		game.depth,
+	)
 }

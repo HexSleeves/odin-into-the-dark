@@ -13,7 +13,7 @@ enemy_make :: proc(id: string, pos: Vec2) -> Enemy {
 		return enemy_make_from_def(def, pos)
 	}
 	// Fallback: unknown enemy
-	fmt.eprintfln("[enemy] WARNING: unknown enemy id '%s'", id)
+	logger_warnf(.Enemy, "unknown enemy id '%s'", id)
 	return Enemy {
 		pos = pos,
 		hp = 1,
@@ -58,14 +58,13 @@ spawn_enemies :: proc(game: ^Game) {
 				}
 			}
 		}
-		if DEBUG_LOGS {
-			fmt.printfln(
-				"[enemy] spawned %v enemies across %v rooms (depth=%v)",
-				total,
-				len(game.rooms) - 1,
-				game.depth,
-			)
-		}
+		logger_debugf(
+			.Enemy,
+			"spawned %v enemies across %v rooms (depth=%v)",
+			total,
+			len(game.rooms) - 1,
+			game.depth,
+		)
 	} else {
 		// Cave layout: scatter enemies on random floor tiles
 		target := 3 + game.depth + game.depth / 2 // slower scaling
@@ -90,9 +89,7 @@ spawn_enemies :: proc(game: ^Game) {
 				spawned += 1
 			}
 		}
-		if DEBUG_LOGS {
-			fmt.printfln("[enemy] spawned %v enemies (cave, depth=%v)", spawned, game.depth)
-		}
+		logger_debugf(.Enemy, "spawned %v enemies (cave, depth=%v)", spawned, game.depth)
 	}
 }
 

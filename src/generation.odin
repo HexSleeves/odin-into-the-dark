@@ -1,6 +1,5 @@
 package main
 
-import "core:fmt"
 import "core:math/rand"
 import "core:slice"
 import rl "vendor:raylib"
@@ -182,17 +181,16 @@ generate_rooms :: proc(game: ^Game) {
 	}
 
 	// (h) Diagnostics log
-	if DEBUG_LOGS {
-		fmt.printfln(
-			"[gen] rooms: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
-			game.seed,
-			len(game.rooms),
-			game.player.pos.x,
-			game.player.pos.y,
-			descent_pos.x,
-			descent_pos.y,
-		)
-	}
+	logger_debugf(
+		.Gen,
+		"rooms: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
+		game.seed,
+		len(game.rooms),
+		game.player.pos.x,
+		game.player.pos.y,
+		descent_pos.x,
+		descent_pos.y,
+	)
 }
 
 // ─── Hazard tile spawning (depth-gated) ───────────────────────────────────────
@@ -253,9 +251,7 @@ spawn_hazards :: proc(game: ^Game) {
 		}
 	}
 
-	if DEBUG_LOGS {
-		fmt.printfln("[gen] hazards spawned (depth=%v)", depth)
-	}
+	logger_debugf(.Gen, "hazards spawned (depth=%v)", depth)
 }
 
 // ─── Ore vein spawning (depth-gated) ──────────────────────────────────────────
@@ -337,9 +333,7 @@ spawn_ore_veins :: proc(game: ^Game) {
 		}
 	}
 
-	if DEBUG_LOGS {
-		fmt.printfln("[gen] ore veins spawned (depth=%v)", depth)
-	}
+	logger_debugf(.Gen, "ore veins spawned (depth=%v)", depth)
 }
 
 // ─── Anvil spawning (one per floor) ───────────────────────────────────────────
@@ -355,9 +349,7 @@ spawn_anvil :: proc(game: ^Game) {
 		if enemy_at(game, x, y) != nil {continue}
 		if item_at(game, x, y) != nil {continue}
 		game.tiles[idx].type = .Anvil
-		if DEBUG_LOGS {
-			fmt.printfln("[gen] anvil at (%v,%v)", x, y)
-		}
+		logger_debugf(.Gen, "anvil at (%v,%v)", x, y)
 		return
 	}
 }
@@ -390,9 +382,7 @@ spawn_boss :: proc(game: ^Game) {
 							boss := enemy_make_from_def(def, Vec2{bx, by})
 							boss.is_boss = true
 							append(&game.enemies, boss)
-							if DEBUG_LOGS {
-								fmt.printfln("[gen] boss '%s' spawned at (%v,%v)", boss_id, bx, by)
-							}
+							logger_debugf(.Gen, "boss '%s' spawned at (%v,%v)", boss_id, bx, by)
 						}
 						return
 					}

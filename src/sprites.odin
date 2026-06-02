@@ -1,7 +1,6 @@
 package main
 
 import "core:encoding/json"
-import "core:fmt"
 import "core:os"
 import rl "vendor:raylib"
 
@@ -58,7 +57,7 @@ sprites_init :: proc() {
 	// Load sprite mapping data
 	data, read_err := os.read_entire_file("data/sprites.json5", context.allocator)
 	if read_err != nil {
-		fmt.eprintln("[sprites] ERROR: could not read data/sprites.json5")
+		logger_errorf(.Sprites, "could not read data/sprites.json5: %v", read_err)
 		return
 	}
 	defer delete(data, context.allocator)
@@ -66,7 +65,7 @@ sprites_init :: proc() {
 	sprite_data: Sprite_Data
 	parse_err := json.unmarshal(data, &sprite_data, spec = .JSON5)
 	if parse_err != nil {
-		fmt.eprintfln("[sprites] ERROR: parse failed for data/sprites.json5: %v", parse_err)
+		logger_errorf(.Sprites, "parse failed for data/sprites.json5: %v", parse_err)
 		return
 	}
 
@@ -83,7 +82,7 @@ sprites_init :: proc() {
 
 	g_sprites.texture = rl.LoadTexture(path_cstr)
 	if g_sprites.texture.id == 0 {
-		fmt.eprintfln("[sprites] ERROR: failed to load texture '%s'", tileset_path)
+		logger_errorf(.Sprites, "failed to load texture '%s'", tileset_path)
 		return
 	}
 
@@ -114,14 +113,13 @@ sprites_init :: proc() {
 	tile_count := len(sprite_data.tiles)
 	char_count := len(sprite_data.characters)
 	item_count := len(sprite_data.items)
-	if DEBUG_LOGS {
-		fmt.printfln(
-			"[sprites] loaded '%s' (%dx%d) — %d tiles, %d chars, %d items",
-			tileset_path,
-			g_sprites.texture.width, g_sprites.texture.height,
-			tile_count, char_count, item_count,
-		)
-	}
+	logger_debugf(
+		.Sprites,
+		"loaded '%s' (%dx%d) - %d tiles, %d chars, %d items",
+		tileset_path,
+		g_sprites.texture.width, g_sprites.texture.height,
+		tile_count, char_count, item_count,
+	)
 }
 
 sprites_cleanup :: proc() {

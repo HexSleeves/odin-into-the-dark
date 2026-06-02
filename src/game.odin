@@ -1,6 +1,5 @@
 package main
 
-import "core:fmt"
 import "core:math/rand"
 import "core:time"
 
@@ -10,9 +9,7 @@ game_init :: proc() -> ^Game {
 	// Derive seed from current time
 	seed := u64(time.time_to_unix_nano(time.now()))
 
-	if DEBUG_LOGS {
-		fmt.printfln("[init] seed = %v", seed)
-	}
+	logger_debugf(.Init, "seed = %v", seed)
 
 	// Initialize RNG (used later by proc-gen in S02; seeded now for R014)
 	rand.reset(seed)
@@ -54,9 +51,7 @@ game_init :: proc() -> ^Game {
 
 game_reinit :: proc(game: ^Game) {
 	seed := u64(time.time_to_unix_nano(time.now()))
-	if DEBUG_LOGS {
-		fmt.printfln("[init] seed = %v", seed)
-	}
+	logger_debugf(.Init, "seed = %v", seed)
 	rand.reset(seed)
 
 	game.seed = seed
