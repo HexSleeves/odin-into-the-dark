@@ -199,218 +199,6 @@ update_playing :: proc(game: ^Game) -> (quit: bool) {
 	return handle_player_action(game)
 }
 
-handle_forced_turn :: proc(game: ^Game) -> bool {
-	// Web: skip player's turn if stuck
-	if game.skip_next_turn {
-		game.skip_next_turn = false
-		game.turn_count += 1
-		hp_before := game.player.hp
-		advance_turn(game, hp_before)
-		add_message(game, "You break free from the web.", rl.Color{200, 200, 100, 255})
-		return true
-	}
-
-	// Water: costs an extra turn
-	if game.water_slow_active {
-		game.water_slow_active = false
-		game.turn_count += 1
-		hp_before := game.player.hp
-		advance_turn(game, hp_before)
-		add_message(game, "You push through the water.", rl.Color{40, 80, 180, 255})
-		return true
-	}
-
-	return false
-}
-
-handle_mining_input :: proc(game: ^Game) -> bool {
-	if !game.ui.mining_mode {return false}
-
-	if rl.IsKeyPressed(.ESCAPE) {
-		game.ui.mining_mode = false
-		add_message(game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
-		return true
-	}
-
-	mdx, mdy := read_cardinal_press()
-	if mdx != 0 || mdy != 0 {
-		game.ui.mining_mode = false
-		if mine_wall(game, mdx, mdy) {
-			play_sfx(.Mine)
-			spawn_mine_particles(
-				game.player.pos.x + mdx,
-				game.player.pos.y + mdy,
-				game.camera_x,
-				game.camera_y,
-			)
-			hp_before := game.player.hp
-			advance_turn(game, hp_before)
-		}
-	}
-
-	return true
-}
-
-read_cardinal_press :: proc() -> (dx, dy: int) {
-	if rl.IsKeyPressed(.W) || rl.IsKeyPressed(.UP) {dy = -1}
-	if rl.IsKeyPressed(.S) || rl.IsKeyPressed(.DOWN) {dy = 1}
-	if rl.IsKeyPressed(.A) || rl.IsKeyPressed(.LEFT) {dx = -1}
-	if rl.IsKeyPressed(.D) || rl.IsKeyPressed(.RIGHT) {dx = 1}
-	return
-}
-
-handle_playing_hotkeys :: proc(game: ^Game) -> bool {
-	// C key: open crafting if on anvil
-	if rl.IsKeyPressed(.C) {
-		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
-		if cur != nil && cur.type == .Anvil {
-			game.state = .Viewing_Crafting
-			return true
-		}
-		add_message(
-			game,
-			"You need to stand on an anvil to craft.",
-			rl.Color{180, 180, 180, 255},
-		)
-	}
-
-	// X key: enter mining mode
-	if rl.IsKeyPressed(.X) {
-		start_mining_mode(game)
-		return true
-	}
-
-	// M key: toggle minimap
-	if rl.IsKeyPressed(.M) {
-		game.ui.show_minimap = !game.ui.show_minimap
-	}
-
-	// F1 key: toggle audio
-	if rl.IsKeyPressed(.F1) {
-		audio_toggle()
-		if g_audio.enabled {
-			add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
-		} else {
-			add_message(game, "Sound: OFF", rl.Color{180, 180, 180, 255})
-		}
-	}
-
-	// F2 key: toggle ASCII / Sprite mode
-	if rl.IsKeyPressed(.F2) {
-		game.ui.use_sprites = !game.ui.use_sprites
-		if game.ui.use_sprites {
-			add_message(game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
-		} else {
-			add_message(game, "Render: ASCII", rl.Color{180, 180, 180, 255})
-		}
-	}
-
-	// F5 key: save game
-	if rl.IsKeyPressed(.F5) {
-		if save_game(game) {
-			add_message(game, "Game saved.", rl.Color{100, 255, 100, 255})
-		} else {
-			add_message(game, "Save failed!", rl.Color{255, 100, 100, 255})
-		}
-	}
-
-	// G key: pick up item (instant, no turn cost)
-	if rl.IsKeyPressed(.G) {
-		if pickup_item(game) {
-			play_sfx(.Pickup)
-			spawn_pickup_particles(
-				game.player.pos.x,
-				game.player.pos.y,
-				game.camera_x,
-				game.camera_y,
-			)
-		}
-	}
-
-	// I key: open inventory screen
-	if rl.IsKeyPressed(.I) {
-		game.state = .Viewing_Inventory
-		game.ui.inspect_slot = 0
-		return true
-	}
-
-	// ? key: open help screen
-	if (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.LEFT_SHIFT)) ||
-	   (rl.IsKeyPressed(.SLASH) && rl.IsKeyDown(.RIGHT_SHIFT)) {
-		game.ui.return_to_title = false
-		game.state = .Viewing_Help
-		return true
-	}
-
-	return false
-}
-
-start_mining_mode :: proc(game: ^Game) {
-	can_mine := false
-	if !game.equipped_weapon.occupied {
-		add_message(game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
-	} else if game.equipped_weapon.item.max_durability > 0 &&
-	   game.equipped_weapon.item.durability <= 0 {
-		add_message(
-			game,
-			fmt.tprintf("Your %s is broken!", game.equipped_weapon.item.name),
-			rl.Color{255, 100, 100, 255},
-		)
-	} else {
-		can_mine = true
-	}
-
-	if can_mine {
-		game.ui.mining_mode = true
-		add_message(
-			game,
-			"Mine which direction? (WASD/arrows, ESC cancel)",
-			rl.Color{200, 200, 100, 255},
-		)
-	}
-}
-
-handle_player_action :: proc(game: ^Game) -> (quit: bool) {
-	game.prev_player_pos = game.player.pos
-	kills_before := game.kills
-	result := handle_input(game)
-
-	switch result {
-	case .Quit:
-		return true
-	case .Moved:
-		handle_player_moved(game, kills_before)
-	case .Waited:
-		hp_before := game.player.hp
-		advance_turn(game, hp_before)
-	case .Descended:
-		handle_player_descended(game)
-	case .None:
-	}
-
-	return false
-}
-
-handle_player_moved :: proc(game: ^Game, kills_before: int) {
-	// Combat hit particles when a kill happened this turn
-	if game.kills > kills_before {
-		spawn_hit_particles(
-			game.prev_player_pos.x,
-			game.prev_player_pos.y,
-			game.camera_x,
-			game.camera_y,
-		)
-	}
-	play_sfx(.Footstep)
-
-	consume_web_if_present(game)
-	apply_current_tile_effects(game)
-	collapse_unstable_previous_tile(game)
-
-	hp_before := game.player.hp
-	advance_turn(game, hp_before)
-	announce_item_under_player(game)
-}
 
 consume_web_if_present :: proc(game: ^Game) {
 	pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
@@ -445,8 +233,7 @@ apply_current_tile_effects :: proc(game: ^Game) {
 }
 
 collapse_unstable_previous_tile :: proc(game: ^Game) {
-	if game.prev_player_pos.x == game.player.pos.x &&
-	   game.prev_player_pos.y == game.player.pos.y {
+	if game.prev_player_pos.x == game.player.pos.x && game.prev_player_pos.y == game.player.pos.y {
 		return
 	}
 
@@ -467,23 +254,11 @@ announce_item_under_player :: proc(game: ^Game) {
 	)
 }
 
-handle_player_descended :: proc(game: ^Game) {
-	play_sfx(.Descent)
-	game.vfx.flash_color = rl.Color{255, 255, 255, 255}
-	game.vfx.flash_alpha = 0.5
-	hp_before := game.player.hp
-	advance_turn(game, hp_before)
-}
 
 update_game_over :: proc(game: ^Game) -> (quit: bool) {
 	if !death_sound_played {
 		play_sfx(.Death)
-		spawn_death_particles(
-			game.player.pos.x,
-			game.player.pos.y,
-			game.camera_x,
-			game.camera_y,
-		)
+		spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
 		death_sound_played = true
 	}
 	if !game.score_saved {
