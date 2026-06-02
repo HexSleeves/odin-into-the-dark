@@ -28,9 +28,9 @@ save_manager_save_game :: proc(saves: ^Save_Manager, turns: ^eng.Turn_Manager, g
 	return save_game_to_path(turns, game, saves.file_path)
 }
 
-save_manager_load_game :: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
+save_manager_load_game :: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	if saves == nil {
-		return load_game(content, turns, camera, messages, game)
+		return load_game(content, turns, camera, vfx, ui, messages, game)
 	}
-	return load_game_from_path(content, turns, camera, messages, game, saves.file_path)
+	return load_game_from_path(content, turns, camera, vfx, ui, messages, game, saves.file_path)
 }

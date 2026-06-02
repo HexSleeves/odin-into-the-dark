@@ -26,7 +26,8 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, game_engine_camera_manager(&engine) != nil)
 	testing.expect(t, game_engine_turn_manager(&engine) != nil)
 	testing.expect(t, game_engine_vfx_manager(&engine) != nil)
-	testing.expect_value(t, services.service_count, 11)
+	testing.expect(t, game_engine_ui_manager(&engine) != nil)
+	testing.expect_value(t, services.service_count, 12)
 	for i in 0 ..< services.service_count {
 		testing.expect(t, services.services[i].owned)
 	}

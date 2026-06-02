@@ -23,9 +23,6 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game.map_height = MAP_HEIGHT
 	game.depth = 1
 	game.state = .Title_Screen
-	game.ui.use_sprites = g_sprites.loaded
-	game.ui.inspect_slot = -1
-	game.ui.title_choice = 0
 
 	// Player defaults from data (position set by generate_map)
 	init_player_from_content(content, game)
@@ -57,8 +54,6 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	game.map_height = MAP_HEIGHT
 	game.depth = 1
 	game.state = .Playing
-	game.ui.use_sprites = g_sprites.loaded
-	game.ui.inspect_slot = -1
 
 	init_player_from_content(content, game)
 

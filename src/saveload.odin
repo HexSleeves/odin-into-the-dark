@@ -380,11 +380,11 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
-load_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
-	return load_game_from_path(content, turns, camera, messages, game, SAVE_FILE)
+load_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
+	return load_game_from_path(content, turns, camera, vfx, ui, messages, game, SAVE_FILE)
 }
 
-load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game, path: string) -> bool {
+load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game, path: string) -> bool {
 	buf, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {return false}
 	defer delete(buf, context.allocator)
@@ -491,16 +491,12 @@ load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager,
 	clear_messages(messages)
 	add_message(messages, game, "Game loaded.", rl.Color{100, 255, 100, 255})
 
-	// Reset transient UI modes on load
-	game.ui.mining_mode = false
-	game.ui.dropping = false
-	game.ui.equipping = false
-	game.ui.show_minimap = false
-	game.ui.inspect_slot = -1
+	// Reset transient UI modes on load.
+	ui_manager_reset_transient(ui)
 	// use_sprites intentionally NOT reset — player render preference is sticky
 
-	// Reset VFX (all fields zero is correct)
-	game.vfx = {}
+	// Reset transient VFX.
+	eng.vfx_manager_reset(vfx)
 
 	// ── Delete save file (roguelike: one load per save) ──
 	os.remove(path)

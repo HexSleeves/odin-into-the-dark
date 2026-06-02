@@ -25,7 +25,7 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	collapse_unstable_previous_tile(messages, game)
 
 	hp_before := game.player.hp
-	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game, hp_before)
+	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
 	announce_item_under_player(messages, game)
 }
 
@@ -42,7 +42,7 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		handle_player_moved(engine, game, kills_before)
 	case .Waited:
 		hp_before := game.player.hp
-		advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game, hp_before)
+		advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
 	case .Descended:
 		handle_player_descended(engine, game)
 	case .None:
@@ -57,7 +57,7 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 	audio_manager_play_sfx(game_engine_audio_manager(engine), .Descent)
 	eng.vfx_manager_flash(vfx, rl.Color{255, 255, 255, 255}, 0.5)
 	hp_before := game.player.hp
-	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game, hp_before)
+	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
 }
 
 // ─── Descent to next floor ───────────────────────────────────────────────────
@@ -92,7 +92,7 @@ descend :: proc(content: ^Content_Manager, camera: ^eng.Camera_Manager, messages
 	)
 }
 
-start_mining_mode :: proc(messages: ^Message_Manager, game: ^Game) {
+start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {
 	can_mine := false
 	if !game.equipped_weapon.occupied {
 		add_message(messages, game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
@@ -109,7 +109,7 @@ start_mining_mode :: proc(messages: ^Message_Manager, game: ^Game) {
 	}
 
 	if can_mine {
-		game.ui.mining_mode = true
+		ui_manager_state(ui).mining_mode = true
 		add_message(
 			messages,
 			game,
@@ -121,7 +121,7 @@ start_mining_mode :: proc(messages: ^Message_Manager, game: ^Game) {
 
 // ─── Turn helpers ─────────────────────────────────────────────────────────────
 
-advance_turn :: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game, hp_before: int) {
+advance_turn :: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, messages: ^Message_Manager, game: ^Game, hp_before: int) {
 	_ = turns
 	process_enemy_turns(messages, game)
 	process_enemy_abilities(messages, game)
@@ -130,7 +130,7 @@ advance_turn :: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, mess
 	compute_fov(game)
 	game_camera_update(camera, game)
 	if game.player.hp < hp_before {
-		eng.vfx_manager_flash(game_engine_vfx_manager_from_messages(messages), rl.Color{255, 0, 0, 255}, 0.3)
+		eng.vfx_manager_flash(vfx, rl.Color{255, 0, 0, 255}, 0.3)
 	}
 }
 
@@ -147,10 +147,12 @@ save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^
 	score_manager_save(scores, &table)
 }
 
-restart_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) {
+restart_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {
 	game_cleanup(game)
 	game^ = {}
 	eng.turn_manager_reset(turns)
+	eng.vfx_manager_reset(vfx)
+	ui_manager_reset_for_new_game(ui, g_sprites.loaded)
 	game_reinit(content, messages, game)
 	compute_fov(game)
 	game_camera_update(camera, game, true)
@@ -185,8 +187,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 3
-		game.vfx.flash_color = rl.Color{160, 180, 40, 255}
-		game.vfx.flash_alpha = 0.4
+		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{160, 180, 40, 255}, 0.4)
 		add_message(messages, game, "Toxic gas burns you! (-3 HP)", rl.Color{160, 180, 40, 255})
 		if game.player.hp <= 0 {
 			game.death_cause = "Suffocated by toxic gas"

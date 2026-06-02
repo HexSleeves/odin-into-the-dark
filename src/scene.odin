@@ -168,7 +168,7 @@ game_scene_victory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_inventory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^Game)ctx
-	update_viewing_inventory(game_engine_content_manager(engine), game_engine_message_manager(engine), game, game_engine_input_manager(engine))
+	update_viewing_inventory(game_engine_content_manager(engine), game_engine_ui_manager(engine), game_engine_message_manager(engine), game, game_engine_input_manager(engine))
 	return false
 }
 
@@ -180,7 +180,7 @@ game_scene_crafting_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_help_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^Game)ctx
-	update_viewing_help(game, game_engine_input_manager(engine))
+	update_viewing_help(game_engine_ui_manager(engine), game, game_engine_input_manager(engine))
 	return false
 }
 

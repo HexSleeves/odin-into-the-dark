@@ -22,7 +22,7 @@ save_manager_save_exists_uses_configured_path :: proc(t: ^testing.T) {
 @(test)
 save_manager_load_accepts_message_manager_context :: proc(t: ^testing.T) {
 	save_handler: proc(saves: ^Save_Manager, turns: ^eng.Turn_Manager, game: ^Game) -> bool = save_manager_save_game
-	load_handler: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, messages: ^Message_Manager, game: ^Game) -> bool = save_manager_load_game
+	load_handler: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) -> bool = save_manager_load_game
 
 	testing.expect(t, save_handler != nil)
 	testing.expect(t, load_handler != nil)

@@ -203,6 +203,4 @@ Game :: struct {
 	death_cause:       string,
 	score_saved:       bool,
 	last_score_rank:   int,
-	// UI
-	ui:                UI_State,
 }

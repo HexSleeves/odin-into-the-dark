@@ -9,9 +9,9 @@ content_handlers_accept_content_manager_context :: proc(t: ^testing.T) {
 	game_reinit_handler: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) = game_reinit
 	player_init_handler: proc(content: ^Content_Manager, game: ^Game) = init_player_from_content
 	starter_gear_handler: proc(content: ^Content_Manager, game: ^Game) = give_starter_gear
-	restart_handler: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) = restart_game
+	restart_handler: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) = restart_game
 	descend_handler: proc(content: ^Content_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) = descend
-	advance_handler: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game, hp_before: int) = advance_turn
+	advance_handler: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, messages: ^Message_Manager, game: ^Game, hp_before: int) = advance_turn
 	map_handler: proc(content: ^Content_Manager, game: ^Game) = generate_map
 	enemy_spawn_handler: proc(content: ^Content_Manager, game: ^Game) = spawn_enemies
 	item_spawn_handler: proc(content: ^Content_Manager, game: ^Game) = spawn_items

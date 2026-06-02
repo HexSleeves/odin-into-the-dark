@@ -8,6 +8,7 @@ import eng "./engine"
 
 render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	turns := game_engine_turn_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	hud_y := i32(MAP_VIEW_HEIGHT)
 
 	// Background bar
@@ -119,7 +120,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	}
 
 	// Mining mode indicator (centered at top of screen)
-	if game.ui.mining_mode {
+	if ui.mining_mode {
 		mine_text := cstring("[MINING] Choose direction (WASD/arrows) | ESC cancel")
 		mine_w := rl.MeasureText(mine_text, 14)
 		rl.DrawText(

@@ -16,6 +16,7 @@ GAME_ENGINE_SERVICE_MESSAGES :: eng.Engine_Service_Id(8)
 GAME_ENGINE_SERVICE_CAMERA :: eng.Engine_Service_Id(9)
 GAME_ENGINE_SERVICE_TURNS :: eng.Engine_Service_Id(10)
 GAME_ENGINE_SERVICE_VFX :: eng.Engine_Service_Id(11)
+GAME_ENGINE_SERVICE_UI :: eng.Engine_Service_Id(12)
 
 Into_The_Depths_App_State :: struct {
 	game:              ^Game,
@@ -72,6 +73,7 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	camera := eng.camera_manager_make()
 	turns := eng.turn_manager_make()
 	vfx := eng.vfx_manager_make()
+	ui := ui_manager_make(g_sprites.loaded)
 	return eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_CONTENT, &content, size_of(Content_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SAVES, &saves, size_of(Save_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_AUDIO, &audio, size_of(Audio_Manager)) != nil &&
@@ -82,7 +84,8 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_MESSAGES, &messages, size_of(Message_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_CAMERA, &camera, size_of(eng.Camera_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_TURNS, &turns, size_of(eng.Turn_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_VFX, &vfx, size_of(eng.Vfx_Manager)) != nil
+	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_VFX, &vfx, size_of(eng.Vfx_Manager)) != nil &&
+	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_UI, &ui, size_of(UI_Manager)) != nil
 }
 
 game_engine_content_manager :: proc(engine: ^eng.Engine) -> ^Content_Manager {
@@ -160,6 +163,13 @@ game_engine_vfx_manager :: proc(engine: ^eng.Engine) -> ^eng.Vfx_Manager {
 		return nil
 	}
 	return cast(^eng.Vfx_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_VFX)
+}
+
+game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
+	if engine == nil || engine.services == nil {
+		return nil
+	}
+	return cast(^UI_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_UI)
 }
 
 game_app_make :: proc() -> eng.Game_App {

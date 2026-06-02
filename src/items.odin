@@ -213,6 +213,7 @@ drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> b
 render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	ox := i32(game_camera_x(camera))
 	oy := i32(game_camera_y(camera))
 
@@ -226,7 +227,7 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
 
-		if game.ui.use_sprites {
+		if ui.use_sprites {
 			spr := sprite_manager_item(sprites, item.item_type)
 			sprite_manager_draw(sprites, spr, ix, iy, item.color)
 		} else {

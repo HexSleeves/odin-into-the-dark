@@ -110,10 +110,12 @@ visible_tile_bounds :: proc(camera: ^eng.Camera_Manager) -> (x0, y0, x1, y1: int
 // ─── Map rendering (with camera offset) ───────────────────────────────────────
 
 render_map :: proc(engine: ^eng.Engine, game: ^Game) {
-	game.vfx.anim_frame += 1
+	vfx := game_engine_vfx_manager(engine)
+	eng.vfx_manager_tick_frame(vfx)
 
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	ox := i32(game_camera_x(camera))
 	oy := i32(game_camera_y(camera))
 	palette := palette_for_depth(game.depth)
@@ -143,7 +145,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 					tint = rl.Color{u8(f32(base.r) * dim), u8(f32(base.g) * dim), u8(f32(base.b) * dim), 255}
 				}
 
-				if game.ui.use_sprites {
+					if ui.use_sprites {
 					spr := sprite_manager_tile(sprites, tile.type)
 					sprite_manager_draw(sprites, spr, sx, sy, tint)
 				} else {
@@ -159,7 +161,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 						if !tile.visible {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
-						if game.ui.use_sprites {
+							if ui.use_sprites {
 							spr := sprite_manager_named(sprites, "tile", "ore_vein")
 							sprite_manager_draw(sprites, spr, sx, sy, ore_tint)
 						} else {
@@ -179,6 +181,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	ox := i32(game_camera_x(camera))
 	oy := i32(game_camera_y(camera))
 
@@ -198,7 +201,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-			if game.ui.use_sprites {
+				if ui.use_sprites {
 				spr := sprite_manager_named(sprites, "tile", "web")
 				sprite_manager_draw(sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
 			} else {
@@ -213,14 +216,16 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	px := i32(game.player.pos.x * TILE_SIZE) - i32(game_camera_x(camera))
 	py := i32(game.player.pos.y * TILE_SIZE) - i32(game_camera_y(camera))
 
-	bob_phase := f32(game.vfx.anim_frame) * 0.06
+	bob_phase := f32(eng.vfx_manager_frame(vfx)) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
 	py += bob_offset
 
-	if game.ui.use_sprites {
+	if ui.use_sprites {
 		spr := sprite_manager_named(sprites, "character", "player")
 		sprite_manager_draw(sprites, spr, px, py, game.player.color)
 	} else {
@@ -236,6 +241,8 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	ox := i32(game_camera_x(camera))
 	oy := i32(game_camera_y(camera))
 
@@ -248,11 +255,11 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
 
-		bob_phase := f32(game.vfx.anim_frame + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
+		bob_phase := f32(eng.vfx_manager_frame(vfx) + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
 
-		if game.ui.use_sprites {
+		if ui.use_sprites {
 			spr := sprite_manager_enemy(sprites, enemy.enemy_type)
 			sprite_manager_draw(sprites, spr, ex, ey, enemy.color)
 		} else {
