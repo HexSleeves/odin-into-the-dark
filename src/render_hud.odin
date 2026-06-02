@@ -2,10 +2,12 @@ package main
 
 import "core:fmt"
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── HUD rendering (fixed region below map viewport) ──────────────────────────
 
-render_hud :: proc(game: ^Game) {
+render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
+	turns := game_engine_turn_manager(engine)
 	hud_y := i32(MAP_VIEW_HEIGHT)
 
 	// Background bar
@@ -58,7 +60,7 @@ render_hud :: proc(game: ^Game) {
 			i32(game.depth),
 			i32(game.player.light_radius),
 			alive_count,
-			i32(game.turn_count),
+			i32(eng.turn_manager_current(turns)),
 		),
 		hp_x,
 		stats_y,

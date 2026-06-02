@@ -31,6 +31,15 @@ game_app_callbacks_are_initialized :: proc(t: ^testing.T) {
 	testing.expect_value(t, app.name, "Test App")
 }
 
+@(test)
+engine_exposes_owned_scene_manager :: proc(t: ^testing.T) {
+	engine := Engine{}
+	manager := engine_scene_manager(&engine)
+
+	testing.expect(t, manager == &engine.scene_manager)
+	testing.expect(t, !scene_manager_has_active(manager))
+}
+
 test_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {return true}
 test_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {return false}
 test_app_render :: proc(engine: ^Engine, app: ^Game_App) {}

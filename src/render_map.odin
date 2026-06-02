@@ -97,11 +97,13 @@ get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
 	return UNSEEN_COLOR
 }
 
-visible_tile_bounds :: proc(game: ^Game) -> (x0, y0, x1, y1: int) {
-	x0 = max(0, game.camera_x / TILE_SIZE)
-	y0 = max(0, game.camera_y / TILE_SIZE)
-	x1 = min(MAP_WIDTH - 1, (game.camera_x + SCREEN_WIDTH) / TILE_SIZE)
-	y1 = min(MAP_HEIGHT - 1, (game.camera_y + MAP_VIEW_HEIGHT) / TILE_SIZE)
+visible_tile_bounds :: proc(camera: ^eng.Camera_Manager) -> (x0, y0, x1, y1: int) {
+	camera_x := game_camera_x(camera)
+	camera_y := game_camera_y(camera)
+	x0 = max(0, camera_x / TILE_SIZE)
+	y0 = max(0, camera_y / TILE_SIZE)
+	x1 = min(MAP_WIDTH - 1, (camera_x + SCREEN_WIDTH) / TILE_SIZE)
+	y1 = min(MAP_HEIGHT - 1, (camera_y + MAP_VIEW_HEIGHT) / TILE_SIZE)
 	return
 }
 
@@ -111,11 +113,12 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 	game.vfx.anim_frame += 1
 
 	sprites := game_engine_sprite_manager(engine)
-	ox := i32(game.camera_x)
-	oy := i32(game.camera_y)
+	camera := game_engine_camera_manager(engine)
+	ox := i32(game_camera_x(camera))
+	oy := i32(game_camera_y(camera))
 	palette := palette_for_depth(game.depth)
 
-	x0, y0, x1, y1 := visible_tile_bounds(game)
+	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
 		for x in x0 ..= x1 {
 			sx := i32(x * TILE_SIZE) - ox
@@ -175,10 +178,11 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 
 render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
-	ox := i32(game.camera_x)
-	oy := i32(game.camera_y)
+	camera := game_engine_camera_manager(engine)
+	ox := i32(game_camera_x(camera))
+	oy := i32(game_camera_y(camera))
 
-	x0, y0, x1, y1 := visible_tile_bounds(game)
+	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
 		for x in x0 ..= x1 {
 			idx := pos_to_idx(x, y)
@@ -208,8 +212,9 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 
 render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
-	px := i32(game.player.pos.x * TILE_SIZE) - i32(game.camera_x)
-	py := i32(game.player.pos.y * TILE_SIZE) - i32(game.camera_y)
+	camera := game_engine_camera_manager(engine)
+	px := i32(game.player.pos.x * TILE_SIZE) - i32(game_camera_x(camera))
+	py := i32(game.player.pos.y * TILE_SIZE) - i32(game_camera_y(camera))
 
 	bob_phase := f32(game.vfx.anim_frame) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * 0.8)
@@ -230,8 +235,9 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 
 render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
-	ox := i32(game.camera_x)
-	oy := i32(game.camera_y)
+	camera := game_engine_camera_manager(engine)
+	ox := i32(game_camera_x(camera))
+	oy := i32(game_camera_y(camera))
 
 	for &enemy in game.enemies {
 		if !enemy.alive {continue}
@@ -268,15 +274,16 @@ TOOLTIP_PAD_Y :: i32(4)
 TOOLTIP_OFFSET_X :: i32(12)
 TOOLTIP_OFFSET_Y :: i32(-20)
 
-render_tooltip :: proc(game: ^Game) {
+render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 	mouse := rl.GetMousePosition()
+	camera := game_engine_camera_manager(engine)
 
 	// Only show tooltips when mouse is in the map viewport region
 	if int(mouse.y) >= MAP_VIEW_HEIGHT {return}
 
 	// Convert screen coordinates to tile coordinates using camera offset
-	tile_x := (int(mouse.x) + game.camera_x) / TILE_SIZE
-	tile_y := (int(mouse.y) + game.camera_y) / TILE_SIZE
+	tile_x := (int(mouse.x) + game_camera_x(camera)) / TILE_SIZE
+	tile_y := (int(mouse.y) + game_camera_y(camera)) / TILE_SIZE
 
 	if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
 		return

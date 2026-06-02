@@ -6,7 +6,8 @@ import eng "./engine"
 // ─── Top-level render call ────────────────────────────────────────────────────
 
 render_game :: proc(engine: ^eng.Engine, game: ^Game) {
-	update_particles()
+	particles := game_engine_particle_manager(engine)
+	update_particles(particles)
 
 	rl.BeginDrawing()
 	rl.ClearBackground(rl.BLACK)
@@ -18,11 +19,11 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_items(engine, game)
 	render_enemies(engine, game)
 	render_player(engine, game)
-	render_particles()
+	render_particles(particles)
 	rl.EndScissorMode()
 
-	render_hud(game)
-	render_messages(game)
+	render_hud(engine, game)
+	render_messages_for_engine(engine)
 
 	if game.ui.show_minimap && game.state == .Playing {
 		render_minimap(game)
@@ -32,25 +33,25 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 		render_title_screen(engine, game)
 	}
 	if game.state == .Playing {
-		render_tooltip(game)
+		render_tooltip(engine, game)
 	}
 	if game.state == .Game_Over {
-		render_game_over(game)
+		render_game_over(engine, game)
 	}
 	if game.state == .Viewing_Inventory {
 		render_inventory(engine, game)
 	}
 	if game.state == .Viewing_Crafting {
-		render_crafting(game)
+		render_crafting(engine, game)
 	}
 	if game.state == .Viewing_Help {
 		render_help(game)
 	}
 	if game.state == .Viewing_Scores {
-		render_high_scores(game)
+		render_high_scores(engine, game)
 	}
 	if game.state == .Victory {
-		render_victory(game)
+		render_victory(engine, game)
 	}
 
 	// Screen flash overlay (S02)

@@ -1,5 +1,7 @@
 package main
 
+import eng "./engine"
+
 // ─── Save manager facade ─────────────────────────────────────────────────────
 
 Save_Manager :: struct {
@@ -19,16 +21,16 @@ save_manager_save_exists :: proc(saves: ^Save_Manager) -> bool {
 	return save_exists_at(saves.file_path)
 }
 
-save_manager_save_game :: proc(saves: ^Save_Manager, game: ^Game) -> bool {
+save_manager_save_game :: proc(saves: ^Save_Manager, turns: ^eng.Turn_Manager, game: ^Game) -> bool {
 	if saves == nil {
-		return save_game(game)
+		return save_game(turns, game)
 	}
-	return save_game_to_path(game, saves.file_path)
+	return save_game_to_path(turns, game, saves.file_path)
 }
 
-save_manager_load_game :: proc(saves: ^Save_Manager, game: ^Game) -> bool {
+save_manager_load_game :: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	if saves == nil {
-		return load_game(game)
+		return load_game(content, turns, camera, messages, game)
 	}
-	return load_game_from_path(game, saves.file_path)
+	return load_game_from_path(content, turns, camera, messages, game, saves.file_path)
 }

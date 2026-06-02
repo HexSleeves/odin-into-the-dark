@@ -5,7 +5,7 @@ import rl "vendor:raylib"
 
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
-mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
+mine_wall :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, dx, dy: int) -> bool {
 	tx := game.player.pos.x + dx
 	ty := game.player.pos.y + dy
 
@@ -14,18 +14,19 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 
 	t := tile_at(game, tx, ty)
 	if t == nil || t.type != .Wall {
-		add_message(game, "Nothing to mine there.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Nothing to mine there.", rl.Color{180, 180, 180, 255})
 		return false
 	}
 
 	// Check pickaxe — need an equipped weapon with durability
 	if !game.equipped_weapon.occupied {
-		add_message(game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
 		return false
 	}
 	wpn := &game.equipped_weapon.item
 	if wpn.max_durability > 0 && wpn.durability <= 0 {
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("Your %s is broken!", wpn.name),
 			rl.Color{255, 100, 100, 255},
@@ -42,13 +43,14 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 
 	// If ore vein, spawn material item
 	if vein.ore_type != "" {
-		def := find_item_def(vein.ore_type)
+		def := content_manager_item_def(content, vein.ore_type)
 		if def != nil {
 			ore_item := item_make_from_def(def, Vec2{tx, ty})
 			append(&game.items, ore_item)
-			add_message(game, fmt.tprintf("You found %s!", def.name), vein.color)
+			add_message(messages, game, fmt.tprintf("You found %s!", def.name), vein.color)
 		} else {
 			add_message(
+				messages,
 				game,
 				"You mine through a vein, but nothing useful falls out.",
 				rl.Color{180, 160, 100, 255},
@@ -56,16 +58,17 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 		}
 		game.ore_veins[idx] = {} // clear the vein
 	} else {
-		add_message(game, "You mine through the wall.", rl.Color{180, 160, 100, 255})
+		add_message(messages, game, "You mine through the wall.", rl.Color{180, 160, 100, 255})
 	}
 
 	// Decrease equipped weapon durability
 	if wpn.max_durability > 0 {
 		wpn.durability -= 1
 		if wpn.durability <= 0 {
-			add_message(game, fmt.tprintf("Your %s breaks!", wpn.name), rl.Color{255, 80, 80, 255})
+			add_message(messages, game, fmt.tprintf("Your %s breaks!", wpn.name), rl.Color{255, 80, 80, 255})
 		} else if wpn.durability <= 5 {
 			add_message(
+				messages,
 				game,
 				fmt.tprintf(
 					"%s wearing down... (%d/%d)",
@@ -78,8 +81,6 @@ mine_wall :: proc(game: ^Game, dx, dy: int) -> bool {
 		}
 	}
 
-	// Consume a turn
-	game.turn_count += 1
 	return true
 }
 
@@ -152,7 +153,7 @@ consume_material :: proc(game: ^Game, material_id: string, amount: int) {
 	}
 }
 
-try_craft :: proc(game: ^Game, recipe_index: int) {
+try_craft :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, recipe_index: int) {
 	if recipe_index < 0 || recipe_index >= len(RECIPES) {return}
 
 	recipes := RECIPES
@@ -161,6 +162,7 @@ try_craft :: proc(game: ^Game, recipe_index: int) {
 
 	if have < recipe.material_qty {
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("Need %d %s (have %d).", recipe.material_qty, recipe.material_id, have),
 			rl.Color{255, 100, 100, 255},
@@ -171,12 +173,13 @@ try_craft :: proc(game: ^Game, recipe_index: int) {
 	if recipe.is_repair {
 		// Repair equipped weapon durability
 		if !game.equipped_weapon.occupied || game.equipped_weapon.item.max_durability <= 0 {
-			add_message(game, "No weapon to repair.", rl.Color{255, 100, 100, 255})
+			add_message(messages, game, "No weapon to repair.", rl.Color{255, 100, 100, 255})
 			return
 		}
 		game.equipped_weapon.item.durability = game.equipped_weapon.item.max_durability
 		consume_material(game, recipe.material_id, recipe.material_qty)
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("%s repaired!", game.equipped_weapon.item.name),
 			rl.Color{100, 255, 100, 255},
@@ -193,13 +196,13 @@ try_craft :: proc(game: ^Game, recipe_index: int) {
 		}
 	}
 	if slot_idx < 0 {
-		add_message(game, "Inventory full! Cannot craft.", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "Inventory full! Cannot craft.", rl.Color{255, 100, 100, 255})
 		return
 	}
 
-	def := find_item_def(recipe.result_id)
+	def := content_manager_item_def(content, recipe.result_id)
 	if def == nil {
-		add_message(game, "Recipe error.", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "Recipe error.", rl.Color{255, 100, 100, 255})
 		return
 	}
 
@@ -210,5 +213,5 @@ try_craft :: proc(game: ^Game, recipe_index: int) {
 	game.inventory[slot_idx].item = crafted
 	game.inventory[slot_idx].item.quantity = 1
 
-	add_message(game, fmt.tprintf("Crafted %s!", def.name), rl.Color{100, 255, 100, 255})
+	add_message(messages, game, fmt.tprintf("Crafted %s!", def.name), rl.Color{100, 255, 100, 255})
 }

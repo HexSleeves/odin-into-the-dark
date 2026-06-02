@@ -5,9 +5,9 @@ import rl "vendor:raylib"
 
 // ─── Starter gear ─────────────────────────────────────────────────────────────
 
-give_starter_gear :: proc(game: ^Game) {
+give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 	// Equip a Rusty Pickaxe directly into the weapon slot
-	pick_def := find_item_def("rusty_pickaxe")
+	pick_def := content_manager_item_def(content, "rusty_pickaxe")
 	if pick_def != nil {
 		pick := item_make_from_def(pick_def, Vec2{0, 0})
 		pick.picked_up = true
@@ -18,7 +18,7 @@ give_starter_gear :: proc(game: ^Game) {
 	}
 
 	// Put a Torch in inventory slot 0
-	torch_def := find_item_def("torch")
+	torch_def := content_manager_item_def(content, "torch")
 	if torch_def != nil {
 		torch := item_make_from_def(torch_def, Vec2{0, 0})
 		torch.picked_up = true
@@ -30,7 +30,7 @@ give_starter_gear :: proc(game: ^Game) {
 	}
 
 	// Put 2 Bandages in inventory slot 1
-	band_def := find_item_def("bandage")
+	band_def := content_manager_item_def(content, "bandage")
 	if band_def != nil {
 		band := item_make_from_def(band_def, Vec2{0, 0})
 		band.picked_up = true
@@ -44,13 +44,13 @@ give_starter_gear :: proc(game: ^Game) {
 
 // ─── Equipment: equip / unequip / stat queries ────────────────────────────────
 
-equip_item :: proc(game: ^Game, slot_index: int) -> bool {
+equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
 	if slot_index < 0 || slot_index >= MAX_INVENTORY {return false}
 	if !game.inventory[slot_index].occupied {return false}
 
 	item := &game.inventory[slot_index].item
 	if item.equipment_slot == "" {
-		add_message(game, "That item cannot be equipped.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "That item cannot be equipped.", rl.Color{180, 180, 180, 255})
 		return false
 	}
 
@@ -58,7 +58,7 @@ equip_item :: proc(game: ^Game, slot_index: int) -> bool {
 	equip_slot: ^Equipment
 	if item.equipment_slot ==
 	   "weapon" {equip_slot = &game.equipped_weapon} else if item.equipment_slot == "armor" {equip_slot = &game.equipped_armor} else if item.equipment_slot == "helmet" {equip_slot = &game.equipped_helmet} else {
-		add_message(game, "Unknown equipment slot.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Unknown equipment slot.", rl.Color{180, 180, 180, 255})
 		return false
 	}
 
@@ -70,6 +70,7 @@ equip_item :: proc(game: ^Game, slot_index: int) -> bool {
 		}
 		if empty < 0 {
 			add_message(
+				messages,
 				game,
 				"No inventory space to swap equipment!",
 				rl.Color{255, 100, 100, 255},
@@ -81,6 +82,7 @@ equip_item :: proc(game: ^Game, slot_index: int) -> bool {
 		game.inventory[empty].item = equip_slot.item
 		game.inventory[empty].item.quantity = 1
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
 			rl.Color{180, 180, 100, 255},
@@ -91,6 +93,7 @@ equip_item :: proc(game: ^Game, slot_index: int) -> bool {
 	equip_slot.occupied = true
 	equip_slot.item = item^
 	add_message(
+		messages,
 		game,
 		fmt.tprintf("You equip the %s.", item_display_name(item)),
 		rl.Color{100, 200, 255, 255},
@@ -102,7 +105,7 @@ equip_item :: proc(game: ^Game, slot_index: int) -> bool {
 	return true
 }
 
-unequip_slot :: proc(game: ^Game, slot_name: string) -> bool {
+unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string) -> bool {
 	equip_slot: ^Equipment
 	if slot_name ==
 	   "weapon" {equip_slot = &game.equipped_weapon} else if slot_name == "armor" {equip_slot = &game.equipped_armor} else if slot_name == "helmet" {equip_slot = &game.equipped_helmet} else {return false}
@@ -115,7 +118,7 @@ unequip_slot :: proc(game: ^Game, slot_name: string) -> bool {
 		if !game.inventory[i].occupied {empty = i; break}
 	}
 	if empty < 0 {
-		add_message(game, "Inventory full! Cannot unequip.", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "Inventory full! Cannot unequip.", rl.Color{255, 100, 100, 255})
 		return false
 	}
 
@@ -123,6 +126,7 @@ unequip_slot :: proc(game: ^Game, slot_name: string) -> bool {
 	game.inventory[empty].item = equip_slot.item
 	game.inventory[empty].item.quantity = 1
 	add_message(
+		messages,
 		game,
 		fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
 		rl.Color{180, 180, 100, 255},

@@ -19,8 +19,37 @@ Particle :: struct {
 
 g_particles: [MAX_PARTICLES]Particle
 
+Particle_Manager :: struct {
+	pool: ^[MAX_PARTICLES]Particle,
+}
+
+particle_manager_make :: proc() -> Particle_Manager {
+	return Particle_Manager {
+		pool = &g_particles,
+	}
+}
+
+particle_manager_pool :: proc(particles: ^Particle_Manager) -> ^[MAX_PARTICLES]Particle {
+	if particles == nil || particles.pool == nil {
+		return &g_particles
+	}
+	return particles.pool
+}
+
+particle_manager_active_count :: proc(particles: ^Particle_Manager) -> int {
+	pool := particle_manager_pool(particles)
+	count := 0
+	for &p in pool {
+		if p.active {
+			count += 1
+		}
+	}
+	return count
+}
+
 // Spawn a burst of particles at a tile position (converted to screen-space)
-spawn_particles :: proc(
+particle_manager_spawn :: proc(
+	particles: ^Particle_Manager,
 	tile_x, tile_y: int,
 	color: rl.Color,
 	count: int,
@@ -31,9 +60,10 @@ spawn_particles :: proc(
 	// Convert tile position to screen pixel center
 	cx := f32(tile_x * TILE_SIZE + TILE_SIZE / 2) - f32(camera_x)
 	cy := f32(tile_y * TILE_SIZE + TILE_SIZE / 2) - f32(camera_y)
+	pool := particle_manager_pool(particles)
 
 	spawned := 0
-	for &p in g_particles {
+	for &p in pool {
 		if spawned >= count {break}
 		if p.active {continue}
 
@@ -52,8 +82,9 @@ spawn_particles :: proc(
 }
 
 // Update all active particles (call once per frame)
-update_particles :: proc() {
-	for &p in g_particles {
+update_particles :: proc(particles: ^Particle_Manager) {
+	pool := particle_manager_pool(particles)
+	for &p in pool {
 		if !p.active {continue}
 
 		p.pos[0] += p.vel[0]
@@ -70,8 +101,9 @@ update_particles :: proc() {
 }
 
 // Render all active particles (call during drawing, inside scissor mode)
-render_particles :: proc() {
-	for &p in g_particles {
+render_particles :: proc(particles: ^Particle_Manager) {
+	pool := particle_manager_pool(particles)
+	for &p in pool {
 		if !p.active {continue}
 
 		alpha := u8(p.life * f32(p.color.a))
@@ -85,18 +117,18 @@ render_particles :: proc() {
 
 // ─── Convenience spawners for specific events ─────────────────────────────────
 
-spawn_hit_particles :: proc(tile_x, tile_y, cam_x, cam_y: int) {
-	spawn_particles(tile_x, tile_y, rl.Color{255, 60, 60, 255}, 8, 2.5, cam_x, cam_y)
+spawn_hit_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
+	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 60, 60, 255}, 8, 2.5, cam_x, cam_y)
 }
 
-spawn_mine_particles :: proc(tile_x, tile_y, cam_x, cam_y: int) {
-	spawn_particles(tile_x, tile_y, rl.Color{255, 200, 50, 255}, 12, 3.0, cam_x, cam_y)
+spawn_mine_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
+	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 200, 50, 255}, 12, 3.0, cam_x, cam_y)
 }
 
-spawn_pickup_particles :: proc(tile_x, tile_y, cam_x, cam_y: int) {
-	spawn_particles(tile_x, tile_y, rl.Color{80, 255, 80, 255}, 6, 1.5, cam_x, cam_y)
+spawn_pickup_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
+	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{80, 255, 80, 255}, 6, 1.5, cam_x, cam_y)
 }
 
-spawn_death_particles :: proc(tile_x, tile_y, cam_x, cam_y: int) {
-	spawn_particles(tile_x, tile_y, rl.Color{255, 0, 0, 255}, 30, 4.0, cam_x, cam_y)
+spawn_death_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
+	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 0, 0, 255}, 30, 4.0, cam_x, cam_y)
 }

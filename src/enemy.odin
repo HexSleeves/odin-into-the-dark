@@ -7,8 +7,8 @@ import rl "vendor:raylib"
 
 // ─── Enemy factory (data-driven) ─────────────────────────────────────────────
 
-enemy_make :: proc(id: string, pos: Vec2) -> Enemy {
-	def := find_enemy_def(id)
+enemy_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Enemy {
+	def := content_manager_enemy_def(content, id)
 	if def != nil {
 		return enemy_make_from_def(def, pos)
 	}
@@ -29,7 +29,7 @@ enemy_make :: proc(id: string, pos: Vec2) -> Enemy {
 
 // ─── Spawn enemies into rooms ────────────────────────────────────────────────
 
-spawn_enemies :: proc(game: ^Game) {
+spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 	clear(&game.enemies)
 
 	if len(game.rooms) >= 2 {
@@ -49,7 +49,7 @@ spawn_enemies :: proc(game: ^Game) {
 					if pos == game.player.pos {continue}
 					if enemy_at(game, ex, ey) != nil {continue}
 
-					def := pick_enemy_def_for_depth(game.depth)
+					def := content_manager_enemy_def_for_depth(content, game.depth)
 					if def != nil {
 						append(&game.enemies, enemy_make_from_def(def, pos))
 						total += 1
@@ -83,7 +83,7 @@ spawn_enemies :: proc(game: ^Game) {
 			t := tile_at(game, x, y)
 			if t != nil && t.type == .Descent {continue}
 
-			def := pick_enemy_def_for_depth(game.depth)
+			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, pos))
 				spawned += 1
@@ -157,7 +157,7 @@ compute_dijkstra_map :: proc(game: ^Game) {
 
 // ─── Process enemy turns ─────────────────────────────────────────────────────
 
-process_enemy_turns :: proc(game: ^Game) {
+process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 	// Recompute dijkstra map so enemies have fresh pathfinding
 	compute_dijkstra_map(game)
 
@@ -169,7 +169,7 @@ process_enemy_turns :: proc(game: ^Game) {
 		is_visible := tile != nil && tile.visible
 
 		if is_visible {
-			chase_player(game, &enemy)
+			chase_player(messages, game, &enemy)
 		} else {
 			wander(game, &enemy)
 		}
@@ -179,7 +179,7 @@ process_enemy_turns :: proc(game: ^Game) {
 // ─── Chase behavior (dijkstra downhill) ──────────────────────────────────────
 
 @(private = "file")
-chase_player :: proc(game: ^Game, enemy: ^Enemy) {
+chase_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
 	// 1. Check if adjacent to player -> attack
 	DX :: [4]int{0, 0, -1, 1}
 	DY :: [4]int{-1, 1, 0, 0}
@@ -189,7 +189,7 @@ chase_player :: proc(game: ^Game, enemy: ^Enemy) {
 		nx := enemy.pos.x + dx[dir]
 		ny := enemy.pos.y + dy[dir]
 		if nx == game.player.pos.x && ny == game.player.pos.y {
-			resolve_attack_enemy_on_player(game, enemy)
+			resolve_attack_enemy_on_player(messages, game, enemy)
 			return
 		}
 	}
@@ -252,7 +252,7 @@ wander :: proc(game: ^Game, enemy: ^Enemy) {
 
 // ─── Process special abilities ───────────────────────────────────────────────
 
-process_enemy_abilities :: proc(game: ^Game) {
+process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 	for &enemy in game.enemies {
 		if !enemy.alive {continue}
 		if enemy.ability_type == "" {continue}
@@ -278,6 +278,7 @@ process_enemy_abilities :: proc(game: ^Game) {
 						game.web_tiles[pos_to_idx(wx, wy)] = true
 						enemy.ability_cooldown = enemy.ability_max_cd
 						add_message(
+							messages,
 							game,
 							fmt.tprintf("The %s spins a web!", enemy_display_name(&enemy)),
 							rl.Color{100, 200, 100, 255},
@@ -321,6 +322,7 @@ process_enemy_abilities :: proc(game: ^Game) {
 						game.player.pos.y = new_y
 						enemy.ability_cooldown = enemy.ability_max_cd
 						add_message(
+							messages,
 							game,
 							"The Deep Watcher pulls you closer!",
 							rl.Color{180, 50, 220, 255},
@@ -344,6 +346,7 @@ process_enemy_abilities :: proc(game: ^Game) {
 							enemy.pos = Vec2{tx, ty}
 							enemy.ability_cooldown = enemy.ability_max_cd
 							add_message(
+								messages,
 								game,
 								fmt.tprintf("The %s appears from the shadows!", enemy_display_name(&enemy)),
 								rl.Color{80, 40, 120, 255},
@@ -358,11 +361,11 @@ process_enemy_abilities :: proc(game: ^Game) {
 			if dist <= 2 {
 				if dist == 1 {
 					game.player.hp -= 4
-					add_message(game, "The Mine Guardian slams the ground! (-4 HP)", rl.Color{220, 180, 60, 255})
+					add_message(messages, game, "The Mine Guardian slams the ground! (-4 HP)", rl.Color{220, 180, 60, 255})
 					if game.player.hp <= 0 {
 						game.death_cause = "Crushed by the Mine Guardian"
 						game.state = .Game_Over
-						add_message(game, "You have been slain...", rl.Color{255, 0, 0, 255})
+						add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd
@@ -373,7 +376,7 @@ process_enemy_abilities :: proc(game: ^Game) {
 				game.light_boost_bonus = max(game.light_boost_bonus - 2, -3)
 				game.light_boost_turns = max(game.light_boost_turns, 5)
 				enemy.ability_cooldown = enemy.ability_max_cd
-				add_message(game, "The Abyssal Lord shrouds you in darkness!", rl.Color{150, 30, 200, 255})
+				add_message(messages, game, "The Abyssal Lord shrouds you in darkness!", rl.Color{150, 30, 200, 255})
 			}
 		}
 	}
@@ -381,7 +384,7 @@ process_enemy_abilities :: proc(game: ^Game) {
 
 // ─── Remove dead enemies ────────────────────────────────────────────────────
 
-remove_dead_enemies :: proc(game: ^Game) {
+remove_dead_enemies :: proc(messages: ^Message_Manager, game: ^Game) {
 	i := 0
 	for i < len(game.enemies) {
 		if !game.enemies[i].alive {
@@ -389,7 +392,7 @@ remove_dead_enemies :: proc(game: ^Game) {
 				t := tile_at(game, game.enemies[i].pos.x, game.enemies[i].pos.y)
 				if t != nil && (t.type == .Floor || t.type == .Rubble) {
 					t.type = .Gas_Vent
-					add_message(game, fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name), rl.Color{120, 200, 40, 255})
+					add_message(messages, game, fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name), rl.Color{120, 200, 40, 255})
 				}
 			}
 			unordered_remove(&game.enemies, i)

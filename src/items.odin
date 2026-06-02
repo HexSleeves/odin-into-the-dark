@@ -8,8 +8,8 @@ import eng "./engine"
 
 // ─── Item factory (data-driven) ───────────────────────────────────────────────
 
-item_make :: proc(id: string, pos: Vec2) -> Item {
-	def := find_item_def(id)
+item_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Item {
+	def := content_manager_item_def(content, id)
 	if def != nil {
 		return item_make_from_def(def, pos)
 	}
@@ -28,16 +28,16 @@ item_make :: proc(id: string, pos: Vec2) -> Item {
 
 // ─── Stack limit lookup (data-driven) ─────────────────────────────────────────
 
-item_stack_limit :: proc(id: string) -> int {
-	def := find_item_def(id)
+item_stack_limit :: proc(content: ^Content_Manager, id: string) -> int {
+	def := content_manager_item_def(content, id)
 	if def != nil && def.stack_limit > 0 {
 		return def.stack_limit
 	}
 	return 1
 }
 
-item_is_stackable :: proc(id: string) -> bool {
-	return item_stack_limit(id) > 1
+item_is_stackable :: proc(content: ^Content_Manager, id: string) -> bool {
+	return item_stack_limit(content, id) > 1
 }
 
 // ─── Find item at position ────────────────────────────────────────────────────
@@ -53,24 +53,25 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 
 // ─── Pick up item at player position ──────────────────────────────────────────
 
-pickup_item :: proc(game: ^Game) -> bool {
+pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	it := item_at(game, game.player.pos.x, game.player.pos.y)
 	if it == nil {
-		add_message(game, "Nothing to pick up here.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Nothing to pick up here.", rl.Color{180, 180, 180, 255})
 		return false
 	}
 
 	itype := it.item_type
-	stack_limit := item_stack_limit(itype)
+	stack_limit := item_stack_limit(content, itype)
 
 	// Only stackable items can merge into existing stacks
-	if item_is_stackable(itype) {
+	if item_is_stackable(content, itype) {
 		for i in 0 ..< MAX_INVENTORY {
 			slot := &game.inventory[i]
 			if slot.occupied && slot.item.item_type == itype && slot.item.quantity < stack_limit {
 				slot.item.quantity += 1
 				it.picked_up = true
 				add_message(
+					messages,
 					game,
 					fmt.tprintf(
 						"Picked up %s (%d/%d).",
@@ -95,7 +96,7 @@ pickup_item :: proc(game: ^Game) -> bool {
 	}
 
 	if slot_idx < 0 {
-		add_message(game, "Inventory is full!", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "Inventory is full!", rl.Color{255, 100, 100, 255})
 		return false
 	}
 
@@ -106,6 +107,7 @@ pickup_item :: proc(game: ^Game) -> bool {
 	it.picked_up = true
 
 	add_message(
+		messages,
 		game,
 		fmt.tprintf("Picked up %s.", item_display_name(it)),
 		rl.Color{100, 255, 100, 255},
@@ -115,7 +117,7 @@ pickup_item :: proc(game: ^Game) -> bool {
 
 // ─── Use an item from inventory (data-driven) ────────────────────────────────
 
-use_item :: proc(game: ^Game, slot_index: int) -> bool {
+use_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
 	if slot_index < 0 || slot_index >= MAX_INVENTORY {
 		return false
 	}
@@ -124,11 +126,12 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 	}
 
 	itype := game.inventory[slot_index].item.item_type
-	def := find_item_def(itype)
+	def := content_manager_item_def(content, itype)
 	if def != nil {
 		// Equip-type items are not consumed on use; hint the player instead
 		if def.effect.type == "equip" {
 			add_message(
+				messages,
 				game,
 				fmt.tprintf("Press E in inventory to equip the %s.", def.name),
 				rl.Color{180, 180, 180, 255},
@@ -138,15 +141,16 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 		// Material items cannot be consumed directly
 		if def.effect.type == "material" {
 			add_message(
+				messages,
 				game,
 				"Raw materials cannot be used directly. Find an anvil to craft.",
 				rl.Color{180, 180, 100, 255},
 			)
 			return false
 		}
-		apply_item_effect(game, def)
+		apply_item_effect(messages, game, def)
 	} else {
-		add_message(game, "Nothing happens.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Nothing happens.", rl.Color{180, 180, 180, 255})
 	}
 
 	// Decrement stack quantity; clear slot only when empty
@@ -159,19 +163,19 @@ use_item :: proc(game: ^Game, slot_index: int) -> bool {
 
 // ─── Tick timed effects (call once per turn) ──────────────────────────────────
 
-tick_timed_effects :: proc(game: ^Game) {
+tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 	if game.light_boost_turns > 0 {
 		game.light_boost_turns -= 1
 		if game.light_boost_turns <= 0 {
 			game.light_boost_bonus = 0
-			add_message(game, "The lantern oil burns out.", rl.Color{180, 130, 50, 255})
+			add_message(messages, game, "The lantern oil burns out.", rl.Color{180, 130, 50, 255})
 		}
 	}
 }
 
 // ─── Drop an item from inventory onto the map ────────────────────────────────
 
-drop_item :: proc(game: ^Game, slot_index: int) -> bool {
+drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
 	if slot_index < 0 || slot_index >= MAX_INVENTORY {return false}
 	if !game.inventory[slot_index].occupied {return false}
 
@@ -190,6 +194,7 @@ drop_item :: proc(game: ^Game, slot_index: int) -> bool {
 	append(&game.items, dropped)
 
 	add_message(
+		messages,
 		game,
 		fmt.tprintf("You drop a %s.", item_display_name(&slot.item)),
 		rl.Color{180, 180, 100, 255},
@@ -207,8 +212,9 @@ drop_item :: proc(game: ^Game, slot_index: int) -> bool {
 
 render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
-	ox := i32(game.camera_x)
-	oy := i32(game.camera_y)
+	camera := game_engine_camera_manager(engine)
+	ox := i32(game_camera_x(camera))
+	oy := i32(game_camera_y(camera))
 
 	for &item in game.items {
 		if item.picked_up {continue}
@@ -236,7 +242,7 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 
 // ─── Spawn items into rooms (data-driven) ─────────────────────────────────────
 
-spawn_items :: proc(game: ^Game) {
+spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 	clear(&game.items)
 
 	if len(game.rooms) < 2 {
@@ -257,7 +263,7 @@ spawn_items :: proc(game: ^Game) {
 			if enemy_at(game, x, y) != nil {continue}
 			if item_at(game, x, y) != nil {continue}
 
-			def := pick_item_def()
+			def := content_manager_pick_item_def(content)
 			if def != nil {
 				append(&game.items, item_make_from_def(def, pos))
 				spawned += 1
@@ -267,7 +273,7 @@ spawn_items :: proc(game: ^Game) {
 		return
 	}
 
-	room_chance := g_data.items.room_item_chance
+	room_chance := content_manager_room_item_chance(content)
 	if room_chance <= 0 {room_chance = 50}
 
 	total := 0
@@ -297,7 +303,7 @@ spawn_items :: proc(game: ^Game) {
 			if enemy_at(game, ix, iy) != nil {continue}
 			if item_at(game, ix, iy) != nil {continue}
 
-			def := pick_item_def()
+			def := content_manager_pick_item_def(content)
 			if def != nil {
 				append(&game.items, item_make_from_def(def, pos))
 				total += 1

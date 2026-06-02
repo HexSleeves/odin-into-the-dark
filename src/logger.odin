@@ -3,6 +3,7 @@ package main
 import "core:fmt"
 import "core:log"
 import "core:os"
+import eng "./engine"
 
 // ─── Game diagnostics logger ─────────────────────────────────────────────────
 
@@ -51,8 +52,12 @@ LOGGER_DEFAULT_FILE_PATH :: "into_the_depths.log"
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 
 logger_init_from_env :: proc(logger: ^Game_Logger) {
+	logger_init_from_config(logger, nil)
+}
+
+logger_init_from_config :: proc(logger: ^Game_Logger, config: ^eng.Config_Manager) {
 	logger^ = {}
-	logger.config = logger_config_from_env()
+	logger.config = logger_config_from_config(config)
 
 	if !logger.config.enabled {
 		return
@@ -116,20 +121,27 @@ logger_destroy :: proc(logger: ^Game_Logger) {
 // ─── Configuration ───────────────────────────────────────────────────────────
 
 logger_config_from_env :: proc() -> Game_Logger_Config {
+	return logger_config_from_config(nil)
+}
+
+logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Config {
 	base_level, enabled := logger_parse_level(
-		os.get_env("ITD_LOG_LEVEL", context.temp_allocator),
+		logger_config_value(config, "ITD_LOG_LEVEL"),
 		log.Level.Info,
 	)
 	console_level, console_enabled_from_level := logger_parse_level(
-		os.get_env("ITD_LOG_CONSOLE_LEVEL", context.temp_allocator),
+		logger_config_value(config, "ITD_LOG_CONSOLE_LEVEL"),
 		base_level,
 	)
 	file_level, file_enabled_from_level := logger_parse_level(
-		os.get_env("ITD_LOG_FILE_LEVEL", context.temp_allocator),
+		logger_config_value(config, "ITD_LOG_FILE_LEVEL"),
 		base_level,
 	)
 
-	file_path := os.get_env("ITD_LOG_FILE_PATH", context.allocator)
+	file_path, file_path_ok := eng.config_manager_get(config, "ITD_LOG_FILE_PATH")
+	if !file_path_ok {
+		file_path = os.get_env("ITD_LOG_FILE_PATH", context.allocator)
+	}
 	if file_path == "" {
 		file_path = LOGGER_DEFAULT_FILE_PATH
 	}
@@ -138,20 +150,27 @@ logger_config_from_env :: proc() -> Game_Logger_Config {
 		enabled = enabled,
 		console_enabled = enabled &&
 		console_enabled_from_level &&
-		logger_parse_bool(os.get_env("ITD_LOG_CONSOLE", context.temp_allocator), true),
+		logger_parse_bool(logger_config_value(config, "ITD_LOG_CONSOLE"), true),
 		file_enabled = enabled &&
 		file_enabled_from_level &&
-		logger_parse_bool(os.get_env("ITD_LOG_FILE", context.temp_allocator), true),
+		logger_parse_bool(logger_config_value(config, "ITD_LOG_FILE"), true),
 		console_level = console_level,
 		file_level = file_level,
 		file_path = file_path,
-		channels = logger_parse_channels(os.get_env("ITD_LOG_CHANNELS", context.temp_allocator)),
+		channels = logger_parse_channels(logger_config_value(config, "ITD_LOG_CHANNELS")),
 		include_source = logger_parse_bool(
-			os.get_env("ITD_LOG_SOURCE", context.temp_allocator),
+			logger_config_value(config, "ITD_LOG_SOURCE"),
 			true,
 		),
-		flush_file = logger_parse_bool(os.get_env("ITD_LOG_FLUSH", context.temp_allocator), true),
+		flush_file = logger_parse_bool(logger_config_value(config, "ITD_LOG_FLUSH"), true),
 	}
+}
+
+logger_config_value :: proc(config: ^eng.Config_Manager, key: string) -> string {
+	if value, ok := eng.config_manager_get(config, key); ok {
+		return value
+	}
+	return os.get_env(key, context.temp_allocator)
 }
 
 logger_parse_bool :: proc(value: string, fallback: bool) -> bool {

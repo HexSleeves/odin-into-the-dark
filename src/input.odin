@@ -23,14 +23,14 @@ read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
 
 // ─── Input handling ───────────────────────────────────────────────────────────
 
-handle_input :: proc(game: ^Game, im: ^Input_Manager) -> Input_Result {
+handle_input :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game, im: ^Input_Manager) -> Input_Result {
 	if action_pressed(im, .Quit) {
 		return .Quit
 	}
 
 	if action_pressed(im, .Wait) {
-		game.turn_count += 1
-		add_message(game, "You wait...", rl.Color{180, 180, 180, 255})
+		eng.turn_manager_advance(turns)
+		add_message(messages, game, "You wait...", rl.Color{180, 180, 180, 255})
 		return .Waited
 	}
 
@@ -59,40 +59,40 @@ handle_input :: proc(game: ^Game, im: ^Input_Manager) -> Input_Result {
 
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
-		resolve_attack_player_on_enemy(game, target_enemy)
-		game.turn_count += 1
+		resolve_attack_player_on_enemy(messages, game, target_enemy)
+		eng.turn_manager_advance(turns)
 		return .Moved
 	}
 
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
-	game.turn_count += 1
+	eng.turn_manager_advance(turns)
 
 	t := tile_at(game, target_x, target_y)
 	if t != nil && t.type == .Descent {
-		descend(game)
+		descend(content, camera, messages, game)
 		return .Descended
 	}
 
 	return .Moved
 }
 
-handle_forced_turn :: proc(game: ^Game) -> bool {
+handle_forced_turn :: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	if game.skip_next_turn {
 		game.skip_next_turn = false
-		game.turn_count += 1
+		eng.turn_manager_advance(turns)
 		hp_before := game.player.hp
-		advance_turn(game, hp_before)
-		add_message(game, "You break free from the web.", rl.Color{200, 200, 100, 255})
+		advance_turn(turns, camera, messages, game, hp_before)
+		add_message(messages, game, "You break free from the web.", rl.Color{200, 200, 100, 255})
 		return true
 	}
 
 	if game.water_slow_active {
 		game.water_slow_active = false
-		game.turn_count += 1
+		eng.turn_manager_advance(turns)
 		hp_before := game.player.hp
-		advance_turn(game, hp_before)
-		add_message(game, "You push through the water.", rl.Color{40, 80, 180, 255})
+		advance_turn(turns, camera, messages, game, hp_before)
+		add_message(messages, game, "You push through the water.", rl.Color{40, 80, 180, 255})
 		return true
 	}
 
@@ -100,27 +100,30 @@ handle_forced_turn :: proc(game: ^Game) -> bool {
 }
 
 handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool {
+	messages := game_engine_message_manager(engine)
 	if !game.ui.mining_mode {return false}
 
 	if action_pressed(im, .Quit) {
 		game.ui.mining_mode = false
-		add_message(game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
 		return true
 	}
 
 	mdx, mdy := read_cardinal_press(im)
 	if mdx != 0 || mdy != 0 {
 		game.ui.mining_mode = false
-		if mine_wall(game, mdx, mdy) {
+		if mine_wall(game_engine_content_manager(engine), messages, game, mdx, mdy) {
+			eng.turn_manager_advance(game_engine_turn_manager(engine))
 			audio_manager_play_sfx(game_engine_audio_manager(engine), .Mine)
 			spawn_mine_particles(
+				game_engine_particle_manager(engine),
 				game.player.pos.x + mdx,
 				game.player.pos.y + mdy,
-				game.camera_x,
-				game.camera_y,
+				game_camera_x(game_engine_camera_manager(engine)),
+				game_camera_y(game_engine_camera_manager(engine)),
 			)
 			hp_before := game.player.hp
-			advance_turn(game, hp_before)
+			advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game, hp_before)
 		}
 	}
 
@@ -128,17 +131,18 @@ handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 }
 
 handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool {
+	messages := game_engine_message_manager(engine)
 	if action_pressed(im, .Crafting) {
 		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 		if cur != nil && cur.type == .Anvil {
 			game.state = .Viewing_Crafting
 			return true
 		}
-		add_message(game, "You need to stand on an anvil to craft.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "You need to stand on an anvil to craft.", rl.Color{180, 180, 180, 255})
 	}
 
 	if action_pressed(im, .Mine) {
-		start_mining_mode(game)
+		start_mining_mode(messages, game)
 		return true
 	}
 
@@ -150,38 +154,40 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		audio := game_engine_audio_manager(engine)
 		enabled := audio_manager_toggle(audio)
 		if enabled {
-			add_message(game, "Sound: ON", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Sound: ON", rl.Color{180, 180, 180, 255})
 		} else {
-			add_message(game, "Sound: OFF", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Sound: OFF", rl.Color{180, 180, 180, 255})
 		}
 	}
 
 	if action_pressed(im, .Toggle_Sprites) {
 		game.ui.use_sprites = !game.ui.use_sprites
 		if game.ui.use_sprites {
-			add_message(game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
 		} else {
-			add_message(game, "Render: ASCII", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Render: ASCII", rl.Color{180, 180, 180, 255})
 		}
 	}
 
 	if action_pressed(im, .Save) {
 		saves := game_engine_save_manager(engine)
-		if save_manager_save_game(saves, game) {
-			add_message(game, "Game saved.", rl.Color{100, 255, 100, 255})
+			if save_manager_save_game(saves, game_engine_turn_manager(engine), game) {
+			add_message(messages, game, "Game saved.", rl.Color{100, 255, 100, 255})
 		} else {
-			add_message(game, "Save failed!", rl.Color{255, 100, 100, 255})
+			add_message(messages, game, "Save failed!", rl.Color{255, 100, 100, 255})
 		}
 	}
 
 	if action_pressed(im, .Pickup) {
-		if pickup_item(game) {
+		if pickup_item(game_engine_content_manager(engine), messages, game) {
+			camera := game_engine_camera_manager(engine)
 			audio_manager_play_sfx(game_engine_audio_manager(engine), .Pickup)
 			spawn_pickup_particles(
+				game_engine_particle_manager(engine),
 				game.player.pos.x,
 				game.player.pos.y,
-				game.camera_x,
-				game.camera_y,
+				game_camera_x(camera),
+				game_camera_y(camera),
 			)
 		}
 	}
@@ -251,14 +257,14 @@ activate_title_choice :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) 
 	switch game.ui.title_choice {
 	case TITLE_NEW_GAME:
 		death_sound_played = false
-		restart_game(game)
+		restart_game(game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_message_manager(engine), game)
 	case TITLE_CONTINUE:
 		saves := game_engine_save_manager(engine)
 		if save_manager_save_exists(saves) {
-			if save_manager_load_game(saves, game) {
+			if save_manager_load_game(saves, game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_message_manager(engine), game) {
 				death_sound_played = false
 			} else {
-				add_message(game, "Save file could not be loaded.", rl.Color{255, 180, 50, 255})
+				add_message(game_engine_message_manager(engine), game, "Save file could not be loaded.", rl.Color{255, 180, 50, 255})
 			}
 		}
 	case TITLE_HIGH_SCORES:
@@ -275,16 +281,17 @@ activate_title_choice :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) 
 handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Load) {
 		saves := game_engine_save_manager(engine)
-		if save_manager_load_game(saves, game) {
+		if save_manager_load_game(saves, game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_message_manager(engine), game) {
 			death_sound_played = false
 		} else {
-			add_message(game, "No save file found.", rl.Color{255, 180, 50, 255})
+			add_message(game_engine_message_manager(engine), game, "No save file found.", rl.Color{255, 180, 50, 255})
 		}
 	}
 }
 
 update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
-	if handle_forced_turn(game) {return}
+	messages := game_engine_message_manager(engine)
+	if handle_forced_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game) {return}
 	if handle_mining_input(engine, game, im) {return}
 	if handle_playing_hotkeys(engine, game, im) {return}
 	return handle_player_action(engine, game)
@@ -293,15 +300,21 @@ update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> 
 update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !death_sound_played {
 		audio_manager_play_sfx(game_engine_audio_manager(engine), .Death)
-		spawn_death_particles(game.player.pos.x, game.player.pos.y, game.camera_x, game.camera_y)
+		spawn_death_particles(
+			game_engine_particle_manager(engine),
+			game.player.pos.x,
+			game.player.pos.y,
+			game_camera_x(game_engine_camera_manager(engine)),
+			game_camera_y(game_engine_camera_manager(engine)),
+		)
 		death_sound_played = true
 	}
 	if !game.score_saved {
-		save_run_score(game)
+		save_run_score(game_engine_score_manager(engine), game_engine_turn_manager(engine), game)
 	}
 	if action_pressed(im, .Restart) {
 		death_sound_played = false
-		restart_game(game)
+		restart_game(game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_message_manager(engine), game)
 	}
 	if action_pressed(im, .Quit) {
 		return true
@@ -309,13 +322,13 @@ update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -
 	return
 }
 
-update_victory :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+update_victory :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !game.score_saved {
 		game.death_cause = "Victory!"
-		save_run_score(game)
+		save_run_score(game_engine_score_manager(engine), game_engine_turn_manager(engine), game)
 	}
 	if action_pressed(im, .Restart) {
-		restart_game(game)
+		restart_game(game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_message_manager(engine), game)
 	}
 	if action_pressed(im, .Quit) {
 		return true
@@ -323,7 +336,7 @@ update_victory :: proc(game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	return
 }
 
-update_viewing_inventory :: proc(game: ^Game, im: ^Input_Manager) {
+update_viewing_inventory :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Inventory) || action_pressed(im, .Menu_Back) {
 		game.state = .Playing
 		game.ui.dropping = false
@@ -352,26 +365,26 @@ update_viewing_inventory :: proc(game: ^Game, im: ^Input_Manager) {
 	for act, idx in inv_actions {
 		if action_pressed(im, act) {
 			if game.ui.dropping {
-				drop_item(game, idx)
+				drop_item(messages, game, idx)
 				game.ui.dropping = false
 			} else if game.ui.equipping {
-				equip_item(game, idx)
+				equip_item(messages, game, idx)
 				game.ui.equipping = false
 			} else {
-				use_item(game, idx)
+				use_item(content, messages, game, idx)
 			}
 		}
 	}
 }
 
-update_viewing_crafting :: proc(game: ^Game, im: ^Input_Manager) {
+update_viewing_crafting :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Menu_Back) || action_pressed(im, .Crafting) {
 		game.state = .Playing
 	}
-	if action_pressed(im, .Craft_1) {try_craft(game, 0)}
-	if action_pressed(im, .Craft_2) {try_craft(game, 1)}
-	if action_pressed(im, .Craft_3) {try_craft(game, 2)}
-	if action_pressed(im, .Craft_4) {try_craft(game, 3)}
+	if action_pressed(im, .Craft_1) {try_craft(content, messages, game, 0)}
+	if action_pressed(im, .Craft_2) {try_craft(content, messages, game, 1)}
+	if action_pressed(im, .Craft_3) {try_craft(content, messages, game, 2)}
+	if action_pressed(im, .Craft_4) {try_craft(content, messages, game, 3)}
 }
 
 update_viewing_help :: proc(game: ^Game, im: ^Input_Manager) {

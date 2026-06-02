@@ -12,8 +12,9 @@ Engine_Config :: struct {
 }
 
 Engine :: struct {
-	config:   Engine_Config,
-	services: ^Engine_Services,
+	config:        Engine_Config,
+	services:      ^Engine_Services,
+	scene_manager: Scene_Manager,
 }
 
 Game_App :: struct {
@@ -40,8 +41,16 @@ engine_config_make :: proc(
 	}
 }
 
+engine_scene_manager :: proc(engine: ^Engine) -> ^Scene_Manager {
+	if engine == nil {
+		return nil
+	}
+	return &engine.scene_manager
+}
+
 engine_run :: proc(config: Engine_Config, services_config: Engine_Services_Config, app: ^Game_App) {
 	services := engine_services_make(services_config)
+	defer engine_services_destroy(&services)
 	engine := Engine{config = config, services = &services}
 
 	engine_services_init_diagnostics(&services)

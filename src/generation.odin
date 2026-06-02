@@ -61,7 +61,7 @@ carve_v_tunnel :: proc(game: ^Game, y1, y2, x: int) {
 
 // ─── Map generator (depth dispatch) ───────────────────────────────────────────
 
-generate_map :: proc(game: ^Game) {
+generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	// Clear tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		game.tiles[i] = Tile{}
@@ -82,8 +82,8 @@ generate_map :: proc(game: ^Game) {
 	}
 
 	// Spawn enemies and items (works for all gen types)
-	spawn_enemies(game)
-	spawn_items(game)
+	spawn_enemies(content, game)
+	spawn_items(content, game)
 	spawn_hazards(game)
 	spawn_ore_veins(game)
 
@@ -91,7 +91,7 @@ generate_map :: proc(game: ^Game) {
 	spawn_anvil(game)
 
 	// Spawn boss on milestone depths
-	spawn_boss(game)
+	spawn_boss(content, game)
 
 	// Clear hazard state
 	game.water_slow_active = false
@@ -356,7 +356,7 @@ spawn_anvil :: proc(game: ^Game) {
 
 // ─── Boss spawning (depth-gated) ─────────────────────────────────────────────
 
-spawn_boss :: proc(game: ^Game) {
+spawn_boss :: proc(content: ^Content_Manager, game: ^Game) {
 	boss_id: string
 	if game.depth == 5 {
 		boss_id = "mine_guardian"
@@ -377,7 +377,7 @@ spawn_boss :: proc(game: ^Game) {
 					bx := x + dx[dir]
 					by := y + dy[dir]
 					if is_walkable(game, bx, by) && enemy_at(game, bx, by) == nil {
-						def := find_enemy_def(boss_id)
+						def := content_manager_enemy_def(content, boss_id)
 						if def != nil {
 							boss := enemy_make_from_def(def, Vec2{bx, by})
 							boss.is_boss = true

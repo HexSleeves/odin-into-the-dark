@@ -69,6 +69,38 @@ engine_services_registers_and_replaces_service_contexts :: proc(t: ^testing.T) {
 }
 
 @(test)
+engine_services_registers_engine_owned_service_values :: proc(t: ^testing.T) {
+	services := engine_services_make(engine_services_default_config())
+	defer engine_services_destroy(&services)
+	value: i32 = 42
+
+	stored := cast(^i32)engine_services_register_value(&services, 8, &value, size_of(i32))
+	testing.expect(t, stored != nil)
+	testing.expect(t, stored != &value)
+	testing.expect_value(t, stored^, 42)
+	testing.expect(t, engine_services_get(&services, 8) == rawptr(stored))
+
+	value = 7
+	testing.expect_value(t, stored^, 42)
+
+	replacement: i32 = 99
+	replaced := cast(^i32)engine_services_register_value(&services, 8, &replacement, size_of(i32))
+	testing.expect(t, replaced == stored)
+	testing.expect_value(t, replaced^, 99)
+	testing.expect_value(t, services.service_count, 1)
+}
+
+@(test)
+engine_services_rejects_oversized_engine_owned_values :: proc(t: ^testing.T) {
+	services := engine_services_make(engine_services_default_config())
+	defer engine_services_destroy(&services)
+	too_large: [ENGINE_SERVICE_STORAGE_BYTES + 1]u8
+
+	testing.expect(t, engine_services_register_value(&services, 9, &too_large, size_of(type_of(too_large))) == nil)
+	testing.expect(t, !engine_services_has(&services, 9))
+}
+
+@(test)
 engine_services_rejects_invalid_or_overflow_registrations :: proc(t: ^testing.T) {
 	services := engine_services_make(engine_services_default_config())
 

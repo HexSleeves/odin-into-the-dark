@@ -122,6 +122,13 @@ load_json5 :: proc($T: typeid, path: string) -> (result: T, ok: bool) {
 }
 
 data_load_all :: proc() -> bool {
+	return data_load_all_into(&g_data)
+}
+
+data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
+	if registry == nil {
+		return false
+	}
 	enemies, enemies_ok := load_json5(Enemy_Data, "data/enemies.json5")
 	if !enemies_ok {return false}
 
@@ -131,17 +138,17 @@ data_load_all :: proc() -> bool {
 	player, player_ok := load_json5(Player_Def, "data/player.json5")
 	if !player_ok {return false}
 
-	g_data.enemies = enemies
-	g_data.items = items
-	g_data.player = player
-	g_data.loaded = true
+	registry.enemies = enemies
+	registry.items = items
+	registry.player = player
+	registry.loaded = true
 
 	logger_debugf(
 		.Data,
 		"loaded %v enemies, %v spawn tables, %v items",
-		len(g_data.enemies.enemies),
-		len(g_data.enemies.spawn_tables),
-		len(g_data.items.items),
+		len(registry.enemies.enemies),
+		len(registry.enemies.spawn_tables),
+		len(registry.items.items),
 	)
 
 	return true
@@ -273,13 +280,14 @@ pick_item_def :: proc() -> ^Item_Def {
 
 // ─── Data-driven item use ─────────────────────────────────────────────────────
 
-apply_item_effect :: proc(game: ^Game, def: ^Item_Def) {
+apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_Def) {
 	eff := &def.effect
 
 	if eff.type == "heal" {
 		actual_heal := min(eff.value, game.player.max_hp - game.player.hp)
 		game.player.hp = min(game.player.hp + eff.value, game.player.max_hp)
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("You use a %s. Restored %d HP.", def.name, actual_heal),
 			rl.Color{100, 255, 100, 255},
@@ -289,6 +297,7 @@ apply_item_effect :: proc(game: ^Game, def: ^Item_Def) {
 		if max_r <= 0 {max_r = 10}
 		game.player.light_radius = min(game.player.light_radius + eff.value, max_r)
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("You use a %s. Light radius increased.", def.name),
 			rl.Color{255, 180, 50, 255},
@@ -297,24 +306,28 @@ apply_item_effect :: proc(game: ^Game, def: ^Item_Def) {
 		game.light_boost_bonus = eff.value
 		game.light_boost_turns = eff.duration
 		add_message(
+			messages,
 			game,
 			"You apply lantern oil. Light burns brighter!",
 			rl.Color{255, 200, 80, 255},
 		)
 	} else if eff.type == "equip" {
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
 			rl.Color{180, 180, 180, 255},
 		)
 	} else if eff.type == "material" {
 		add_message(
+			messages,
 			game,
 			"Raw materials cannot be used directly. Find an anvil to craft.",
 			rl.Color{180, 180, 100, 255},
 		)
 	} else {
 		add_message(
+			messages,
 			game,
 			fmt.tprintf("You use a %s. Nothing happens.", def.name),
 			rl.Color{180, 180, 180, 255},

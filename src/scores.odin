@@ -20,12 +20,30 @@ Score_Table :: struct {
 	count:  int,
 }
 
+Score_Manager :: struct {
+	file_path: string,
+}
+
+score_manager_make :: proc() -> Score_Manager {
+	return Score_Manager {
+		file_path = SCORES_FILE,
+	}
+}
+
+score_manager_path :: proc(scores: ^Score_Manager) -> string {
+	if scores == nil || scores.file_path == "" {
+		return SCORES_FILE
+	}
+	return scores.file_path
+}
+
 // ─── Load / Save ──────────────────────────────────────────────────────────────
 
-load_scores :: proc() -> Score_Table {
+score_manager_load :: proc(scores: ^Score_Manager) -> Score_Table {
 	result: Score_Table
+	path := score_manager_path(scores)
 
-	data, read_err := os.read_entire_file(SCORES_FILE, context.allocator)
+	data, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {
 		// No file yet — return empty table
 		return result
@@ -34,14 +52,15 @@ load_scores :: proc() -> Score_Table {
 
 	parse_err := json.unmarshal(data, &result)
 	if parse_err != nil {
-		logger_warnf(.Scores, "parse failed for %s: %v", SCORES_FILE, parse_err)
+		logger_warnf(.Scores, "parse failed for %s: %v", path, parse_err)
 		return {}
 	}
 
 	return result
 }
 
-save_scores :: proc(table: ^Score_Table) {
+score_manager_save :: proc(scores: ^Score_Manager, table: ^Score_Table) {
+	path := score_manager_path(scores)
 	data, marshal_err := json.marshal(table^, allocator = context.allocator)
 	if marshal_err != nil {
 		logger_errorf(.Scores, "marshal failed: %v", marshal_err)
@@ -49,9 +68,9 @@ save_scores :: proc(table: ^Score_Table) {
 	}
 	defer delete(data, context.allocator)
 
-	write_err := os.write_entire_file(SCORES_FILE, data)
+	write_err := os.write_entire_file(path, data)
 	if write_err != nil {
-		logger_errorf(.Scores, "write failed for %s: %v", SCORES_FILE, write_err)
+		logger_errorf(.Scores, "write failed for %s: %v", path, write_err)
 	}
 }
 

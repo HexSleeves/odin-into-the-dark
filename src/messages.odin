@@ -1,6 +1,7 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Message panel layout ────────────────────────────────────────────────────
 
@@ -10,15 +11,34 @@ MSG_FONT_SIZE :: i32(14)
 MSG_LINE_HEIGHT :: i32(16)
 MSG_MAX_VISIBLE :: 7
 
+Message_Manager :: struct {
+	log:   MessageLog,
+	turns: ^eng.Turn_Manager,
+}
+
+message_manager_make :: proc() -> Message_Manager {
+	return Message_Manager{}
+}
+
+message_manager_bind_turns :: proc(messages: ^Message_Manager, turns: ^eng.Turn_Manager) {
+	if messages == nil {
+		return
+	}
+	messages.turns = turns
+}
+
 // ─── Add a message to the ring buffer ────────────────────────────────────────
 
-add_message :: proc(game: ^Game, text: string, color: rl.Color) {
-	log := &game.message_log
+add_message :: proc(messages: ^Message_Manager, game: ^Game, text: string, color: rl.Color) {
+	if messages == nil || game == nil {
+		return
+	}
+	log := &messages.log
 
 	// Write into the slot at head
 	msg := &log.messages[log.head]
 	msg.color = color
-	msg.turn = game.turn_count
+	msg.turn = eng.turn_manager_current(messages.turns)
 
 	// Copy text into fixed buffer (truncate if too long)
 	n := min(len(text), MAX_MSG_LEN - 1)
@@ -37,15 +57,25 @@ add_message :: proc(game: ^Game, text: string, color: rl.Color) {
 
 // ─── Clear all messages ──────────────────────────────────────────────────────
 
-clear_messages :: proc(game: ^Game) {
-	game.message_log.head = 0
-	game.message_log.count = 0
+clear_messages :: proc(messages: ^Message_Manager) {
+	if messages == nil {
+		return
+	}
+	messages.log.head = 0
+	messages.log.count = 0
 }
 
 // ─── Render message panel ────────────────────────────────────────────────────
 
-render_messages :: proc(game: ^Game) {
-	log := &game.message_log
+render_messages_for_engine :: proc(engine: ^eng.Engine) {
+	render_messages(game_engine_message_manager(engine))
+}
+
+render_messages :: proc(messages: ^Message_Manager) {
+	if messages == nil {
+		return
+	}
+	log := &messages.log
 
 	// Draw dark background for the message panel
 	rl.DrawRectangle(

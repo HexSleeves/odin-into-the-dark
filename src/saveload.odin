@@ -4,6 +4,7 @@ import "core:mem"
 import "core:os"
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
@@ -163,24 +164,32 @@ string_to_save :: proc(s: string) -> Save_String {
 	return result
 }
 
-// Resolve a Save_String back to a stable string pointer from g_data.
+// Resolve a Save_String back to a stable string pointer from loaded content.
 // All game strings originate from data definitions (lifetime = program),
 // so we look them up instead of allocating.
-save_to_string :: proc(s: ^Save_String) -> string {
+save_to_string :: proc(content: ^Content_Manager, s: ^Save_String) -> string {
 	if s.len == 0 {
 		return ""
 	}
 	temp := string(s.data[:s.len])
 
 	// Look up in enemy definitions
-	for &def in g_data.enemies.enemies {
+	enemies: []Enemy_Def
+	if content != nil {
+		enemies = content.registry.enemies.enemies
+	}
+	for &def in enemies {
 		if def.id == temp {return def.id}
 		if def.name == temp {return def.name}
 		if def.ability.type == temp {return def.ability.type}
 	}
 
 	// Look up in item definitions
-	for &def in g_data.items.items {
+	items: []Item_Def
+	if content != nil {
+		items = content.registry.items.items
+	}
+	for &def in items {
 		if def.id == temp {return def.id}
 		if def.name == temp {return def.name}
 		if def.equipment_slot == temp {return def.equipment_slot}
@@ -213,16 +222,16 @@ item_to_save :: proc(item: ^Item) -> Save_Item {
 	}
 }
 
-save_to_item :: proc(si: ^Save_Item) -> Item {
+save_to_item :: proc(content: ^Content_Manager, si: ^Save_Item) -> Item {
 	return Item {
 		pos = si.pos,
-		item_type = save_to_string(&si.item_type),
-		name = save_to_string(&si.name),
+		item_type = save_to_string(content, &si.item_type),
+		name = save_to_string(content, &si.name),
 		glyph = si.glyph,
 		color = si.color,
 		picked_up = si.picked_up,
 		quantity = si.quantity,
-		equipment_slot = save_to_string(&si.equipment_slot),
+		equipment_slot = save_to_string(content, &si.equipment_slot),
 		stat_bonus = si.stat_bonus,
 		durability = si.durability,
 		max_durability = si.max_durability,
@@ -231,11 +240,11 @@ save_to_item :: proc(si: ^Save_Item) -> Item {
 
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
-save_game :: proc(game: ^Game) -> bool {
-	return save_game_to_path(game, SAVE_FILE)
+save_game :: proc(turns: ^eng.Turn_Manager, game: ^Game) -> bool {
+	return save_game_to_path(turns, game, SAVE_FILE)
 }
 
-save_game_to_path :: proc(game: ^Game, path: string) -> bool {
+save_game_to_path :: proc(turns: ^eng.Turn_Manager, game: ^Game, path: string) -> bool {
 	// Heap-allocate — Save_Data is large (~600KB+)
 	data := new(Save_Data)
 	if data == nil {return false}
@@ -246,7 +255,7 @@ save_game_to_path :: proc(game: ^Game, path: string) -> bool {
 	data.web_tiles = game.web_tiles
 	data.player = game.player
 	data.depth = game.depth
-	data.turn_count = game.turn_count
+	data.turn_count = eng.turn_manager_current(turns)
 	data.kills = game.kills
 	data.seed = game.seed
 	data.light_boost_bonus = game.light_boost_bonus
@@ -371,11 +380,11 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
-load_game :: proc(game: ^Game) -> bool {
-	return load_game_from_path(game, SAVE_FILE)
+load_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
+	return load_game_from_path(content, turns, camera, messages, game, SAVE_FILE)
 }
 
-load_game_from_path :: proc(game: ^Game, path: string) -> bool {
+load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game, path: string) -> bool {
 	buf, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {return false}
 	defer delete(buf, context.allocator)
@@ -399,7 +408,7 @@ load_game_from_path :: proc(game: ^Game, path: string) -> bool {
 	game.web_tiles = data.web_tiles
 	game.player = data.player
 	game.depth = data.depth
-	game.turn_count = data.turn_count
+	eng.turn_manager_set(turns, data.turn_count)
 	game.kills = data.kills
 	game.seed = data.seed
 	game.light_boost_bonus = data.light_boost_bonus
@@ -411,7 +420,7 @@ load_game_from_path :: proc(game: ^Game, path: string) -> bool {
 	// ── Restore ore veins ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		game.ore_veins[i] = Ore_Vein {
-			ore_type = save_to_string(&data.ore_veins[i].ore_type),
+			ore_type = save_to_string(content, &data.ore_veins[i].ore_type),
 			color    = data.ore_veins[i].color,
 		}
 	}
@@ -427,20 +436,20 @@ load_game_from_path :: proc(game: ^Game, path: string) -> bool {
 		se := &data.enemies[i]
 		append(
 			&game.enemies,
-			Enemy {
-				pos = se.pos,
-				hp = se.hp,
-				max_hp = se.max_hp,
-				attack = se.attack,
-				enemy_type = save_to_string(&se.enemy_type),
-				name = save_to_string(&se.name),
-				glyph = se.glyph,
-				color = se.color,
-				alive = se.alive,
-				ability_type = save_to_string(&se.ability_type),
-				ability_cooldown = se.ability_cooldown,
-				ability_max_cd = se.ability_max_cd,
-				ability_range = se.ability_range,
+				Enemy {
+					pos = se.pos,
+					hp = se.hp,
+					max_hp = se.max_hp,
+					attack = se.attack,
+					enemy_type = save_to_string(content, &se.enemy_type),
+					name = save_to_string(content, &se.name),
+					glyph = se.glyph,
+					color = se.color,
+					alive = se.alive,
+					ability_type = save_to_string(content, &se.ability_type),
+					ability_cooldown = se.ability_cooldown,
+					ability_max_cd = se.ability_max_cd,
+					ability_range = se.ability_range,
 				is_boss = se.is_boss,
 			},
 		)
@@ -448,7 +457,7 @@ load_game_from_path :: proc(game: ^Game, path: string) -> bool {
 
 	game.items = make([dynamic]Item)
 	for i in 0 ..< data.item_count {
-		append(&game.items, save_to_item(&data.items[i]))
+		append(&game.items, save_to_item(content, &data.items[i]))
 	}
 
 	game.light_sources = make([dynamic]Light_Source)
@@ -457,30 +466,30 @@ load_game_from_path :: proc(game: ^Game, path: string) -> bool {
 	for i in 0 ..< MAX_INVENTORY {
 		game.inventory[i] = Inventory_Slot {
 			occupied = data.inventory[i].occupied,
-			item     = save_to_item(&data.inventory[i].item),
+			item     = save_to_item(content, &data.inventory[i].item),
 		}
 	}
 
 	// ── Restore equipment ──
 	game.equipped_weapon = Equipment {
 		occupied = data.equipped_weapon.occupied,
-		item     = save_to_item(&data.equipped_weapon.item),
+		item     = save_to_item(content, &data.equipped_weapon.item),
 	}
 	game.equipped_armor = Equipment {
 		occupied = data.equipped_armor.occupied,
-		item     = save_to_item(&data.equipped_armor.item),
+		item     = save_to_item(content, &data.equipped_armor.item),
 	}
 	game.equipped_helmet = Equipment {
 		occupied = data.equipped_helmet.occupied,
-		item     = save_to_item(&data.equipped_helmet.item),
+		item     = save_to_item(content, &data.equipped_helmet.item),
 	}
 
 	// ── Reconstruct transient state ──
 	game.palette = palette_for_depth(game.depth)
 	compute_fov(game)
-	camera_update(game, snap = true)
-	clear_messages(game)
-	add_message(game, "Game loaded.", rl.Color{100, 255, 100, 255})
+	game_camera_update(camera, game, true)
+	clear_messages(messages)
+	add_message(messages, game, "Game loaded.", rl.Color{100, 255, 100, 255})
 
 	// Reset transient UI modes on load
 	game.ui.mining_mode = false

@@ -12,8 +12,8 @@ draw_centered_text :: proc(text: cstring, y, size: i32, color: rl.Color) {
 	rl.DrawText(text, x, y, size, color)
 }
 
-draw_score_rows :: proc(base_y, row_size, row_h: i32, highlight_rank: int = -1) {
-	table := load_scores()
+draw_score_rows :: proc(scores: ^Score_Manager, base_y, row_size, row_h: i32, highlight_rank: int = -1) {
+	table := score_manager_load(scores)
 	if table.count == 0 {
 		draw_centered_text("No scores yet.", base_y, row_size, rl.Color{120, 120, 120, 255})
 		return
@@ -78,17 +78,19 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 	draw_centered_text("Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit", i32(SCREEN_HEIGHT) - 48, 14, rl.Color{150, 150, 150, 255})
 }
 
-render_high_scores :: proc(game: ^Game) {
+render_high_scores :: proc(engine: ^eng.Engine, game: ^Game) {
 	_ = game
+	scores := game_engine_score_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 230})
 	draw_centered_text("HIGH SCORES", 80, 34, rl.Color{255, 220, 50, 255})
-	draw_score_rows(145, 16, 28)
+	draw_score_rows(scores, 145, 16, 28)
 	draw_centered_text("Press ESC or H to return", i32(SCREEN_HEIGHT) - 40, 16, rl.Color{150, 150, 150, 255})
 }
 
 // ─── Inventory overlay screen ─────────────────────────────────────────────────
 
 render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
+	content := game_engine_content_manager(engine)
 	sprites := game_engine_sprite_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
 
@@ -255,7 +257,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	if inspect_item != nil {
 		it := inspect_item
-		def := find_item_def(it.item_type)
+		def := content_manager_item_def(content, it.item_type)
 
 		panel_x :: i32(720)
 		panel_y :: i32(175)
@@ -431,7 +433,9 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 
 // ─── Game Over screen ─────────────────────────────────────────────────────────
 
-render_game_over :: proc(game: ^Game) {
+render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
+	scores := game_engine_score_manager(engine)
+	turns := game_engine_turn_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 220})
 
 	sw := i32(SCREEN_WIDTH)
@@ -456,7 +460,7 @@ render_game_over :: proc(game: ^Game) {
 		"Depth: %d  |  Kills: %d  |  Turns: %d",
 		i32(game.depth),
 		i32(game.kills),
-		i32(game.turn_count),
+		i32(eng.turn_manager_current(turns)),
 	)
 	stats_size :: i32(16)
 	stats_w := rl.MeasureText(stats_text, stats_size)
@@ -469,7 +473,7 @@ render_game_over :: proc(game: ^Game) {
 	rl.DrawText(hs_title, (sw - hs_w) / 2, 145, hs_size, rl.Color{255, 220, 50, 255})
 
 	// Load and display score table
-	table := load_scores()
+	table := score_manager_load(scores)
 	row_h :: i32(22)
 	base_y :: i32(170)
 	row_size :: i32(14)
@@ -518,7 +522,8 @@ render_game_over :: proc(game: ^Game) {
 
 // ─── Crafting overlay screen ──────────────────────────────────────────────────
 
-render_crafting :: proc(game: ^Game) {
+render_crafting :: proc(engine: ^eng.Engine, game: ^Game) {
+	content := game_engine_content_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 200})
 
 	title := cstring("CRAFTING")
@@ -546,7 +551,7 @@ render_crafting :: proc(game: ^Game) {
 		color := rl.Color{100, 255, 100, 255} if can_craft else rl.Color{150, 80, 80, 255}
 
 		// Get material display name
-		mat_def := find_item_def(recipe.material_id)
+		mat_def := content_manager_item_def(content, recipe.material_id)
 		mat_name := recipe.material_id
 		if mat_def != nil {mat_name = mat_def.name}
 
@@ -569,7 +574,9 @@ render_crafting :: proc(game: ^Game) {
 
 // ─── Victory screen overlay ──────────────────────────────────────────────────
 
-render_victory :: proc(game: ^Game) {
+render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
+	scores := game_engine_score_manager(engine)
+	turns := game_engine_turn_manager(engine)
 	rl.DrawRectangle(0, 0, i32(SCREEN_WIDTH), i32(SCREEN_HEIGHT), rl.Color{0, 0, 0, 220})
 
 	sw := i32(SCREEN_WIDTH)
@@ -599,7 +606,7 @@ render_victory :: proc(game: ^Game) {
 		center_x - 100, stats_y + 25, 18, rl.Color{200, 200, 200, 255},
 	)
 	rl.DrawText(
-		rl.TextFormat("Turns Survived: %d", i32(game.turn_count)),
+		rl.TextFormat("Turns Survived: %d", i32(eng.turn_manager_current(turns))),
 		center_x - 100, stats_y + 50, 18, rl.Color{200, 200, 200, 255},
 	)
 	rl.DrawText(
@@ -613,7 +620,7 @@ render_victory :: proc(game: ^Game) {
 	hs_w := rl.MeasureText(hs_title, hs_size)
 	rl.DrawText(hs_title, (sw - hs_w) / 2, stats_y + 115, hs_size, rl.Color{255, 220, 50, 255})
 
-	table := load_scores()
+	table := score_manager_load(scores)
 	row_h :: i32(22)
 	base_y := stats_y + 140
 	row_size :: i32(14)

@@ -2,6 +2,7 @@ package main
 
 import "core:log"
 import "core:testing"
+import eng "./engine"
 
 @(test)
 logger_parse_bool_accepts_common_env_values :: proc(t: ^testing.T) {
@@ -57,4 +58,24 @@ logger_channel_labels_and_filters_are_stable :: proc(t: ^testing.T) {
 	all_channels := logger_parse_channels("all")
 	testing.expect(t, .App in all_channels)
 	testing.expect(t, .Save in all_channels)
+}
+
+@(test)
+logger_config_reads_engine_config_manager_values :: proc(t: ^testing.T) {
+	config := eng.config_manager_make()
+	eng.config_manager_load_env_text(
+		&config,
+		"ITD_LOG_LEVEL=debug\nITD_LOG_CONSOLE=false\nITD_LOG_FILE=true\nITD_LOG_FILE_PATH=logs/config-manager.log\nITD_LOG_CHANNELS=data,save\n",
+	)
+
+	logger_config := logger_config_from_config(&config)
+
+	testing.expect_value(t, logger_config.console_level, log.Level.Debug)
+	testing.expect_value(t, logger_config.file_level, log.Level.Debug)
+	testing.expect(t, !logger_config.console_enabled)
+	testing.expect(t, logger_config.file_enabled)
+	testing.expect_value(t, logger_config.file_path, "logs/config-manager.log")
+	testing.expect(t, .Data in logger_config.channels)
+	testing.expect(t, .Save in logger_config.channels)
+	testing.expect(t, !(.Audio in logger_config.channels))
 }

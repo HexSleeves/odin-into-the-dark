@@ -141,14 +141,6 @@ Ore_Vein :: struct {
 	color:    rl.Color, // visual tint for the wall
 }
 
-// ─── VFX State ────────────────────────────────────────────────────────────────
-
-VFX_State :: struct {
-	flash_color:    rl.Color, // current screen flash color
-	flash_alpha:    f32, // fades each render frame (0-1)
-	anim_frame:     int, // global frame counter (increments each render)
-}
-
 // ─── UI State ─────────────────────────────────────────────────────────────────
 
 UI_State :: struct {
@@ -187,18 +179,9 @@ Game :: struct {
 	inventory:         [MAX_INVENTORY]Inventory_Slot,
 	light_sources:     [dynamic]Light_Source,
 	depth:             int,
-	turn_count:        int,
 	kills:             int,
 	seed:              u64,
 	state:             Game_State,
-	input:             Input_Manager,
-	message_log:       MessageLog,
-	// Camera offset: pixel position of top-left corner of the viewport in map-space
-	camera_x:          int,
-	camera_y:          int,
-	// Smooth camera target (computed)
-	camera_target_x:   int,
-	camera_target_y:   int,
 	// Timed light boost (from lantern oil)
 	light_boost_bonus: int,
 	light_boost_turns: int,
@@ -220,7 +203,6 @@ Game :: struct {
 	death_cause:       string,
 	score_saved:       bool,
 	last_score_rank:   int,
-	// UI and VFX
+	// UI
 	ui:                UI_State,
-	vfx:               VFX_State,
 }

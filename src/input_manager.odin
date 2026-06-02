@@ -75,6 +75,12 @@ Input_Manager :: struct {
 	repeat_rate:  f32,
 }
 
+input_manager_make :: proc() -> Input_Manager {
+	input: Input_Manager
+	input_manager_init(&input)
+	return input
+}
+
 // ---------------------------------------------------------------------------
 // Init
 // ---------------------------------------------------------------------------
