@@ -1,9 +1,12 @@
 package main
 
+import eng "./engine"
+
 // ─── Entry point ──────────────────────────────────────────────────────────────
 
 main :: proc() {
-	config := engine_default_config()
+	config := game_engine_config()
+	services := game_engine_services_config()
 	app := game_app_make()
-	engine_run(config, &app)
+	eng.engine_run(config, services, &app)
 }

@@ -1,6 +1,7 @@
 set dotenv-load
 
 src := "src/"
+engine_src := "src/engine"
 binary := "into_the_depths"
 
 default:
@@ -36,14 +37,19 @@ profile:
 
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
+# Run root package and engine package tests
+test:
+    odin test {{src}}
+    odin test {{engine_src}}
+
 # Check and build (CI-style verification)
-verify: check build
-    @echo "✓ check + build passed"
+verify: test check build
+    @echo "✓ tests + check + build passed"
 
 # Count lines by domain
 stats:
     @echo "=== Lines by file ==="
-    @wc -l src/*.odin | sort -rn
+    @wc -l src/*.odin src/engine/*.odin | sort -rn
     @echo ""
     @echo "=== Data files ==="
     @wc -l data/*.json5

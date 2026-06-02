@@ -1,4 +1,4 @@
-package main
+package engine
 
 import rl "vendor:raylib"
 
@@ -12,7 +12,8 @@ Engine_Config :: struct {
 }
 
 Engine :: struct {
-	config: Engine_Config,
+	config:   Engine_Config,
+	services: ^Engine_Services,
 }
 
 Game_App :: struct {
@@ -25,30 +26,33 @@ Game_App :: struct {
 	autosave: proc(engine: ^Engine, app: ^Game_App),
 }
 
-engine_default_config :: proc() -> Engine_Config {
+engine_config_make :: proc(
+	window_width: i32,
+	window_height: i32,
+	window_title: cstring,
+	target_fps: i32,
+) -> Engine_Config {
 	return Engine_Config {
-		window_width  = SCREEN_WIDTH,
-		window_height = SCREEN_HEIGHT,
-		window_title  = "Into the Depths",
-		target_fps    = 60,
+		window_width  = window_width,
+		window_height = window_height,
+		window_title  = window_title,
+		target_fps    = target_fps,
 	}
 }
 
-engine_run :: proc(config: Engine_Config, app: ^Game_App) {
-	engine := Engine{config = config}
+engine_run :: proc(config: Engine_Config, services_config: Engine_Services_Config, app: ^Game_App) {
+	services := engine_services_make(services_config)
+	engine := Engine{config = config, services = &services}
 
-	logger_init_from_env(&g_logger)
-	defer logger_destroy(&g_logger)
+	engine_services_init_diagnostics(&services)
+	defer engine_services_shutdown_diagnostics(&services)
 
 	rl.InitWindow(config.window_width, config.window_height, config.window_title)
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(config.target_fps)
 
-	audio_init()
-	defer audio_cleanup()
-
-	sprites_init()
-	defer sprites_cleanup()
+	engine_services_init_runtime_assets(&services)
+	defer engine_services_shutdown_runtime_assets(&services)
 
 	if app == nil || app.init == nil || !app.init(&engine, app) {
 		return

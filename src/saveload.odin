@@ -232,6 +232,10 @@ save_to_item :: proc(si: ^Save_Item) -> Item {
 // ─── Save ─────────────────────────────────────────────────────────────────────
 
 save_game :: proc(game: ^Game) -> bool {
+	return save_game_to_path(game, SAVE_FILE)
+}
+
+save_game_to_path :: proc(game: ^Game, path: string) -> bool {
 	// Heap-allocate — Save_Data is large (~600KB+)
 	data := new(Save_Data)
 	if data == nil {return false}
@@ -326,7 +330,7 @@ save_game :: proc(game: ^Game) -> bool {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 	mem.copy(&buf[size_of(Save_Header)], data, size_of(Save_Data))
 
-	write_err := os.write_entire_file(SAVE_FILE, buf)
+	write_err := os.write_entire_file(path, buf)
 	return write_err == nil
 }
 
@@ -368,7 +372,11 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
 load_game :: proc(game: ^Game) -> bool {
-	buf, read_err := os.read_entire_file(SAVE_FILE, context.allocator)
+	return load_game_from_path(game, SAVE_FILE)
+}
+
+load_game_from_path :: proc(game: ^Game, path: string) -> bool {
+	buf, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {return false}
 	defer delete(buf, context.allocator)
 
@@ -486,7 +494,7 @@ load_game :: proc(game: ^Game) -> bool {
 	game.vfx = {}
 
 	// ── Delete save file (roguelike: one load per save) ──
-	os.remove(SAVE_FILE)
+	os.remove(path)
 
 	return true
 }
@@ -494,5 +502,9 @@ load_game :: proc(game: ^Game) -> bool {
 // ─── Check if a save file exists ──────────────────────────────────────────────
 
 save_exists :: proc() -> bool {
-	return os.exists(SAVE_FILE)
+	return save_exists_at(SAVE_FILE)
+}
+
+save_exists_at :: proc(path: string) -> bool {
+	return os.exists(path)
 }

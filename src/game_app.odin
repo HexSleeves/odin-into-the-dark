@@ -1,15 +1,49 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Into the Depths app adapter ─────────────────────────────────────────────
 
 Into_The_Depths_App_State :: struct {
-	game: ^Game,
+	game:    ^Game,
+	content: Content_Manager,
+	saves:   Save_Manager,
 }
 
-game_app_make :: proc() -> Game_App {
-	return Game_App {
+game_engine_config :: proc() -> eng.Engine_Config {
+	return eng.engine_config_make(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths", 60)
+}
+
+game_engine_services_config :: proc() -> eng.Engine_Services_Config {
+	return eng.Engine_Services_Config {
+		diagnostics_init = game_diagnostics_init,
+		diagnostics_shutdown = game_diagnostics_shutdown,
+		runtime_assets_init = game_runtime_assets_init,
+		runtime_assets_shutdown = game_runtime_assets_shutdown,
+	}
+}
+
+game_diagnostics_init :: proc() {
+	logger_init_from_env(&g_logger)
+}
+
+game_diagnostics_shutdown :: proc() {
+	logger_destroy(&g_logger)
+}
+
+game_runtime_assets_init :: proc() {
+	audio_init()
+	sprites_init()
+}
+
+game_runtime_assets_shutdown :: proc() {
+	sprites_cleanup()
+	audio_cleanup()
+}
+
+game_app_make :: proc() -> eng.Game_App {
+	return eng.Game_App {
 		name     = "Into the Depths",
 		init     = game_app_init,
 		update   = game_app_update,
@@ -19,22 +53,27 @@ game_app_make :: proc() -> Game_App {
 	}
 }
 
-game_app_state :: proc(app: ^Game_App) -> ^Into_The_Depths_App_State {
+game_app_state :: proc(app: ^eng.Game_App) -> ^Into_The_Depths_App_State {
 	if app == nil || app.state == nil {
 		return nil
 	}
 	return cast(^Into_The_Depths_App_State)app.state
 }
 
-game_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {
-	if !data_load_all() {
+game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
+	state := new(Into_The_Depths_App_State)
+	state.content = content_manager_make()
+	state.saves = save_manager_make()
+	app.state = state
+
+	if !content_manager_load_all(&state.content) {
 		logger_fatalf(.App, "Failed to load data files. Exiting.")
+		free(state)
+		app.state = nil
 		return false
 	}
 
-	state := new(Into_The_Depths_App_State)
 	state.game = game_init()
-	app.state = state
 
 	game := state.game
 	logger_debugf(.Init, "seed = %v", game.seed)
@@ -46,7 +85,7 @@ game_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {
 	return true
 }
 
-game_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {
+game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	state := game_app_state(app)
 	if state == nil || state.game == nil {
 		return true
@@ -54,30 +93,10 @@ game_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {
 
 	game := state.game
 	handle_global_input(game, &game.input)
-
-	switch game.state {
-	case .Title_Screen:
-		return update_title_screen(game, &game.input)
-	case .Playing:
-		return update_playing(game, &game.input)
-	case .Game_Over:
-		return update_game_over(game, &game.input)
-	case .Victory:
-		return update_victory(game, &game.input)
-	case .Viewing_Inventory:
-		update_viewing_inventory(game, &game.input)
-	case .Viewing_Crafting:
-		update_viewing_crafting(game, &game.input)
-	case .Viewing_Help:
-		update_viewing_help(game, &game.input)
-	case .Viewing_Scores:
-		update_viewing_scores(game, &game.input)
-	}
-
-	return false
+	return scene_update(game)
 }
 
-game_app_render :: proc(engine: ^Engine, app: ^Game_App) {
+game_app_render :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	state := game_app_state(app)
 	if state == nil || state.game == nil {
 		return
@@ -85,18 +104,18 @@ game_app_render :: proc(engine: ^Engine, app: ^Game_App) {
 	render_game(state.game)
 }
 
-game_app_autosave :: proc(engine: ^Engine, app: ^Game_App) {
+game_app_autosave :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	state := game_app_state(app)
 	if state == nil || state.game == nil {
 		return
 	}
 
 	if state.game.state == .Playing {
-		save_game(state.game)
+		save_manager_save_game(&state.saves, state.game)
 	}
 }
 
-game_app_shutdown :: proc(engine: ^Engine, app: ^Game_App) {
+game_app_shutdown :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	state := game_app_state(app)
 	if state == nil {
 		return
