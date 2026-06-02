@@ -17,14 +17,14 @@ Engine_Event_Type :: enum {
 }
 
 Engine_Event :: struct {
-	type:        Engine_Event_Type,
-	key:         Engine_Key,
-	mouse_x:     f32,
-	mouse_y:     f32,
+	type:         Engine_Event_Type,
+	key:          Engine_Key,
+	mouse_x:      f32,
+	mouse_y:      f32,
 	mouse_button: int,
-	wheel_delta: f32,
-	width:       i32,
-	height:      i32,
+	wheel_delta:  f32,
+	width:        i32,
+	height:       i32,
 }
 
 Event_Manager :: struct {

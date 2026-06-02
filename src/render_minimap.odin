@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Minimap overlay ──────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 				case:
 					c = rl.Color{120, 100, 80, 255}
 				}
-			render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
+				render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
 			} else if state.explored {
 				c: rl.Color
 				#partial switch tile.type {
@@ -57,7 +57,7 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 				case:
 					c = rl.Color{50, 40, 30, 255}
 				}
-			render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
+				render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
 			}
 			// Unseen tiles: don't draw (background shows through)
 		}
@@ -69,7 +69,14 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 		if !tile_visible_at(game, enemy.pos.x, enemy.pos.y) {continue}
 		ex := mm_x + i32(enemy.pos.x) * MINIMAP_TILE_SIZE
 		ey := mm_y + i32(enemy.pos.y) * MINIMAP_TILE_SIZE
-		render_draw_rectangle(engine, ex, ey, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, rl.Color{255, 60, 60, 255})
+		render_draw_rectangle(
+			engine,
+			ex,
+			ey,
+			MINIMAP_TILE_SIZE,
+			MINIMAP_TILE_SIZE,
+			rl.Color{255, 60, 60, 255},
+		)
 	}
 
 	// Draw player as bright yellow dot

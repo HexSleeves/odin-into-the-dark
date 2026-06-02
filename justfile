@@ -35,6 +35,14 @@ release:
 profile:
     odin build {{src}} -out:{{binary}} -o:speed -debug
 
+# ─── Formatting ────────────────────────────────────────────────────────────────
+
+odinfmt := "/Users/lecoqjacob/Developer/games/ols/odinfmt"
+
+# Format all Odin source files
+fmt:
+    {{odinfmt}} {{src}} -w
+
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
 # Run root package and engine package tests

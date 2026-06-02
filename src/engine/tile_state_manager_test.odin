@@ -40,7 +40,11 @@ tile_state_manager_clears_visibility_without_losing_exploration :: proc(t: ^test
 tile_state_manager_imports_and_exports_linear_storage :: proc(t: ^testing.T) {
 	states := tile_state_manager_make(engine_grid_2d_make(4, 3))
 	input: [12]Tile_State
-	input[5] = Tile_State{visible = true, explored = true, light_level = 0.4}
+	input[5] = Tile_State {
+		visible     = true,
+		explored    = true,
+		light_level = 0.4,
+	}
 	output: [12]Tile_State
 
 	tile_state_manager_import(&states, input[:])
@@ -53,4 +57,3 @@ tile_state_manager_imports_and_exports_linear_storage :: proc(t: ^testing.T) {
 	testing.expect(t, output[5].explored)
 	testing.expect_value(t, output[5].light_level, f32(0.4))
 }
-

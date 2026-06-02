@@ -3,8 +3,8 @@ package main
 import "core:fmt"
 import "core:math/rand"
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Enemy factory (data-driven) ─────────────────────────────────────────────
 
@@ -344,7 +344,10 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							add_message(
 								messages,
 								game,
-								fmt.tprintf("The %s appears from the shadows!", enemy_display_name(&enemy)),
+								fmt.tprintf(
+									"The %s appears from the shadows!",
+									enemy_display_name(&enemy),
+								),
 								rl.Color{80, 40, 120, 255},
 							)
 							break
@@ -357,11 +360,21 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			if dist <= 2 {
 				if dist == 1 {
 					game.player.hp -= 4
-					add_message(messages, game, "The Mine Guardian slams the ground! (-4 HP)", rl.Color{220, 180, 60, 255})
+					add_message(
+						messages,
+						game,
+						"The Mine Guardian slams the ground! (-4 HP)",
+						rl.Color{220, 180, 60, 255},
+					)
 					if game.player.hp <= 0 {
 						game.death_cause = "Crushed by the Mine Guardian"
 						game.state = .Game_Over
-						add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+						add_message(
+							messages,
+							game,
+							"You have been slain...",
+							rl.Color{255, 0, 0, 255},
+						)
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd
@@ -372,7 +385,12 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 				game.light_boost_bonus = max(game.light_boost_bonus - 2, -3)
 				game.light_boost_turns = max(game.light_boost_turns, 5)
 				enemy.ability_cooldown = enemy.ability_max_cd
-				add_message(messages, game, "The Abyssal Lord shrouds you in darkness!", rl.Color{150, 30, 200, 255})
+				add_message(
+					messages,
+					game,
+					"The Abyssal Lord shrouds you in darkness!",
+					rl.Color{150, 30, 200, 255},
+				)
 			}
 		}
 	}
@@ -388,7 +406,12 @@ remove_dead_enemies :: proc(messages: ^Message_Manager, game: ^Game) {
 				t := tile_at(game, game.enemies[i].pos.x, game.enemies[i].pos.y)
 				if t != nil && (t.type == .Floor || t.type == .Rubble) {
 					t.type = .Gas_Vent
-					add_message(messages, game, fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name), rl.Color{120, 200, 40, 255})
+					add_message(
+						messages,
+						game,
+						fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name),
+						rl.Color{120, 200, 40, 255},
+					)
 				}
 			}
 			unordered_remove(&game.enemies, i)

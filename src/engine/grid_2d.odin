@@ -25,11 +25,7 @@ engine_grid_2d_cell_count :: proc(grid: Engine_Grid_2D) -> int {
 }
 
 engine_grid_2d_contains :: proc(grid: Engine_Grid_2D, x, y: int) -> bool {
-	return engine_grid_2d_is_valid(grid) &&
-	       x >= 0 &&
-	       y >= 0 &&
-	       x < grid.width &&
-	       y < grid.height
+	return engine_grid_2d_is_valid(grid) && x >= 0 && y >= 0 && x < grid.width && y < grid.height
 }
 
 engine_grid_2d_index :: proc(grid: Engine_Grid_2D, x, y: int) -> int {
@@ -42,4 +38,3 @@ engine_grid_2d_position :: proc(grid: Engine_Grid_2D, index: int) -> Engine_Grid
 	}
 	return Engine_Grid_Pos{x = index % grid.width, y = index / grid.width}
 }
-

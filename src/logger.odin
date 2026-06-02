@@ -1,9 +1,9 @@
 package main
 
+import eng "./engine"
 import "core:fmt"
 import "core:log"
 import "core:os"
-import eng "./engine"
 
 // ─── Game diagnostics logger ─────────────────────────────────────────────────
 
@@ -158,10 +158,7 @@ logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Co
 		file_level = file_level,
 		file_path = file_path,
 		channels = logger_parse_channels(logger_config_value(config, "ITD_LOG_CHANNELS")),
-		include_source = logger_parse_bool(
-			logger_config_value(config, "ITD_LOG_SOURCE"),
-			true,
-		),
+		include_source = logger_parse_bool(logger_config_value(config, "ITD_LOG_SOURCE"), true),
 		flush_file = logger_parse_bool(logger_config_value(config, "ITD_LOG_FLUSH"), true),
 	}
 }

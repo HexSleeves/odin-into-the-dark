@@ -96,7 +96,11 @@ engine_services_rejects_oversized_engine_owned_values :: proc(t: ^testing.T) {
 	defer engine_services_destroy(&services)
 	too_large: [ENGINE_SERVICE_STORAGE_BYTES + 1]u8
 
-	testing.expect(t, engine_services_register_value(&services, 9, &too_large, size_of(type_of(too_large))) == nil)
+	testing.expect(
+		t,
+		engine_services_register_value(&services, 9, &too_large, size_of(type_of(too_large))) ==
+		nil,
+	)
 	testing.expect(t, !engine_services_has(&services, 9))
 }
 
@@ -110,7 +114,17 @@ engine_services_rejects_invalid_or_overflow_registrations :: proc(t: ^testing.T)
 	testing.expect(t, engine_services_get(&services, -1) == nil)
 
 	for i in 0 ..< ENGINE_SERVICE_MAX {
-		testing.expect(t, engine_services_register(&services, Engine_Service_Id(i), rawptr(uintptr(i + 1))))
+		testing.expect(
+			t,
+			engine_services_register(&services, Engine_Service_Id(i), rawptr(uintptr(i + 1))),
+		)
 	}
-	testing.expect(t, !engine_services_register(&services, Engine_Service_Id(ENGINE_SERVICE_MAX + 1), rawptr(uintptr(99))))
+	testing.expect(
+		t,
+		!engine_services_register(
+			&services,
+			Engine_Service_Id(ENGINE_SERVICE_MAX + 1),
+			rawptr(uintptr(99)),
+		),
+	)
 }

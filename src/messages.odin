@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Message panel layout ────────────────────────────────────────────────────
 

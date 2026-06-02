@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:testing"
 import rl "vendor:raylib"
-import eng "./engine"
 
 @(test)
 message_manager_make_starts_empty :: proc(t: ^testing.T) {
@@ -33,8 +33,10 @@ message_manager_adds_and_clears_messages :: proc(t: ^testing.T) {
 
 @(test)
 message_handlers_accept_manager_context :: proc(t: ^testing.T) {
-	bind_handler: proc(messages: ^Message_Manager, turns: ^eng.Turn_Manager) = message_manager_bind_turns
-	add_handler: proc(messages: ^Message_Manager, game: ^Game, text: string, color: rl.Color) = add_message
+	bind_handler: proc(messages: ^Message_Manager, turns: ^eng.Turn_Manager) =
+		message_manager_bind_turns
+	add_handler: proc(messages: ^Message_Manager, game: ^Game, text: string, color: rl.Color) =
+		add_message
 	clear_handler: proc(messages: ^Message_Manager) = clear_messages
 	render_handler: proc(engine: ^eng.Engine, messages: ^Message_Manager) = render_messages
 

@@ -31,4 +31,3 @@ engine_distance_map_rejects_out_of_bounds_and_invalid_storage :: proc(t: ^testin
 	testing.expect_value(t, engine_distance_map_get(&dmap, -1, 0), 123)
 	testing.expect_value(t, engine_distance_map_get(&dmap, 2, 0), 123)
 }
-

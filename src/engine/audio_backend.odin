@@ -1,18 +1,20 @@
 package engine
 
 Engine_Audio_Backend :: struct {
-	ctx: rawptr,
-	play: proc(ctx: rawptr, sound_id: int),
-	is_enabled: proc(ctx: rawptr) -> bool,
+	ctx:         rawptr,
+	play:        proc(ctx: rawptr, sound_id: int),
+	is_enabled:  proc(ctx: rawptr) -> bool,
 	set_enabled: proc(ctx: rawptr, enabled: bool) -> bool,
-	toggle: proc(ctx: rawptr) -> bool,
+	toggle:      proc(ctx: rawptr) -> bool,
 }
 
 engine_audio_backend_is_valid :: proc(audio: Engine_Audio_Backend) -> bool {
-	return audio.play != nil &&
-	       audio.is_enabled != nil &&
-	       audio.set_enabled != nil &&
-	       audio.toggle != nil
+	return(
+		audio.play != nil &&
+		audio.is_enabled != nil &&
+		audio.set_enabled != nil &&
+		audio.toggle != nil \
+	)
 }
 
 engine_audio_backend_or_default :: proc(audio: Engine_Audio_Backend) -> Engine_Audio_Backend {

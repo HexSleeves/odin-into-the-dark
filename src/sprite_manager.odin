@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Sprite manager facade ───────────────────────────────────────────────────
 
@@ -10,9 +10,7 @@ Sprite_Manager :: struct {
 }
 
 sprite_manager_make :: proc() -> Sprite_Manager {
-	return Sprite_Manager {
-		backend = &g_sprites,
-	}
+	return Sprite_Manager{backend = &g_sprites}
 }
 
 sprite_manager_is_loaded :: proc(sprites: ^Sprite_Manager) -> bool {
@@ -51,16 +49,26 @@ sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> S
 	}
 	key: string
 	#partial switch tile_type {
-	case .Wall:     key = "wall"
-	case .Floor:    key = "floor"
-	case .Rubble:   key = "rubble"
-	case .Descent:  key = "descent"
-	case .Water:    key = "water"
-	case .Gas_Vent: key = "gas_vent"
-	case .Unstable: key = "unstable"
-	case .Chasm:    key = "chasm"
-	case .Anvil:    key = "anvil"
-	case:           key = "floor"
+	case .Wall:
+		key = "wall"
+	case .Floor:
+		key = "floor"
+	case .Rubble:
+		key = "rubble"
+	case .Descent:
+		key = "descent"
+	case .Water:
+		key = "water"
+	case .Gas_Vent:
+		key = "gas_vent"
+	case .Unstable:
+		key = "unstable"
+	case .Chasm:
+		key = "chasm"
+	case .Anvil:
+		key = "anvil"
+	case:
+		key = "floor"
 	}
 	spr, ok := sprites.backend.tile_map[key]
 	if ok {return spr}

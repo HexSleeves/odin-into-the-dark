@@ -100,7 +100,13 @@ particle_manager_render :: proc(engine: ^Engine, particles: ^Particle_Manager) {
 		}
 		size := i32(particle.size * particle.life)
 		if size < 1 {size = 1}
-		engine_render_draw_rectangle(engine, i32(particle.pos[0]), i32(particle.pos[1]), size, size, color)
+		engine_render_draw_rectangle(
+			engine,
+			i32(particle.pos[0]),
+			i32(particle.pos[1]),
+			size,
+			size,
+			color,
+		)
 	}
 }
-

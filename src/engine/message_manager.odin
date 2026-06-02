@@ -61,4 +61,3 @@ message_manager_clear :: proc(messages: ^Message_Manager) {
 	messages.log.head = 0
 	messages.log.count = 0
 }
-

@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:math/rand"
 import "core:time"
-import eng "./engine"
 
 // ─── Game initialization ─────────────────────────────────────────────────────
 

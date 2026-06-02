@@ -15,7 +15,9 @@ audio_backend_nil_is_valid_and_disabled :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_delegates_play_toggle_and_enabled_state :: proc(t: ^testing.T) {
-	state := Test_Audio_Backend_State{enabled = true}
+	state := Test_Audio_Backend_State {
+		enabled = true,
+	}
 	audio := audio_manager_make(test_audio_backend(&state))
 
 	testing.expect(t, audio_manager_is_enabled(&audio))
@@ -43,8 +45,8 @@ engine_exposes_owned_audio_manager :: proc(t: ^testing.T) {
 }
 
 Test_Audio_Backend_State :: struct {
-	enabled: bool,
-	play_count: int,
+	enabled:       bool,
+	play_count:    int,
 	last_sound_id: int,
 }
 

@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:log"
 import "core:testing"
-import eng "./engine"
 
 @(test)
 logger_parse_bool_accepts_common_env_values :: proc(t: ^testing.T) {

@@ -1,9 +1,9 @@
 package main
 
+import eng "./engine"
 import "core:os"
 import "core:strings"
 import "core:testing"
-import eng "./engine"
 
 @(test)
 render_handlers_accept_engine_context_for_services :: proc(t: ^testing.T) {
@@ -62,7 +62,10 @@ message_and_particle_rendering_use_engine_render_backend :: proc(t: ^testing.T) 
 	}
 	defer delete(message_source, context.allocator)
 
-	particle_source, particle_read_err := os.read_entire_file("src/particles.odin", context.allocator)
+	particle_source, particle_read_err := os.read_entire_file(
+		"src/particles.odin",
+		context.allocator,
+	)
 	testing.expect(t, particle_read_err == nil)
 	if particle_read_err != nil {
 		return
@@ -93,7 +96,10 @@ hud_rendering_uses_engine_render_backend_primitives :: proc(t: ^testing.T) {
 
 @(test)
 minimap_and_item_rendering_use_engine_render_backend_primitives :: proc(t: ^testing.T) {
-	minimap_source, minimap_read_err := os.read_entire_file("src/render_minimap.odin", context.allocator)
+	minimap_source, minimap_read_err := os.read_entire_file(
+		"src/render_minimap.odin",
+		context.allocator,
+	)
 	testing.expect(t, minimap_read_err == nil)
 	if minimap_read_err != nil {
 		return
@@ -147,7 +153,10 @@ ui_rendering_uses_engine_render_backend_primitives :: proc(t: ^testing.T) {
 
 @(test)
 sprite_rendering_uses_engine_render_backend_for_texture_regions :: proc(t: ^testing.T) {
-	manager_source, manager_read_err := os.read_entire_file("src/sprite_manager.odin", context.allocator)
+	manager_source, manager_read_err := os.read_entire_file(
+		"src/sprite_manager.odin",
+		context.allocator,
+	)
 	testing.expect(t, manager_read_err == nil)
 	if manager_read_err != nil {
 		return

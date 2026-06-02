@@ -11,17 +11,15 @@ engine_distance_map_make :: proc(
 	grid: Engine_Grid_2D,
 	unreachable: int,
 ) -> Engine_Distance_Map {
-	return Engine_Distance_Map {
-		values = values,
-		grid = grid,
-		unreachable = unreachable,
-	}
+	return Engine_Distance_Map{values = values, grid = grid, unreachable = unreachable}
 }
 
 engine_distance_map_is_valid :: proc(dmap: ^Engine_Distance_Map) -> bool {
-	return dmap != nil &&
-	       engine_grid_2d_is_valid(dmap.grid) &&
-	       len(dmap.values) >= engine_grid_2d_cell_count(dmap.grid)
+	return(
+		dmap != nil &&
+		engine_grid_2d_is_valid(dmap.grid) &&
+		len(dmap.values) >= engine_grid_2d_cell_count(dmap.grid) \
+	)
 }
 
 engine_distance_map_reset :: proc(dmap: ^Engine_Distance_Map) {
@@ -47,4 +45,3 @@ engine_distance_map_set :: proc(dmap: ^Engine_Distance_Map, x, y, distance: int)
 	dmap.values[engine_grid_2d_index(dmap.grid, x, y)] = distance
 	return true
 }
-

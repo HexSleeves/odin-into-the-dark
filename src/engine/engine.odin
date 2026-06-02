@@ -9,30 +9,30 @@ Engine_Config :: struct {
 	target_fps:    i32,
 	platform:      Engine_Platform_Backend,
 	file_system:   Engine_File_System,
-	audio:        Engine_Audio_Backend,
+	audio:         Engine_Audio_Backend,
 	input:         Engine_Input_Backend,
 	render:        Engine_Render_Backend,
 	texture:       Engine_Texture_Backend,
 }
 
 Engine :: struct {
-	config:        Engine_Config,
-	services:      ^Engine_Services,
-	scene_manager: Scene_Manager,
-	frame_manager: Frame_Manager,
-	event_manager: Event_Manager,
-	texture_manager: Texture_Manager,
-	audio_manager: Audio_Manager,
-	camera_manager: Camera_Manager,
-	turn_manager: Turn_Manager,
-	vfx_manager: Vfx_Manager,
-	message_manager: Message_Manager,
+	config:           Engine_Config,
+	services:         ^Engine_Services,
+	scene_manager:    Scene_Manager,
+	frame_manager:    Frame_Manager,
+	event_manager:    Event_Manager,
+	texture_manager:  Texture_Manager,
+	audio_manager:    Audio_Manager,
+	camera_manager:   Camera_Manager,
+	turn_manager:     Turn_Manager,
+	vfx_manager:      Vfx_Manager,
+	message_manager:  Message_Manager,
 	particle_manager: Particle_Manager,
-	file_system:   Engine_File_System,
-	audio:        Engine_Audio_Backend,
-	input:         Engine_Input_Backend,
-	render:        Engine_Render_Backend,
-	texture:       Engine_Texture_Backend,
+	file_system:      Engine_File_System,
+	audio:            Engine_Audio_Backend,
+	input:            Engine_Input_Backend,
+	render:           Engine_Render_Backend,
+	texture:          Engine_Texture_Backend,
 }
 
 Game_App :: struct {
@@ -52,10 +52,10 @@ engine_config_make :: proc(
 	target_fps: i32,
 ) -> Engine_Config {
 	return Engine_Config {
-		window_width  = window_width,
+		window_width = window_width,
 		window_height = window_height,
-		window_title  = window_title,
-		target_fps    = target_fps,
+		window_title = window_title,
+		target_fps = target_fps,
 	}
 }
 
@@ -164,17 +164,21 @@ engine_texture_backend :: proc(engine: ^Engine) -> Engine_Texture_Backend {
 	return engine_texture_backend_or_default(engine.texture)
 }
 
-engine_run :: proc(config: Engine_Config, services_config: Engine_Services_Config, app: ^Game_App) {
+engine_run :: proc(
+	config: Engine_Config,
+	services_config: Engine_Services_Config,
+	app: ^Game_App,
+) {
 	services := engine_services_make(services_config)
 	defer engine_services_destroy(&services)
 	engine := Engine {
-		config = config,
-		services = &services,
+		config      = config,
+		services    = &services,
 		file_system = engine_file_system_or_default(config.file_system),
-		audio = engine_audio_backend_or_default(config.audio),
-		input = engine_input_backend_or_default(config.input),
-		render = engine_render_backend_or_default(config.render),
-		texture = engine_texture_backend_or_default(config.texture),
+		audio       = engine_audio_backend_or_default(config.audio),
+		input       = engine_input_backend_or_default(config.input),
+		render      = engine_render_backend_or_default(config.render),
+		texture     = engine_texture_backend_or_default(config.texture),
 	}
 	engine.texture_manager = texture_manager_make(engine.texture)
 	engine.audio_manager = audio_manager_make(engine.audio)

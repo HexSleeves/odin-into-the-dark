@@ -6,10 +6,7 @@ World_Manager :: struct {
 }
 
 world_manager_make :: proc(width, height, tile_size: int) -> World_Manager {
-	return World_Manager {
-		grid = engine_grid_2d_make(width, height),
-		tile_size = tile_size,
-	}
+	return World_Manager{grid = engine_grid_2d_make(width, height), tile_size = tile_size}
 }
 
 world_manager_is_valid :: proc(world: World_Manager) -> bool {
@@ -61,4 +58,3 @@ world_manager_index :: proc(world: World_Manager, x, y: int) -> int {
 world_manager_position :: proc(world: World_Manager, index: int) -> Engine_Grid_Pos {
 	return engine_grid_2d_position(world.grid, index)
 }
-

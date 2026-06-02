@@ -119,7 +119,12 @@ tile_state_set :: proc(game: ^Game, x, y: int, visible, explored: bool, light_le
 	return eng.tile_state_set(&game.tile_states, x, y, visible, explored, light_level)
 }
 
-tile_state_set_idx :: proc(game: ^Game, idx: int, visible, explored: bool, light_level: f32) -> bool {
+tile_state_set_idx :: proc(
+	game: ^Game,
+	idx: int,
+	visible, explored: bool,
+	light_level: f32,
+) -> bool {
 	if game == nil {
 		return false
 	}

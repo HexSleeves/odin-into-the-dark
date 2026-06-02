@@ -57,7 +57,7 @@ Key_Binding :: eng.Engine_Key_Binding
 Repeat_State :: eng.Engine_Repeat_State
 
 KEY_REPEAT_DELAY :: f32(0.20)
-KEY_REPEAT_RATE  :: f32(0.08)
+KEY_REPEAT_RATE :: f32(0.08)
 
 Input_Manager :: eng.Action_Input_Manager
 

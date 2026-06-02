@@ -5,9 +5,7 @@ Audio_Manager :: struct {
 }
 
 audio_manager_make :: proc(backend: Engine_Audio_Backend) -> Audio_Manager {
-	return Audio_Manager {
-		backend = engine_audio_backend_or_default(backend),
-	}
+	return Audio_Manager{backend = engine_audio_backend_or_default(backend)}
 }
 
 audio_manager_is_enabled :: proc(audio: ^Audio_Manager) -> bool {

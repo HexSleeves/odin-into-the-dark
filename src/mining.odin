@@ -5,7 +5,12 @@ import rl "vendor:raylib"
 
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
-mine_wall :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, dx, dy: int) -> bool {
+mine_wall :: proc(
+	content: ^Content_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	dx, dy: int,
+) -> bool {
 	tx := game.player.pos.x + dx
 	ty := game.player.pos.y + dy
 
@@ -65,7 +70,12 @@ mine_wall :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^
 	if wpn.max_durability > 0 {
 		wpn.durability -= 1
 		if wpn.durability <= 0 {
-			add_message(messages, game, fmt.tprintf("Your %s breaks!", wpn.name), rl.Color{255, 80, 80, 255})
+			add_message(
+				messages,
+				game,
+				fmt.tprintf("Your %s breaks!", wpn.name),
+				rl.Color{255, 80, 80, 255},
+			)
 		} else if wpn.durability <= 5 {
 			add_message(
 				messages,
@@ -153,7 +163,12 @@ consume_material :: proc(game: ^Game, material_id: string, amount: int) {
 	}
 }
 
-try_craft :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, recipe_index: int) {
+try_craft :: proc(
+	content: ^Content_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	recipe_index: int,
+) {
 	if recipe_index < 0 || recipe_index >= len(RECIPES) {return}
 
 	recipes := RECIPES

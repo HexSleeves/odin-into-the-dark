@@ -12,8 +12,10 @@ bool_grid_manager_make :: proc(grid: Engine_Grid_2D) -> Bool_Grid_Manager {
 }
 
 bool_grid_manager_is_valid :: proc(manager: Bool_Grid_Manager) -> bool {
-	return engine_grid_2d_is_valid(manager.grid) &&
-	       engine_grid_2d_cell_count(manager.grid) <= ENGINE_BOOL_GRID_MAX_CELLS
+	return(
+		engine_grid_2d_is_valid(manager.grid) &&
+		engine_grid_2d_cell_count(manager.grid) <= ENGINE_BOOL_GRID_MAX_CELLS \
+	)
 }
 
 bool_grid_manager_cell_count :: proc(manager: Bool_Grid_Manager) -> int {
@@ -31,7 +33,9 @@ bool_grid_manager_get :: proc(manager: Bool_Grid_Manager, x, y: int) -> bool {
 }
 
 bool_grid_manager_set :: proc(manager: ^Bool_Grid_Manager, x, y: int, value: bool) -> bool {
-	if manager == nil || !bool_grid_manager_is_valid(manager^) || !engine_grid_2d_contains(manager.grid, x, y) {
+	if manager == nil ||
+	   !bool_grid_manager_is_valid(manager^) ||
+	   !engine_grid_2d_contains(manager.grid, x, y) {
 		return false
 	}
 	manager.values[engine_grid_2d_index(manager.grid, x, y)] = value
@@ -82,4 +86,3 @@ bool_grid_manager_export :: proc(manager: Bool_Grid_Manager, values: []bool) {
 		values[i] = manager.values[i]
 	}
 }
-

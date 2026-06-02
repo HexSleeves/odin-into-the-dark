@@ -3,8 +3,8 @@ package main
 import "core:fmt"
 import "core:math/rand"
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Item factory (data-driven) ───────────────────────────────────────────────
 
@@ -117,7 +117,12 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 
 // ─── Use an item from inventory (data-driven) ────────────────────────────────
 
-use_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
+use_item :: proc(
+	content: ^Content_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	slot_index: int,
+) -> bool {
 	if slot_index < 0 || slot_index >= MAX_INVENTORY {
 		return false
 	}

@@ -3,11 +3,11 @@ package engine
 import "core:testing"
 
 Scene_Manager_Test_State :: struct {
-	enter_count: int,
-	exit_count: int,
-	update_count: int,
-	render_count: int,
-	quit_on_update: bool,
+	enter_count:     int,
+	exit_count:      int,
+	update_count:    int,
+	render_count:    int,
+	quit_on_update:  bool,
 	seen_target_fps: i32,
 }
 
@@ -42,17 +42,25 @@ scene_manager_test_render :: proc(engine: ^Engine, ctx: rawptr) {
 
 @(private = "file")
 scene_manager_test_engine :: proc() -> Engine {
-	return Engine {
-		config = engine_config_make(320, 200, "Scene Test", 17),
-	}
+	return Engine{config = engine_config_make(320, 200, "Scene Test", 17)}
 }
 
 @(test)
 scene_manager_switches_active_scene_with_lifecycle_callbacks :: proc(t: ^testing.T) {
 	state := Scene_Manager_Test_State{}
 	scenes := [?]Engine_Scene {
-		Engine_Scene{id = 10, ctx = &state, enter = scene_manager_test_enter, exit = scene_manager_test_exit},
-		Engine_Scene{id = 20, ctx = &state, enter = scene_manager_test_enter, exit = scene_manager_test_exit},
+		Engine_Scene {
+			id = 10,
+			ctx = &state,
+			enter = scene_manager_test_enter,
+			exit = scene_manager_test_exit,
+		},
+		Engine_Scene {
+			id = 20,
+			ctx = &state,
+			enter = scene_manager_test_enter,
+			exit = scene_manager_test_exit,
+		},
 	}
 	manager := scene_manager_make(scenes[:])
 	engine := scene_manager_test_engine()

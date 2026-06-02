@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 audio_manager_make_wraps_current_audio_backend :: proc(t: ^testing.T) {
@@ -25,7 +25,9 @@ audio_manager_reports_enabled_state_from_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_play_sfx_delegates_to_engine_audio_backend :: proc(t: ^testing.T) {
-	state := Test_Game_Audio_Backend_State{enabled = true}
+	state := Test_Game_Audio_Backend_State {
+		enabled = true,
+	}
 	audio := eng.audio_manager_make(test_game_audio_backend(&state))
 
 	audio_manager_play_sfx(&audio, .Mine)
@@ -34,12 +36,14 @@ audio_manager_play_sfx_delegates_to_engine_audio_backend :: proc(t: ^testing.T) 
 }
 
 Test_Game_Audio_Backend_State :: struct {
-	enabled: bool,
-	play_count: int,
+	enabled:       bool,
+	play_count:    int,
 	last_sound_id: int,
 }
 
-test_game_audio_backend :: proc(state: ^Test_Game_Audio_Backend_State) -> eng.Engine_Audio_Backend {
+test_game_audio_backend :: proc(
+	state: ^Test_Game_Audio_Backend_State,
+) -> eng.Engine_Audio_Backend {
 	return eng.Engine_Audio_Backend {
 		ctx = state,
 		play = test_game_audio_play,

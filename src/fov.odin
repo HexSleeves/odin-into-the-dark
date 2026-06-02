@@ -102,7 +102,14 @@ cast_light :: proc(
 				t := tile_at(game, map_x, map_y)
 				if t != nil {
 					// Light falls off with distance
-					_ = tile_state_set(game, map_x, map_y, true, true, f32(1.0 - dist_sq / radius_sq))
+					_ = tile_state_set(
+						game,
+						map_x,
+						map_y,
+						true,
+						true,
+						f32(1.0 - dist_sq / radius_sq),
+					)
 				}
 			}
 

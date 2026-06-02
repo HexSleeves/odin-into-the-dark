@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 MAX_PARTICLES :: eng.ENGINE_MAX_PARTICLES
 Particle :: eng.Particle
@@ -44,17 +44,53 @@ render_particles :: proc(engine: ^eng.Engine, particles: ^Particle_Manager) {
 // ─── Convenience spawners for specific events ─────────────────────────────────
 
 spawn_hit_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
-	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 60, 60, 255}, 8, 2.5, cam_x, cam_y)
+	particle_manager_spawn(
+		particles,
+		tile_x,
+		tile_y,
+		rl.Color{255, 60, 60, 255},
+		8,
+		2.5,
+		cam_x,
+		cam_y,
+	)
 }
 
 spawn_mine_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
-	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 200, 50, 255}, 12, 3.0, cam_x, cam_y)
+	particle_manager_spawn(
+		particles,
+		tile_x,
+		tile_y,
+		rl.Color{255, 200, 50, 255},
+		12,
+		3.0,
+		cam_x,
+		cam_y,
+	)
 }
 
 spawn_pickup_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
-	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{80, 255, 80, 255}, 6, 1.5, cam_x, cam_y)
+	particle_manager_spawn(
+		particles,
+		tile_x,
+		tile_y,
+		rl.Color{80, 255, 80, 255},
+		6,
+		1.5,
+		cam_x,
+		cam_y,
+	)
 }
 
 spawn_death_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) {
-	particle_manager_spawn(particles, tile_x, tile_y, rl.Color{255, 0, 0, 255}, 30, 4.0, cam_x, cam_y)
+	particle_manager_spawn(
+		particles,
+		tile_x,
+		tile_y,
+		rl.Color{255, 0, 0, 255},
+		30,
+		4.0,
+		cam_x,
+		cam_y,
+	)
 }

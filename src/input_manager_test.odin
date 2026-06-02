@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 input_manager_make_applies_default_repeat_settings :: proc(t: ^testing.T) {
@@ -10,7 +10,10 @@ input_manager_make_applies_default_repeat_settings :: proc(t: ^testing.T) {
 
 	testing.expect_value(t, input.repeat_delay, KEY_REPEAT_DELAY)
 	testing.expect_value(t, input.repeat_rate, KEY_REPEAT_RATE)
-	testing.expect(t, input.bindings[cast(int)Game_Action.Move_North].primary != eng.Engine_Key.None)
+	testing.expect(
+		t,
+		input.bindings[cast(int)Game_Action.Move_North].primary != eng.Engine_Key.None,
+	)
 	testing.expect_value(t, engine_input.repeat_delay, KEY_REPEAT_DELAY)
 }
 
@@ -35,7 +38,9 @@ input_manager_reads_actions_from_configured_engine_input_backend :: proc(t: ^tes
 
 @(test)
 input_manager_repeat_uses_engine_input_frame_time :: proc(t: ^testing.T) {
-	backend_state := Test_Input_Backend_State{frame_time = KEY_REPEAT_DELAY + KEY_REPEAT_RATE}
+	backend_state := Test_Input_Backend_State {
+		frame_time = KEY_REPEAT_DELAY + KEY_REPEAT_RATE,
+	}
 	backend_state.down[eng.Engine_Key.W] = true
 	input := input_manager_make()
 	input.backend = test_input_backend(&backend_state)
@@ -45,9 +50,9 @@ input_manager_repeat_uses_engine_input_frame_time :: proc(t: ^testing.T) {
 }
 
 Test_Input_Backend_State :: struct {
-	pressed: [eng.Engine_Key]bool,
-	down: [eng.Engine_Key]bool,
-	released: [eng.Engine_Key]bool,
+	pressed:    [eng.Engine_Key]bool,
+	down:       [eng.Engine_Key]bool,
+	released:   [eng.Engine_Key]bool,
 	frame_time: f32,
 }
 

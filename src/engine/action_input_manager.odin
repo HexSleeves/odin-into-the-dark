@@ -64,8 +64,10 @@ action_input_released :: proc(input: ^Action_Input_Manager, action: int) -> bool
 	backend := action_input_backend(input)
 	if binding.primary == .None {return false}
 	if binding.needs_shift && !action_input_shift_is_held(backend) {return false}
-	return engine_input_key_released(backend, binding.primary) ||
-	       (binding.alt != .None && engine_input_key_released(backend, binding.alt))
+	return(
+		engine_input_key_released(backend, binding.primary) ||
+		(binding.alt != .None && engine_input_key_released(backend, binding.alt)) \
+	)
 }
 
 action_input_repeat :: proc(input: ^Action_Input_Manager, action: int) -> bool {
@@ -119,24 +121,35 @@ action_input_backend :: proc(input: ^Action_Input_Manager) -> Engine_Input_Backe
 }
 
 @(private = "file")
-action_input_binding_held :: proc(backend: Engine_Input_Backend, binding: Engine_Key_Binding) -> bool {
+action_input_binding_held :: proc(
+	backend: Engine_Input_Backend,
+	binding: Engine_Key_Binding,
+) -> bool {
 	if binding.primary == .None {return false}
 	if binding.needs_shift && !action_input_shift_is_held(backend) {return false}
-	return engine_input_key_down(backend, binding.primary) ||
-	       (binding.alt != .None && engine_input_key_down(backend, binding.alt))
+	return(
+		engine_input_key_down(backend, binding.primary) ||
+		(binding.alt != .None && engine_input_key_down(backend, binding.alt)) \
+	)
 }
 
 @(private = "file")
-action_input_binding_pressed :: proc(backend: Engine_Input_Backend, binding: Engine_Key_Binding) -> bool {
+action_input_binding_pressed :: proc(
+	backend: Engine_Input_Backend,
+	binding: Engine_Key_Binding,
+) -> bool {
 	if binding.primary == .None {return false}
 	if binding.needs_shift && !action_input_shift_is_held(backend) {return false}
-	return engine_input_key_pressed(backend, binding.primary) ||
-	       (binding.alt != .None && engine_input_key_pressed(backend, binding.alt))
+	return(
+		engine_input_key_pressed(backend, binding.primary) ||
+		(binding.alt != .None && engine_input_key_pressed(backend, binding.alt)) \
+	)
 }
 
 @(private = "file")
 action_input_shift_is_held :: proc(backend: Engine_Input_Backend) -> bool {
-	return engine_input_key_down(backend, .Left_Shift) ||
-	       engine_input_key_down(backend, .Right_Shift)
+	return(
+		engine_input_key_down(backend, .Left_Shift) ||
+		engine_input_key_down(backend, .Right_Shift) \
+	)
 }
-

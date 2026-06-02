@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:testing"
 import rl "vendor:raylib"
-import eng "./engine"
 
 @(test)
 particle_manager_make_wraps_current_particle_pool :: proc(t: ^testing.T) {
@@ -26,13 +26,26 @@ particle_manager_active_count_reads_pool_state :: proc(t: ^testing.T) {
 
 @(test)
 particle_handlers_accept_manager_context :: proc(t: ^testing.T) {
-	spawn_handler: proc(particles: ^Particle_Manager, tile_x, tile_y: int, color: rl.Color, count: int, speed: f32, camera_x: int, camera_y: int) = particle_manager_spawn
+	spawn_handler: proc(
+			particles: ^Particle_Manager,
+			tile_x, tile_y: int,
+			color: rl.Color,
+			count: int,
+			speed: f32,
+			camera_x: int,
+			camera_y: int,
+		) =
+		particle_manager_spawn
 	update_handler: proc(particles: ^Particle_Manager) = update_particles
 	render_handler: proc(engine: ^eng.Engine, particles: ^Particle_Manager) = render_particles
-	hit_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_hit_particles
-	mine_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_mine_particles
-	pickup_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_pickup_particles
-	death_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_death_particles
+	hit_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) =
+		spawn_hit_particles
+	mine_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) =
+		spawn_mine_particles
+	pickup_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) =
+		spawn_pickup_particles
+	death_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) =
+		spawn_death_particles
 
 	testing.expect(t, spawn_handler != nil)
 	testing.expect(t, update_handler != nil)

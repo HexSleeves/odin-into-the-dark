@@ -25,9 +25,7 @@ Score_Manager :: struct {
 }
 
 score_manager_make :: proc() -> Score_Manager {
-	return Score_Manager {
-		file_path = SCORES_FILE,
-	}
+	return Score_Manager{file_path = SCORES_FILE}
 }
 
 score_manager_path :: proc(scores: ^Score_Manager) -> string {

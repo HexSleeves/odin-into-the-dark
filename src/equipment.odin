@@ -118,7 +118,12 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 		if !game.inventory[i].occupied {empty = i; break}
 	}
 	if empty < 0 {
-		add_message(messages, game, "Inventory full! Cannot unequip.", rl.Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"Inventory full! Cannot unequip.",
+			rl.Color{255, 100, 100, 255},
+		)
 		return false
 	}
 

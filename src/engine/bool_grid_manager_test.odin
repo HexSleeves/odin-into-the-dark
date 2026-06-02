@@ -43,4 +43,3 @@ bool_grid_manager_imports_and_exports_linear_storage :: proc(t: ^testing.T) {
 	testing.expect(t, out[5])
 	testing.expect(t, out[11])
 }
-

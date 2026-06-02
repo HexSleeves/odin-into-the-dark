@@ -19,19 +19,19 @@ Engine_Service_Registration :: struct {
 }
 
 Engine_Services_Config :: struct {
-	diagnostics_init:           Engine_Service_Callback,
-	diagnostics_shutdown:       Engine_Service_Callback,
-	runtime_assets_init:        Engine_Service_Callback,
-	runtime_assets_shutdown:    Engine_Service_Callback,
+	diagnostics_init:        Engine_Service_Callback,
+	diagnostics_shutdown:    Engine_Service_Callback,
+	runtime_assets_init:     Engine_Service_Callback,
+	runtime_assets_shutdown: Engine_Service_Callback,
 }
 
 Engine_Services :: struct {
-	config:                      Engine_Services_Config,
-	diagnostics_initialized:     bool,
-	runtime_assets_initialized:  bool,
-	service_count:               int,
-	services:                    [ENGINE_SERVICE_MAX]Engine_Service_Registration,
-	service_storage:             [ENGINE_SERVICE_MAX]^[ENGINE_SERVICE_STORAGE_WORDS]u64,
+	config:                     Engine_Services_Config,
+	diagnostics_initialized:    bool,
+	runtime_assets_initialized: bool,
+	service_count:              int,
+	services:                   [ENGINE_SERVICE_MAX]Engine_Service_Registration,
+	service_storage:            [ENGINE_SERVICE_MAX]^[ENGINE_SERVICE_STORAGE_WORDS]u64,
 }
 
 engine_services_default_config :: proc() -> Engine_Services_Config {
@@ -39,9 +39,7 @@ engine_services_default_config :: proc() -> Engine_Services_Config {
 }
 
 engine_services_make :: proc(config: Engine_Services_Config) -> Engine_Services {
-	return Engine_Services {
-		config = config,
-	}
+	return Engine_Services{config = config}
 }
 
 engine_services_destroy :: proc(services: ^Engine_Services) {
@@ -132,7 +130,11 @@ engine_services_register_value :: proc(
 	value: rawptr,
 	size: int,
 ) -> rawptr {
-	if services == nil || id < 0 || value == nil || size <= 0 || size > ENGINE_SERVICE_STORAGE_BYTES {
+	if services == nil ||
+	   id < 0 ||
+	   value == nil ||
+	   size <= 0 ||
+	   size > ENGINE_SERVICE_STORAGE_BYTES {
 		return nil
 	}
 
@@ -176,7 +178,10 @@ engine_services_get :: proc(services: ^Engine_Services, id: Engine_Service_Id) -
 engine_services_find_index :: proc(
 	services: ^Engine_Services,
 	id: Engine_Service_Id,
-) -> (index: int, found: bool) {
+) -> (
+	index: int,
+	found: bool,
+) {
 	if services == nil || id < 0 {
 		return -1, false
 	}

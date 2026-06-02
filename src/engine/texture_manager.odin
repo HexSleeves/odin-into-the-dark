@@ -6,15 +6,13 @@ Engine_Texture_Handle :: distinct int
 ENGINE_TEXTURE_HANDLE_NONE :: Engine_Texture_Handle(0)
 
 Texture_Manager :: struct {
-	backend: Engine_Texture_Backend,
-	loaded:  [ENGINE_TEXTURE_MAX]bool,
+	backend:  Engine_Texture_Backend,
+	loaded:   [ENGINE_TEXTURE_MAX]bool,
 	textures: [ENGINE_TEXTURE_MAX]Engine_Texture,
 }
 
 texture_manager_make :: proc(backend: Engine_Texture_Backend) -> Texture_Manager {
-	return Texture_Manager {
-		backend = engine_texture_backend_or_default(backend),
-	}
+	return Texture_Manager{backend = engine_texture_backend_or_default(backend)}
 }
 
 texture_handle_is_valid :: proc(handle: Engine_Texture_Handle) -> bool {
@@ -39,7 +37,10 @@ texture_manager_load :: proc(manager: ^Texture_Manager, path: string) -> Engine_
 	return Engine_Texture_Handle(slot + 1)
 }
 
-texture_manager_get :: proc(manager: Texture_Manager, handle: Engine_Texture_Handle) -> Engine_Texture {
+texture_manager_get :: proc(
+	manager: Texture_Manager,
+	handle: Engine_Texture_Handle,
+) -> Engine_Texture {
 	if !texture_handle_is_valid(handle) {
 		return Engine_Texture{}
 	}
@@ -94,7 +95,10 @@ engine_texture_manager_load :: proc(engine: ^Engine, path: string) -> Engine_Tex
 	return texture_manager_load(manager, path)
 }
 
-engine_texture_manager_get :: proc(engine: ^Engine, handle: Engine_Texture_Handle) -> Engine_Texture {
+engine_texture_manager_get :: proc(
+	engine: ^Engine,
+	handle: Engine_Texture_Handle,
+) -> Engine_Texture {
 	manager := engine_texture_manager(engine)
 	if manager == nil {
 		return Engine_Texture{}

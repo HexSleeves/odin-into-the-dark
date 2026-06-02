@@ -9,8 +9,8 @@ Engine_Texture :: struct {
 }
 
 Engine_Texture_Backend :: struct {
-	ctx: rawptr,
-	load: proc(ctx: rawptr, path: string) -> Engine_Texture,
+	ctx:    rawptr,
+	load:   proc(ctx: rawptr, path: string) -> Engine_Texture,
 	unload: proc(ctx: rawptr, texture: ^Engine_Texture),
 }
 
@@ -22,7 +22,9 @@ engine_texture_backend_is_valid :: proc(texture: Engine_Texture_Backend) -> bool
 	return texture.load != nil && texture.unload != nil
 }
 
-engine_texture_backend_or_default :: proc(texture: Engine_Texture_Backend) -> Engine_Texture_Backend {
+engine_texture_backend_or_default :: proc(
+	texture: Engine_Texture_Backend,
+) -> Engine_Texture_Backend {
 	if engine_texture_backend_is_valid(texture) {
 		return texture
 	}
@@ -30,17 +32,11 @@ engine_texture_backend_or_default :: proc(texture: Engine_Texture_Backend) -> En
 }
 
 engine_texture_backend_default :: proc() -> Engine_Texture_Backend {
-	return Engine_Texture_Backend {
-		load = raylib_texture_load,
-		unload = raylib_texture_unload,
-	}
+	return Engine_Texture_Backend{load = raylib_texture_load, unload = raylib_texture_unload}
 }
 
 engine_texture_backend_nil :: proc() -> Engine_Texture_Backend {
-	return Engine_Texture_Backend {
-		load = nil_texture_load,
-		unload = nil_texture_unload,
-	}
+	return Engine_Texture_Backend{load = nil_texture_load, unload = nil_texture_unload}
 }
 
 engine_texture_load :: proc(engine: ^Engine, path: string) -> Engine_Texture {

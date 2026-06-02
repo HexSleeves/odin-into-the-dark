@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 engine_color_from_rl :: proc(color: rl.Color) -> eng.Engine_Color {
 	return eng.engine_color_make(color.r, color.g, color.b, color.a)
@@ -19,8 +19,19 @@ render_draw_rectangle :: proc(engine: ^eng.Engine, x, y, width, height: i32, col
 	eng.engine_render_draw_rectangle(engine, x, y, width, height, engine_color_from_rl(color))
 }
 
-render_draw_rectangle_lines :: proc(engine: ^eng.Engine, x, y, width, height: i32, color: rl.Color) {
-	eng.engine_render_draw_rectangle_lines(engine, x, y, width, height, engine_color_from_rl(color))
+render_draw_rectangle_lines :: proc(
+	engine: ^eng.Engine,
+	x, y, width, height: i32,
+	color: rl.Color,
+) {
+	eng.engine_render_draw_rectangle_lines(
+		engine,
+		x,
+		y,
+		width,
+		height,
+		engine_color_from_rl(color),
+	)
 }
 
 render_draw_text :: proc(engine: ^eng.Engine, text: cstring, x, y, size: i32, color: rl.Color) {

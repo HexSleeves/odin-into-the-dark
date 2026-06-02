@@ -42,4 +42,3 @@ world_manager_rejects_invalid_dimensions_or_tile_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, world_manager_pixel_width(missing_tile), 0)
 	testing.expect_value(t, world_manager_pixel_height(missing_tile), 0)
 }
-

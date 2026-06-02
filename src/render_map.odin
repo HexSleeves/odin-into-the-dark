@@ -1,9 +1,9 @@
 package main
 
+import eng "./engine"
 import "core:fmt"
 import "core:math"
 import rl "vendor:raylib"
-import eng "./engine"
 
 // ─── Depth palette definitions ────────────────────────────────────────────────
 
@@ -141,13 +141,23 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 				tint: rl.Color
 				if state.visible {
 					brightness := max(state.light_level, 0.5)
-					tint = rl.Color{u8(f32(base.r) * brightness), u8(f32(base.g) * brightness), u8(f32(base.b) * brightness), 255}
+					tint = rl.Color {
+						u8(f32(base.r) * brightness),
+						u8(f32(base.g) * brightness),
+						u8(f32(base.b) * brightness),
+						255,
+					}
 				} else {
 					dim := f32(EXPLORED_DIM)
-					tint = rl.Color{u8(f32(base.r) * dim), u8(f32(base.g) * dim), u8(f32(base.b) * dim), 255}
+					tint = rl.Color {
+						u8(f32(base.r) * dim),
+						u8(f32(base.g) * dim),
+						u8(f32(base.b) * dim),
+						255,
+					}
 				}
 
-					if ui.use_sprites {
+				if ui.use_sprites {
 					spr := sprite_manager_tile(sprites, tile.type)
 					sprite_manager_draw(engine, sprites, spr, sx, sy, tint)
 				} else {
@@ -163,7 +173,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 						if !state.visible {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
-							if ui.use_sprites {
+						if ui.use_sprites {
 							spr := sprite_manager_named(sprites, "tile", "ore_vein")
 							sprite_manager_draw(engine, sprites, spr, sx, sy, ore_tint)
 						} else {
@@ -202,11 +212,18 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-				if ui.use_sprites {
+			if ui.use_sprites {
 				spr := sprite_manager_named(sprites, "tile", "web")
 				sprite_manager_draw(engine, sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
 			} else {
-				render_draw_text(engine, "w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
+				render_draw_text(
+					engine,
+					"w",
+					sx + 4,
+					sy + 4,
+					i32(TILE_SIZE) - 8,
+					rl.Color{180, 180, 180, 150},
+				)
 			}
 		}
 	}
@@ -233,7 +250,14 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
 		glyph_buf[1] = 0
-		render_draw_text(engine, cast(cstring)&glyph_buf[0], px, py, i32(TILE_SIZE), game.player.color)
+		render_draw_text(
+			engine,
+			cast(cstring)&glyph_buf[0],
+			px,
+			py,
+			i32(TILE_SIZE),
+			game.player.color,
+		)
 	}
 }
 
@@ -266,7 +290,14 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(enemy.glyph)
 			glyph_buf[1] = 0
-			render_draw_text(engine, cast(cstring)&glyph_buf[0], ex, ey, i32(TILE_SIZE), enemy.color)
+			render_draw_text(
+				engine,
+				cast(cstring)&glyph_buf[0],
+				ex,
+				ey,
+				i32(TILE_SIZE),
+				enemy.color,
+			)
 		}
 	}
 }

@@ -5,12 +5,7 @@ UI_Manager :: struct {
 }
 
 ui_manager_make :: proc(use_sprites: bool) -> UI_Manager {
-	return UI_Manager {
-		state = UI_State {
-			use_sprites = use_sprites,
-			inspect_slot = -1,
-		},
-	}
+	return UI_Manager{state = UI_State{use_sprites = use_sprites, inspect_slot = -1}}
 }
 
 ui_manager_state :: proc(ui: ^UI_Manager) -> ^UI_State {
@@ -25,7 +20,7 @@ ui_manager_reset_for_new_game :: proc(ui: ^UI_Manager, use_sprites: bool) {
 		return
 	}
 	ui.state = UI_State {
-		use_sprites = use_sprites,
+		use_sprites  = use_sprites,
 		inspect_slot = -1,
 	}
 }

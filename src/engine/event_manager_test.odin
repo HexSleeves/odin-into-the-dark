@@ -26,7 +26,7 @@ event_manager_starts_empty_and_preserves_event_order :: proc(t: ^testing.T) {
 event_manager_clears_frame_events_and_rejects_overflow :: proc(t: ^testing.T) {
 	events := event_manager_make()
 
-	for i in 0 ..< ENGINE_EVENT_MAX {
+	for _ in 0 ..< ENGINE_EVENT_MAX {
 		testing.expect(t, event_manager_push(&events, engine_event_key_up(.A)))
 	}
 	testing.expect_value(t, event_manager_count(events), ENGINE_EVENT_MAX)

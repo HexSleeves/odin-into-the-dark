@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 sprite_manager_make_wraps_current_sprite_atlas :: proc(t: ^testing.T) {
@@ -28,7 +28,7 @@ sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
 	state := Test_Sprite_Texture_Backend_State{}
 	texture_backend := test_sprite_texture_backend(&state)
 	engine := eng.Engine {
-		texture = texture_backend,
+		texture         = texture_backend,
 		texture_manager = eng.texture_manager_make(texture_backend),
 	}
 	defer sprites_cleanup(&engine)
@@ -45,12 +45,14 @@ sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
 }
 
 Test_Sprite_Texture_Backend_State :: struct {
-	load_count: int,
+	load_count:   int,
 	unload_count: int,
-	last_path: string,
+	last_path:    string,
 }
 
-test_sprite_texture_backend :: proc(state: ^Test_Sprite_Texture_Backend_State) -> eng.Engine_Texture_Backend {
+test_sprite_texture_backend :: proc(
+	state: ^Test_Sprite_Texture_Backend_State,
+) -> eng.Engine_Texture_Backend {
 	return eng.Engine_Texture_Backend {
 		ctx = state,
 		load = test_sprite_texture_load,

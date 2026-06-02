@@ -49,19 +49,21 @@ Engine_Mouse_Position :: struct {
 }
 
 Engine_Input_Backend :: struct {
-	ctx: rawptr,
-	key_down: proc(ctx: rawptr, key: Engine_Key) -> bool,
-	key_pressed: proc(ctx: rawptr, key: Engine_Key) -> bool,
-	key_released: proc(ctx: rawptr, key: Engine_Key) -> bool,
-	frame_time: proc(ctx: rawptr) -> f32,
+	ctx:            rawptr,
+	key_down:       proc(ctx: rawptr, key: Engine_Key) -> bool,
+	key_pressed:    proc(ctx: rawptr, key: Engine_Key) -> bool,
+	key_released:   proc(ctx: rawptr, key: Engine_Key) -> bool,
+	frame_time:     proc(ctx: rawptr) -> f32,
 	mouse_position: proc(ctx: rawptr) -> Engine_Mouse_Position,
 }
 
 engine_input_backend_is_valid :: proc(input: Engine_Input_Backend) -> bool {
-	return input.key_down != nil &&
-	       input.key_pressed != nil &&
-	       input.key_released != nil &&
-	       input.frame_time != nil
+	return(
+		input.key_down != nil &&
+		input.key_pressed != nil &&
+		input.key_released != nil &&
+		input.frame_time != nil \
+	)
 }
 
 engine_input_backend_or_default :: proc(input: Engine_Input_Backend) -> Engine_Input_Backend {
@@ -185,44 +187,83 @@ nil_input_mouse_position :: proc(ctx: rawptr) -> Engine_Mouse_Position {
 
 engine_key_to_raylib :: proc(key: Engine_Key) -> rl.KeyboardKey {
 	#partial switch key {
-	case .W: return .W
-	case .S: return .S
-	case .D: return .D
-	case .A: return .A
-	case .Up: return .UP
-	case .Down: return .DOWN
-	case .Right: return .RIGHT
-	case .Left: return .LEFT
-	case .Period: return .PERIOD
-	case .Escape: return .ESCAPE
-	case .G: return .G
-	case .X: return .X
-	case .I: return .I
-	case .C: return .C
-	case .Slash: return .SLASH
-	case .M: return .M
-	case .F5: return .F5
-	case .F9: return .F9
-	case .F1: return .F1
-	case .F2: return .F2
-	case .Enter: return .ENTER
-	case .Space: return .SPACE
-	case .N: return .N
-	case .H: return .H
-	case .Q: return .Q
-	case .R: return .R
-	case .E: return .E
-	case .One: return .ONE
-	case .Two: return .TWO
-	case .Three: return .THREE
-	case .Four: return .FOUR
-	case .Five: return .FIVE
-	case .Six: return .SIX
-	case .Seven: return .SEVEN
-	case .Eight: return .EIGHT
-	case .Nine: return .NINE
-	case .Left_Shift: return .LEFT_SHIFT
-	case .Right_Shift: return .RIGHT_SHIFT
-	case: return .KEY_NULL
+	case .W:
+		return .W
+	case .S:
+		return .S
+	case .D:
+		return .D
+	case .A:
+		return .A
+	case .Up:
+		return .UP
+	case .Down:
+		return .DOWN
+	case .Right:
+		return .RIGHT
+	case .Left:
+		return .LEFT
+	case .Period:
+		return .PERIOD
+	case .Escape:
+		return .ESCAPE
+	case .G:
+		return .G
+	case .X:
+		return .X
+	case .I:
+		return .I
+	case .C:
+		return .C
+	case .Slash:
+		return .SLASH
+	case .M:
+		return .M
+	case .F5:
+		return .F5
+	case .F9:
+		return .F9
+	case .F1:
+		return .F1
+	case .F2:
+		return .F2
+	case .Enter:
+		return .ENTER
+	case .Space:
+		return .SPACE
+	case .N:
+		return .N
+	case .H:
+		return .H
+	case .Q:
+		return .Q
+	case .R:
+		return .R
+	case .E:
+		return .E
+	case .One:
+		return .ONE
+	case .Two:
+		return .TWO
+	case .Three:
+		return .THREE
+	case .Four:
+		return .FOUR
+	case .Five:
+		return .FIVE
+	case .Six:
+		return .SIX
+	case .Seven:
+		return .SEVEN
+	case .Eight:
+		return .EIGHT
+	case .Nine:
+		return .NINE
+	case .Left_Shift:
+		return .LEFT_SHIFT
+	case .Right_Shift:
+		return .RIGHT_SHIFT
+	case:
+		return .KEY_NULL
 	}
 }

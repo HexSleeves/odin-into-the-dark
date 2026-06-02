@@ -17,7 +17,9 @@ nil_input_backend_is_valid_and_returns_empty_state :: proc(t: ^testing.T) {
 
 @(test)
 nil_render_backend_is_valid_and_safe_to_call :: proc(t: ^testing.T) {
-	engine := Engine{render = engine_render_backend_nil()}
+	engine := Engine {
+		render = engine_render_backend_nil(),
+	}
 
 	testing.expect(t, engine_render_backend_is_valid(engine.render))
 	engine_render_begin_frame(&engine)
@@ -42,7 +44,9 @@ nil_render_backend_is_valid_and_safe_to_call :: proc(t: ^testing.T) {
 
 @(test)
 nil_texture_backend_is_valid_and_returns_empty_textures :: proc(t: ^testing.T) {
-	engine := Engine{texture = engine_texture_backend_nil()}
+	engine := Engine {
+		texture = engine_texture_backend_nil(),
+	}
 	texture := engine_texture_load(&engine, "assets/missing.png")
 
 	testing.expect(t, engine_texture_backend_is_valid(engine.texture))

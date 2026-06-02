@@ -1,9 +1,9 @@
 package main
 
+import eng "./engine"
 import "core:encoding/json"
 import "core:os"
 import rl "vendor:raylib"
-import eng "./engine"
 
 // ─── Sprite types ─────────────────────────────────────────────────────────────
 
@@ -46,9 +46,9 @@ g_sprites: Sprite_Atlas
 sprite_at :: proc(col, row, size: int) -> Sprite {
 	return Sprite {
 		src = rl.Rectangle {
-			x      = f32(col * size),
-			y      = f32(row * size),
-			width  = f32(size),
+			x = f32(col * size),
+			y = f32(row * size),
+			width = f32(size),
 			height = f32(size),
 		},
 	}
@@ -80,7 +80,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 
 	// Load the tileset texture
 	tileset_path := sprite_data.tileset
-	if tileset_path == "" { tileset_path = "assets/kenney_1bit.png" }
+	if tileset_path == "" {tileset_path = "assets/kenney_1bit.png"}
 
 	g_sprites.texture_handle = eng.engine_texture_manager_load(engine, tileset_path)
 	g_sprites.texture = eng.engine_texture_manager_get(engine, g_sprites.texture_handle)
@@ -90,7 +90,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	}
 
 	size := sprite_data.sprite_size
-	if size <= 0 { size = SPRITE_SIZE }
+	if size <= 0 {size = SPRITE_SIZE}
 	g_sprites.tile_size = size
 	g_sprites.tile_map = make(map[string]Sprite)
 	g_sprites.char_map = make(map[string]Sprite)
@@ -124,13 +124,16 @@ sprites_init :: proc(engine: ^eng.Engine) {
 		.Sprites,
 		"loaded '%s' (%dx%d) - %d tiles, %d chars, %d items",
 		tileset_path,
-		g_sprites.texture.width, g_sprites.texture.height,
-		tile_count, char_count, item_count,
+		g_sprites.texture.width,
+		g_sprites.texture.height,
+		tile_count,
+		char_count,
+		item_count,
 	)
 }
 
 sprites_cleanup :: proc(engine: ^eng.Engine) {
-	if !g_sprites.loaded { return }
+	if !g_sprites.loaded {return}
 	if eng.texture_handle_is_valid(g_sprites.texture_handle) {
 		_ = eng.engine_texture_manager_unload(engine, g_sprites.texture_handle)
 	} else {
@@ -151,7 +154,7 @@ sprites_cleanup :: proc(engine: ^eng.Engine) {
 // ─── Drawing ──────────────────────────────────────────────────────────────────
 
 draw_sprite :: proc(engine: ^eng.Engine, spr: Sprite, x, y: i32, tint: rl.Color = rl.WHITE) {
-	if !g_sprites.loaded { return }
+	if !g_sprites.loaded {return}
 	dest := rl.Rectangle {
 		x      = f32(x),
 		y      = f32(y),
@@ -172,31 +175,41 @@ fallback_sprite :: proc() -> Sprite {
 get_tile_sprite :: proc(tile_type: Tile_Type) -> Sprite {
 	key: string
 	#partial switch tile_type {
-	case .Wall:     key = "wall"
-	case .Floor:    key = "floor"
-	case .Rubble:   key = "rubble"
-	case .Descent:  key = "descent"
-	case .Water:    key = "water"
-	case .Gas_Vent: key = "gas_vent"
-	case .Unstable: key = "unstable"
-	case .Chasm:    key = "chasm"
-	case .Anvil:    key = "anvil"
-	case:           key = "floor"
+	case .Wall:
+		key = "wall"
+	case .Floor:
+		key = "floor"
+	case .Rubble:
+		key = "rubble"
+	case .Descent:
+		key = "descent"
+	case .Water:
+		key = "water"
+	case .Gas_Vent:
+		key = "gas_vent"
+	case .Unstable:
+		key = "unstable"
+	case .Chasm:
+		key = "chasm"
+	case .Anvil:
+		key = "anvil"
+	case:
+		key = "floor"
 	}
 	spr, ok := g_sprites.tile_map[key]
-	if ok { return spr }
+	if ok {return spr}
 	return fallback_sprite()
 }
 
 get_enemy_sprite :: proc(enemy_type: string) -> Sprite {
 	spr, ok := g_sprites.char_map[enemy_type]
-	if ok { return spr }
+	if ok {return spr}
 	return fallback_sprite()
 }
 
 get_item_sprite :: proc(item_type: string) -> Sprite {
 	spr, ok := g_sprites.item_map[item_type]
-	if ok { return spr }
+	if ok {return spr}
 	return fallback_sprite()
 }
 
@@ -204,13 +217,13 @@ get_item_sprite :: proc(item_type: string) -> Sprite {
 get_named_sprite :: proc(category: string, name: string) -> Sprite {
 	if category == "tile" {
 		spr, ok := g_sprites.tile_map[name]
-		if ok { return spr }
+		if ok {return spr}
 	} else if category == "character" {
 		spr, ok := g_sprites.char_map[name]
-		if ok { return spr }
+		if ok {return spr}
 	} else if category == "item" {
 		spr, ok := g_sprites.item_map[name]
-		if ok { return spr }
+		if ok {return spr}
 	}
 	return fallback_sprite()
 }

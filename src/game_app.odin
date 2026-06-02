@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Into the Depths app adapter ─────────────────────────────────────────────
 
@@ -69,19 +69,62 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	input := input_manager_make()
 	input.backend = eng.engine_input_backend(engine)
 	ui := ui_manager_make(g_sprites.loaded)
-	return eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_CONTENT, &content, size_of(Content_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SAVES, &saves, size_of(Save_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SPRITES, &sprites, size_of(Sprite_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SCORES, &scores, size_of(Score_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_INPUT, &input, size_of(Input_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_UI, &ui, size_of(UI_Manager)) != nil
+	return(
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_CONTENT,
+			&content,
+			size_of(Content_Manager),
+		) !=
+			nil &&
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_SAVES,
+			&saves,
+			size_of(Save_Manager),
+		) !=
+			nil &&
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_SPRITES,
+			&sprites,
+			size_of(Sprite_Manager),
+		) !=
+			nil &&
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_SCORES,
+			&scores,
+			size_of(Score_Manager),
+		) !=
+			nil &&
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_INPUT,
+			&input,
+			size_of(Input_Manager),
+		) !=
+			nil &&
+		eng.engine_services_register_value(
+			engine.services,
+			GAME_ENGINE_SERVICE_UI,
+			&ui,
+			size_of(UI_Manager),
+		) !=
+			nil \
+	)
 }
 
 game_engine_content_manager :: proc(engine: ^eng.Engine) -> ^Content_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^Content_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_CONTENT)
+	return(
+		cast(^Content_Manager)eng.engine_services_get(
+			engine.services,
+			GAME_ENGINE_SERVICE_CONTENT,
+		) \
+	)
 }
 
 game_engine_save_manager :: proc(engine: ^eng.Engine) -> ^Save_Manager {
@@ -99,7 +142,12 @@ game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^Sprite_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^Sprite_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_SPRITES)
+	return(
+		cast(^Sprite_Manager)eng.engine_services_get(
+			engine.services,
+			GAME_ENGINE_SERVICE_SPRITES,
+		) \
+	)
 }
 
 game_engine_particle_manager :: proc(engine: ^eng.Engine) -> ^Particle_Manager {
@@ -145,10 +193,10 @@ game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
 
 game_app_make :: proc() -> eng.Game_App {
 	return eng.Game_App {
-		name     = "Into the Depths",
-		init     = game_app_init,
-		update   = game_app_update,
-		render   = game_app_render,
+		name = "Into the Depths",
+		init = game_app_init,
+		update = game_app_update,
+		render = game_app_render,
 		shutdown = game_app_shutdown,
 		autosave = game_app_autosave,
 	}
@@ -184,7 +232,10 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 		return false
 	}
 
-	message_manager_bind_turns(game_engine_message_manager(engine), game_engine_turn_manager(engine))
+	message_manager_bind_turns(
+		game_engine_message_manager(engine),
+		game_engine_turn_manager(engine),
+	)
 
 	state.game = game_init(content)
 	if !game_scene_manager_init(state.scene_descriptors[:], engine, state.game) {
@@ -201,7 +252,12 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 
 	compute_fov(game)
 	game_camera_update(game_engine_camera_manager(engine), game, true)
-	add_message(game_engine_message_manager(engine), game, "Welcome to the depths. Tread carefully...", rl.Color{200, 200, 100, 255})
+	add_message(
+		game_engine_message_manager(engine),
+		game,
+		"Welcome to the depths. Tread carefully...",
+		rl.Color{200, 200, 100, 255},
+	)
 
 	return true
 }

@@ -57,56 +57,58 @@ engine_run_uses_configured_platform_backend :: proc(t: ^testing.T) {
 	platform_state := Test_Platform_State{}
 	file_system_state := Test_Run_File_System_State{}
 	render_state := Test_Render_Backend_State{}
-	input_state := Test_Run_Input_Backend_State{frame_time = 0.125}
+	input_state := Test_Run_Input_Backend_State {
+		frame_time = 0.125,
+	}
 	texture_state := Test_Texture_Backend_State{}
 	app_state := Test_Run_App_State{}
 	config := engine_config_make(640, 360, "Backend Test", 144)
 	config.platform = Engine_Platform_Backend {
-		ctx = &platform_state,
-		init = test_platform_init,
-		shutdown = test_platform_shutdown,
-		set_target_fps = test_platform_set_target_fps,
-		disable_exit_key = test_platform_disable_exit_key,
+		ctx                 = &platform_state,
+		init                = test_platform_init,
+		shutdown            = test_platform_shutdown,
+		set_target_fps      = test_platform_set_target_fps,
+		disable_exit_key    = test_platform_disable_exit_key,
 		window_should_close = test_platform_window_should_close,
 	}
 	config.file_system = Engine_File_System {
-		ctx = &file_system_state,
-		read_entire_file = test_run_file_system_read_entire_file,
+		ctx               = &file_system_state,
+		read_entire_file  = test_run_file_system_read_entire_file,
 		write_entire_file = test_run_file_system_write_entire_file,
-		exists = test_run_file_system_exists,
-		remove = test_run_file_system_remove,
+		exists            = test_run_file_system_exists,
+		remove            = test_run_file_system_remove,
 	}
 	config.input = Engine_Input_Backend {
-		ctx = &input_state,
-		key_down = test_run_input_key_down,
-		key_pressed = test_run_input_key_pressed,
+		ctx          = &input_state,
+		key_down     = test_run_input_key_down,
+		key_pressed  = test_run_input_key_pressed,
 		key_released = test_run_input_key_released,
-		frame_time = test_run_input_frame_time,
+		frame_time   = test_run_input_frame_time,
 	}
 	config.render = Engine_Render_Backend {
-		ctx = &render_state,
-		begin_frame = test_render_begin_frame,
-		end_frame = test_render_end_frame,
-		clear = test_render_clear,
-		begin_scissor = test_render_begin_scissor,
-		end_scissor = test_render_end_scissor,
-		draw_rectangle = test_render_draw_rectangle,
-		draw_text = test_render_draw_text,
-		measure_text = test_render_measure_text,
+		ctx                  = &render_state,
+		begin_frame          = test_render_begin_frame,
+		end_frame            = test_render_end_frame,
+		clear                = test_render_clear,
+		begin_scissor        = test_render_begin_scissor,
+		end_scissor          = test_render_end_scissor,
+		draw_rectangle       = test_render_draw_rectangle,
+		draw_text            = test_render_draw_text,
+		measure_text         = test_render_measure_text,
 		draw_rectangle_lines = test_render_draw_rectangle_lines,
-		draw_texture_region = test_render_draw_texture_region,
+		draw_texture_region  = test_render_draw_texture_region,
 	}
 	config.texture = Engine_Texture_Backend {
-		ctx = &texture_state,
-		load = test_texture_load,
+		ctx    = &texture_state,
+		load   = test_texture_load,
 		unload = test_texture_unload,
 	}
 	app := Game_App {
-		name = "Backend Test App",
-		state = &app_state,
-		init = test_run_app_init,
-		update = test_run_app_update,
-		render = test_run_app_render,
+		name     = "Backend Test App",
+		state    = &app_state,
+		init     = test_run_app_init,
+		update   = test_run_app_update,
+		render   = test_run_app_render,
 		shutdown = test_run_app_shutdown,
 		autosave = test_run_app_autosave,
 	}
@@ -158,11 +160,11 @@ test_app_shutdown :: proc(engine: ^Engine, app: ^Game_App) {}
 test_app_autosave :: proc(engine: ^Engine, app: ^Game_App) {}
 
 Test_Platform_State :: struct {
-	init_count: int,
-	shutdown_count: int,
-	target_fps: i32,
+	init_count:             int,
+	shutdown_count:         int,
+	target_fps:             i32,
 	disable_exit_key_count: int,
-	should_close_calls: int,
+	should_close_calls:     int,
 }
 
 test_platform_init :: proc(ctx: rawptr, config: Engine_Config) -> bool {
@@ -193,19 +195,19 @@ test_platform_window_should_close :: proc(ctx: rawptr) -> bool {
 }
 
 Test_Run_App_State :: struct {
-	init_count: int,
-	update_count: int,
-	render_count: int,
-	shutdown_count: int,
-	autosave_count: int,
-	measured_width: i32,
-	file_system_ctx: rawptr,
-	input_ctx: rawptr,
-	texture: Engine_Texture,
-	texture_handle: rawptr,
-	frame_index: int,
-	delta_time: f32,
-	elapsed_time: f32,
+	init_count:            int,
+	update_count:          int,
+	render_count:          int,
+	shutdown_count:        int,
+	autosave_count:        int,
+	measured_width:        i32,
+	file_system_ctx:       rawptr,
+	input_ctx:             rawptr,
+	texture:               Engine_Texture,
+	texture_handle:        rawptr,
+	frame_index:           int,
+	delta_time:            f32,
+	elapsed_time:          f32,
 	event_count_in_update: int,
 	event_count_in_render: int,
 }
@@ -273,7 +275,14 @@ test_run_app_autosave :: proc(engine: ^Engine, app: ^Game_App) {
 
 Test_Run_File_System_State :: struct {}
 
-test_run_file_system_read_entire_file :: proc(ctx: rawptr, path: string, allocator: runtime.Allocator) -> ([]u8, bool) {
+test_run_file_system_read_entire_file :: proc(
+	ctx: rawptr,
+	path: string,
+	allocator: runtime.Allocator,
+) -> (
+	[]u8,
+	bool,
+) {
 	return {}, false
 }
 
@@ -311,18 +320,18 @@ test_run_input_frame_time :: proc(ctx: rawptr) -> f32 {
 }
 
 Test_Render_Backend_State :: struct {
-	begin_frame_count: int,
-	end_frame_count: int,
-	clear_count: int,
-	begin_scissor_count: int,
-	end_scissor_count: int,
-	rectangle_count: int,
-	text_count: int,
-	measure_count: int,
+	begin_frame_count:     int,
+	end_frame_count:       int,
+	clear_count:           int,
+	begin_scissor_count:   int,
+	end_scissor_count:     int,
+	rectangle_count:       int,
+	text_count:            int,
+	measure_count:         int,
 	rectangle_lines_count: int,
-	texture_region_count: int,
-	last_color: Engine_Color,
-	last_texture: rawptr,
+	texture_region_count:  int,
+	last_color:            Engine_Color,
+	last_texture:          rawptr,
 }
 
 test_render_begin_frame :: proc(ctx: rawptr) {
@@ -367,7 +376,11 @@ test_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
 	return 42
 }
 
-test_render_draw_rectangle_lines :: proc(ctx: rawptr, x, y, width, height: i32, color: Engine_Color) {
+test_render_draw_rectangle_lines :: proc(
+	ctx: rawptr,
+	x, y, width, height: i32,
+	color: Engine_Color,
+) {
 	state := cast(^Test_Render_Backend_State)ctx
 	state.rectangle_lines_count += 1
 }
@@ -386,9 +399,9 @@ test_render_draw_texture_region :: proc(
 }
 
 Test_Texture_Backend_State :: struct {
-	load_count: int,
-	unload_count: int,
-	last_loaded_path: string,
+	load_count:           int,
+	unload_count:         int,
+	last_loaded_path:     string,
 	last_unloaded_handle: rawptr,
 }
 
@@ -396,11 +409,7 @@ test_texture_load :: proc(ctx: rawptr, path: string) -> Engine_Texture {
 	state := cast(^Test_Texture_Backend_State)ctx
 	state.load_count += 1
 	state.last_loaded_path = path
-	return Engine_Texture {
-		handle = rawptr(uintptr(123)),
-		width = 16,
-		height = 16,
-	}
+	return Engine_Texture{handle = rawptr(uintptr(123)), width = 16, height = 16}
 }
 
 test_texture_unload :: proc(ctx: rawptr, texture: ^Engine_Texture) {

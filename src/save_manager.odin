@@ -9,9 +9,7 @@ Save_Manager :: struct {
 }
 
 save_manager_make :: proc() -> Save_Manager {
-	return Save_Manager {
-		file_path = SAVE_FILE,
-	}
+	return Save_Manager{file_path = SAVE_FILE}
 }
 
 save_manager_save_exists :: proc(saves: ^Save_Manager) -> bool {
@@ -21,14 +19,27 @@ save_manager_save_exists :: proc(saves: ^Save_Manager) -> bool {
 	return save_exists_at(saves.file_path)
 }
 
-save_manager_save_game :: proc(saves: ^Save_Manager, turns: ^eng.Turn_Manager, game: ^Game) -> bool {
+save_manager_save_game :: proc(
+	saves: ^Save_Manager,
+	turns: ^eng.Turn_Manager,
+	game: ^Game,
+) -> bool {
 	if saves == nil {
 		return save_game(turns, game)
 	}
 	return save_game_to_path(turns, game, saves.file_path)
 }
 
-save_manager_load_game :: proc(saves: ^Save_Manager, content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
+save_manager_load_game :: proc(
+	saves: ^Save_Manager,
+	content: ^Content_Manager,
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	ui: ^UI_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+) -> bool {
 	if saves == nil {
 		return load_game(content, turns, camera, vfx, ui, messages, game)
 	}

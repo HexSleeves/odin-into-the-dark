@@ -8,18 +8,27 @@ import "core:os"
 // Default implementations use core:os. Tests, tools, and future web/embedded
 // builds can inject another backend without changing content/config callers.
 Engine_File_System :: struct {
-	ctx: rawptr,
-	read_entire_file: proc(ctx: rawptr, path: string, allocator: runtime.Allocator) -> ([]u8, bool),
+	ctx:               rawptr,
+	read_entire_file:  proc(
+		ctx: rawptr,
+		path: string,
+		allocator: runtime.Allocator,
+	) -> (
+		[]u8,
+		bool,
+	),
 	write_entire_file: proc(ctx: rawptr, path: string, data: []u8) -> bool,
-	exists: proc(ctx: rawptr, path: string) -> bool,
-	remove: proc(ctx: rawptr, path: string) -> bool,
+	exists:            proc(ctx: rawptr, path: string) -> bool,
+	remove:            proc(ctx: rawptr, path: string) -> bool,
 }
 
 engine_file_system_is_valid :: proc(fs: Engine_File_System) -> bool {
-	return fs.read_entire_file != nil &&
-	       fs.write_entire_file != nil &&
-	       fs.exists != nil &&
-	       fs.remove != nil
+	return(
+		fs.read_entire_file != nil &&
+		fs.write_entire_file != nil &&
+		fs.exists != nil &&
+		fs.remove != nil \
+	)
 }
 
 engine_file_system_or_default :: proc(fs: Engine_File_System) -> Engine_File_System {
@@ -43,7 +52,10 @@ os_file_system_read_entire_file :: proc(
 	ctx: rawptr,
 	path: string,
 	allocator: runtime.Allocator,
-) -> ([]u8, bool) {
+) -> (
+	[]u8,
+	bool,
+) {
 	buf, err := os.read_entire_file(path, allocator)
 	if err != nil {
 		return {}, false

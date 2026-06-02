@@ -46,11 +46,11 @@ config_manager_loads_env_file_from_configured_file_system :: proc(t: ^testing.T)
 		content = "ITD_LOG_LEVEL=trace\nCUSTOM_VALUE=engine-fs\n",
 	}
 	fs := Engine_File_System {
-		ctx = &fs_state,
-		read_entire_file = test_file_system_read_entire_file,
+		ctx               = &fs_state,
+		read_entire_file  = test_file_system_read_entire_file,
 		write_entire_file = test_file_system_write_entire_file,
-		exists = test_file_system_exists,
-		remove = test_file_system_remove,
+		exists            = test_file_system_exists,
+		remove            = test_file_system_remove,
 	}
 
 	ok := config_manager_load_env_file_with_file_system(&config, "virtual.env", fs)
@@ -67,8 +67,8 @@ config_manager_loads_env_file_from_configured_file_system :: proc(t: ^testing.T)
 }
 
 Test_File_System_State :: struct {
-	content: string,
-	last_path: string,
+	content:    string,
+	last_path:  string,
 	read_count: int,
 }
 
@@ -76,7 +76,10 @@ test_file_system_read_entire_file :: proc(
 	ctx: rawptr,
 	path: string,
 	allocator: runtime.Allocator,
-) -> ([]u8, bool) {
+) -> (
+	[]u8,
+	bool,
+) {
 	state := cast(^Test_File_System_State)ctx
 	state.read_count += 1
 	state.last_path = path

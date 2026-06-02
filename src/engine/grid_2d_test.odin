@@ -27,4 +27,3 @@ engine_grid_2d_reports_bounds_and_rejects_invalid_dimensions :: proc(t: ^testing
 	testing.expect(t, !engine_grid_2d_contains(grid, 4, 2))
 	testing.expect(t, !engine_grid_2d_contains(grid, 3, 3))
 }
-

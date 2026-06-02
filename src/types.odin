@@ -1,7 +1,7 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 
@@ -135,13 +135,13 @@ Ore_Vein :: struct {
 // ─── UI State ─────────────────────────────────────────────────────────────────
 
 UI_State :: struct {
-	show_minimap:  bool,
-	dropping:      bool, // inventory drop mode
-	equipping:     bool, // inventory equip mode
-	inspect_slot:  int, // highlighted slot in inventory (-1 = none)
-	mining_mode:   bool, // true when player pressed X and awaits direction
-	use_sprites:   bool, // true = tileset sprites, false = ASCII mode
-	title_choice:  int, // selected title menu option
+	show_minimap:    bool,
+	dropping:        bool, // inventory drop mode
+	equipping:       bool, // inventory equip mode
+	inspect_slot:    int, // highlighted slot in inventory (-1 = none)
+	mining_mode:     bool, // true when player pressed X and awaits direction
+	use_sprites:     bool, // true = tileset sprites, false = ASCII mode
+	title_choice:    int, // selected title menu option
 	return_to_title: bool, // modal overlays should return to title instead of gameplay
 }
 
@@ -161,7 +161,7 @@ Game_State :: enum {
 Game :: struct {
 	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
 	dijkstra_map:      [MAP_WIDTH * MAP_HEIGHT]int,
-	world:            eng.World_Manager,
+	world:             eng.World_Manager,
 	map_width:         int,
 	map_height:        int,
 	player:            Player,

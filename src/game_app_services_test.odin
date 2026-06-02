@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 game_app_registers_current_engine_services :: proc(t: ^testing.T) {
@@ -36,13 +36,19 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, game_engine_save_manager(&engine) != nil)
 	testing.expect(t, game_engine_audio_manager(&engine) != nil)
 	testing.expect(t, game_engine_audio_manager(&engine) == &engine.audio_manager)
-	testing.expect(t, game_engine_audio_manager(&engine).backend.ctx == rawptr(&audio_backend_state))
+	testing.expect(
+		t,
+		game_engine_audio_manager(&engine).backend.ctx == rawptr(&audio_backend_state),
+	)
 	testing.expect(t, game_engine_sprite_manager(&engine) != nil)
 	testing.expect(t, game_engine_particle_manager(&engine) != nil)
 	testing.expect(t, game_engine_particle_manager(&engine) == &engine.particle_manager)
 	testing.expect(t, game_engine_score_manager(&engine) != nil)
 	testing.expect(t, game_engine_input_manager(&engine) != nil)
-	testing.expect(t, game_engine_input_manager(&engine).backend.ctx == rawptr(&input_backend_state))
+	testing.expect(
+		t,
+		game_engine_input_manager(&engine).backend.ctx == rawptr(&input_backend_state),
+	)
 	testing.expect(t, game_engine_message_manager(&engine) != nil)
 	testing.expect(t, game_engine_message_manager(&engine) == &engine.message_manager)
 	testing.expect(t, game_engine_camera_manager(&engine) != nil)
@@ -88,7 +94,9 @@ Test_Game_App_Audio_Backend_State :: struct {
 	enabled: bool,
 }
 
-test_game_app_audio_backend :: proc(state: ^Test_Game_App_Audio_Backend_State) -> eng.Engine_Audio_Backend {
+test_game_app_audio_backend :: proc(
+	state: ^Test_Game_App_Audio_Backend_State,
+) -> eng.Engine_Audio_Backend {
 	return eng.Engine_Audio_Backend {
 		ctx = state,
 		play = test_game_app_audio_play,

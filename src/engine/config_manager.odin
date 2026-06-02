@@ -21,7 +21,11 @@ config_manager_make :: proc() -> Config_Manager {
 }
 
 config_manager_load_env_file :: proc(config: ^Config_Manager, path: string) -> bool {
-	return config_manager_load_env_file_with_file_system(config, path, engine_file_system_default())
+	return config_manager_load_env_file_with_file_system(
+		config,
+		path,
+		engine_file_system_default(),
+	)
 }
 
 config_manager_load_env_file_with_file_system :: proc(

@@ -54,4 +54,3 @@ engine_message_manager_wraps_at_capacity_and_clears :: proc(t: ^testing.T) {
 	testing.expect_value(t, messages.log.count, 0)
 	testing.expect_value(t, messages.log.head, 0)
 }
-

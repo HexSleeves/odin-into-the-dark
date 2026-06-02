@@ -3,8 +3,8 @@ package main
 import "core:mem"
 import "core:os"
 
-import rl "vendor:raylib"
 import eng "./engine"
+import rl "vendor:raylib"
 
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
@@ -82,36 +82,36 @@ Save_Header :: struct {
 
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
-	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
-	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
-	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:         [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
 
 	// Player (no strings — safe)
-	player:             Player,
+	player:            Player,
 
 	// Dynamic arrays flattened to fixed-size + count
-	enemy_count:        int,
-	enemies:            [MAX_SAVE_ENEMIES]Save_Enemy,
-	item_count:         int,
-	items:              [MAX_SAVE_ITEMS]Save_Item,
-	room_count:         int,
-	rooms:              [MAX_SAVE_ROOMS]Room,
+	enemy_count:       int,
+	enemies:           [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:        int,
+	items:             [MAX_SAVE_ITEMS]Save_Item,
+	room_count:        int,
+	rooms:             [MAX_SAVE_ROOMS]Room,
 
 	// Inventory and equipment
-	inventory:          [MAX_INVENTORY]Save_Inventory_Slot,
-	equipped_weapon:    Save_Equipment,
-	equipped_armor:     Save_Equipment,
-	equipped_helmet:    Save_Equipment,
+	inventory:         [MAX_INVENTORY]Save_Inventory_Slot,
+	equipped_weapon:   Save_Equipment,
+	equipped_armor:    Save_Equipment,
+	equipped_helmet:   Save_Equipment,
 
 	// Scalar game state
-	depth:              int,
-	turn_count:         int,
-	kills:              int,
-	seed:               u64,
-	light_boost_bonus:  int,
-	light_boost_turns:  int,
-	skip_next_turn:     bool,
-	water_slow_active:  bool,
+	depth:             int,
+	turn_count:        int,
+	kills:             int,
+	seed:              u64,
+	light_boost_bonus: int,
+	light_boost_turns: int,
+	skip_next_turn:    bool,
+	water_slow_active: bool,
 }
 
 // v2 save files used the same prefix as v3, followed by two legacy pickaxe
@@ -196,7 +196,18 @@ save_to_string :: proc(content: ^Content_Manager, s: ^Save_String) -> string {
 	}
 
 	// Known constant strings (string literals — always valid)
-	known := [?]string{"web", "pull", "poison_cloud", "teleport", "slam", "darkness", "weapon", "armor", "helmet", "material"}
+	known := [?]string {
+		"web",
+		"pull",
+		"poison_cloud",
+		"teleport",
+		"slam",
+		"darkness",
+		"weapon",
+		"armor",
+		"helmet",
+		"material",
+	}
 	for k in known {
 		if k == temp {return k}
 	}
@@ -381,11 +392,28 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 
 // ─── Load ─────────────────────────────────────────────────────────────────────
 
-load_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
+load_game :: proc(
+	content: ^Content_Manager,
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	ui: ^UI_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+) -> bool {
 	return load_game_from_path(content, turns, camera, vfx, ui, messages, game, SAVE_FILE)
 }
 
-load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game, path: string) -> bool {
+load_game_from_path :: proc(
+	content: ^Content_Manager,
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	ui: ^UI_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	path: string,
+) -> bool {
 	buf, read_err := os.read_entire_file(path, context.allocator)
 	if read_err != nil {return false}
 	defer delete(buf, context.allocator)
@@ -439,20 +467,20 @@ load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager,
 		se := &data.enemies[i]
 		append(
 			&game.enemies,
-				Enemy {
-					pos = se.pos,
-					hp = se.hp,
-					max_hp = se.max_hp,
-					attack = se.attack,
-					enemy_type = save_to_string(content, &se.enemy_type),
-					name = save_to_string(content, &se.name),
-					glyph = se.glyph,
-					color = se.color,
-					alive = se.alive,
-					ability_type = save_to_string(content, &se.ability_type),
-					ability_cooldown = se.ability_cooldown,
-					ability_max_cd = se.ability_max_cd,
-					ability_range = se.ability_range,
+			Enemy {
+				pos = se.pos,
+				hp = se.hp,
+				max_hp = se.max_hp,
+				attack = se.attack,
+				enemy_type = save_to_string(content, &se.enemy_type),
+				name = save_to_string(content, &se.name),
+				glyph = se.glyph,
+				color = se.color,
+				alive = se.alive,
+				ability_type = save_to_string(content, &se.ability_type),
+				ability_cooldown = se.ability_cooldown,
+				ability_max_cd = se.ability_max_cd,
+				ability_range = se.ability_range,
 				is_boss = se.is_boss,
 			},
 		)

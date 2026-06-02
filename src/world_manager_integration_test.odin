@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 game_init_world_configures_engine_world_manager :: proc(t: ^testing.T) {

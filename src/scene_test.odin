@@ -1,7 +1,7 @@
 package main
 
-import "core:testing"
 import eng "./engine"
+import "core:testing"
 
 @(test)
 scene_for_state_maps_all_game_states :: proc(t: ^testing.T) {
@@ -17,7 +17,8 @@ scene_for_state_maps_all_game_states :: proc(t: ^testing.T) {
 
 @(test)
 game_scene_manager_handlers_use_engine_owned_manager :: proc(t: ^testing.T) {
-	init_handler: proc(scenes: []eng.Engine_Scene, engine: ^eng.Engine, game: ^Game) -> bool = game_scene_manager_init
+	init_handler: proc(scenes: []eng.Engine_Scene, engine: ^eng.Engine, game: ^Game) -> bool =
+		game_scene_manager_init
 	update_handler: proc(engine: ^eng.Engine, game: ^Game) -> bool = game_scene_manager_update
 	render_handler: proc(engine: ^eng.Engine, game: ^Game) = game_scene_manager_render
 

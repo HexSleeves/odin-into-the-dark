@@ -18,8 +18,10 @@ tile_state_manager_make :: proc(grid: Engine_Grid_2D) -> Tile_State_Manager {
 }
 
 tile_state_manager_is_valid :: proc(manager: Tile_State_Manager) -> bool {
-	return engine_grid_2d_is_valid(manager.grid) &&
-	       engine_grid_2d_cell_count(manager.grid) <= ENGINE_TILE_STATE_MAX_CELLS
+	return(
+		engine_grid_2d_is_valid(manager.grid) &&
+		engine_grid_2d_cell_count(manager.grid) <= ENGINE_TILE_STATE_MAX_CELLS \
+	)
 }
 
 tile_state_manager_cell_count :: proc(manager: Tile_State_Manager) -> int {
@@ -37,7 +39,9 @@ tile_state_at :: proc(manager: Tile_State_Manager, x, y: int) -> Tile_State {
 }
 
 tile_state_at_idx :: proc(manager: Tile_State_Manager, index: int) -> Tile_State {
-	if !tile_state_manager_is_valid(manager) || index < 0 || index >= tile_state_manager_cell_count(manager) {
+	if !tile_state_manager_is_valid(manager) ||
+	   index < 0 ||
+	   index >= tile_state_manager_cell_count(manager) {
 		return Tile_State{}
 	}
 	return manager.states[index]
@@ -67,8 +71,15 @@ tile_state_light_level_idx :: proc(manager: Tile_State_Manager, index: int) -> f
 	return tile_state_at_idx(manager, index).light_level
 }
 
-tile_state_set :: proc(manager: ^Tile_State_Manager, x, y: int, visible, explored: bool, light_level: f32) -> bool {
-	if manager == nil || !tile_state_manager_is_valid(manager^) || !engine_grid_2d_contains(manager.grid, x, y) {
+tile_state_set :: proc(
+	manager: ^Tile_State_Manager,
+	x, y: int,
+	visible, explored: bool,
+	light_level: f32,
+) -> bool {
+	if manager == nil ||
+	   !tile_state_manager_is_valid(manager^) ||
+	   !engine_grid_2d_contains(manager.grid, x, y) {
 		return false
 	}
 	manager.states[engine_grid_2d_index(manager.grid, x, y)] = Tile_State {
@@ -79,8 +90,16 @@ tile_state_set :: proc(manager: ^Tile_State_Manager, x, y: int, visible, explore
 	return true
 }
 
-tile_state_set_idx :: proc(manager: ^Tile_State_Manager, index: int, visible, explored: bool, light_level: f32) -> bool {
-	if manager == nil || !tile_state_manager_is_valid(manager^) || index < 0 || index >= tile_state_manager_cell_count(manager^) {
+tile_state_set_idx :: proc(
+	manager: ^Tile_State_Manager,
+	index: int,
+	visible, explored: bool,
+	light_level: f32,
+) -> bool {
+	if manager == nil ||
+	   !tile_state_manager_is_valid(manager^) ||
+	   index < 0 ||
+	   index >= tile_state_manager_cell_count(manager^) {
 		return false
 	}
 	manager.states[index] = Tile_State {
@@ -92,7 +111,9 @@ tile_state_set_idx :: proc(manager: ^Tile_State_Manager, index: int, visible, ex
 }
 
 tile_state_set_visible :: proc(manager: ^Tile_State_Manager, x, y: int, visible: bool) -> bool {
-	if manager == nil || !tile_state_manager_is_valid(manager^) || !engine_grid_2d_contains(manager.grid, x, y) {
+	if manager == nil ||
+	   !tile_state_manager_is_valid(manager^) ||
+	   !engine_grid_2d_contains(manager.grid, x, y) {
 		return false
 	}
 	manager.states[engine_grid_2d_index(manager.grid, x, y)].visible = visible
@@ -100,15 +121,23 @@ tile_state_set_visible :: proc(manager: ^Tile_State_Manager, x, y: int, visible:
 }
 
 tile_state_set_explored :: proc(manager: ^Tile_State_Manager, x, y: int, explored: bool) -> bool {
-	if manager == nil || !tile_state_manager_is_valid(manager^) || !engine_grid_2d_contains(manager.grid, x, y) {
+	if manager == nil ||
+	   !tile_state_manager_is_valid(manager^) ||
+	   !engine_grid_2d_contains(manager.grid, x, y) {
 		return false
 	}
 	manager.states[engine_grid_2d_index(manager.grid, x, y)].explored = explored
 	return true
 }
 
-tile_state_set_light_level :: proc(manager: ^Tile_State_Manager, x, y: int, light_level: f32) -> bool {
-	if manager == nil || !tile_state_manager_is_valid(manager^) || !engine_grid_2d_contains(manager.grid, x, y) {
+tile_state_set_light_level :: proc(
+	manager: ^Tile_State_Manager,
+	x, y: int,
+	light_level: f32,
+) -> bool {
+	if manager == nil ||
+	   !tile_state_manager_is_valid(manager^) ||
+	   !engine_grid_2d_contains(manager.grid, x, y) {
 		return false
 	}
 	manager.states[engine_grid_2d_index(manager.grid, x, y)].light_level = light_level

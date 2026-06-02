@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:fmt"
 import rl "vendor:raylib"
-import eng "./engine"
 
 // ─── HUD rendering (fixed region below map viewport) ──────────────────────────
 
@@ -12,7 +12,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	hud_y := i32(MAP_VIEW_HEIGHT)
 
 	// Background bar
-	render_draw_rectangle(engine, 
+	render_draw_rectangle(
+		engine,
 		0,
 		hud_y,
 		i32(SCREEN_WIDTH),
@@ -30,7 +31,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	// Background (red)
 	render_draw_rectangle(engine, hp_x, hp_y, hp_bar_w, hp_bar_h, rl.Color{80, 20, 20, 255})
 	// Foreground (green)
-	render_draw_rectangle(engine, 
+	render_draw_rectangle(
+		engine,
 		hp_x,
 		hp_y,
 		i32(f32(hp_bar_w) * hp_ratio),
@@ -39,7 +41,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 
 	// HP text
-	render_draw_text(engine, 
+	render_draw_text(
+		engine,
 		rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
 		hp_x + 4,
 		hp_y + 1,
@@ -55,7 +58,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		if e.alive {alive_count += 1}
 	}
 
-	render_draw_text(engine, 
+	render_draw_text(
+		engine,
 		rl.TextFormat(
 			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  X=Mine  M=Map  ?=Help",
 			i32(game.depth),
@@ -83,7 +87,14 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	pick_y := hp_y + 2
 
 	// Background
-	render_draw_rectangle(engine, pick_x, pick_y, pick_bar_w, pick_bar_h, rl.Color{40, 30, 20, 255})
+	render_draw_rectangle(
+		engine,
+		pick_x,
+		pick_y,
+		pick_bar_w,
+		pick_bar_h,
+		rl.Color{40, 30, 20, 255},
+	)
 
 	if game.equipped_weapon.occupied && game.equipped_weapon.item.max_durability > 0 {
 		wpn := game.equipped_weapon.item
@@ -98,14 +109,16 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			pick_color = rl.Color{200, 60, 60, 255} // red
 		}
 		if wpn.durability > 0 {
-			render_draw_rectangle(engine, 
+			render_draw_rectangle(
+				engine,
 				pick_x,
 				pick_y,
 				i32(f32(pick_bar_w) * pick_ratio),
 				pick_bar_h,
 				pick_color,
 			)
-			render_draw_text(engine, 
+			render_draw_text(
+				engine,
 				rl.TextFormat("Pick: %d/%d", i32(wpn.durability), i32(wpn.max_durability)),
 				pick_x + 2,
 				pick_y,
@@ -113,7 +126,14 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 				rl.WHITE,
 			)
 		} else {
-			render_draw_text(engine, "Pick: BROKEN", pick_x + 2, pick_y, 12, rl.Color{255, 80, 80, 255})
+			render_draw_text(
+				engine,
+				"Pick: BROKEN",
+				pick_x + 2,
+				pick_y,
+				12,
+				rl.Color{255, 80, 80, 255},
+			)
 		}
 	} else if !game.equipped_weapon.occupied {
 		render_draw_text(engine, "Pick: ---", pick_x + 2, pick_y, 12, rl.Color{80, 80, 80, 255})
@@ -123,7 +143,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	if ui.mining_mode {
 		mine_text := cstring("[MINING] Choose direction (WASD/arrows) | ESC cancel")
 		mine_w := render_measure_text(engine, mine_text, 14)
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			mine_text,
 			(i32(SCREEN_WIDTH) - mine_w) / 2,
 			2,
@@ -137,7 +158,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	if cur != nil && cur.type == .Anvil {
 		anvil_text := cstring("[C=Craft]")
 		anvil_w := render_measure_text(engine, anvil_text, 14)
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			anvil_text,
 			(i32(SCREEN_WIDTH) - anvil_w) / 2,
 			hud_y - 18,
@@ -149,7 +171,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	// Equipment indicators (right side of HUD)
 	eq_x := i32(hp_x) + 600
 	if game.equipped_weapon.occupied {
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			fmt.ctprintf(
 				"Wpn: %s (+%d)",
 				game.equipped_weapon.item.name,
@@ -164,7 +187,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		render_draw_text(engine, "Wpn: ---", eq_x, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
 	}
 	if game.equipped_armor.occupied {
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			fmt.ctprintf(
 				"Arm: %s (+%d)",
 				game.equipped_armor.item.name,
@@ -179,7 +203,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		render_draw_text(engine, "Arm: ---", eq_x, hp_y + 18, 14, rl.Color{80, 80, 80, 255})
 	}
 	if game.equipped_helmet.occupied {
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			fmt.ctprintf(
 				"Hlm: %s (+%d)",
 				game.equipped_helmet.item.name,
@@ -203,15 +228,40 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		boss_bar_x := (i32(SCREEN_WIDTH) - boss_bar_w) / 2
 		boss_bar_y := i32(18)
 
-		render_draw_rectangle(engine, boss_bar_x - 2, boss_bar_y - 2, boss_bar_w + 4, boss_bar_h + 4, rl.Color{10, 10, 15, 200})
-		render_draw_rectangle(engine, boss_bar_x, boss_bar_y, boss_bar_w, boss_bar_h, rl.Color{60, 20, 20, 255})
+		render_draw_rectangle(
+			engine,
+			boss_bar_x - 2,
+			boss_bar_y - 2,
+			boss_bar_w + 4,
+			boss_bar_h + 4,
+			rl.Color{10, 10, 15, 200},
+		)
+		render_draw_rectangle(
+			engine,
+			boss_bar_x,
+			boss_bar_y,
+			boss_bar_w,
+			boss_bar_h,
+			rl.Color{60, 20, 20, 255},
+		)
 
 		ratio := f32(max(enemy.hp, 0)) / f32(enemy.max_hp)
-		render_draw_rectangle(engine, boss_bar_x, boss_bar_y, i32(f32(boss_bar_w) * ratio), boss_bar_h, rl.Color{200, 40, 40, 255})
+		render_draw_rectangle(
+			engine,
+			boss_bar_x,
+			boss_bar_y,
+			i32(f32(boss_bar_w) * ratio),
+			boss_bar_h,
+			rl.Color{200, 40, 40, 255},
+		)
 
-		render_draw_text(engine, 
+		render_draw_text(
+			engine,
 			fmt.ctprintf("%s  %d/%d", enemy.name, enemy.hp, enemy.max_hp),
-			boss_bar_x + 4, boss_bar_y + 1, 14, rl.WHITE,
+			boss_bar_x + 4,
+			boss_bar_y + 1,
+			14,
+			rl.WHITE,
 		)
 		break
 	}

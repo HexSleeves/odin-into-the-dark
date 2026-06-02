@@ -4,8 +4,8 @@ import eng "./engine"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-TILE_SIZE :: 32       // render size (sprites are 16x16, drawn at 32x32)
-SPRITE_SIZE :: 16     // source sprite size in spritesheet
+TILE_SIZE :: 32 // render size (sprites are 16x16, drawn at 32x32)
+SPRITE_SIZE :: 16 // source sprite size in spritesheet
 SCREEN_WIDTH :: 1280
 SCREEN_HEIGHT :: 900
 MAP_WIDTH :: 80

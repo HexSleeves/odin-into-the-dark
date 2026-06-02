@@ -47,12 +47,14 @@ engine_exposes_owned_texture_manager :: proc(t: ^testing.T) {
 }
 
 Test_Texture_Manager_Backend_State :: struct {
-	load_count: int,
+	load_count:   int,
 	unload_count: int,
-	last_path: string,
+	last_path:    string,
 }
 
-test_texture_manager_backend :: proc(state: ^Test_Texture_Manager_Backend_State) -> Engine_Texture_Backend {
+test_texture_manager_backend :: proc(
+	state: ^Test_Texture_Manager_Backend_State,
+) -> Engine_Texture_Backend {
 	return Engine_Texture_Backend {
 		ctx = state,
 		load = test_texture_manager_backend_load,

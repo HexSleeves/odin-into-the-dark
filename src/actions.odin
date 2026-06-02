@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:fmt"
 import rl "vendor:raylib"
-import eng "./engine"
 
 
 handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int) {
@@ -25,7 +25,14 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	collapse_unstable_previous_tile(messages, game)
 
 	hp_before := game.player.hp
-	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
+	advance_turn(
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		game_engine_vfx_manager(engine),
+		messages,
+		game,
+		hp_before,
+	)
 	announce_item_under_player(messages, game)
 }
 
@@ -33,7 +40,14 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 	messages := game_engine_message_manager(engine)
 	game.prev_player_pos = game.player.pos
 	kills_before := game.kills
-	result := handle_input(game_engine_content_manager(engine), game_engine_turn_manager(engine), game_engine_camera_manager(engine), messages, game, game_engine_input_manager(engine))
+	result := handle_input(
+		game_engine_content_manager(engine),
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		messages,
+		game,
+		game_engine_input_manager(engine),
+	)
 
 	switch result {
 	case .Quit:
@@ -42,7 +56,14 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		handle_player_moved(engine, game, kills_before)
 	case .Waited:
 		hp_before := game.player.hp
-		advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
+		advance_turn(
+			game_engine_turn_manager(engine),
+			game_engine_camera_manager(engine),
+			game_engine_vfx_manager(engine),
+			messages,
+			game,
+			hp_before,
+		)
 	case .Descended:
 		handle_player_descended(engine, game)
 	case .None:
@@ -57,12 +78,24 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 	audio_manager_play_sfx(game_engine_audio_manager(engine), .Descent)
 	eng.vfx_manager_flash(vfx, rl.Color{255, 255, 255, 255}, 0.5)
 	hp_before := game.player.hp
-	advance_turn(game_engine_turn_manager(engine), game_engine_camera_manager(engine), game_engine_vfx_manager(engine), messages, game, hp_before)
+	advance_turn(
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		game_engine_vfx_manager(engine),
+		messages,
+		game,
+		hp_before,
+	)
 }
 
 // ─── Descent to next floor ───────────────────────────────────────────────────
 
-descend :: proc(content: ^Content_Manager, camera: ^eng.Camera_Manager, messages: ^Message_Manager, game: ^Game) {
+descend :: proc(
+	content: ^Content_Manager,
+	camera: ^eng.Camera_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+) {
 	// Victory condition: escaping from depth 12
 	if game.depth >= 12 {
 		game.state = .Victory
@@ -121,7 +154,14 @@ start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Ga
 
 // ─── Turn helpers ─────────────────────────────────────────────────────────────
 
-advance_turn :: proc(turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, messages: ^Message_Manager, game: ^Game, hp_before: int) {
+advance_turn :: proc(
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	hp_before: int,
+) {
 	_ = turns
 	process_enemy_turns(messages, game)
 	process_enemy_abilities(messages, game)
@@ -147,7 +187,15 @@ save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^
 	score_manager_save(scores, &table)
 }
 
-restart_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera: ^eng.Camera_Manager, vfx: ^eng.Vfx_Manager, ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {
+restart_game :: proc(
+	content: ^Content_Manager,
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	ui: ^UI_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+) {
 	game_cleanup(game)
 	game^ = {}
 	eng.turn_manager_reset(turns)
@@ -205,7 +253,12 @@ collapse_unstable_previous_tile :: proc(messages: ^Message_Manager, game: ^Game)
 	prev_tile := tile_at(game, game.prev_player_pos.x, game.prev_player_pos.y)
 	if prev_tile != nil && prev_tile.type == .Unstable {
 		prev_tile.type = .Chasm
-		add_message(messages, game, "The ground collapses behind you!", rl.Color{180, 120, 60, 255})
+		add_message(
+			messages,
+			game,
+			"The ground collapses behind you!",
+			rl.Color{180, 120, 60, 255},
+		)
 	}
 }
 

@@ -7,23 +7,27 @@ import rl "vendor:raylib"
 // The default backend is Raylib, but engine_run only depends on this contract.
 // Tests and future ports can provide a small backend without opening a window.
 Engine_Platform_Backend :: struct {
-	ctx: rawptr,
-	init: proc(ctx: rawptr, config: Engine_Config) -> bool,
-	shutdown: proc(ctx: rawptr),
-	set_target_fps: proc(ctx: rawptr, target_fps: i32),
-	disable_exit_key: proc(ctx: rawptr),
+	ctx:                 rawptr,
+	init:                proc(ctx: rawptr, config: Engine_Config) -> bool,
+	shutdown:            proc(ctx: rawptr),
+	set_target_fps:      proc(ctx: rawptr, target_fps: i32),
+	disable_exit_key:    proc(ctx: rawptr),
 	window_should_close: proc(ctx: rawptr) -> bool,
 }
 
 engine_platform_backend_is_valid :: proc(platform: Engine_Platform_Backend) -> bool {
-	return platform.init != nil &&
-	       platform.shutdown != nil &&
-	       platform.set_target_fps != nil &&
-	       platform.disable_exit_key != nil &&
-	       platform.window_should_close != nil
+	return(
+		platform.init != nil &&
+		platform.shutdown != nil &&
+		platform.set_target_fps != nil &&
+		platform.disable_exit_key != nil &&
+		platform.window_should_close != nil \
+	)
 }
 
-engine_platform_backend_or_default :: proc(platform: Engine_Platform_Backend) -> Engine_Platform_Backend {
+engine_platform_backend_or_default :: proc(
+	platform: Engine_Platform_Backend,
+) -> Engine_Platform_Backend {
 	if engine_platform_backend_is_valid(platform) {
 		return platform
 	}
