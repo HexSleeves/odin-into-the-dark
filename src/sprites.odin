@@ -3,6 +3,7 @@ package main
 import "core:encoding/json"
 import "core:os"
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Sprite types ─────────────────────────────────────────────────────────────
 
@@ -28,12 +29,14 @@ Sprite_Data :: struct {
 // ─── Global sprite atlas ──────────────────────────────────────────────────────
 
 Sprite_Atlas :: struct {
-	texture:    rl.Texture2D,
-	tile_size:  int, // source sprite size from data
-	tile_map:   map[string]Sprite, // "wall", "floor", etc.
-	char_map:   map[string]Sprite, // "player", "rat", etc.
-	item_map:   map[string]Sprite, // "health_potion", etc.
-	loaded:     bool,
+	texture:        eng.Engine_Texture,
+	texture_handle: eng.Engine_Texture_Handle,
+	tile_size:      int, // source sprite size from data
+	tile_map:       map[string]Sprite, // "wall", "floor", etc.
+	char_map:       map[string]Sprite, // "player", "rat", etc.
+	item_map:       map[string]Sprite, // "health_potion", etc.
+	owned_strings:  [dynamic]string,
+	loaded:         bool,
 }
 
 g_sprites: Sprite_Atlas
@@ -53,7 +56,7 @@ sprite_at :: proc(col, row, size: int) -> Sprite {
 
 // ─── Init / Cleanup ───────────────────────────────────────────────────────────
 
-sprites_init :: proc() {
+sprites_init :: proc(engine: ^eng.Engine) {
 	// Load sprite mapping data
 	data, read_err := os.read_entire_file("data/sprites.json5", context.allocator)
 	if read_err != nil {
@@ -68,20 +71,20 @@ sprites_init :: proc() {
 		logger_errorf(.Sprites, "parse failed for data/sprites.json5: %v", parse_err)
 		return
 	}
+	if sprite_data.tileset != "" {
+		defer delete(sprite_data.tileset)
+	}
+	defer delete(sprite_data.tiles)
+	defer delete(sprite_data.characters)
+	defer delete(sprite_data.items)
 
 	// Load the tileset texture
 	tileset_path := sprite_data.tileset
 	if tileset_path == "" { tileset_path = "assets/kenney_1bit.png" }
 
-	// Convert to cstring for Raylib
-	path_buf: [256]u8
-	copy_len := min(len(tileset_path), 255)
-	for i in 0 ..< copy_len { path_buf[i] = tileset_path[i] }
-	path_buf[copy_len] = 0
-	path_cstr := cast(cstring)&path_buf[0]
-
-	g_sprites.texture = rl.LoadTexture(path_cstr)
-	if g_sprites.texture.id == 0 {
+	g_sprites.texture_handle = eng.engine_texture_manager_load(engine, tileset_path)
+	g_sprites.texture = eng.engine_texture_manager_get(engine, g_sprites.texture_handle)
+	if !eng.engine_texture_is_valid(g_sprites.texture) {
 		logger_errorf(.Sprites, "failed to load texture '%s'", tileset_path)
 		return
 	}
@@ -92,19 +95,23 @@ sprites_init :: proc() {
 	g_sprites.tile_map = make(map[string]Sprite)
 	g_sprites.char_map = make(map[string]Sprite)
 	g_sprites.item_map = make(map[string]Sprite)
+	g_sprites.owned_strings = make([dynamic]string)
 
 	// Build tile sprite map
 	for id, pos in sprite_data.tiles {
+		append(&g_sprites.owned_strings, id)
 		(&g_sprites.tile_map)[id] = sprite_at(pos.col, pos.row, size)
 	}
 
 	// Build character sprite map
 	for id, pos in sprite_data.characters {
+		append(&g_sprites.owned_strings, id)
 		(&g_sprites.char_map)[id] = sprite_at(pos.col, pos.row, size)
 	}
 
 	// Build item sprite map
 	for id, pos in sprite_data.items {
+		append(&g_sprites.owned_strings, id)
 		(&g_sprites.item_map)[id] = sprite_at(pos.col, pos.row, size)
 	}
 
@@ -122,17 +129,28 @@ sprites_init :: proc() {
 	)
 }
 
-sprites_cleanup :: proc() {
+sprites_cleanup :: proc(engine: ^eng.Engine) {
 	if !g_sprites.loaded { return }
-	rl.UnloadTexture(g_sprites.texture)
+	if eng.texture_handle_is_valid(g_sprites.texture_handle) {
+		_ = eng.engine_texture_manager_unload(engine, g_sprites.texture_handle)
+	} else {
+		eng.engine_texture_unload(engine, &g_sprites.texture)
+	}
 	delete(g_sprites.tile_map)
 	delete(g_sprites.char_map)
 	delete(g_sprites.item_map)
+	for owned in g_sprites.owned_strings {
+		delete(owned)
+	}
+	delete(g_sprites.owned_strings)
+	g_sprites.texture = eng.Engine_Texture{}
+	g_sprites.texture_handle = eng.ENGINE_TEXTURE_HANDLE_NONE
+	g_sprites.loaded = false
 }
 
 // ─── Drawing ──────────────────────────────────────────────────────────────────
 
-draw_sprite :: proc(spr: Sprite, x, y: i32, tint: rl.Color = rl.WHITE) {
+draw_sprite :: proc(engine: ^eng.Engine, spr: Sprite, x, y: i32, tint: rl.Color = rl.WHITE) {
 	if !g_sprites.loaded { return }
 	dest := rl.Rectangle {
 		x      = f32(x),
@@ -140,7 +158,7 @@ draw_sprite :: proc(spr: Sprite, x, y: i32, tint: rl.Color = rl.WHITE) {
 		width  = f32(TILE_SIZE),
 		height = f32(TILE_SIZE),
 	}
-	rl.DrawTexturePro(g_sprites.texture, spr.src, dest, {0, 0}, 0, tint)
+	render_draw_texture_region(engine, g_sprites.texture, spr.src, dest, {0, 0}, 0, tint)
 }
 
 // ─── Lookup helpers ───────────────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import "core:fmt"
 import "core:math/rand"
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Enemy factory (data-driven) ─────────────────────────────────────────────
 
@@ -107,10 +108,8 @@ enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 // ─── Dijkstra map (BFS flood-fill from player) ──────────────────────────────
 
 compute_dijkstra_map :: proc(game: ^Game) {
-	// Fill with unreachable
-	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-		game.dijkstra_map[i] = DMAP_UNREACHABLE
-	}
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
+	eng.engine_distance_map_reset(&dmap)
 
 	// BFS queue using a simple ring buffer
 	Queue_Entry :: struct {
@@ -123,7 +122,7 @@ compute_dijkstra_map :: proc(game: ^Game) {
 	// Seed with player position
 	px := game.player.pos.x
 	py := game.player.pos.y
-	game.dijkstra_map[pos_to_idx(px, py)] = 0
+	eng.engine_distance_map_set(&dmap, px, py, 0)
 	queue[tail] = {px, py}
 	tail += 1
 
@@ -134,7 +133,7 @@ compute_dijkstra_map :: proc(game: ^Game) {
 	for head != tail {
 		cur := queue[head]
 		head += 1
-		cur_dist := game.dijkstra_map[pos_to_idx(cur.x, cur.y)]
+		cur_dist := eng.engine_distance_map_get(&dmap, cur.x, cur.y)
 
 		dx := DX
 		dy := DY
@@ -145,10 +144,9 @@ compute_dijkstra_map :: proc(game: ^Game) {
 			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
 			if !is_walkable(game, nx, ny) {continue}
 
-			idx := pos_to_idx(nx, ny)
-			if game.dijkstra_map[idx] <= cur_dist + 1 {continue}
+			if eng.engine_distance_map_get(&dmap, nx, ny) <= cur_dist + 1 {continue}
 
-			game.dijkstra_map[idx] = cur_dist + 1
+			eng.engine_distance_map_set(&dmap, nx, ny, cur_dist + 1)
 			queue[tail] = {nx, ny}
 			tail += 1
 		}
@@ -165,8 +163,7 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 		if !enemy.alive {continue}
 
 		// Check if this enemy's tile is currently visible to the player
-		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-		is_visible := tile != nil && tile.visible
+		is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
 
 		if is_visible {
 			chase_player(messages, game, &enemy)
@@ -195,7 +192,8 @@ chase_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
 	}
 
 	// 2. Follow the precomputed Dijkstra map downhill toward the player.
-	current_dist := game.dijkstra_map[pos_to_idx(enemy.pos.x, enemy.pos.y)]
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
+	current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
 	if current_dist >= DMAP_UNREACHABLE {
 		wander(game, enemy)
 		return
@@ -210,7 +208,7 @@ chase_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
 		if !is_walkable(game, nx, ny) {continue}
 		if enemy_at(game, nx, ny) != nil {continue}
 
-		n_dist := game.dijkstra_map[pos_to_idx(nx, ny)]
+		n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
 		if n_dist < best_dist {
 			best_dist = n_dist
 			best_pos = Vec2{nx, ny}
@@ -274,8 +272,8 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 				for dir in 0 ..< 4 {
 					wx := enemy.pos.x + dx[dir]
 					wy := enemy.pos.y + dy[dir]
-					if is_walkable(game, wx, wy) && !game.web_tiles[pos_to_idx(wx, wy)] {
-						game.web_tiles[pos_to_idx(wx, wy)] = true
+					if is_walkable(game, wx, wy) && !web_tile_at(game, wx, wy) {
+						web_tile_set(game, wx, wy, true)
 						enemy.ability_cooldown = enemy.ability_max_cd
 						add_message(
 							messages,
@@ -291,8 +289,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			// Pull: if player is in LOS within range but not adjacent, pull 1 tile closer
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 2 && dist <= enemy.ability_range {
-				etile := tile_at(game, enemy.pos.x, enemy.pos.y)
-				if etile != nil && etile.visible {
+				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
 					// Pull player 1 tile toward enemy along the longer axis
 					pull_dx := 0
 					pull_dy := 0
@@ -333,8 +330,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 		} else if enemy.ability_type == "teleport" {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 3 && dist <= enemy.ability_range {
-				tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-				if tile != nil && tile.visible {
+				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
 					DX :: [4]int{0, 0, -1, 1}
 					DY :: [4]int{-1, 1, 0, 0}
 					dx := DX

@@ -166,8 +166,8 @@ restart_game :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager, camera
 
 consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 	pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
-	if game.web_tiles[pidx] {
-		game.web_tiles[pidx] = false
+	if web_tile_at_idx(game, pidx) {
+		web_tile_set_idx(game, pidx, false)
 		game.skip_next_turn = true
 		add_message(messages, game, "You are stuck in a web!", rl.Color{180, 180, 180, 255})
 	}

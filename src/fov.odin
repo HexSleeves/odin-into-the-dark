@@ -24,22 +24,14 @@ OCTANT_MULTIPLIERS :: [8][4]int {
 
 compute_fov :: proc(game: ^Game) {
 	// Clear visibility for all tiles
-	for &tile in game.tiles {
-		tile.visible = false
-		tile.light_level = 0
-	}
+	tile_states_clear_visibility(game)
 
 	// Player's tile is always visible
 	px := game.player.pos.x
 	py := game.player.pos.y
 	radius := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
 
-	player_tile := tile_at(game, px, py)
-	if player_tile != nil {
-		player_tile.visible = true
-		player_tile.explored = true
-		player_tile.light_level = 1.0
-	}
+	_ = tile_state_set(game, px, py, true, true, 1.0)
 
 	// Cast light in all 8 octants
 	mults := OCTANT_MULTIPLIERS
@@ -50,8 +42,8 @@ compute_fov :: proc(game: ^Game) {
 	// Diagnostic: count visible tiles
 	if logger_should_log(&g_logger, log.Level.Debug, .Fov) {
 		visible_count := 0
-		for &tile in game.tiles {
-			if tile.visible {
+		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+			if tile_visible_idx(game, i) {
 				visible_count += 1
 			}
 		}
@@ -109,10 +101,8 @@ cast_light :: proc(
 			if dist_sq <= radius_sq {
 				t := tile_at(game, map_x, map_y)
 				if t != nil {
-					t.visible = true
-					t.explored = true
 					// Light falls off with distance
-					t.light_level = f32(1.0 - dist_sq / radius_sq)
+					_ = tile_state_set(game, map_x, map_y, true, true, f32(1.0 - dist_sq / radius_sq))
 				}
 			}
 

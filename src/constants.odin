@@ -1,5 +1,7 @@
 package main
 
+import eng "./engine"
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 TILE_SIZE :: 32       // render size (sprites are 16x16, drawn at 32x32)
@@ -17,8 +19,8 @@ MAP_VIEW_HEIGHT :: SCREEN_HEIGHT - HUD_REGION_HEIGHT - MSG_REGION_HEIGHT
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 
-MAX_MESSAGES :: 64
-MAX_MSG_LEN :: 256
+MAX_MESSAGES :: eng.ENGINE_MAX_MESSAGES
+MAX_MSG_LEN :: eng.ENGINE_MAX_MESSAGE_LEN
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
 

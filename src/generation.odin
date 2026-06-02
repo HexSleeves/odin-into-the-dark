@@ -65,8 +65,8 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	// Clear tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		game.tiles[i] = Tile{}
-		game.web_tiles[i] = false
 	}
+	web_tiles_clear(game)
 
 	// Clear rooms and state
 	clear(&game.rooms)

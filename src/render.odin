@@ -1,6 +1,5 @@
 package main
 
-import rl "vendor:raylib"
 import eng "./engine"
 
 // ─── Top-level render call ────────────────────────────────────────────────────
@@ -9,25 +8,25 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	particles := game_engine_particle_manager(engine)
 	update_particles(particles)
 
-	rl.BeginDrawing()
-	rl.ClearBackground(rl.BLACK)
+	eng.engine_render_begin_frame(engine)
+	eng.engine_render_clear(engine, eng.engine_color_make(0, 0, 0, 255))
 
 	// Clip the map rendering to the viewport region so it doesn't bleed into HUD/messages
-	rl.BeginScissorMode(0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
+	eng.engine_render_begin_scissor(engine, 0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
 	render_map(engine, game)
 	render_webs(engine, game)
 	render_items(engine, game)
 	render_enemies(engine, game)
 	render_player(engine, game)
-	render_particles(particles)
-	rl.EndScissorMode()
+	render_particles(engine, particles)
+	eng.engine_render_end_scissor(engine)
 
 	render_hud(engine, game)
 	render_messages_for_engine(engine)
 
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	if ui.show_minimap && game.state == .Playing {
-		render_minimap(game)
+		render_minimap(engine, game)
 	}
 
 	if game.state == .Title_Screen {
@@ -46,7 +45,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 		render_crafting(engine, game)
 	}
 	if game.state == .Viewing_Help {
-		render_help(game)
+		render_help(engine, game)
 	}
 	if game.state == .Viewing_Scores {
 		render_high_scores(engine, game)
@@ -59,15 +58,16 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	vfx := game_engine_vfx_manager(engine)
 	if vfx != nil && vfx.flash_alpha > 0.01 {
 		alpha := u8(vfx.flash_alpha * 255.0)
-		rl.DrawRectangle(
+		eng.engine_render_draw_rectangle(
+			engine,
 			0,
 			0,
 			i32(SCREEN_WIDTH),
 			i32(SCREEN_HEIGHT),
-			rl.Color{vfx.flash_color.r, vfx.flash_color.g, vfx.flash_color.b, alpha},
+			eng.engine_color_make(vfx.flash_color.r, vfx.flash_color.g, vfx.flash_color.b, alpha),
 		)
 		eng.vfx_manager_fade_flash(vfx, 0.85)
 	}
 
-	rl.EndDrawing()
+	eng.engine_render_end_frame(engine)
 }

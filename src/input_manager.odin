@@ -1,6 +1,6 @@
 package main
 
-import rl "vendor:raylib"
+import eng "./engine"
 
 // ---------------------------------------------------------------------------
 // Game_Action enum
@@ -53,27 +53,13 @@ Game_Action :: enum {
 // Structs
 // ---------------------------------------------------------------------------
 
-Key_Binding :: struct {
-	primary:     rl.KeyboardKey,
-	alt:         rl.KeyboardKey,
-	needs_shift: bool,
-}
-
-Repeat_State :: struct {
-	hold_time:    f32,
-	repeat_timer: f32,
-	last_fired:   bool,
-}
+Key_Binding :: eng.Engine_Key_Binding
+Repeat_State :: eng.Engine_Repeat_State
 
 KEY_REPEAT_DELAY :: f32(0.20)
 KEY_REPEAT_RATE  :: f32(0.08)
 
-Input_Manager :: struct {
-	bindings:     [Game_Action]Key_Binding,
-	repeat:       [Game_Action]Repeat_State,
-	repeat_delay: f32,
-	repeat_rate:  f32,
-}
+Input_Manager :: eng.Action_Input_Manager
 
 input_manager_make :: proc() -> Input_Manager {
 	input: Input_Manager
@@ -86,8 +72,7 @@ input_manager_make :: proc() -> Input_Manager {
 // ---------------------------------------------------------------------------
 
 input_manager_init :: proc(im: ^Input_Manager) {
-	im.repeat_delay = KEY_REPEAT_DELAY
-	im.repeat_rate = KEY_REPEAT_RATE
+	im^ = eng.action_input_manager_make(KEY_REPEAT_DELAY, KEY_REPEAT_RATE)
 	input_default_bindings(im)
 }
 
@@ -96,83 +81,66 @@ input_manager_init :: proc(im: ^Input_Manager) {
 // ---------------------------------------------------------------------------
 
 input_default_bindings :: proc(im: ^Input_Manager) {
-	im.bindings[.Move_North] = {primary = .W, alt = .UP}
-	im.bindings[.Move_South] = {primary = .S, alt = .DOWN}
-	im.bindings[.Move_East] = {primary = .D, alt = .RIGHT}
-	im.bindings[.Move_West] = {primary = .A, alt = .LEFT}
-	im.bindings[.Wait] = {primary = .PERIOD}
-	im.bindings[.Quit] = {primary = .ESCAPE}
-	im.bindings[.Pickup] = {primary = .G}
-	im.bindings[.Mine] = {primary = .X}
-	im.bindings[.Inventory] = {primary = .I}
-	im.bindings[.Crafting] = {primary = .C}
-	im.bindings[.Help] = {primary = .SLASH, needs_shift = true}
-	im.bindings[.Toggle_Map] = {primary = .M}
-	im.bindings[.Save] = {primary = .F5}
-	im.bindings[.Load] = {primary = .F9}
-	im.bindings[.Toggle_Audio] = {primary = .F1}
-	im.bindings[.Toggle_Sprites] = {primary = .F2}
-	im.bindings[.Menu_Up] = {primary = .W, alt = .UP}
-	im.bindings[.Menu_Down] = {primary = .S, alt = .DOWN}
-	im.bindings[.Menu_Confirm] = {primary = .ENTER, alt = .SPACE}
-	im.bindings[.Menu_New_Game] = {primary = .N}
-	im.bindings[.Menu_Continue] = {primary = .C}
-	im.bindings[.Menu_High_Scores] = {primary = .H}
-	im.bindings[.Menu_Quit] = {primary = .Q}
-	im.bindings[.Menu_Back] = {primary = .ESCAPE}
-	im.bindings[.Restart] = {primary = .R}
-	im.bindings[.Inv_Drop_Mode] = {primary = .D}
-	im.bindings[.Inv_Equip_Mode] = {primary = .E}
-	im.bindings[.Inv_Slot_1] = {primary = .ONE}
-	im.bindings[.Inv_Slot_2] = {primary = .TWO}
-	im.bindings[.Inv_Slot_3] = {primary = .THREE}
-	im.bindings[.Inv_Slot_4] = {primary = .FOUR}
-	im.bindings[.Inv_Slot_5] = {primary = .FIVE}
-	im.bindings[.Inv_Slot_6] = {primary = .SIX}
-	im.bindings[.Inv_Slot_7] = {primary = .SEVEN}
-	im.bindings[.Inv_Slot_8] = {primary = .EIGHT}
-	im.bindings[.Inv_Slot_9] = {primary = .NINE}
-	im.bindings[.Craft_1] = {primary = .ONE}
-	im.bindings[.Craft_2] = {primary = .TWO}
-	im.bindings[.Craft_3] = {primary = .THREE}
-	im.bindings[.Craft_4] = {primary = .FOUR}
+	input_set_binding(im, .Move_North, {primary = .W, alt = .Up})
+	input_set_binding(im, .Move_South, {primary = .S, alt = .Down})
+	input_set_binding(im, .Move_East, {primary = .D, alt = .Right})
+	input_set_binding(im, .Move_West, {primary = .A, alt = .Left})
+	input_set_binding(im, .Wait, {primary = .Period})
+	input_set_binding(im, .Quit, {primary = .Escape})
+	input_set_binding(im, .Pickup, {primary = .G})
+	input_set_binding(im, .Mine, {primary = .X})
+	input_set_binding(im, .Inventory, {primary = .I})
+	input_set_binding(im, .Crafting, {primary = .C})
+	input_set_binding(im, .Help, {primary = .Slash, needs_shift = true})
+	input_set_binding(im, .Toggle_Map, {primary = .M})
+	input_set_binding(im, .Save, {primary = .F5})
+	input_set_binding(im, .Load, {primary = .F9})
+	input_set_binding(im, .Toggle_Audio, {primary = .F1})
+	input_set_binding(im, .Toggle_Sprites, {primary = .F2})
+	input_set_binding(im, .Menu_Up, {primary = .W, alt = .Up})
+	input_set_binding(im, .Menu_Down, {primary = .S, alt = .Down})
+	input_set_binding(im, .Menu_Confirm, {primary = .Enter, alt = .Space})
+	input_set_binding(im, .Menu_New_Game, {primary = .N})
+	input_set_binding(im, .Menu_Continue, {primary = .C})
+	input_set_binding(im, .Menu_High_Scores, {primary = .H})
+	input_set_binding(im, .Menu_Quit, {primary = .Q})
+	input_set_binding(im, .Menu_Back, {primary = .Escape})
+	input_set_binding(im, .Restart, {primary = .R})
+	input_set_binding(im, .Inv_Drop_Mode, {primary = .D})
+	input_set_binding(im, .Inv_Equip_Mode, {primary = .E})
+	input_set_binding(im, .Inv_Slot_1, {primary = .One})
+	input_set_binding(im, .Inv_Slot_2, {primary = .Two})
+	input_set_binding(im, .Inv_Slot_3, {primary = .Three})
+	input_set_binding(im, .Inv_Slot_4, {primary = .Four})
+	input_set_binding(im, .Inv_Slot_5, {primary = .Five})
+	input_set_binding(im, .Inv_Slot_6, {primary = .Six})
+	input_set_binding(im, .Inv_Slot_7, {primary = .Seven})
+	input_set_binding(im, .Inv_Slot_8, {primary = .Eight})
+	input_set_binding(im, .Inv_Slot_9, {primary = .Nine})
+	input_set_binding(im, .Craft_1, {primary = .One})
+	input_set_binding(im, .Craft_2, {primary = .Two})
+	input_set_binding(im, .Craft_3, {primary = .Three})
+	input_set_binding(im, .Craft_4, {primary = .Four})
 }
 
 // ---------------------------------------------------------------------------
 // Private helpers
 // ---------------------------------------------------------------------------
 
-@(private = "file")
-_binding_matches_held :: proc(b: Key_Binding) -> bool {
-	if b.primary == .KEY_NULL {return false}
-	if b.needs_shift && !(rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {return false}
-	return rl.IsKeyDown(b.primary) || (b.alt != .KEY_NULL && rl.IsKeyDown(b.alt))
-}
-
-@(private = "file")
-_binding_matches_pressed :: proc(b: Key_Binding) -> bool {
-	if b.primary == .KEY_NULL {return false}
-	if b.needs_shift && !(rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {return false}
-	return rl.IsKeyPressed(b.primary) || (b.alt != .KEY_NULL && rl.IsKeyPressed(b.alt))
-}
-
 // ---------------------------------------------------------------------------
 // Public query procs
 // ---------------------------------------------------------------------------
 
 action_pressed :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return _binding_matches_pressed(im.bindings[action])
+	return eng.action_input_pressed(im, input_action_id(action))
 }
 
 action_held :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return _binding_matches_held(im.bindings[action])
+	return eng.action_input_held(im, input_action_id(action))
 }
 
 action_released :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	b := im.bindings[action]
-	if b.primary == .KEY_NULL {return false}
-	if b.needs_shift && !(rl.IsKeyDown(.LEFT_SHIFT) || rl.IsKeyDown(.RIGHT_SHIFT)) {return false}
-	return rl.IsKeyReleased(b.primary) || (b.alt != .KEY_NULL && rl.IsKeyReleased(b.alt))
+	return eng.action_input_released(im, input_action_id(action))
 }
 
 // ---------------------------------------------------------------------------
@@ -180,35 +148,15 @@ action_released :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
 // ---------------------------------------------------------------------------
 
 check_repeat :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	dt := rl.GetFrameTime()
-	rs := &im.repeat[action]
+	return eng.action_input_repeat(im, input_action_id(action))
+}
 
-	held := _binding_matches_held(im.bindings[action])
+@(private = "file")
+input_set_binding :: proc(im: ^Input_Manager, action: Game_Action, binding: Key_Binding) {
+	eng.action_input_manager_set_binding(im, input_action_id(action), binding)
+}
 
-	if !held {
-		rs.hold_time = 0
-		rs.repeat_timer = 0
-		rs.last_fired = false
-		return false
-	}
-
-	if !rs.last_fired {
-		rs.last_fired = true
-		rs.hold_time = 0
-		rs.repeat_timer = 0
-		return true
-	}
-
-	rs.hold_time += dt
-	if rs.hold_time < im.repeat_delay {
-		return false
-	}
-
-	rs.repeat_timer += dt
-	if rs.repeat_timer >= im.repeat_rate {
-		rs.repeat_timer -= im.repeat_rate
-		return true
-	}
-
-	return false
+@(private = "file")
+input_action_id :: proc(action: Game_Action) -> int {
+	return int(action)
 }

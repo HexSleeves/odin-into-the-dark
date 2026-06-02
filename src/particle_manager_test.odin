@@ -2,24 +2,25 @@ package main
 
 import "core:testing"
 import rl "vendor:raylib"
+import eng "./engine"
 
 @(test)
 particle_manager_make_wraps_current_particle_pool :: proc(t: ^testing.T) {
 	particles := particle_manager_make()
+	engine_particles: eng.Particle_Manager = particles
 
-	testing.expect(t, particles.pool == &g_particles)
+	testing.expect_value(t, particle_manager_active_count(&particles), 0)
+	testing.expect_value(t, eng.particle_manager_active_count(&engine_particles), 0)
 }
 
 @(test)
 particle_manager_active_count_reads_pool_state :: proc(t: ^testing.T) {
 	particles := particle_manager_make()
-	was_active := g_particles[0].active
-	defer g_particles[0].active = was_active
 
-	g_particles[0].active = false
+	particles.pool[0].active = false
 	testing.expect_value(t, particle_manager_active_count(&particles), 0)
 
-	g_particles[0].active = true
+	particles.pool[0].active = true
 	testing.expect_value(t, particle_manager_active_count(&particles), 1)
 }
 
@@ -27,7 +28,7 @@ particle_manager_active_count_reads_pool_state :: proc(t: ^testing.T) {
 particle_handlers_accept_manager_context :: proc(t: ^testing.T) {
 	spawn_handler: proc(particles: ^Particle_Manager, tile_x, tile_y: int, color: rl.Color, count: int, speed: f32, camera_x: int, camera_y: int) = particle_manager_spawn
 	update_handler: proc(particles: ^Particle_Manager) = update_particles
-	render_handler: proc(particles: ^Particle_Manager) = render_particles
+	render_handler: proc(engine: ^eng.Engine, particles: ^Particle_Manager) = render_particles
 	hit_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_hit_particles
 	mine_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_mine_particles
 	pickup_handler: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x, cam_y: int) = spawn_pickup_particles

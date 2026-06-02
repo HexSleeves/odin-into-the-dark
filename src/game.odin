@@ -19,8 +19,7 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game := new(Game)
 
 	game.seed = seed
-	game.map_width = MAP_WIDTH
-	game.map_height = MAP_HEIGHT
+	game_init_world(game)
 	game.depth = 1
 	game.state = .Title_Screen
 
@@ -50,8 +49,7 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	rand.reset(seed)
 
 	game.seed = seed
-	game.map_width = MAP_WIDTH
-	game.map_height = MAP_HEIGHT
+	game_init_world(game)
 	game.depth = 1
 	game.state = .Playing
 
@@ -68,6 +66,17 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 
 	// Give the player starting equipment
 	give_starter_gear(content, game)
+}
+
+game_init_world :: proc(game: ^Game) {
+	if game == nil {
+		return
+	}
+	game.world = eng.world_manager_make(MAP_WIDTH, MAP_HEIGHT, TILE_SIZE)
+	game.web_tiles = eng.bool_grid_manager_make(eng.world_manager_grid(game.world))
+	game.tile_states = eng.tile_state_manager_make(eng.world_manager_grid(game.world))
+	game.map_width = eng.world_manager_width(game.world)
+	game.map_height = eng.world_manager_height(game.world)
 }
 
 // ─── Initialize player from data ─────────────────────────────────────────────
@@ -99,8 +108,8 @@ game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool 
 		game.player.pos.y * TILE_SIZE + TILE_SIZE / 2,
 		SCREEN_WIDTH,
 		MAP_VIEW_HEIGHT,
-		MAP_WIDTH * TILE_SIZE,
-		MAP_HEIGHT * TILE_SIZE,
+		eng.world_manager_pixel_width(game.world),
+		eng.world_manager_pixel_height(game.world),
 		snap,
 	)
 }

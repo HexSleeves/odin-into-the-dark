@@ -1,7 +1,5 @@
 package engine
 
-import "core:os"
-
 CONFIG_MANAGER_MAX_ENTRIES :: 64
 CONFIG_MANAGER_MAX_KEY_LEN :: 64
 CONFIG_MANAGER_MAX_VALUE_LEN :: 256
@@ -23,11 +21,20 @@ config_manager_make :: proc() -> Config_Manager {
 }
 
 config_manager_load_env_file :: proc(config: ^Config_Manager, path: string) -> bool {
+	return config_manager_load_env_file_with_file_system(config, path, engine_file_system_default())
+}
+
+config_manager_load_env_file_with_file_system :: proc(
+	config: ^Config_Manager,
+	path: string,
+	fs: Engine_File_System,
+) -> bool {
 	if config == nil {
 		return false
 	}
-	buf, read_err := os.read_entire_file(path, context.allocator)
-	if read_err != nil {
+	file_system := engine_file_system_or_default(fs)
+	buf, ok := file_system.read_entire_file(file_system.ctx, path, context.allocator)
+	if !ok {
 		return false
 	}
 	defer delete(buf, context.allocator)

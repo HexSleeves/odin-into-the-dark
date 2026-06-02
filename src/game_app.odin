@@ -26,7 +26,9 @@ Into_The_Depths_App_State :: struct {
 g_config: eng.Config_Manager
 
 game_engine_config :: proc() -> eng.Engine_Config {
-	return eng.engine_config_make(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths", 60)
+	config := eng.engine_config_make(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths", 60)
+	config.audio = game_audio_backend(&g_audio)
+	return config
 }
 
 game_engine_services_config :: proc() -> eng.Engine_Services_Config {
@@ -50,11 +52,9 @@ game_diagnostics_shutdown :: proc() {
 
 game_runtime_assets_init :: proc() {
 	audio_init()
-	sprites_init()
 }
 
 game_runtime_assets_shutdown :: proc() {
-	sprites_cleanup()
 	audio_cleanup()
 }
 
@@ -64,27 +64,16 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	}
 	content := content_manager_make()
 	saves := save_manager_make()
-	audio := audio_manager_make()
 	sprites := sprite_manager_make()
-	particles := particle_manager_make()
 	scores := score_manager_make()
 	input := input_manager_make()
-	messages := message_manager_make()
-	camera := eng.camera_manager_make()
-	turns := eng.turn_manager_make()
-	vfx := eng.vfx_manager_make()
+	input.backend = eng.engine_input_backend(engine)
 	ui := ui_manager_make(g_sprites.loaded)
 	return eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_CONTENT, &content, size_of(Content_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SAVES, &saves, size_of(Save_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_AUDIO, &audio, size_of(Audio_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SPRITES, &sprites, size_of(Sprite_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_PARTICLES, &particles, size_of(Particle_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_SCORES, &scores, size_of(Score_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_INPUT, &input, size_of(Input_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_MESSAGES, &messages, size_of(Message_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_CAMERA, &camera, size_of(eng.Camera_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_TURNS, &turns, size_of(eng.Turn_Manager)) != nil &&
-	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_VFX, &vfx, size_of(eng.Vfx_Manager)) != nil &&
 	       eng.engine_services_register_value(engine.services, GAME_ENGINE_SERVICE_UI, &ui, size_of(UI_Manager)) != nil
 }
 
@@ -103,10 +92,7 @@ game_engine_save_manager :: proc(engine: ^eng.Engine) -> ^Save_Manager {
 }
 
 game_engine_audio_manager :: proc(engine: ^eng.Engine) -> ^Audio_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^Audio_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_AUDIO)
+	return eng.engine_audio_manager(engine)
 }
 
 game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^Sprite_Manager {
@@ -117,10 +103,7 @@ game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^Sprite_Manager {
 }
 
 game_engine_particle_manager :: proc(engine: ^eng.Engine) -> ^Particle_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^Particle_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_PARTICLES)
+	return eng.engine_particle_manager(engine)
 }
 
 game_engine_score_manager :: proc(engine: ^eng.Engine) -> ^Score_Manager {
@@ -138,31 +121,19 @@ game_engine_input_manager :: proc(engine: ^eng.Engine) -> ^Input_Manager {
 }
 
 game_engine_message_manager :: proc(engine: ^eng.Engine) -> ^Message_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^Message_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_MESSAGES)
+	return eng.engine_message_manager(engine)
 }
 
 game_engine_camera_manager :: proc(engine: ^eng.Engine) -> ^eng.Camera_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^eng.Camera_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_CAMERA)
+	return eng.engine_camera_manager(engine)
 }
 
 game_engine_turn_manager :: proc(engine: ^eng.Engine) -> ^eng.Turn_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^eng.Turn_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_TURNS)
+	return eng.engine_turn_manager(engine)
 }
 
 game_engine_vfx_manager :: proc(engine: ^eng.Engine) -> ^eng.Vfx_Manager {
-	if engine == nil || engine.services == nil {
-		return nil
-	}
-	return cast(^eng.Vfx_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_VFX)
+	return eng.engine_vfx_manager(engine)
 }
 
 game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
@@ -194,8 +165,11 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	state := new(Into_The_Depths_App_State)
 	app.state = state
 
+	sprites_init(engine)
+
 	if !game_engine_register_app_services(engine) {
 		logger_fatalf(.App, "Failed to register app services. Exiting.")
+		sprites_cleanup(engine)
 		free(state)
 		app.state = nil
 		return false
@@ -204,6 +178,7 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	content := game_engine_content_manager(engine)
 	if content == nil || !content_manager_load_all(content) {
 		logger_fatalf(.App, "Failed to load data files. Exiting.")
+		sprites_cleanup(engine)
 		free(state)
 		app.state = nil
 		return false
@@ -215,6 +190,7 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	if !game_scene_manager_init(state.scene_descriptors[:], engine, state.game) {
 		logger_fatalf(.App, "Failed to initialize scene manager. Exiting.")
 		game_destroy(state.game)
+		sprites_cleanup(engine)
 		free(state)
 		app.state = nil
 		return false
@@ -269,6 +245,7 @@ game_app_shutdown :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	if state.game != nil {
 		game_destroy(state.game)
 	}
+	sprites_cleanup(engine)
 	free(state)
 	app.state = nil
 }

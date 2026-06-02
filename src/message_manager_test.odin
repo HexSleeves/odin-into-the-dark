@@ -7,9 +7,11 @@ import eng "./engine"
 @(test)
 message_manager_make_starts_empty :: proc(t: ^testing.T) {
 	messages := message_manager_make()
+	engine_messages: eng.Message_Manager = messages
 
 	testing.expect_value(t, messages.log.count, 0)
 	testing.expect_value(t, messages.log.head, 0)
+	testing.expect_value(t, engine_messages.log.count, 0)
 }
 
 @(test)
@@ -34,7 +36,7 @@ message_handlers_accept_manager_context :: proc(t: ^testing.T) {
 	bind_handler: proc(messages: ^Message_Manager, turns: ^eng.Turn_Manager) = message_manager_bind_turns
 	add_handler: proc(messages: ^Message_Manager, game: ^Game, text: string, color: rl.Color) = add_message
 	clear_handler: proc(messages: ^Message_Manager) = clear_messages
-	render_handler: proc(messages: ^Message_Manager) = render_messages
+	render_handler: proc(engine: ^eng.Engine, messages: ^Message_Manager) = render_messages
 
 	testing.expect(t, bind_handler != nil)
 	testing.expect(t, add_handler != nil)

@@ -87,11 +87,11 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 	return UNSEEN_COLOR
 }
 
-get_tile_color :: proc(tile: Tile, palette: Floor_Palette) -> rl.Color {
-	if tile.visible {
-		return dim_color(base_tile_color(tile.type, palette), max(tile.light_level, 0.5))
+get_tile_color :: proc(tile: Tile, state: eng.Tile_State, palette: Floor_Palette) -> rl.Color {
+	if state.visible {
+		return dim_color(base_tile_color(tile.type, palette), max(state.light_level, 0.5))
 	}
-	if tile.explored {
+	if state.explored {
 		return dim_color(base_tile_color(tile.type, palette), EXPLORED_DIM)
 	}
 	return UNSEEN_COLOR
@@ -130,15 +130,17 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
-			tile := game.tiles[pos_to_idx(x, y)]
+			idx := pos_to_idx(x, y)
+			tile := game.tiles[idx]
+			state := tile_state_at_idx(game, idx)
 
-			if !tile.visible && !tile.explored {
-				rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), UNSEEN_COLOR)
+			if !state.visible && !state.explored {
+				render_draw_rectangle(engine, sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), UNSEEN_COLOR)
 			} else {
 				base := base_tile_color(tile.type, palette)
 				tint: rl.Color
-				if tile.visible {
-					brightness := max(tile.light_level, 0.5)
+				if state.visible {
+					brightness := max(state.light_level, 0.5)
 					tint = rl.Color{u8(f32(base.r) * brightness), u8(f32(base.g) * brightness), u8(f32(base.b) * brightness), 255}
 				} else {
 					dim := f32(EXPLORED_DIM)
@@ -147,27 +149,27 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 
 					if ui.use_sprites {
 					spr := sprite_manager_tile(sprites, tile.type)
-					sprite_manager_draw(sprites, spr, sx, sy, tint)
+					sprite_manager_draw(engine, sprites, spr, sx, sy, tint)
 				} else {
 					// ASCII mode: colored rectangle
-					rl.DrawRectangle(sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), tint)
+					render_draw_rectangle(engine, sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), tint)
 				}
 
 				// Ore vein overlay on walls
 				if tile.type == .Wall {
-					vein := game.ore_veins[pos_to_idx(x, y)]
+					vein := game.ore_veins[idx]
 					if vein.ore_type != "" {
 						ore_tint := vein.color
-						if !tile.visible {
+						if !state.visible {
 							ore_tint = dim_color(vein.color, EXPLORED_DIM)
 						}
 							if ui.use_sprites {
 							spr := sprite_manager_named(sprites, "tile", "ore_vein")
-							sprite_manager_draw(sprites, spr, sx, sy, ore_tint)
+							sprite_manager_draw(engine, sprites, spr, sx, sy, ore_tint)
 						} else {
 							dot_x := sx + i32(TILE_SIZE) / 2 - 3
 							dot_y := sy + i32(TILE_SIZE) / 2 - 3
-							rl.DrawRectangle(dot_x, dot_y, 6, 6, ore_tint)
+							render_draw_rectangle(engine, dot_x, dot_y, 6, 6, ore_tint)
 						}
 					}
 				}
@@ -189,10 +191,9 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 	for y in y0 ..= y1 {
 		for x in x0 ..= x1 {
 			idx := pos_to_idx(x, y)
-			if !game.web_tiles[idx] {continue}
+			if !web_tile_at_idx(game, idx) {continue}
 
-			tile := &game.tiles[idx]
-			if !tile.visible {continue}
+			if !tile_visible_idx(game, idx) {continue}
 
 			sx := i32(x * TILE_SIZE) - ox
 			sy := i32(y * TILE_SIZE) - oy
@@ -203,9 +204,9 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 
 				if ui.use_sprites {
 				spr := sprite_manager_named(sprites, "tile", "web")
-				sprite_manager_draw(sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
+				sprite_manager_draw(engine, sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
 			} else {
-				rl.DrawText("w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
+				render_draw_text(engine, "w", sx + 4, sy + 4, i32(TILE_SIZE) - 8, rl.Color{180, 180, 180, 150})
 			}
 		}
 	}
@@ -227,12 +228,12 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	if ui.use_sprites {
 		spr := sprite_manager_named(sprites, "character", "player")
-		sprite_manager_draw(sprites, spr, px, py, game.player.color)
+		sprite_manager_draw(engine, sprites, spr, px, py, game.player.color)
 	} else {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
 		glyph_buf[1] = 0
-		rl.DrawText(cast(cstring)&glyph_buf[0], px, py, i32(TILE_SIZE), game.player.color)
+		render_draw_text(engine, cast(cstring)&glyph_buf[0], px, py, i32(TILE_SIZE), game.player.color)
 	}
 }
 
@@ -249,8 +250,7 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 	for &enemy in game.enemies {
 		if !enemy.alive {continue}
 
-		tile := tile_at(game, enemy.pos.x, enemy.pos.y)
-		if tile == nil || !tile.visible {continue}
+		if !tile_visible_at(game, enemy.pos.x, enemy.pos.y) {continue}
 
 		ex := i32(enemy.pos.x * TILE_SIZE) - ox
 		ey := i32(enemy.pos.y * TILE_SIZE) - oy
@@ -261,12 +261,12 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 
 		if ui.use_sprites {
 			spr := sprite_manager_enemy(sprites, enemy.enemy_type)
-			sprite_manager_draw(sprites, spr, ex, ey, enemy.color)
+			sprite_manager_draw(engine, sprites, spr, ex, ey, enemy.color)
 		} else {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(enemy.glyph)
 			glyph_buf[1] = 0
-			rl.DrawText(cast(cstring)&glyph_buf[0], ex, ey, i32(TILE_SIZE), enemy.color)
+			render_draw_text(engine, cast(cstring)&glyph_buf[0], ex, ey, i32(TILE_SIZE), enemy.color)
 		}
 	}
 }
@@ -282,7 +282,7 @@ TOOLTIP_OFFSET_X :: i32(12)
 TOOLTIP_OFFSET_Y :: i32(-20)
 
 render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
-	mouse := rl.GetMousePosition()
+	mouse := eng.engine_mouse_position(engine)
 	camera := game_engine_camera_manager(engine)
 
 	// Only show tooltips when mouse is in the map viewport region
@@ -297,7 +297,7 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 	}
 
 	tile := tile_at(game, tile_x, tile_y)
-	if tile == nil || !tile.visible {
+	if tile == nil || !tile_visible_at(game, tile_x, tile_y) {
 		return
 	}
 
@@ -314,7 +314,7 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 		tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
 	}
 
-	text_w := rl.MeasureText(tooltip_text, TOOLTIP_FONT_SIZE)
+	text_w := render_measure_text(engine, tooltip_text, TOOLTIP_FONT_SIZE)
 	box_w := text_w + TOOLTIP_PAD_X * 2
 	box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
 
@@ -326,8 +326,9 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 	if box_y < 0 {box_y = 0}
 	if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}
 
-	rl.DrawRectangle(box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
-	rl.DrawText(
+	render_draw_rectangle(engine, box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
+	render_draw_text(
+		engine,
 		tooltip_text,
 		box_x + TOOLTIP_PAD_X,
 		box_y + TOOLTIP_PAD_Y,

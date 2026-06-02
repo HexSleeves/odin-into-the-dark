@@ -252,7 +252,8 @@ save_game_to_path :: proc(turns: ^eng.Turn_Manager, game: ^Game, path: string) -
 
 	// ── Copy fixed arrays and scalars ──
 	data.tiles = game.tiles
-	data.web_tiles = game.web_tiles
+	tile_states_export_to_tiles(game, data.tiles[:])
+	eng.bool_grid_manager_export(game.web_tiles, data.web_tiles[:])
 	data.player = game.player
 	data.depth = game.depth
 	data.turn_count = eng.turn_manager_current(turns)
@@ -405,7 +406,9 @@ load_game_from_path :: proc(content: ^Content_Manager, turns: ^eng.Turn_Manager,
 
 	// ── Restore fixed fields ──
 	game.tiles = data.tiles
-	game.web_tiles = data.web_tiles
+	game_init_world(game)
+	tile_states_import_from_tiles(game, data.tiles[:])
+	eng.bool_grid_manager_import(&game.web_tiles, data.web_tiles[:])
 	game.player = data.player
 	game.depth = data.depth
 	eng.turn_manager_set(turns, data.turn_count)

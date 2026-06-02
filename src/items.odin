@@ -221,22 +221,21 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 		if item.picked_up {continue}
 
 		// Only render items on visible tiles
-		tile := tile_at(game, item.pos.x, item.pos.y)
-		if tile == nil || !tile.visible {continue}
+		if !tile_visible_at(game, item.pos.x, item.pos.y) {continue}
 
 		ix := i32(item.pos.x * TILE_SIZE) - ox
 		iy := i32(item.pos.y * TILE_SIZE) - oy
 
 		if ui.use_sprites {
 			spr := sprite_manager_item(sprites, item.item_type)
-			sprite_manager_draw(sprites, spr, ix, iy, item.color)
+			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color)
 		} else {
 			font_size :: i32(TILE_SIZE)
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(item.glyph)
 			glyph_buf[1] = 0
 			glyph_cstr := cast(cstring)&glyph_buf[0]
-			rl.DrawText(glyph_cstr, ix, iy, font_size, item.color)
+			render_draw_text(engine, glyph_cstr, ix, iy, font_size, item.color)
 		}
 	}
 }

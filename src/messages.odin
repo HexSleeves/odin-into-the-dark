@@ -11,20 +11,14 @@ MSG_FONT_SIZE :: i32(14)
 MSG_LINE_HEIGHT :: i32(16)
 MSG_MAX_VISIBLE :: 7
 
-Message_Manager :: struct {
-	log:   MessageLog,
-	turns: ^eng.Turn_Manager,
-}
+Message_Manager :: eng.Message_Manager
 
 message_manager_make :: proc() -> Message_Manager {
-	return Message_Manager{}
+	return eng.message_manager_make()
 }
 
 message_manager_bind_turns :: proc(messages: ^Message_Manager, turns: ^eng.Turn_Manager) {
-	if messages == nil {
-		return
-	}
-	messages.turns = turns
+	eng.message_manager_bind_turns(messages, turns)
 }
 
 // ─── Add a message to the ring buffer ────────────────────────────────────────
@@ -33,57 +27,35 @@ add_message :: proc(messages: ^Message_Manager, game: ^Game, text: string, color
 	if messages == nil || game == nil {
 		return
 	}
-	log := &messages.log
-
-	// Write into the slot at head
-	msg := &log.messages[log.head]
-	msg.color = color
-	msg.turn = eng.turn_manager_current(messages.turns)
-
-	// Copy text into fixed buffer (truncate if too long)
-	n := min(len(text), MAX_MSG_LEN - 1)
-	for i in 0 ..< n {
-		msg.text[i] = text[i]
-	}
-	msg.text[n] = 0 // null-terminate
-	msg.text_len = n
-
-	// Advance head (ring buffer wrap)
-	log.head = (log.head + 1) % MAX_MESSAGES
-	if log.count < MAX_MESSAGES {
-		log.count += 1
-	}
+	eng.message_manager_add(messages, text, engine_color_from_rl(color))
 }
 
 // ─── Clear all messages ──────────────────────────────────────────────────────
 
 clear_messages :: proc(messages: ^Message_Manager) {
-	if messages == nil {
-		return
-	}
-	messages.log.head = 0
-	messages.log.count = 0
+	eng.message_manager_clear(messages)
 }
 
 // ─── Render message panel ────────────────────────────────────────────────────
 
 render_messages_for_engine :: proc(engine: ^eng.Engine) {
-	render_messages(game_engine_message_manager(engine))
+	render_messages(engine, game_engine_message_manager(engine))
 }
 
-render_messages :: proc(messages: ^Message_Manager) {
+render_messages :: proc(engine: ^eng.Engine, messages: ^Message_Manager) {
 	if messages == nil {
 		return
 	}
 	log := &messages.log
 
 	// Draw dark background for the message panel
-	rl.DrawRectangle(
+	eng.engine_render_draw_rectangle(
+		engine,
 		0,
 		MSG_PANEL_Y,
 		i32(SCREEN_WIDTH),
 		MSG_PANEL_HEIGHT,
-		rl.Color{15, 15, 20, 255},
+		eng.engine_color_make(15, 15, 20, 255),
 	)
 
 	// Determine how many messages to show
@@ -103,7 +75,7 @@ render_messages :: proc(messages: ^Message_Manager) {
 
 		y := MSG_PANEL_Y + 4 + i32(i) * MSG_LINE_HEIGHT
 		text_cstr := cast(cstring)&msg.text[0]
-		rl.DrawText(text_cstr, 8, y, MSG_FONT_SIZE, msg.color)
+		eng.engine_render_draw_text(engine, text_cstr, 8, y, MSG_FONT_SIZE, msg.color)
 	}
 }
 

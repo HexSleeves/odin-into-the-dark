@@ -1,6 +1,7 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Sprite manager facade ───────────────────────────────────────────────────
 
@@ -22,13 +23,14 @@ sprite_manager_is_loaded :: proc(sprites: ^Sprite_Manager) -> bool {
 }
 
 sprite_manager_draw :: proc(
+	engine: ^eng.Engine,
 	sprites: ^Sprite_Manager,
 	spr: Sprite,
 	x, y: i32,
 	tint: rl.Color = rl.WHITE,
 ) {
 	if sprites == nil || sprites.backend == nil || sprites.backend == &g_sprites {
-		draw_sprite(spr, x, y, tint)
+		draw_sprite(engine, spr, x, y, tint)
 		return
 	}
 	if !sprites.backend.loaded {
@@ -40,7 +42,7 @@ sprite_manager_draw :: proc(
 		width  = f32(TILE_SIZE),
 		height = f32(TILE_SIZE),
 	}
-	rl.DrawTexturePro(sprites.backend.texture, spr.src, dest, {0, 0}, 0, tint)
+	render_draw_texture_region(engine, sprites.backend.texture, spr.src, dest, {0, 0}, 0, tint)
 }
 
 sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> Sprite {
@@ -107,4 +109,3 @@ sprite_manager_fallback :: proc(sprites: ^Sprite_Manager) -> Sprite {
 	size := sprites.backend.tile_size if sprites.backend.tile_size > 0 else SPRITE_SIZE
 	return sprite_at(0, 0, size)
 }
-

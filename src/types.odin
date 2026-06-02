@@ -1,21 +1,12 @@
 package main
 
 import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 
-Message :: struct {
-	text:     [MAX_MSG_LEN]u8,
-	text_len: int,
-	color:    rl.Color,
-	turn:     int,
-}
-
-MessageLog :: struct {
-	messages: [MAX_MESSAGES]Message,
-	head:     int,
-	count:    int,
-}
+Message :: eng.Message
+MessageLog :: eng.Message_Log
 
 // ─── Vector ───────────────────────────────────────────────────────────────────
 
@@ -170,6 +161,7 @@ Game_State :: enum {
 Game :: struct {
 	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
 	dijkstra_map:      [MAP_WIDTH * MAP_HEIGHT]int,
+	world:            eng.World_Manager,
 	map_width:         int,
 	map_height:        int,
 	player:            Player,
@@ -186,7 +178,8 @@ Game :: struct {
 	light_boost_bonus: int,
 	light_boost_turns: int,
 	// Web tiles (Cave Crawler ability)
-	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
+	web_tiles:         eng.Bool_Grid_Manager,
+	tile_states:       eng.Tile_State_Manager,
 	skip_next_turn:    bool, // player stuck in web
 	// Equipment slots
 	equipped_weapon:   Equipment,
