@@ -77,16 +77,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           release: nightly
 
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
-
-      - name: Setup Emscripten
-        uses: mymindstorm/setup-emsdk@v14
-
       - uses: actions/checkout@v6
 
+      - name: Checkout karl2d
+        uses: actions/checkout@v6
+        with:
+          repository: karl-zylinski/karl2d
+          path: ../karl2d
+
+      - name: Build vendor stb libs
+        run: make -C "$(odin root)/vendor/stb/src"
+
       - name: Build WASM
-        run: EMSDK_DIR="$EMSDK" bash scripts/build_web.sh
+        run: bash scripts/build_karl2d_web.sh
 
       - name: Package
         run: cd build/web && zip -r ../../into_the_depths-web.zip .
