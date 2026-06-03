@@ -2,7 +2,6 @@ package main
 
 import eng "./engine"
 import "core:encoding/json"
-import "core:os"
 import rl "vendor:raylib"
 
 // ─── Sprite types ─────────────────────────────────────────────────────────────
@@ -57,20 +56,16 @@ sprite_at :: proc(col, row, size: int) -> Sprite {
 // ─── Init / Cleanup ───────────────────────────────────────────────────────────
 
 sprites_init :: proc(engine: ^eng.Engine) {
-	// Load sprite mapping data
-	data, read_err := os.read_entire_file("data/sprites.json5", context.allocator)
-	if read_err != nil {
-		logger_errorf(.Sprites, "could not read data/sprites.json5: %v", read_err)
-		return
-	}
-	defer delete(data, context.allocator)
+	// Compile-time embedded sprite data — no runtime file I/O
+	EMBEDDED_SPRITES :: #load("../data/sprites.json5")
 
 	sprite_data: Sprite_Data
-	parse_err := json.unmarshal(data, &sprite_data, spec = .JSON5)
+	parse_err := json.unmarshal(EMBEDDED_SPRITES, &sprite_data, spec = .JSON5)
 	if parse_err != nil {
 		logger_errorf(.Sprites, "parse failed for data/sprites.json5: %v", parse_err)
 		return
 	}
+
 	if sprite_data.tileset != "" {
 		defer delete(sprite_data.tileset)
 	}

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    steps:
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: nightly
+
+      - name: Install lld (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install lld
+
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+
+      - uses: actions/checkout@v6
+
+      - name: Run tests
+        run: odin test src/ && odin test src/engine/
+
+      - name: Type check
+        run: odin check src/ -vet -strict-style
+
+      - name: Build
+        run: odin build src/ -out:into_the_depths

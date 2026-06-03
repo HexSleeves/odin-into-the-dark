@@ -3,7 +3,6 @@ package main
 import "core:encoding/json"
 import "core:fmt"
 import "core:math/rand"
-import "core:os"
 
 import rl "vendor:raylib"
 
@@ -86,7 +85,7 @@ Item_Spawn_Weight :: struct {
 }
 
 Item_Data :: struct {
-	items:            []Item_Def,
+	items:             []Item_Def,
 	spawn_weights:     []Item_Spawn_Weight,
 	item_spawn_tables: []Item_Spawn_Table,
 	room_item_chance:  int,
@@ -118,22 +117,13 @@ g_data: Data_Registry
 
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
-load_json5 :: proc($T: typeid, path: string) -> (result: T, ok: bool) {
-	data, read_err := os.read_entire_file(path, context.allocator)
-	if read_err != nil {
-		logger_errorf(.Data, "could not read %s: %v", path, read_err)
-		return {}, false
-	}
-	defer delete(data, context.allocator)
-
-	parse_err := json.unmarshal(data, &result, spec = .JSON5)
-	if parse_err != nil {
-		logger_errorf(.Data, "parse failed for %s: %v", path, parse_err)
-		return {}, false
-	}
-
-	return result, true
-}
+// Compile-time embedded data files — no runtime file I/O needed
+@(private = "file")
+EMBEDDED_ENEMIES :: #load("../data/enemies.json5")
+@(private = "file")
+EMBEDDED_ITEMS :: #load("../data/items.json5")
+@(private = "file")
+EMBEDDED_PLAYER :: #load("../data/player.json5")
 
 data_load_all :: proc() -> bool {
 	return data_load_all_into(&g_data)
@@ -143,13 +133,13 @@ data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
 	if registry == nil {
 		return false
 	}
-	enemies, enemies_ok := load_json5(Enemy_Data, "data/enemies.json5")
+	enemies, enemies_ok := load_json5_from_bytes(Enemy_Data, EMBEDDED_ENEMIES)
 	if !enemies_ok {return false}
 
-	items, items_ok := load_json5(Item_Data, "data/items.json5")
+	items, items_ok := load_json5_from_bytes(Item_Data, EMBEDDED_ITEMS)
 	if !items_ok {return false}
 
-	player, player_ok := load_json5(Player_Def, "data/player.json5")
+	player, player_ok := load_json5_from_bytes(Player_Def, EMBEDDED_PLAYER)
 	if !player_ok {return false}
 
 	registry.enemies = enemies
@@ -297,18 +287,18 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		g = rune(def.glyph[0])
 	}
 	return Item {
-		pos            = pos,
-		item_type      = def.id,
-		glyph          = g,
-		color          = json5_color_to_rl(def.color),
-		picked_up      = false,
-		quantity       = 1,
-		name           = def.name,
+		pos = pos,
+		item_type = def.id,
+		glyph = g,
+		color = json5_color_to_rl(def.color),
+		picked_up = false,
+		quantity = 1,
+		name = def.name,
 		equipment_slot = def.equipment_slot,
-		stat_bonus     = def.effect.value,
-		durability     = def.durability,
+		stat_bonus = def.effect.value,
+		durability = def.durability,
 		max_durability = def.durability,
-		action_cost    = def.action_cost,
+		action_cost = def.action_cost,
 	}
 }
 
@@ -416,9 +406,19 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 	} else if eff.type == "cure_poison" {
 		if game.poison_turns > 0 {
 			game.poison_turns = 0
-			add_message(messages, game, "You drink the antidote. Poison cured!", rl.Color{120, 220, 80, 255})
+			add_message(
+				messages,
+				game,
+				"You drink the antidote. Poison cured!",
+				rl.Color{120, 220, 80, 255},
+			)
 		} else {
-			add_message(messages, game, "You drink the antidote. (You weren't poisoned)", rl.Color{120, 220, 80, 255})
+			add_message(
+				messages,
+				game,
+				"You drink the antidote. (You weren't poisoned)",
+				rl.Color{120, 220, 80, 255},
+			)
 		}
 	} else {
 		add_message(

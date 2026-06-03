@@ -102,6 +102,30 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		)
 	}
 
+	// ── Recent scores ────────────────────────────────────────────────────────
+	scores := game_engine_score_manager(engine)
+	table := score_manager_load(scores)
+	defer score_table_destroy(&table)
+	if table.count > 0 {
+		score_y := base_y + row_h * TITLE_OPTION_COUNT + 20
+		draw_centered_text(engine, "RECENT SCORES", score_y, 14, rl.Color{180, 160, 80, 255})
+		score_y += 20
+		show_count := min(table.count, 3)
+		for i in 0 ..< show_count {
+			s := table.scores[i]
+			row := fmt.ctprintf(
+				"#%d  Depth %d  Kills %d  Items %d  Turns %d",
+				i + 1,
+				s.depth,
+				s.kills,
+				s.items_found,
+				s.turns,
+			)
+			draw_centered_text(engine, row, score_y + i32(i) * 18, 13, rl.Color{140, 140, 140, 255})
+		}
+	}
+
+	// ── Footer ───────────────────────────────────────────────────────────────
 	draw_centered_text(
 		engine,
 		"Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit",
@@ -109,6 +133,7 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		14,
 		rl.Color{150, 150, 150, 255},
 	)
+	draw_centered_text(engine, "v0.1.0", i32(SCREEN_HEIGHT) - 28, 12, rl.Color{80, 80, 80, 255})
 }
 
 render_high_scores :: proc(engine: ^eng.Engine, game: ^Game) {

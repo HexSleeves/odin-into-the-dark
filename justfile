@@ -31,6 +31,21 @@ run-built: build
 release:
     odin build {{src}} -out:{{binary}} -o:speed -disable-assert -no-bounds-check
 
+# ─── Platform releases ─────────────────────────────────────────────────────────
+
+# Build macOS .app bundle
+release-macos:
+    odin build {{src}} -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check
+    bash scripts/bundle_macos.sh build/macos/into_the_depths
+
+# Build Linux x86_64 binary (for CI or native Linux)
+release-linux:
+    odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check
+
+# Build web/WASM (requires Emscripten SDK)
+release-web:
+    bash scripts/build_web.sh
+
 # Build with debug info for profiling
 profile:
     odin build {{src}} -out:{{binary}} -o:speed -debug
