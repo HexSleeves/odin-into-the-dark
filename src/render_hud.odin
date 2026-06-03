@@ -299,8 +299,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		sb_divider(engine, controls_y)
 		sb_text(engine, "CONTROLS", controls_y + 6, 12, SB_HEADER)
 		sb_text(engine, "[I]nv  [G]rab  [X]Mine", controls_y + 22, 12, SB_KEY)
-		sb_text(engine, "[M]ap  [?]Help  [M]ute", controls_y + 38, 12, SB_KEY)
-		sb_text(engine, "[ ] / [ ]  Volume", controls_y + 54, 12, SB_KEY)
+		sb_text(engine, "[M]ap  [?]Help  [.]Wait", controls_y + 38, 12, SB_KEY)
+		sb_text(engine, "[F1]Mute  [ ]/[ ] Vol", controls_y + 54, 12, SB_KEY)
 	}
 
 	// ── Contextual overlays (these draw ON the map, not in sidebar) ──────────

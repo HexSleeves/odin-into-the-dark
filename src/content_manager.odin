@@ -131,6 +131,35 @@ content_manager_pick_item_def :: proc(content: ^Content_Manager) -> ^Item_Def {
 	return nil
 }
 
+content_manager_pick_item_def_for_depth :: proc(content: ^Content_Manager, depth: int) -> ^Item_Def {
+	if content == nil {
+		return pick_item_def_for_depth(depth)
+	}
+	for &table in content.registry.items.item_spawn_tables {
+		if depth >= table.depth_min && depth <= table.depth_max {
+			total_weight := 0
+			for &w in table.weights {
+				total_weight += w.weight
+			}
+			if total_weight <= 0 {break}
+
+			roll := rand.int_max(total_weight)
+			acc := 0
+			for &w in table.weights {
+				acc += w.weight
+				if roll < acc {
+					def := content_manager_item_def(content, w.id)
+					if def != nil {return def}
+					break
+				}
+			}
+			break
+		}
+	}
+	// Fallback to flat spawn_weights if no depth table matches
+	return content_manager_pick_item_def(content)
+}
+
 content_manager_room_item_chance :: proc(content: ^Content_Manager) -> int {
 	if content == nil {
 		return g_data.items.room_item_chance

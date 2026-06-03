@@ -293,7 +293,7 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 			if enemy_at(game, x, y) != nil {continue}
 			if item_at(game, x, y) != nil {continue}
 
-			def := content_manager_pick_item_def(content)
+			def := content_manager_pick_item_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.items, item_make_from_def(def, pos))
 				spawned += 1
@@ -333,7 +333,7 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 			if enemy_at(game, ix, iy) != nil {continue}
 			if item_at(game, ix, iy) != nil {continue}
 
-			def := content_manager_pick_item_def(content)
+			def := content_manager_pick_item_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.items, item_make_from_def(def, pos))
 				total += 1

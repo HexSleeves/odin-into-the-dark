@@ -165,10 +165,23 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 		// Check if this enemy's tile is currently visible to the player
 		is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
 
-		if is_visible {
-			chase_player(messages, game, &enemy)
-		} else {
-			wander(game, &enemy)
+		switch enemy.behavior {
+		case "berserker":
+			// Berserkers charge toward the player when visible; wait in place otherwise
+			if is_visible {
+				berserker_chase(messages, game, &enemy)
+			}
+		case "lurker":
+			// Lurkers only act when the player is adjacent; otherwise they stay still
+			if is_visible {
+				lurker_behavior(messages, game, &enemy)
+			}
+		case:
+			if is_visible {
+				chase_player(messages, game, &enemy)
+			} else {
+				wander(game, &enemy)
+			}
 		}
 	}
 }
@@ -246,6 +259,85 @@ wander :: proc(game: ^Game, enemy: ^Enemy) {
 
 	enemy.pos.x = nx
 	enemy.pos.y = ny
+}
+
+// ─── Berserker behavior (charges 2 tiles per turn) ───────────────────────────
+
+@(private = "file")
+berserker_chase :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
+	DX :: [4]int{0, 0, -1, 1}
+	DY :: [4]int{-1, 1, 0, 0}
+	dx := DX
+	dy := DY
+
+	// Check if adjacent -> attack immediately
+	for dir in 0 ..< 4 {
+		nx := enemy.pos.x + dx[dir]
+		ny := enemy.pos.y + dy[dir]
+		if nx == game.player.pos.x && ny == game.player.pos.y {
+			resolve_attack_enemy_on_player(messages, game, enemy)
+			return
+		}
+	}
+
+	// Move up to 2 tiles per turn (berserker speed)
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
+	for step in 0 ..< 2 {
+		current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
+		if current_dist >= DMAP_UNREACHABLE || current_dist == 0 {break}
+
+		best_pos := enemy.pos
+		best_dist := current_dist
+		for dir in 0 ..< 4 {
+			nx := enemy.pos.x + dx[dir]
+			ny := enemy.pos.y + dy[dir]
+			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
+			if !is_walkable(game, nx, ny) {continue}
+			if enemy_at(game, nx, ny) != nil {continue}
+			// Don't step onto player tile during movement sweep; handle via adjacency check
+			if nx == game.player.pos.x && ny == game.player.pos.y {continue}
+
+			n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
+			if n_dist < best_dist {
+				best_dist = n_dist
+				best_pos = Vec2{nx, ny}
+			}
+		}
+
+		if best_pos == enemy.pos {break}
+		enemy.pos = best_pos
+
+		// After each step check if now adjacent and attack
+		for dir in 0 ..< 4 {
+			nx := enemy.pos.x + dx[dir]
+			ny := enemy.pos.y + dy[dir]
+			if nx == game.player.pos.x && ny == game.player.pos.y {
+				resolve_attack_enemy_on_player(messages, game, enemy)
+				return
+			}
+		}
+	}
+}
+
+// ─── Lurker behavior (stays still until adjacent, then attacks) ───────────────
+
+@(private = "file")
+lurker_behavior :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
+	DX :: [4]int{0, 0, -1, 1}
+	DY :: [4]int{-1, 1, 0, 0}
+	dx := DX
+	dy := DY
+
+	// Attack if adjacent
+	for dir in 0 ..< 4 {
+		nx := enemy.pos.x + dx[dir]
+		ny := enemy.pos.y + dy[dir]
+		if nx == game.player.pos.x && ny == game.player.pos.y {
+			resolve_attack_enemy_on_player(messages, game, enemy)
+			return
+		}
+	}
+	// Not adjacent: lurker stays still — do nothing
 }
 
 // ─── Process special abilities ───────────────────────────────────────────────
@@ -391,6 +483,38 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					"The Abyssal Lord shrouds you in darkness!",
 					rl.Color{150, 30, 200, 255},
 				)
+			}
+		} else if enemy.ability_type == "ranged_shoot" {
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist >= 2 && dist <= enemy.ability_range {
+				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+					dmg := enemy.attack
+					game.player.hp -= dmg
+					enemy.ability_cooldown = enemy.ability_max_cd
+					add_message(
+						messages,
+						game,
+						fmt.tprintf(
+							"The %s throws a stone at you! (%d damage)",
+							enemy_display_name(&enemy),
+							dmg,
+						),
+						rl.Color{200, 160, 80, 255},
+					)
+					if game.player.hp <= 0 {
+						game.death_cause = fmt.tprintf(
+							"Pelted to death by a %s",
+							enemy_display_name(&enemy),
+						)
+						game.state = .Game_Over
+						add_message(
+							messages,
+							game,
+							"You have been slain...",
+							rl.Color{255, 0, 0, 255},
+						)
+					}
+				}
 			}
 		}
 	}

@@ -192,6 +192,51 @@
     { id: "chainmail", weight: 3 },
     { id: "crystal_lamp", weight: 3 },
   ],
+  // Depth-weighted spawn tables — better gear at deeper floors
+  item_spawn_tables: [
+    {
+      // Depth 1-2: shallow — consumables + tier 1 gear
+      depth_min: 1, depth_max: 2,
+      weights: [
+        { id: "health_potion", weight: 35 },
+        { id: "bandage", weight: 28 },
+        { id: "torch", weight: 20 },
+        { id: "rusty_pickaxe", weight: 8 },
+        { id: "leather_vest", weight: 6 },
+        { id: "miners_helmet", weight: 3 },
+      ],
+    },
+    {
+      // Depth 3-5: mid — antidote appears, lantern oil, still mostly tier 1
+      depth_min: 3, depth_max: 5,
+      weights: [
+        { id: "health_potion", weight: 25 },
+        { id: "bandage", weight: 20 },
+        { id: "lantern_oil", weight: 18 },
+        { id: "torch", weight: 10 },
+        { id: "antidote", weight: 10 },
+        { id: "rusty_pickaxe", weight: 7 },
+        { id: "leather_vest", weight: 6 },
+        { id: "miners_helmet", weight: 4 },
+      ],
+    },
+    {
+      // Depth 6+: deep — tier 2 gear common, still some consumables
+      depth_min: 6, depth_max: 99,
+      weights: [
+        { id: "health_potion", weight: 18 },
+        { id: "antidote", weight: 15 },
+        { id: "lantern_oil", weight: 15 },
+        { id: "bandage", weight: 8 },
+        { id: "steel_pickaxe", weight: 12 },
+        { id: "chainmail", weight: 12 },
+        { id: "crystal_lamp", weight: 12 },
+        { id: "torch", weight: 5 },
+        { id: "rusty_pickaxe", weight: 2 },
+        { id: "leather_vest", weight: 1 },
+      ],
+    },
+  ],
 
   // Probability (0-100) that a room gets an item
   room_item_chance: 55,  // was 50 — slightly more generous for deeper content

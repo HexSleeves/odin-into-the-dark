@@ -72,6 +72,7 @@ Enemy :: struct {
 	ability_max_cd:   int, // max cooldown for reset
 	ability_range:    int, // range of the ability
 	is_boss:          bool,
+	behavior:         string, // "berserker", "lurker", or "" for standard
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────

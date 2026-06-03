@@ -31,7 +31,8 @@ Enemy_Def :: struct {
 	color:   Color_Array,
 	hp:      int,
 	attack:  int,
-	ability: Ability_Def,
+	ability:  Ability_Def,
+	behavior: string, // "berserker", "lurker", or "" for standard
 }
 
 Spawn_Weight :: struct {
@@ -59,6 +60,12 @@ Item_Effect :: struct {
 	duration:   int, // optional, used by timed_light_boost
 }
 
+Item_Spawn_Table :: struct {
+	depth_min: int,
+	depth_max: int,
+	weights:   []Item_Spawn_Weight,
+}
+
 Item_Def :: struct {
 	id:             string,
 	name:           string,
@@ -77,8 +84,9 @@ Item_Spawn_Weight :: struct {
 
 Item_Data :: struct {
 	items:            []Item_Def,
-	spawn_weights:    []Item_Spawn_Weight,
-	room_item_chance: int,
+	spawn_weights:     []Item_Spawn_Weight,
+	item_spawn_tables: []Item_Spawn_Table,
+	room_item_chance:  int,
 }
 
 // ── Player data ──
@@ -188,6 +196,11 @@ data_registry_destroy :: proc(registry: ^Data_Registry) {
 	delete(registry.items.items)
 	for &w in registry.items.spawn_weights {delete(w.id)}
 	delete(registry.items.spawn_weights)
+	for &t in registry.items.item_spawn_tables {
+		for &w in t.weights {delete(w.id)}
+		delete(t.weights)
+	}
+	delete(registry.items.item_spawn_tables)
 	delete(registry.player.glyph)
 	registry^ = {}
 }
@@ -230,6 +243,7 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		ability_cooldown = 0,
 		ability_max_cd = def.ability.cooldown,
 		ability_range = def.ability.range,
+		behavior = def.behavior,
 	}
 }
 
@@ -315,6 +329,32 @@ pick_item_def :: proc() -> ^Item_Def {
 		return &g_data.items.items[0]
 	}
 	return nil
+}
+
+pick_item_def_for_depth :: proc(depth: int) -> ^Item_Def {
+	for &table in g_data.items.item_spawn_tables {
+		if depth >= table.depth_min && depth <= table.depth_max {
+			total_weight := 0
+			for &w in table.weights {
+				total_weight += w.weight
+			}
+			if total_weight <= 0 {break}
+
+			roll := rand.int_max(total_weight)
+			acc := 0
+			for &w in table.weights {
+				acc += w.weight
+				if roll < acc {
+					def := find_item_def(w.id)
+					if def != nil {return def}
+					break
+				}
+			}
+			break
+		}
+	}
+	// Fallback to flat spawn_weights if no table matches
+	return pick_item_def()
 }
 
 // ─── Data-driven item use ─────────────────────────────────────────────────────

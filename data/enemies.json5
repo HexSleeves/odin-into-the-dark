@@ -54,6 +54,33 @@
       attack: 5,
       ability: { type: "teleport", cooldown: 3, range: 5 },
     },
+    {
+      id: "cave_bat",
+      name: "Cave Bat",
+      glyph: "b",
+      color: [120, 90, 150, 255],
+      hp: 5,
+      attack: 3,
+      behavior: "berserker",
+    },
+    {
+      id: "stone_thrower",
+      name: "Stone Thrower",
+      glyph: "T",
+      color: [160, 140, 110, 255],
+      hp: 9,
+      attack: 4,
+      ability: { type: "ranged_shoot", cooldown: 2, range: 5 },
+    },
+    {
+      id: "mine_lurker",
+      name: "Mine Lurker",
+      glyph: "L",
+      color: [60, 60, 100, 255],
+      hp: 18,
+      attack: 8,
+      behavior: "lurker",
+    },
     // Bosses
     {
       id: "mine_guardian",
@@ -81,47 +108,56 @@
       // Depth 1: mostly rats, intro floor
       depth_min: 1, depth_max: 1,
       weights: [
-        { id: "rat", weight: 90 },
+        { id: "rat", weight: 75 },
         { id: "miner_husk", weight: 10 },
+        { id: "cave_bat", weight: 15 },
       ],
     },
     {
       // Depth 2: husks start appearing
       depth_min: 2, depth_max: 2,
       weights: [
-        { id: "rat", weight: 50 },
-        { id: "miner_husk", weight: 50 },
+        { id: "rat", weight: 30 },
+        { id: "miner_husk", weight: 40 },
+        { id: "cave_bat", weight: 20 },
+        { id: "stone_thrower", weight: 10 },
       ],
     },
     {
       // Depth 3-4: crawlers enter, toxic spores appear
       depth_min: 3, depth_max: 4,
       weights: [
-        { id: "rat", weight: 10 },
-        { id: "miner_husk", weight: 30 },
-        { id: "cave_crawler", weight: 35 },
-        { id: "toxic_spore", weight: 25 },
+        { id: "rat", weight: 5 },
+        { id: "miner_husk", weight: 25 },
+        { id: "cave_crawler", weight: 25 },
+        { id: "toxic_spore", weight: 10 },
+        { id: "stone_thrower", weight: 20 },
+        { id: "mine_lurker", weight: 15 },
       ],
     },
     {
       // Depth 5-7: deep watchers enter, shadow stalkers appear
       depth_min: 5, depth_max: 7,
       weights: [
-        { id: "miner_husk", weight: 10 },
-        { id: "cave_crawler", weight: 30 },
-        { id: "deep_watcher", weight: 30 },
-        { id: "toxic_spore", weight: 15 },
-        { id: "shadow_stalker", weight: 15 },
+        { id: "miner_husk", weight: 5 },
+        { id: "cave_crawler", weight: 20 },
+        { id: "deep_watcher", weight: 25 },
+        { id: "toxic_spore", weight: 10 },
+        { id: "shadow_stalker", weight: 10 },
+        { id: "stone_thrower", weight: 15 },
+        { id: "mine_lurker", weight: 15 },
       ],
     },
     {
       // Depth 8+: endgame gauntlet with shadow stalkers
       depth_min: 8, depth_max: 99,
       weights: [
-        { id: "cave_crawler", weight: 20 },
-        { id: "deep_watcher", weight: 40 },
-        { id: "shadow_stalker", weight: 30 },
+        { id: "cave_crawler", weight: 15 },
+        { id: "deep_watcher", weight: 30 },
+        { id: "shadow_stalker", weight: 25 },
         { id: "toxic_spore", weight: 10 },
+        { id: "mine_lurker", weight: 15 },
+        { id: "miner_husk", weight: 5 },
       ],
     },
   ],
