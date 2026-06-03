@@ -181,75 +181,129 @@ engine_frame_allocator :: proc(engine: ^Engine) -> runtime.Allocator {
 	return frame_manager_allocator(&engine.frame_manager)
 }
 
-engine_run :: proc(
+// ─── Split lifecycle for web (init/step/shutdown) ─────────────────────────────
+
+Engine_State :: struct {
+	engine:              Engine,
+	services:            Engine_Services,
+	platform:            Engine_Platform_Backend,
+	app:                 ^Game_App,
+	diagnostics_started: bool,
+	runtime_started:     bool,
+	platform_started:    bool,
+	app_started:         bool,
+}
+
+engine_init :: proc(
+	state: ^Engine_State,
 	config: Engine_Config,
 	services_config: Engine_Services_Config,
 	app: ^Game_App,
-) {
-	services := engine_services_make(services_config)
-	defer engine_services_destroy(&services)
-	engine := Engine {
+) -> bool {
+	state.services = engine_services_make(services_config)
+	state.app = app
+
+	state.engine = Engine {
 		config      = config,
-		services    = &services,
+		services    = &state.services,
 		file_system = engine_file_system_or_default(config.file_system),
 		audio       = engine_audio_backend_or_default(config.audio),
 		input       = engine_input_backend_or_default(config.input),
 		render      = engine_render_backend_or_default(config.render),
 		texture     = engine_texture_backend_or_default(config.texture),
 	}
-	engine.texture_manager = texture_manager_make(engine.texture)
-	engine.audio_manager = audio_manager_make(engine.audio)
-	engine.storage_manager = storage_manager_make(engine.file_system)
-	engine.camera_manager = camera_manager_make()
-	engine.turn_manager = turn_manager_make()
-	engine.vfx_manager = vfx_manager_make()
-	engine.message_manager = message_manager_make()
-	message_manager_bind_turns(&engine.message_manager, &engine.turn_manager)
-	engine.particle_manager = particle_manager_make()
-	defer texture_manager_unload_all(&engine.texture_manager)
-	defer frame_manager_destroy(&engine.frame_manager)
-	platform := engine_platform_backend_or_default(config.platform)
 
-	engine_services_init_diagnostics(&services)
-	defer engine_services_shutdown_diagnostics(&services)
+	state.engine.texture_manager = texture_manager_make(state.engine.texture)
+	state.engine.audio_manager = audio_manager_make(state.engine.audio)
+	state.engine.storage_manager = storage_manager_make(state.engine.file_system)
+	state.engine.camera_manager = camera_manager_make()
+	state.engine.turn_manager = turn_manager_make()
+	state.engine.vfx_manager = vfx_manager_make()
+	state.engine.message_manager = message_manager_make()
+	message_manager_bind_turns(&state.engine.message_manager, &state.engine.turn_manager)
+	state.engine.particle_manager = particle_manager_make()
 
-	if !platform.init(platform.ctx, config) {
+	state.platform = engine_platform_backend_or_default(config.platform)
+
+	engine_services_init_diagnostics(&state.services)
+	state.diagnostics_started = true
+
+	if !state.platform.init(state.platform.ctx, config) {
+		return false
+	}
+	state.platform_started = true
+	state.platform.set_target_fps(state.platform.ctx, config.target_fps)
+
+	engine_services_init_runtime_assets(&state.services)
+	state.runtime_started = true
+
+	if app == nil || app.init == nil || !app.init(&state.engine, app) {
+		return false
+	}
+	state.app_started = true
+
+	state.platform.disable_exit_key(state.platform.ctx)
+	return true
+}
+
+// engine_step runs one frame. Returns false when the game should exit.
+engine_step :: proc(state: ^Engine_State) -> bool {
+	if state.platform.window_should_close(state.platform.ctx) {
+		return false
+	}
+
+	frame_manager_begin(&state.engine.frame_manager, engine_input_frame_time(state.engine.input))
+	frame_manager_clear_quit(&state.engine.frame_manager)
+	event_manager_clear(&state.engine.event_manager)
+	audio_manager_update(&state.engine.audio_manager)
+
+	quit := false
+	if state.app.update != nil {
+		quit = state.app.update(&state.engine, state.app)
+	}
+	if quit || frame_manager_quit_requested(state.engine.frame_manager) {
+		return false
+	}
+
+	if state.app.render != nil {
+		state.app.render(&state.engine, state.app)
+	}
+	return true
+}
+
+engine_shutdown :: proc(state: ^Engine_State) {
+	if state.app_started && state.app != nil {
+		if state.app.autosave != nil {
+			state.app.autosave(&state.engine, state.app)
+		}
+		state.app.shutdown(&state.engine, state.app)
+	}
+	if state.runtime_started {
+		engine_services_shutdown_runtime_assets(&state.services)
+	}
+	if state.platform_started {
+		state.platform.shutdown(state.platform.ctx)
+	}
+	if state.diagnostics_started {
+		engine_services_shutdown_diagnostics(&state.services)
+	}
+	texture_manager_unload_all(&state.engine.texture_manager)
+	frame_manager_destroy(&state.engine.frame_manager)
+	engine_services_destroy(&state.services)
+}
+
+// ─── Desktop convenience wrapper ─────────────────────────────────────────────
+
+engine_run :: proc(
+	config: Engine_Config,
+	services_config: Engine_Services_Config,
+	app: ^Game_App,
+) {
+	state: Engine_State
+	if !engine_init(&state, config, services_config, app) {
+		engine_shutdown(&state)
 		return
 	}
-	defer platform.shutdown(platform.ctx)
-	platform.set_target_fps(platform.ctx, config.target_fps)
-
-	engine_services_init_runtime_assets(&services)
-	defer engine_services_shutdown_runtime_assets(&services)
-
-	if app == nil || app.init == nil || !app.init(&engine, app) {
-		return
-	}
-	defer app.shutdown(&engine, app)
-
-	// Disable default escape key to allow inventory to be closed with ESC.
-	platform.disable_exit_key(platform.ctx)
-
-	for !platform.window_should_close(platform.ctx) {
-		frame_manager_begin(&engine.frame_manager, engine_input_frame_time(engine.input))
-		frame_manager_clear_quit(&engine.frame_manager)
-		event_manager_clear(&engine.event_manager)
-		audio_manager_update(&engine.audio_manager)
-
-		quit := false
-		if app.update != nil {
-			quit = app.update(&engine, app)
-		}
-		if quit || frame_manager_quit_requested(engine.frame_manager) {
-			break
-		}
-
-		if app.render != nil {
-			app.render(&engine, app)
-		}
-	}
-
-	if app.autosave != nil {
-		app.autosave(&engine, app)
-	}
+	for engine_step(&state) {}
+	engine_shutdown(&state)
 }

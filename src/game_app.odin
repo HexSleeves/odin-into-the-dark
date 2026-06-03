@@ -34,7 +34,16 @@ g_game_config: Game_Config
 
 game_engine_config :: proc() -> eng.Engine_Config {
 	config := eng.engine_config_make(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths", 60)
-	config.audio = game_audio_backend(&g_audio)
+	when ODIN_OS == .JS {
+		// Web: karl2d backends, nil audio (no music streaming on web yet)
+		config.platform = karl2d_platform_backend()
+		config.render = karl2d_render_backend()
+		config.input = karl2d_input_backend()
+		config.texture = karl2d_texture_backend()
+	} else {
+		// Desktop: Raylib defaults + game audio backend
+		config.audio = game_audio_backend(&g_audio)
+	}
 	return config
 }
 
@@ -71,16 +80,20 @@ game_diagnostics_shutdown :: proc() {
 }
 
 game_runtime_assets_init :: proc() {
-	backend := game_audio_backend(&g_audio)
-	audio_init(backend)
-	music_init()
-	audio_set_master_volume(g_game_config.master_volume)
-	music_set_volume(g_game_config.music_volume)
+	when ODIN_OS != .JS {
+		backend := game_audio_backend(&g_audio)
+		audio_init(backend)
+		music_init()
+		audio_set_master_volume(g_game_config.master_volume)
+		music_set_volume(g_game_config.music_volume)
+	}
 }
 
 game_runtime_assets_shutdown :: proc() {
-	music_cleanup()
-	audio_cleanup()
+	when ODIN_OS != .JS {
+		music_cleanup()
+		audio_cleanup()
+	}
 }
 
 game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
