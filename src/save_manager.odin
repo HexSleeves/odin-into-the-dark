@@ -10,10 +10,7 @@ Save_Manager :: struct {
 }
 
 save_manager_make :: proc() -> Save_Manager {
-	return Save_Manager {
-		file_path = SAVE_FILE,
-		storage   = eng.storage_manager_make(),
-	}
+	return Save_Manager{file_path = SAVE_FILE, storage = eng.storage_manager_make()}
 }
 
 save_manager_save_exists :: proc(saves: ^Save_Manager) -> bool {

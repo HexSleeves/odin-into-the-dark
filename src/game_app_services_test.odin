@@ -153,7 +153,11 @@ test_game_app_file_system_read_entire_file :: proc(
 	return {}, false
 }
 
-test_game_app_file_system_write_entire_file :: proc(ctx: rawptr, path: string, data: []u8) -> bool {
+test_game_app_file_system_write_entire_file :: proc(
+	ctx: rawptr,
+	path: string,
+	data: []u8,
+) -> bool {
 	return false
 }
 

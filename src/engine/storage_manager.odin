@@ -11,9 +11,7 @@ Storage_Manager :: struct {
 }
 
 storage_manager_make :: proc(file_system: Engine_File_System = {}) -> Storage_Manager {
-	return Storage_Manager {
-		file_system = engine_file_system_or_default(file_system),
-	}
+	return Storage_Manager{file_system = engine_file_system_or_default(file_system)}
 }
 
 storage_manager_is_valid :: proc(storage: Storage_Manager) -> bool {

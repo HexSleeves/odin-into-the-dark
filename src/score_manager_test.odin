@@ -55,7 +55,7 @@ score_handlers_accept_manager_or_engine_context :: proc(t: ^testing.T) {
 		draw_score_rows
 	game_over_render: proc(engine: ^eng.Engine, game: ^Game) = render_game_over
 	victory_render: proc(engine: ^eng.Engine, game: ^Game) = render_victory
-high_scores_render: proc(engine: ^eng.Engine, game: ^Game) = render_high_scores
+	high_scores_render: proc(engine: ^eng.Engine, game: ^Game) = render_high_scores
 	victory_update: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool =
 		update_victory
 
