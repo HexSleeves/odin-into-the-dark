@@ -117,18 +117,12 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 	cam_x := game_camera_x(camera)
 	cam_y := game_camera_y(camera)
 
-	camera_moved := cam_x != game.render_last_cam_x || cam_y != game.render_last_cam_y
-	if !game.render_map_dirty && !camera_moved {
-		return
-	}
-	game.render_map_dirty = false
-	game.render_last_cam_x = cam_x
-	game.render_last_cam_y = cam_y
 
 	sprites := game_engine_sprite_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
-	ox := i32(cam_x)
-	oy := i32(cam_y)
+	shake := eng.vfx_manager_shake_offset(vfx)
+	ox := i32(cam_x) + i32(shake[0])
+	oy := i32(cam_y) + i32(shake[1])
 	palette := palette_for_depth(game.depth)
 
 	x0, y0, x1, y1 := visible_tile_bounds(camera)

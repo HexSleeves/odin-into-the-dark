@@ -122,6 +122,7 @@ use_item :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 	slot_index: int,
+	engine: ^eng.Engine = nil,
 ) -> bool {
 	if slot_index < 0 || slot_index >= MAX_INVENTORY {
 		return false
@@ -154,6 +155,17 @@ use_item :: proc(
 			return false
 		}
 		apply_item_effect(messages, game, def)
+		if engine != nil {
+			cam := game_engine_camera_manager(engine)
+			particles := game_engine_particle_manager(engine)
+			if def.effect.type == "heal" || def.effect.type == "timed_light_boost" {
+				spawn_pickup_particles(
+					particles,
+					game.player.pos.x, game.player.pos.y,
+					game_camera_x(cam), game_camera_y(cam),
+				)
+			}
+		}
 	} else {
 		add_message(messages, game, "Nothing happens.", rl.Color{180, 180, 180, 255})
 	}

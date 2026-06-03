@@ -91,12 +91,13 @@ handle_forced_turn :: proc(
 	vfx: ^eng.Vfx_Manager,
 	messages: ^Message_Manager,
 	game: ^Game,
+	particles: ^eng.Particle_Manager,
 ) -> bool {
 	if game.skip_next_turn {
 		game.skip_next_turn = false
 		eng.turn_manager_advance(turns)
 		hp_before := game.player.hp
-		advance_turn(turns, camera, vfx, messages, game, hp_before)
+		advance_turn(turns, camera, vfx, messages, game, hp_before, particles)
 		add_message(messages, game, "You break free from the web.", rl.Color{200, 200, 100, 255})
 		return true
 	}
@@ -105,7 +106,7 @@ handle_forced_turn :: proc(
 		game.water_slow_active = false
 		eng.turn_manager_advance(turns)
 		hp_before := game.player.hp
-		advance_turn(turns, camera, vfx, messages, game, hp_before)
+		advance_turn(turns, camera, vfx, messages, game, hp_before, particles)
 		add_message(messages, game, "You push through the water.", rl.Color{40, 80, 180, 255})
 		return true
 	}
@@ -145,6 +146,7 @@ handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 				messages,
 				game,
 				hp_before,
+				game_engine_particle_manager(engine),
 			)
 		}
 	}
@@ -383,6 +385,7 @@ update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> 
 		game_engine_vfx_manager(engine),
 		messages,
 		game,
+		game_engine_particle_manager(engine),
 	) {return}
 	if handle_mining_input(engine, game, im) {return}
 	if handle_playing_hotkeys(engine, game, im) {return}
@@ -450,6 +453,7 @@ update_viewing_inventory :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 	im: ^Input_Manager,
+	engine: ^eng.Engine = nil,
 ) {
 	ui := ui_manager_state(ui_manager)
 	if action_pressed(im, .Inventory) || action_pressed(im, .Menu_Back) {
@@ -492,7 +496,7 @@ update_viewing_inventory :: proc(
 				equip_item(messages, game, idx)
 				ui.equipping = false
 			} else {
-				use_item(content, messages, game, idx)
+				use_item(content, messages, game, idx, engine)
 			}
 		}
 	}

@@ -34,6 +34,7 @@ content_handlers_accept_content_manager_context :: proc(t: ^testing.T) {
 			messages: ^Message_Manager,
 			game: ^Game,
 			hp_before: int,
+			particles: ^eng.Particle_Manager,
 		) =
 		advance_turn
 	map_handler: proc(content: ^Content_Manager, game: ^Game) = generate_map
@@ -48,6 +49,7 @@ content_handlers_accept_content_manager_context :: proc(t: ^testing.T) {
 			messages: ^Message_Manager,
 			game: ^Game,
 			slot_index: int,
+			engine: ^eng.Engine,
 		) -> bool =
 		use_item
 	mine_handler: proc(

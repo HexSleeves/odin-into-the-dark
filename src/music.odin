@@ -1,6 +1,7 @@
 package main
 
 import "core:math"
+import "core:mem"
 import rl "vendor:raylib"
 
 Music_Tier :: enum u8 {
@@ -56,11 +57,7 @@ encode_wav :: proc(samples: []i16, sample_rate: u32) -> []u8 {
 	b[40] = u8(data_size); b[41] = u8(data_size >> 8)
 	b[42] = u8(data_size >> 16); b[43] = u8(data_size >> 24)
 
-	for i, s in samples {
-		u := u16(s)
-		wav[44 + i * 2] = u8(u)
-		wav[44 + i * 2 + 1] = u8(u >> 8)
-	}
+	mem.copy(&wav[44], raw_data(samples), data_size)
 	return wav
 }
 

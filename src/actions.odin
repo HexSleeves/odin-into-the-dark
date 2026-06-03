@@ -21,11 +21,11 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	}
 	audio_manager_play_sfx(game_engine_audio_manager(engine), .Footstep)
 
+	hp_before := game.player.hp
 	consume_web_if_present(messages, game)
 	apply_current_tile_effects(engine, game)
 	collapse_unstable_previous_tile(messages, game)
 
-	hp_before := game.player.hp
 	advance_turn(
 		game_engine_turn_manager(engine),
 		game_engine_camera_manager(engine),
@@ -33,6 +33,7 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 		messages,
 		game,
 		hp_before,
+		game_engine_particle_manager(engine),
 	)
 	announce_item_under_player(messages, game)
 }
@@ -64,6 +65,7 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 			messages,
 			game,
 			hp_before,
+			game_engine_particle_manager(engine),
 		)
 	case .Descended:
 		handle_player_descended(engine, game)
@@ -91,6 +93,7 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages,
 		game,
 		hp_before,
+		game_engine_particle_manager(engine),
 	)
 }
 
@@ -167,16 +170,23 @@ advance_turn :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 	hp_before: int,
+	particles: ^eng.Particle_Manager = nil,
 ) {
 	_ = turns
 	process_enemy_turns(messages, game)
 	process_enemy_abilities(messages, game)
-	remove_dead_enemies(messages, game)
+	remove_dead_enemies(messages, game, particles, game_camera_x(camera), game_camera_y(camera))
 	tick_timed_effects(messages, game)
 	compute_fov(game)
 	game_camera_update(camera, game)
 	if game.player.hp < hp_before {
 		eng.vfx_manager_flash(vfx, rl.Color{255, 0, 0, 255}, 0.3)
+		eng.vfx_manager_shake(vfx, 4.0)
+		spawn_hit_particles(
+			particles,
+			game.player.pos.x, game.player.pos.y,
+			game_camera_x(camera), game_camera_y(camera),
+		)
 	}
 }
 

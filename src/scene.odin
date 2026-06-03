@@ -180,6 +180,7 @@ game_scene_inventory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 		game_engine_message_manager(engine),
 		game,
 		game_engine_input_manager(engine),
+		engine,
 	)
 	return false
 }

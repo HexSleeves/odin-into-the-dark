@@ -398,7 +398,12 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 
 // ─── Remove dead enemies ────────────────────────────────────────────────────
 
-remove_dead_enemies :: proc(messages: ^Message_Manager, game: ^Game) {
+remove_dead_enemies :: proc(
+	messages: ^Message_Manager,
+	game: ^Game,
+	particles: ^eng.Particle_Manager,
+	cam_x, cam_y: int,
+) {
 	i := 0
 	for i < len(game.enemies) {
 		if !game.enemies[i].alive {
@@ -414,6 +419,11 @@ remove_dead_enemies :: proc(messages: ^Message_Manager, game: ^Game) {
 					)
 				}
 			}
+			spawn_death_particles(
+				particles,
+				game.enemies[i].pos.x, game.enemies[i].pos.y,
+				cam_x, cam_y,
+			)
 			unordered_remove(&game.enemies, i)
 		} else {
 			i += 1
