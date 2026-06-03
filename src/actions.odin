@@ -87,7 +87,7 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 		game_engine_audio_manager(engine),
 		0.6 + min(f32(game.depth) * 0.02, 0.4),
 	)
-	eng.vfx_manager_flash(vfx, rl.Color{255, 255, 255, 255}, 0.5)
+	eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 255, 255, 255}, 0.5)
 	hp_before := game.player.hp
 	advance_turn(
 		game_engine_turn_manager(engine),
@@ -184,7 +184,7 @@ advance_turn :: proc(
 	compute_fov(game)
 	game_camera_update(camera, game)
 	if game.player.hp < hp_before {
-		eng.vfx_manager_flash(vfx, rl.Color{255, 0, 0, 255}, 0.3)
+		eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 0, 0, 255}, 0.3)
 		eng.vfx_manager_shake(vfx, 4.0)
 		spawn_hit_particles(
 			particles,
@@ -290,7 +290,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 3
 		game.poison_turns = max(game.poison_turns, 5)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{160, 180, 40, 255}, 0.4)
+		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{160, 180, 40, 255}, 0.4)
 		add_message(
 			messages,
 			game,
@@ -332,7 +332,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 2
 		game.burning_turns = max(game.burning_turns, 4)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{255, 120, 20, 255}, 0.4)
+		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{255, 120, 20, 255}, 0.4)
 		add_message(
 			messages,
 			game,

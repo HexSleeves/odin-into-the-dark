@@ -26,7 +26,7 @@ resolve_attack_player_on_enemy :: proc(
 
 	if engine != nil {
 		vfx := game_engine_vfx_manager(engine)
-		eng.vfx_manager_flash(vfx, rl.Color{255, 220, 80, 200}, 0.15)
+		eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 220, 80, 200}, 0.15)
 	}
 
 	if enemy.hp <= 0 {
@@ -43,7 +43,7 @@ resolve_attack_player_on_enemy :: proc(
 			)
 			if engine != nil {
 				vfx := game_engine_vfx_manager(engine)
-				eng.vfx_manager_flash(vfx, rl.Color{255, 220, 50, 255}, 0.8)
+				eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 220, 50, 255}, 0.8)
 				eng.vfx_manager_shake(vfx, 8.0)
 			}
 		} else {

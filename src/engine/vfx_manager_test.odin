@@ -1,7 +1,6 @@
 package engine
 
 import "core:testing"
-import rl "vendor:raylib"
 
 @(test)
 vfx_manager_tracks_frame_and_flash :: proc(t: ^testing.T) {
@@ -12,15 +11,16 @@ vfx_manager_tracks_frame_and_flash :: proc(t: ^testing.T) {
 	vfx_manager_tick_frame(&vfx)
 	testing.expect_value(t, vfx_manager_frame(&vfx), 2)
 
-	vfx_manager_flash(&vfx, rl.RED, 0.5)
-	testing.expect_value(t, vfx.flash_color, rl.RED)
+	red := Engine_Color{230, 41, 55, 255} // rl.RED
+	vfx_manager_flash(&vfx, red, 0.5)
+	testing.expect_value(t, vfx.flash_color, red)
 	testing.expect_value(t, vfx.flash_alpha, f32(0.5))
 }
 
 @(test)
 vfx_manager_fades_and_resets_flash :: proc(t: ^testing.T) {
 	vfx := vfx_manager_make()
-	vfx_manager_flash(&vfx, rl.WHITE, 0.005)
+	vfx_manager_flash(&vfx, Engine_Color{255, 255, 255, 255}, 0.005)
 
 	vfx_manager_fade_flash(&vfx, 0.85)
 

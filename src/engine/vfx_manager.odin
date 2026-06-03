@@ -1,10 +1,9 @@
 package engine
 
 import "core:math"
-import rl "vendor:raylib"
 
 Vfx_Manager :: struct {
-	flash_color:  rl.Color,
+	flash_color:  Engine_Color,
 	flash_alpha:  f32,
 	anim_frame:   int,
 	shake_amount: f32,
@@ -33,7 +32,7 @@ vfx_manager_tick_frame :: proc(vfx: ^Vfx_Manager) -> int {
 	return vfx.anim_frame
 }
 
-vfx_manager_flash :: proc(vfx: ^Vfx_Manager, color: rl.Color, alpha: f32) {
+vfx_manager_flash :: proc(vfx: ^Vfx_Manager, color: Engine_Color, alpha: f32) {
 	if vfx == nil {
 		return
 	}
