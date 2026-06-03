@@ -24,12 +24,7 @@ logger_init_file :: proc(logger: ^Game_Logger, options: log.Options) {
 		)
 	} else {
 		logger.file_handle = file
-		logger.file = log.create_file_logger(
-			file,
-			logger.config.file_level,
-			file_options,
-			"itd",
-		)
+		logger.file = log.create_file_logger(file, logger.config.file_level, file_options, "itd")
 		logger.file_ready = true
 	}
 }

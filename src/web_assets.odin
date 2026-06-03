@@ -15,9 +15,7 @@ Web_Asset_Entry :: struct {
 }
 
 @(private = "file")
-WEB_ASSETS := []Web_Asset_Entry {
-	{"assets/kenney_1bit.png", EMBEDDED_TILESET},
-}
+WEB_ASSETS := []Web_Asset_Entry{{"assets/kenney_1bit.png", EMBEDDED_TILESET}}
 
 web_asset_lookup :: proc(path: string) -> ([]u8, bool) {
 	for &entry in WEB_ASSETS {

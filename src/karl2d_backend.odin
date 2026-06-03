@@ -10,9 +10,9 @@ package main
 // Audio is NOT covered — karl2d's mixer has no streaming equivalent for music.
 // The web build uses nil audio until a web-audio backend is implemented.
 
-import "core:math"
 import k2 "../../karl2d"
 import eng "./engine"
+import "core:math"
 
 // ── Value conversions ─────────────────────────────────────────────────────────
 
@@ -41,7 +41,11 @@ to_k2_vec2 :: proc(v: eng.Engine_Vec2) -> k2.Vec2 {
 karl2d_platform_backend :: proc() -> eng.Engine_Platform_Backend {
 	return eng.Engine_Platform_Backend {
 		init = proc(ctx: rawptr, config: eng.Engine_Config) -> bool {
-			k2.init(int(config.window_width), int(config.window_height), string(config.window_title))
+			k2.init(
+				int(config.window_width),
+				int(config.window_height),
+				string(config.window_title),
+			)
 			return true
 		},
 		shutdown = proc(ctx: rawptr) {
@@ -79,7 +83,11 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 		draw_rectangle = proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {
 			k2.draw_rect(to_k2_rect_i(x, y, width, height), to_k2_color(color))
 		},
-		draw_rectangle_lines = proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {
+		draw_rectangle_lines = proc(
+			ctx: rawptr,
+			x, y, width, height: i32,
+			color: eng.Engine_Color,
+		) {
 			k2.draw_rect_outline(to_k2_rect_i(x, y, width, height), 1, to_k2_color(color))
 		},
 		draw_text = proc(ctx: rawptr, text: cstring, x, y, size: i32, color: eng.Engine_Color) {
@@ -100,7 +108,14 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 			tex := (cast(^k2.Texture)texture.handle)^
 			// Engine passes degrees (Raylib convention); karl2d takes radians.
 			rad := rotation * (math.PI / 180.0)
-			k2.draw_texture_fit(tex, to_k2_rect(source), to_k2_rect(dest), to_k2_vec2(origin), rad, to_k2_color(tint))
+			k2.draw_texture_fit(
+				tex,
+				to_k2_rect(source),
+				to_k2_rect(dest),
+				to_k2_vec2(origin),
+				rad,
+				to_k2_color(tint),
+			)
 		},
 	}
 }
@@ -108,24 +123,18 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 // ── Input backend ─────────────────────────────────────────────────────────────
 
 karl2d_input_backend :: proc() -> eng.Engine_Input_Backend {
-	return eng.Engine_Input_Backend {
-		key_down = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
+	return eng.Engine_Input_Backend{key_down = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
 			return k2.key_is_held(to_k2_key(key))
-		},
-		key_pressed = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
+		}, key_pressed = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
 			return k2.key_went_down(to_k2_key(key))
-		},
-		key_released = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
+		}, key_released = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
 			return k2.key_went_up(to_k2_key(key))
-		},
-		frame_time = proc(ctx: rawptr) -> f32 {
+		}, frame_time = proc(ctx: rawptr) -> f32 {
 			return k2.get_frame_time()
-		},
-		mouse_position = proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
+		}, mouse_position = proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
 			p := k2.get_mouse_position()
 			return eng.Engine_Mouse_Position{x = p.x, y = p.y}
-		},
-	}
+		}}
 }
 
 // ── Texture backend (web: bytes-based) ────────────────────────────────────────
@@ -144,7 +153,7 @@ karl2d_texture_backend :: proc() -> eng.Engine_Texture_Backend {
 			}
 			return eng.Engine_Texture {
 				handle = rawptr(tex),
-				width  = i32(tex.width),
+				width = i32(tex.width),
 				height = i32(tex.height),
 			}
 		},

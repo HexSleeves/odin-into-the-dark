@@ -6,10 +6,10 @@ import "core:os"
 
 engine_file_system_default :: proc() -> Engine_File_System {
 	return Engine_File_System {
-		read_entire_file  = os_read_entire_file,
+		read_entire_file = os_read_entire_file,
 		write_entire_file = os_write_entire_file,
-		exists            = os_exists,
-		remove            = os_remove,
+		exists = os_exists,
+		remove = os_remove,
 	}
 }
 
