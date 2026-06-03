@@ -12,7 +12,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	eng.engine_render_clear(engine, eng.engine_color_make(0, 0, 0, 255))
 
 	// Clip the map rendering to the viewport region so it doesn't bleed into HUD/messages
-	eng.engine_render_begin_scissor(engine, 0, 0, i32(SCREEN_WIDTH), i32(MAP_VIEW_HEIGHT))
+	eng.engine_render_begin_scissor(engine, 0, 0, i32(MAP_VIEW_WIDTH), i32(MAP_VIEW_HEIGHT))
 	render_map(engine, game)
 	render_webs(engine, game)
 	render_items(engine, game)

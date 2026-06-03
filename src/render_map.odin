@@ -104,7 +104,7 @@ visible_tile_bounds :: proc(camera: ^eng.Camera_Manager) -> (x0, y0, x1, y1: int
 	camera_y := game_camera_y(camera)
 	x0 = max(0, camera_x / TILE_SIZE)
 	y0 = max(0, camera_y / TILE_SIZE)
-	x1 = min(MAP_WIDTH - 1, (camera_x + SCREEN_WIDTH) / TILE_SIZE)
+	x1 = min(MAP_WIDTH - 1, (camera_x + MAP_VIEW_WIDTH) / TILE_SIZE)
 	y1 = min(MAP_HEIGHT - 1, (camera_y + MAP_VIEW_HEIGHT) / TILE_SIZE)
 	return
 }
@@ -134,7 +134,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 			sy := i32(y * TILE_SIZE) - oy
 
 			// Cull tiles entirely outside the map viewport
-			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
+			if sx + i32(TILE_SIZE) < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			idx := pos_to_idx(x, y)
@@ -216,7 +216,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 			sy := i32(y * TILE_SIZE) - oy
 
 			// Cull off-screen
-			if sx + i32(TILE_SIZE) < 0 || sx >= i32(SCREEN_WIDTH) {continue}
+			if sx + i32(TILE_SIZE) < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
 			if sy + i32(TILE_SIZE) < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 
 			if ui.use_sprites {
@@ -324,7 +324,7 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 	camera := game_engine_camera_manager(engine)
 
 	// Only show tooltips when mouse is in the map viewport region
-	if int(mouse.y) >= MAP_VIEW_HEIGHT {return}
+	if int(mouse.x) >= MAP_VIEW_WIDTH || int(mouse.y) >= MAP_VIEW_HEIGHT {return}
 
 	// Convert screen coordinates to tile coordinates using camera offset
 	tile_x := (int(mouse.x) + game_camera_x(camera)) / TILE_SIZE
@@ -359,7 +359,7 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 	box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
 	box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
 
-	if box_x + box_w > i32(SCREEN_WIDTH) {box_x = i32(SCREEN_WIDTH) - box_w}
+	if box_x + box_w > i32(MAP_VIEW_WIDTH) {box_x = i32(MAP_VIEW_WIDTH) - box_w}
 	if box_x < 0 {box_x = 0}
 	if box_y < 0 {box_y = 0}
 	if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}

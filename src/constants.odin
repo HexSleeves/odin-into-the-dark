@@ -12,10 +12,12 @@ MAP_WIDTH :: 80
 MAP_HEIGHT :: 50
 
 // ─── UI Layout ────────────────────────────────────────────────────────────────
-// Screen is split top-to-bottom: map viewport → HUD → message log.
-HUD_REGION_HEIGHT :: 44
+// Sidebar replaces the cramped HUD bar. Map occupies left region; sidebar right.
+SIDEBAR_WIDTH     :: 256
+HUD_REGION_HEIGHT :: 0   // kept for legacy; sidebar does all stat display now
 MSG_REGION_HEIGHT :: 120
-MAP_VIEW_HEIGHT :: SCREEN_HEIGHT - HUD_REGION_HEIGHT - MSG_REGION_HEIGHT
+MAP_VIEW_WIDTH    :: SCREEN_WIDTH - SIDEBAR_WIDTH     // 1024
+MAP_VIEW_HEIGHT   :: SCREEN_HEIGHT - MSG_REGION_HEIGHT // 780
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 

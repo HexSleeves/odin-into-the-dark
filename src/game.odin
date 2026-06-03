@@ -106,7 +106,7 @@ game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool 
 		camera,
 		game.player.pos.x * TILE_SIZE + TILE_SIZE / 2,
 		game.player.pos.y * TILE_SIZE + TILE_SIZE / 2,
-		SCREEN_WIDTH,
+		MAP_VIEW_WIDTH,
 		MAP_VIEW_HEIGHT,
 		eng.world_manager_pixel_width(game.world),
 		eng.world_manager_pixel_height(game.world),

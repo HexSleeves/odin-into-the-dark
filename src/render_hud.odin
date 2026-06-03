@@ -4,273 +4,348 @@ import eng "./engine"
 import "core:fmt"
 import rl "vendor:raylib"
 
-// ─── HUD rendering (fixed region below map viewport) ──────────────────────────
+// ─── Sidebar palette ─────────────────────────────────────────────────────────
+
+SB_BG         :: rl.Color{12, 12, 20, 255}
+SB_DIVIDER    :: rl.Color{35, 35, 52, 255}
+SB_TITLE      :: rl.Color{200, 175, 90, 255}
+SB_HEADER     :: rl.Color{130, 130, 155, 255}
+SB_TEXT       :: rl.Color{195, 195, 210, 255}
+SB_DIM        :: rl.Color{75, 75, 90, 255}
+SB_HP_BG      :: rl.Color{70, 15, 15, 255}
+SB_HP_FG      :: rl.Color{45, 185, 55, 255}
+SB_HP_LOW     :: rl.Color{200, 55, 40, 255}
+SB_PICK_BG    :: rl.Color{35, 25, 15, 255}
+SB_PICK_OK    :: rl.Color{75, 170, 75, 255}
+SB_PICK_WARN  :: rl.Color{195, 175, 45, 255}
+SB_PICK_CRIT  :: rl.Color{200, 55, 40, 255}
+SB_WPN        :: rl.Color{195, 145, 70, 255}
+SB_ARM        :: rl.Color{90, 155, 205, 255}
+SB_HLM        :: rl.Color{195, 195, 50, 255}
+SB_OIL        :: rl.Color{250, 195, 70, 255}
+SB_POISON     :: rl.Color{115, 200, 40, 255}
+SB_BOSS       :: rl.Color{210, 45, 45, 255}
+SB_KEY        :: rl.Color{120, 180, 255, 255}
+
+// ─── Sidebar geometry ────────────────────────────────────────────────────────
+
+SB_X  :: i32(MAP_VIEW_WIDTH)
+SB_W  :: i32(SIDEBAR_WIDTH)
+SB_H  :: i32(MAP_VIEW_HEIGHT)
+SB_PX :: i32(8)   // inner padding-x
+SB_IW :: SB_W - SB_PX * 2  // inner content width
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+sb_bar :: proc(
+	engine: ^eng.Engine,
+	y: i32,
+	ratio: f32,
+	h: i32,
+	bg, fg: rl.Color,
+) {
+	render_draw_rectangle(engine, SB_X + SB_PX, y, SB_IW, h, bg)
+	filled := i32(f32(SB_IW) * clamp(ratio, 0, 1))
+	if filled > 0 {
+		render_draw_rectangle(engine, SB_X + SB_PX, y, filled, h, fg)
+	}
+}
+
+sb_divider :: proc(engine: ^eng.Engine, y: i32) {
+	render_draw_rectangle(engine, SB_X, y, SB_W, 1, SB_DIVIDER)
+}
+
+sb_text :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: rl.Color) {
+	render_draw_text(engine, text, SB_X + SB_PX, y, size, color)
+}
+
+sb_text_right :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: rl.Color) {
+	w := render_measure_text(engine, text, size)
+	render_draw_text(engine, text, SB_X + SB_W - SB_PX - w, y, size, color)
+}
+
+// ─── Main sidebar ─────────────────────────────────────────────────────────────
 
 render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	turns := game_engine_turn_manager(engine)
-	ui := ui_manager_state(game_engine_ui_manager(engine))
-	hud_y := i32(MAP_VIEW_HEIGHT)
 
-	// Background bar
-	render_draw_rectangle(
-		engine,
-		0,
-		hud_y,
-		i32(SCREEN_WIDTH),
-		i32(HUD_REGION_HEIGHT),
-		rl.Color{20, 20, 25, 255},
-	)
+	// Background
+	render_draw_rectangle(engine, SB_X, 0, SB_W, SB_H, SB_BG)
 
-	// HP bar
+	y := i32(4)
+
+	// ── Title ──────────────────────────────────────────────────────────────
+	title := cstring("INTO THE DEPTHS")
+	tw := render_measure_text(engine, title, 14)
+	render_draw_text(engine, title, SB_X + (SB_W - tw) / 2, y, 14, SB_TITLE)
+	y += 20
+	sb_divider(engine, y)
+	y += 6
+
+	// ── HP ──────────────────────────────────────────────────────────────────
 	hp_ratio := f32(max(game.player.hp, 0)) / f32(game.player.max_hp)
-	hp_bar_w :: i32(200)
-	hp_bar_h :: i32(16)
-	hp_x :: i32(8)
-	hp_y := hud_y + 4
-
-	// Background (red)
-	render_draw_rectangle(engine, hp_x, hp_y, hp_bar_w, hp_bar_h, rl.Color{80, 20, 20, 255})
-	// Foreground (green)
-	render_draw_rectangle(
+	hp_fg := SB_HP_FG if hp_ratio > 0.3 else SB_HP_LOW
+	sb_text(engine, "HP", y, 12, SB_HEADER)
+	sb_text_right(
 		engine,
-		hp_x,
-		hp_y,
-		i32(f32(hp_bar_w) * hp_ratio),
-		hp_bar_h,
-		rl.Color{40, 180, 40, 255},
+		rl.TextFormat("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+		y,
+		12,
+		SB_TEXT,
 	)
+	y += 14
+	sb_bar(engine, y, hp_ratio, 10, SB_HP_BG, hp_fg)
+	y += 15
 
-	// HP text
-	render_draw_text(
+	// ── Pickaxe durability (only when equipped) ──────────────────────────────
+	if game.equipped_weapon.occupied {
+		wpn := game.equipped_weapon.item
+		if wpn.max_durability > 0 {
+			pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
+			pick_fg: rl.Color
+			if wpn.durability <= 0 {
+				pick_fg = SB_PICK_CRIT
+			} else if pick_ratio > 0.5 {
+				pick_fg = SB_PICK_OK
+			} else if pick_ratio > 0.25 {
+				pick_fg = SB_PICK_WARN
+			} else {
+				pick_fg = SB_PICK_CRIT
+			}
+			pick_label: cstring = "PICK"
+			if wpn.durability <= 0 {
+				sb_text(engine, "PICK  BROKEN", y, 12, SB_PICK_CRIT)
+			} else {
+				sb_text(engine, pick_label, y, 12, SB_HEADER)
+				sb_text_right(
+					engine,
+					rl.TextFormat("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
+					y,
+					12,
+					SB_TEXT,
+				)
+			}
+			y += 14
+			sb_bar(engine, y, pick_ratio, 6, SB_PICK_BG, pick_fg)
+			y += 11
+		}
+	}
+
+	y += 3
+	sb_divider(engine, y)
+	y += 6
+
+	// ── Depth / Turn / Kills / Light ─────────────────────────────────────────
+	sb_text(
 		engine,
-		rl.TextFormat("HP: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
-		hp_x + 4,
-		hp_y + 1,
-		14,
-		rl.WHITE,
+		rl.TextFormat("DEPTH  %d", i32(game.depth)),
+		y,
+		13,
+		SB_TEXT,
 	)
-
-	// Stats line
-	stats_y := hp_y + hp_bar_h + 4
+	sb_text_right(
+		engine,
+		rl.TextFormat("TURN %d", i32(eng.turn_manager_current(turns))),
+		y,
+		13,
+		SB_DIM,
+	)
+	y += 17
 
 	alive_count: i32 = 0
 	for &e in game.enemies {
 		if e.alive {alive_count += 1}
 	}
-
-	render_draw_text(
+	sb_text(
 		engine,
-		rl.TextFormat(
-			"Depth: %d  |  Kills: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  X=Mine  M=Map  ?=Help",
-			i32(game.depth),
-			i32(game.kills),
-			i32(game.player.light_radius),
-			alive_count,
-			i32(eng.turn_manager_current(turns)),
-		),
-		hp_x,
-		stats_y,
-		14,
-		rl.Color{180, 180, 180, 255},
+		rl.TextFormat("KILLS  %d", i32(game.kills)),
+		y,
+		13,
+		SB_TEXT,
 	)
-
-	// Oil buff indicator
-	if game.light_boost_turns > 0 {
-		oil_text := rl.TextFormat("Oil: %dt", i32(game.light_boost_turns))
-		oil_x := hp_x + hp_bar_w + 16
-		render_draw_text(engine, oil_text, oil_x, hp_y + 1, 14, rl.Color{255, 200, 80, 255})
-	}
-
-	// Poison status indicator
-	if game.poison_turns > 0 {
-		poison_text := rl.TextFormat("POISON (%dt)", i32(game.poison_turns))
-		poison_x := hp_x + hp_bar_w + 16
-		render_draw_text(engine, poison_text, poison_x, hp_y + 18, 14, rl.Color{120, 200, 40, 255})
-	}
-
-	// Pickaxe durability bar
-	pick_x := hp_x + hp_bar_w + 120
-	pick_bar_w :: i32(80)
-	pick_bar_h :: i32(12)
-	pick_y := hp_y + 2
-
-	// Background
-	render_draw_rectangle(
+	sb_text_right(
 		engine,
-		pick_x,
-		pick_y,
-		pick_bar_w,
-		pick_bar_h,
-		rl.Color{40, 30, 20, 255},
+		rl.TextFormat("NEAR %d", alive_count),
+		y,
+		13,
+		SB_DIM,
 	)
+	y += 17
 
-	if game.equipped_weapon.occupied && game.equipped_weapon.item.max_durability > 0 {
-		wpn := game.equipped_weapon.item
-		pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
-		// Color gradient: green -> yellow -> red
-		pick_color: rl.Color
-		if pick_ratio > 0.5 {
-			pick_color = rl.Color{80, 180, 80, 255} // green
-		} else if pick_ratio > 0.25 {
-			pick_color = rl.Color{200, 180, 50, 255} // yellow
-		} else {
-			pick_color = rl.Color{200, 60, 60, 255} // red
-		}
-		if wpn.durability > 0 {
-			render_draw_rectangle(
+	sb_text(
+		engine,
+		rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
+		y,
+		13,
+		SB_TEXT,
+	)
+	sb_text_right(
+		engine,
+		rl.TextFormat("ITEMS %d", i32(game.items_found)),
+		y,
+		13,
+		SB_DIM,
+	)
+	y += 17
+
+	y += 2
+	sb_divider(engine, y)
+	y += 6
+
+	// ── Equipment ────────────────────────────────────────────────────────────
+	sb_text(engine, "EQUIPMENT", y, 12, SB_HEADER)
+	y += 16
+
+	if game.equipped_weapon.occupied {
+		wpn := &game.equipped_weapon.item
+		sb_text(
+			engine,
+			rl.TextFormat("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
+			y,
+			12,
+			SB_WPN,
+		)
+	} else {
+		sb_text(engine, "WPN  ---", y, 12, SB_DIM)
+	}
+	y += 15
+
+	if game.equipped_armor.occupied {
+		arm := &game.equipped_armor.item
+		sb_text(
+			engine,
+			rl.TextFormat("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
+			y,
+			12,
+			SB_ARM,
+		)
+	} else {
+		sb_text(engine, "ARM  ---", y, 12, SB_DIM)
+	}
+	y += 15
+
+	if game.equipped_helmet.occupied {
+		hlm := &game.equipped_helmet.item
+		sb_text(
+			engine,
+			rl.TextFormat("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
+			y,
+			12,
+			SB_HLM,
+		)
+	} else {
+		sb_text(engine, "HLM  ---", y, 12, SB_DIM)
+	}
+	y += 15
+
+	// ── Status effects ───────────────────────────────────────────────────────
+	has_status := game.light_boost_turns > 0 || game.poison_turns > 0
+	if has_status {
+		y += 2
+		sb_divider(engine, y)
+		y += 6
+		sb_text(engine, "STATUS", y, 12, SB_HEADER)
+		y += 16
+
+		if game.light_boost_turns > 0 {
+			sb_text(
 				engine,
-				pick_x,
-				pick_y,
-				i32(f32(pick_bar_w) * pick_ratio),
-				pick_bar_h,
-				pick_color,
-			)
-			render_draw_text(
-				engine,
-				rl.TextFormat("Pick: %d/%d", i32(wpn.durability), i32(wpn.max_durability)),
-				pick_x + 2,
-				pick_y,
+				rl.TextFormat("OIL   %dt remaining", i32(game.light_boost_turns)),
+				y,
 				12,
-				rl.WHITE,
+				SB_OIL,
 			)
-		} else {
-			render_draw_text(
-				engine,
-				"Pick: BROKEN",
-				pick_x + 2,
-				pick_y,
-				12,
-				rl.Color{255, 80, 80, 255},
-			)
+			y += 15
 		}
-	} else if !game.equipped_weapon.occupied {
-		render_draw_text(engine, "Pick: ---", pick_x + 2, pick_y, 12, rl.Color{80, 80, 80, 255})
+		if game.poison_turns > 0 {
+			sb_text(
+				engine,
+				rl.TextFormat("POISON  %dt remaining", i32(game.poison_turns)),
+				y,
+				12,
+				SB_POISON,
+			)
+			y += 15
+		}
 	}
 
-	// Mining mode indicator (centered at top of screen)
+	// ── Boss health bar (in sidebar, not overlaying the map) ─────────────────
+	for &enemy in game.enemies {
+		if !enemy.alive || !enemy.is_boss {continue}
+
+		y += 2
+		sb_divider(engine, y)
+		y += 6
+		sb_text(engine, rl.TextFormat("%s", enemy.name), y, 12, SB_BOSS)
+		sb_text_right(
+			engine,
+			rl.TextFormat("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
+			y,
+			12,
+			SB_TEXT,
+		)
+		y += 16
+		boss_ratio := f32(max(enemy.hp, 0)) / f32(max(enemy.max_hp, 1))
+		sb_bar(engine, y, boss_ratio, 8, rl.Color{50, 15, 15, 255}, SB_BOSS)
+		y += 12
+		break
+	}
+
+	// ── Controls (near bottom, only if room) ─────────────────────────────────
+	controls_y := SB_H - 82
+	if y < controls_y {
+		// Draw divider+controls only when there's space — avoids overlap with
+		// long equipment/status sections
+		sb_divider(engine, controls_y)
+		sb_text(engine, "CONTROLS", controls_y + 6, 12, SB_HEADER)
+		sb_text(engine, "[I]nv  [G]rab  [X]Mine", controls_y + 22, 12, SB_KEY)
+		sb_text(engine, "[M]ap  [?]Help  [M]ute", controls_y + 38, 12, SB_KEY)
+		sb_text(engine, "[ ] / [ ]  Volume", controls_y + 54, 12, SB_KEY)
+	}
+
+	// ── Contextual overlays (these draw ON the map, not in sidebar) ──────────
+
+	// Mining mode — top-center of map area
+	ui := ui_manager_state(game_engine_ui_manager(engine))
 	if ui.mining_mode {
-		mine_text := cstring("[MINING] Choose direction (WASD/arrows) | ESC cancel")
+		mine_text := cstring("[MINING] Direction (WASD/arrows) | ESC cancel")
 		mine_w := render_measure_text(engine, mine_text, 14)
 		render_draw_text(
 			engine,
 			mine_text,
-			(i32(SCREEN_WIDTH) - mine_w) / 2,
-			2,
+			(i32(MAP_VIEW_WIDTH) - mine_w) / 2,
+			4,
 			14,
 			rl.Color{255, 200, 80, 255},
 		)
 	}
 
-	// Contextual hint: C=Craft when standing on anvil
+	// Anvil hint — just above the message log
 	cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 	if cur != nil && cur.type == .Anvil {
-		anvil_text := cstring("[C=Craft]")
+		anvil_text := cstring("[C = Craft]")
 		anvil_w := render_measure_text(engine, anvil_text, 14)
 		render_draw_text(
 			engine,
 			anvil_text,
-			(i32(SCREEN_WIDTH) - anvil_w) / 2,
-			hud_y - 18,
+			(i32(MAP_VIEW_WIDTH) - anvil_w) / 2,
+			i32(MAP_VIEW_HEIGHT) - 22,
 			14,
 			rl.Color{160, 160, 170, 255},
 		)
 	}
 
-	// Equipment indicators (right side of HUD)
-	eq_x := i32(hp_x) + 600
-	if game.equipped_weapon.occupied {
+	// Fountain hint
+	if cur != nil && cur.type == .Fountain {
+		fount_text := cstring("[Fountain — restores HP]")
+		fount_w := render_measure_text(engine, fount_text, 14)
 		render_draw_text(
 			engine,
-			fmt.ctprintf(
-				"Wpn: %s (+%d)",
-				game.equipped_weapon.item.name,
-				game.equipped_weapon.item.stat_bonus,
-			),
-			eq_x,
-			hp_y + 1,
+			fount_text,
+			(i32(MAP_VIEW_WIDTH) - fount_w) / 2,
+			i32(MAP_VIEW_HEIGHT) - 22,
 			14,
-			rl.Color{200, 150, 80, 255},
+			rl.Color{80, 180, 220, 255},
 		)
-	} else {
-		render_draw_text(engine, "Wpn: ---", eq_x, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
-	}
-	if game.equipped_armor.occupied {
-		render_draw_text(
-			engine,
-			fmt.ctprintf(
-				"Arm: %s (+%d)",
-				game.equipped_armor.item.name,
-				game.equipped_armor.item.stat_bonus,
-			),
-			eq_x,
-			hp_y + 18,
-			14,
-			rl.Color{100, 160, 200, 255},
-		)
-	} else {
-		render_draw_text(engine, "Arm: ---", eq_x, hp_y + 18, 14, rl.Color{80, 80, 80, 255})
-	}
-	if game.equipped_helmet.occupied {
-		render_draw_text(
-			engine,
-			fmt.ctprintf(
-				"Hlm: %s (+%d)",
-				game.equipped_helmet.item.name,
-				game.equipped_helmet.item.stat_bonus,
-			),
-			eq_x + 200,
-			hp_y + 1,
-			14,
-			rl.Color{200, 200, 50, 255},
-		)
-	} else {
-		render_draw_text(engine, "Hlm: ---", eq_x + 200, hp_y + 1, 14, rl.Color{80, 80, 80, 255})
-	}
-
-	// Boss health bar
-	for &enemy in game.enemies {
-		if !enemy.alive || !enemy.is_boss {continue}
-
-		boss_bar_w :: i32(300)
-		boss_bar_h :: i32(16)
-		boss_bar_x := (i32(SCREEN_WIDTH) - boss_bar_w) / 2
-		boss_bar_y := i32(18)
-
-		render_draw_rectangle(
-			engine,
-			boss_bar_x - 2,
-			boss_bar_y - 2,
-			boss_bar_w + 4,
-			boss_bar_h + 4,
-			rl.Color{10, 10, 15, 200},
-		)
-		render_draw_rectangle(
-			engine,
-			boss_bar_x,
-			boss_bar_y,
-			boss_bar_w,
-			boss_bar_h,
-			rl.Color{60, 20, 20, 255},
-		)
-
-		ratio := f32(max(enemy.hp, 0)) / f32(enemy.max_hp)
-		render_draw_rectangle(
-			engine,
-			boss_bar_x,
-			boss_bar_y,
-			i32(f32(boss_bar_w) * ratio),
-			boss_bar_h,
-			rl.Color{200, 40, 40, 255},
-		)
-
-		render_draw_text(
-			engine,
-			fmt.ctprintf("%s  %d/%d", enemy.name, enemy.hp, enemy.max_hp),
-			boss_bar_x + 4,
-			boss_bar_y + 1,
-			14,
-			rl.WHITE,
-		)
-		break
 	}
 }

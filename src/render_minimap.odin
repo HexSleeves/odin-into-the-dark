@@ -12,7 +12,7 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 	// Position: top-right corner
 	mm_w := i32(MAP_WIDTH) * MINIMAP_TILE_SIZE
 	mm_h := i32(MAP_HEIGHT) * MINIMAP_TILE_SIZE
-	mm_x := i32(SCREEN_WIDTH) - mm_w - MINIMAP_MARGIN
+	mm_x := i32(MAP_VIEW_WIDTH) - mm_w - MINIMAP_MARGIN
 	mm_y := MINIMAP_MARGIN
 
 	// Semi-transparent background
