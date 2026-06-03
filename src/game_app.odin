@@ -1,6 +1,7 @@
 package main
 
 import eng "./engine"
+import "core:strconv"
 import rl "vendor:raylib"
 
 // ─── Into the Depths app adapter ─────────────────────────────────────────────
@@ -25,6 +26,13 @@ Into_The_Depths_App_State :: struct {
 
 g_config: eng.Config_Manager
 
+Game_Config :: struct {
+	master_volume: f32,
+	music_volume:  f32,
+}
+
+g_game_config: Game_Config
+
 game_engine_config :: proc() -> eng.Engine_Config {
 	config := eng.engine_config_make(SCREEN_WIDTH, SCREEN_HEIGHT, "Into the Depths", 60)
 	config.audio = game_audio_backend(&g_audio)
@@ -44,6 +52,19 @@ game_diagnostics_init :: proc() {
 	g_config = eng.config_manager_make()
 	eng.config_manager_load_env_file(&g_config, ".env")
 	logger_init_from_config(&g_logger, &g_config)
+
+	if v, ok := strconv.parse_f32(eng.config_manager_get_or(&g_config, "ITD_MASTER_VOLUME", ""));
+	   ok && v > 0 {
+		g_game_config.master_volume = v
+	} else {
+		g_game_config.master_volume = 0.7
+	}
+	if v, ok := strconv.parse_f32(eng.config_manager_get_or(&g_config, "ITD_MUSIC_VOLUME", ""));
+	   ok && v > 0 {
+		g_game_config.music_volume = v
+	} else {
+		g_game_config.music_volume = 0.3
+	}
 }
 
 game_diagnostics_shutdown :: proc() {
@@ -52,9 +73,13 @@ game_diagnostics_shutdown :: proc() {
 
 game_runtime_assets_init :: proc() {
 	audio_init()
+	music_init()
+	audio_set_master_volume(g_game_config.master_volume)
+	music_set_volume(g_game_config.music_volume)
 }
 
 game_runtime_assets_shutdown :: proc() {
+	music_cleanup()
 	audio_cleanup()
 }
 
@@ -272,6 +297,7 @@ game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	game := state.game
+	music_update(game)
 	handle_global_input(engine, game, game_engine_input_manager(engine))
 	return game_scene_manager_update(engine, game)
 }

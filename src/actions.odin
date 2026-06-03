@@ -77,6 +77,11 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 	messages := game_engine_message_manager(engine)
 	vfx := game_engine_vfx_manager(engine)
 	audio_manager_play_sfx(game_engine_audio_manager(engine), .Descent)
+	music_set_tier_by_depth(game.depth)
+	audio_manager_set_master_volume(
+		game_engine_audio_manager(engine),
+		0.6 + min(f32(game.depth) * 0.02, 0.4),
+	)
 	eng.vfx_manager_flash(vfx, rl.Color{255, 255, 255, 255}, 0.5)
 	hp_before := game.player.hp
 	advance_turn(

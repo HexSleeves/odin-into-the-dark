@@ -234,6 +234,7 @@ engine_run :: proc(
 		frame_manager_begin(&engine.frame_manager, engine_input_frame_time(engine.input))
 		frame_manager_clear_quit(&engine.frame_manager)
 		event_manager_clear(&engine.event_manager)
+		audio_manager_update(&engine.audio_manager)
 
 		quit := false
 		if app.update != nil {

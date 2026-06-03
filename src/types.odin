@@ -196,4 +196,8 @@ Game :: struct {
 	death_cause:       string,
 	score_saved:       bool,
 	last_score_rank:   int,
+	// Render dirty tracking — zero-value means "redraw everything on first frame"
+	render_map_dirty:  bool,
+	render_last_cam_x: int,
+	render_last_cam_y: int,
 }

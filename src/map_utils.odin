@@ -135,6 +135,7 @@ tile_states_clear_visibility :: proc(game: ^Game) {
 	if game == nil {
 		return
 	}
+	game.render_map_dirty = true
 	eng.tile_state_clear_visibility(&game.tile_states)
 }
 

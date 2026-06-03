@@ -30,6 +30,11 @@ game_audio_backend :: proc(audio: ^Game_Audio) -> eng.Engine_Audio_Backend {
 		is_enabled = game_audio_backend_is_enabled,
 		set_enabled = game_audio_backend_set_enabled,
 		toggle = game_audio_backend_toggle,
+		stop = game_audio_backend_stop,
+		set_volume = game_audio_backend_set_volume,
+		set_master_volume = game_audio_backend_set_master_volume,
+		play_looped = game_audio_backend_play_looped,
+		update = game_audio_backend_update,
 	}
 }
 
@@ -62,4 +67,69 @@ game_audio_backend_toggle :: proc(ctx: rawptr) -> bool {
 	}
 	audio.enabled = !audio.enabled
 	return audio.enabled
+}
+
+audio_manager_stop_sfx :: proc(audio: ^Audio_Manager, stype: Sound_Type) {
+	eng.audio_manager_stop(audio, int(stype))
+}
+
+audio_manager_set_sfx_volume :: proc(audio: ^Audio_Manager, stype: Sound_Type, volume: f32) {
+	eng.audio_manager_set_volume(audio, int(stype), volume)
+}
+
+audio_manager_set_master_volume :: proc(audio: ^Audio_Manager, volume: f32) {
+	eng.audio_manager_set_master_volume(audio, volume)
+}
+
+audio_manager_play_sfx_looped :: proc(audio: ^Audio_Manager, stype: Sound_Type) {
+	eng.audio_manager_play_looped(audio, int(stype))
+}
+
+game_audio_backend_stop :: proc(ctx: rawptr, sound_id: int) {
+	audio := cast(^Game_Audio)ctx
+	if audio == nil || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
+		return
+	}
+	stype := Sound_Type(sound_id)
+	audio.looping[stype] = false
+	rl.StopSound(audio.sounds[stype])
+}
+
+game_audio_backend_set_volume :: proc(ctx: rawptr, sound_id: int, volume: f32) {
+	audio := cast(^Game_Audio)ctx
+	if audio == nil || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
+		return
+	}
+	rl.SetSoundVolume(audio.sounds[Sound_Type(sound_id)], volume)
+}
+
+game_audio_backend_set_master_volume :: proc(ctx: rawptr, volume: f32) {
+	if !rl.IsAudioDeviceReady() {
+		return
+	}
+	rl.SetMasterVolume(clamp(volume, 0, 1))
+}
+
+game_audio_backend_play_looped :: proc(ctx: rawptr, sound_id: int) {
+	audio := cast(^Game_Audio)ctx
+	if audio == nil || !audio.enabled || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
+		return
+	}
+	stype := Sound_Type(sound_id)
+	audio.looping[stype] = true
+	if !rl.IsSoundPlaying(audio.sounds[stype]) {
+		rl.PlaySound(audio.sounds[stype])
+	}
+}
+
+game_audio_backend_update :: proc(ctx: rawptr) {
+	audio := cast(^Game_Audio)ctx
+	if audio == nil || !audio.enabled {
+		return
+	}
+	for stype in Sound_Type {
+		if audio.looping[stype] && !rl.IsSoundPlaying(audio.sounds[stype]) {
+			rl.PlaySound(audio.sounds[stype])
+		}
+	}
 }

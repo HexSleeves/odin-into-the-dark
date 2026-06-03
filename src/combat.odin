@@ -10,6 +10,7 @@ import rl "vendor:raylib"
 resolve_attack_player_on_enemy :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
 	damage := effective_attack(game)
 	enemy.hp -= damage
+	play_sfx(.Hit)
 	add_message(
 		messages,
 		game,

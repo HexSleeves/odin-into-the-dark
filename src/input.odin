@@ -1,6 +1,7 @@
 package main
 
 import eng "./engine"
+import "core:fmt"
 import rl "vendor:raylib"
 
 // ─── Input result ─────────────────────────────────────────────────────────────
@@ -229,6 +230,26 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		ui.return_to_title = false
 		game.state = .Viewing_Help
 		return true
+	}
+	if rl.IsKeyPressed(.LEFT_BRACKET) {
+		g_game_config.master_volume = max(0, g_game_config.master_volume - 0.1)
+		audio_set_master_volume(g_game_config.master_volume)
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("Volume: %d%%", int(g_game_config.master_volume * 100 + 0.5)),
+			rl.Color{180, 180, 180, 255},
+		)
+	}
+	if rl.IsKeyPressed(.RIGHT_BRACKET) {
+		g_game_config.master_volume = min(1, g_game_config.master_volume + 0.1)
+		audio_set_master_volume(g_game_config.master_volume)
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("Volume: %d%%", int(g_game_config.master_volume * 100 + 0.5)),
+			rl.Color{180, 180, 180, 255},
+		)
 	}
 
 	return false

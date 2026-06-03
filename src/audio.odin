@@ -16,6 +16,7 @@ Sound_Type :: enum {
 Game_Audio :: struct {
 	sounds:  [Sound_Type]rl.Sound,
 	enabled: bool,
+	looping: [Sound_Type]bool,
 }
 
 Generated_Wave :: struct {
@@ -119,4 +120,9 @@ audio_toggle :: proc() {
 	if rl.IsAudioDeviceReady() {
 		g_audio.enabled = !g_audio.enabled
 	}
+}
+
+audio_set_master_volume :: proc(volume: f32) {
+	if !rl.IsAudioDeviceReady() {return}
+	rl.SetMasterVolume(clamp(volume, 0, 1))
 }

@@ -35,3 +35,38 @@ audio_manager_play :: proc(audio: ^Audio_Manager, sound_id: int) {
 	}
 	engine_audio_backend_play(audio.backend, sound_id)
 }
+
+audio_manager_stop :: proc(audio: ^Audio_Manager, sound_id: int) {
+	if audio == nil {
+		return
+	}
+	engine_audio_backend_stop(audio.backend, sound_id)
+}
+
+audio_manager_set_volume :: proc(audio: ^Audio_Manager, sound_id: int, volume: f32) {
+	if audio == nil {
+		return
+	}
+	engine_audio_backend_set_volume(audio.backend, sound_id, volume)
+}
+
+audio_manager_set_master_volume :: proc(audio: ^Audio_Manager, volume: f32) {
+	if audio == nil {
+		return
+	}
+	engine_audio_backend_set_master_volume(audio.backend, volume)
+}
+
+audio_manager_play_looped :: proc(audio: ^Audio_Manager, sound_id: int) {
+	if audio == nil {
+		return
+	}
+	engine_audio_backend_play_looped(audio.backend, sound_id)
+}
+
+audio_manager_update :: proc(audio: ^Audio_Manager) {
+	if audio == nil {
+		return
+	}
+	engine_audio_backend_update(audio.backend)
+}

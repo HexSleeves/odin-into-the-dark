@@ -1044,6 +1044,14 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		14,
 		key_color,
 	)
+	render_draw_text(
+		engine,
+		"[ / ]            Adjust volume",
+		col2_x,
+		start_y + line_h * 9,
+		14,
+		key_color,
+	)
 
 	render_draw_text(engine, "TILE LEGEND", col2_x, start_y + line_h * 10, 16, head_color)
 	render_draw_text(engine, "@  You", col2_x, start_y + line_h * 11, 14, rl.YELLOW)

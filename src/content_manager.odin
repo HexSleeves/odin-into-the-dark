@@ -167,9 +167,9 @@ content_manager_load_from_storage :: proc(
 	if !player_ok {return false}
 
 	registry.enemies = enemies
-	registry.items   = items
-	registry.player  = player
-	registry.loaded  = true
-	registry.owned   = true
+	registry.items = items
+	registry.player = player
+	registry.loaded = true
+	registry.owned = true
 	return true
 }
