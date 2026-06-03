@@ -56,8 +56,8 @@ camera_manager_update :: proc(
 	// Without this, diffs of 2-5 produce int(f32(diff)*0.2) = 0, stalling the camera.
 	step_x := int(f32(diff_x) * LERP_SPEED)
 	step_y := int(f32(diff_y) * LERP_SPEED)
-	if diff_x != 0 && step_x == 0 { step_x = 1 if diff_x > 0 else -1 }
-	if diff_y != 0 && step_y == 0 { step_y = 1 if diff_y > 0 else -1 }
+	if diff_x != 0 && step_x == 0 {step_x = 1 if diff_x > 0 else -1}
+	if diff_y != 0 && step_y == 0 {step_y = 1 if diff_y > 0 else -1}
 	camera.x += step_x
 	camera.y += step_y
 }

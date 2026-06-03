@@ -131,7 +131,10 @@ content_manager_pick_item_def :: proc(content: ^Content_Manager) -> ^Item_Def {
 	return nil
 }
 
-content_manager_pick_item_def_for_depth :: proc(content: ^Content_Manager, depth: int) -> ^Item_Def {
+content_manager_pick_item_def_for_depth :: proc(
+	content: ^Content_Manager,
+	depth: int,
+) -> ^Item_Def {
 	if content == nil {
 		return pick_item_def_for_depth(depth)
 	}

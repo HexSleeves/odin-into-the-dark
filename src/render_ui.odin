@@ -121,7 +121,13 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 				s.items_found,
 				s.turns,
 			)
-			draw_centered_text(engine, row, score_y + i32(i) * 18, 13, rl.Color{140, 140, 140, 255})
+			draw_centered_text(
+				engine,
+				row,
+				score_y + i32(i) * 18,
+				13,
+				rl.Color{140, 140, 140, 255},
+			)
 		}
 	}
 
@@ -804,13 +810,34 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_draw_text(engine, rl.TextFormat("%d", i32(game.depth)), val_col, stats_y, 18, val_color)
 
 	render_draw_text(engine, "Enemies Slain", stat_col, stats_y + 25, 18, stat_color)
-	render_draw_text(engine, rl.TextFormat("%d", i32(game.kills)), val_col, stats_y + 25, 18, val_color)
+	render_draw_text(
+		engine,
+		rl.TextFormat("%d", i32(game.kills)),
+		val_col,
+		stats_y + 25,
+		18,
+		val_color,
+	)
 
 	render_draw_text(engine, "Items Found", stat_col, stats_y + 50, 18, stat_color)
-	render_draw_text(engine, rl.TextFormat("%d", i32(game.items_found)), val_col, stats_y + 50, 18, val_color)
+	render_draw_text(
+		engine,
+		rl.TextFormat("%d", i32(game.items_found)),
+		val_col,
+		stats_y + 50,
+		18,
+		val_color,
+	)
 
 	render_draw_text(engine, "Turns Survived", stat_col, stats_y + 75, 18, stat_color)
-	render_draw_text(engine, rl.TextFormat("%d", i32(eng.turn_manager_current(turns))), val_col, stats_y + 75, 18, val_color)
+	render_draw_text(
+		engine,
+		rl.TextFormat("%d", i32(eng.turn_manager_current(turns))),
+		val_col,
+		stats_y + 75,
+		18,
+		val_color,
+	)
 
 	render_draw_text(engine, "HP Remaining", stat_col, stats_y + 100, 18, stat_color)
 	render_draw_text(
@@ -823,14 +850,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 
 	// Divider
-	render_draw_rectangle(
-		engine,
-		center_x - 100,
-		stats_y + 130,
-		200,
-		1,
-		rl.Color{80, 80, 80, 255},
-	)
+	render_draw_rectangle(engine, center_x - 100, stats_y + 130, 200, 1, rl.Color{80, 80, 80, 255})
 
 	// High Scores
 	hs_title := cstring("HIGH SCORES")

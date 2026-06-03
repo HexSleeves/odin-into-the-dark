@@ -557,8 +557,10 @@ remove_dead_enemies :: proc(
 			}
 			spawn_death_particles(
 				particles,
-				game.enemies[i].pos.x, game.enemies[i].pos.y,
-				cam_x, cam_y,
+				game.enemies[i].pos.x,
+				game.enemies[i].pos.y,
+				cam_x,
+				cam_y,
 			)
 			unordered_remove(&game.enemies, i)
 		} else {

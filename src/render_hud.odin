@@ -6,44 +6,38 @@ import rl "vendor:raylib"
 
 // ─── Sidebar palette ─────────────────────────────────────────────────────────
 
-SB_BG         :: rl.Color{12, 12, 20, 255}
-SB_DIVIDER    :: rl.Color{35, 35, 52, 255}
-SB_TITLE      :: rl.Color{200, 175, 90, 255}
-SB_HEADER     :: rl.Color{130, 130, 155, 255}
-SB_TEXT       :: rl.Color{195, 195, 210, 255}
-SB_DIM        :: rl.Color{75, 75, 90, 255}
-SB_HP_BG      :: rl.Color{70, 15, 15, 255}
-SB_HP_FG      :: rl.Color{45, 185, 55, 255}
-SB_HP_LOW     :: rl.Color{200, 55, 40, 255}
-SB_PICK_BG    :: rl.Color{35, 25, 15, 255}
-SB_PICK_OK    :: rl.Color{75, 170, 75, 255}
-SB_PICK_WARN  :: rl.Color{195, 175, 45, 255}
-SB_PICK_CRIT  :: rl.Color{200, 55, 40, 255}
-SB_WPN        :: rl.Color{195, 145, 70, 255}
-SB_ARM        :: rl.Color{90, 155, 205, 255}
-SB_HLM        :: rl.Color{195, 195, 50, 255}
-SB_OIL        :: rl.Color{250, 195, 70, 255}
-SB_POISON     :: rl.Color{115, 200, 40, 255}
-SB_BOSS       :: rl.Color{210, 45, 45, 255}
-SB_KEY        :: rl.Color{120, 180, 255, 255}
+SB_BG :: rl.Color{12, 12, 20, 255}
+SB_DIVIDER :: rl.Color{35, 35, 52, 255}
+SB_TITLE :: rl.Color{200, 175, 90, 255}
+SB_HEADER :: rl.Color{130, 130, 155, 255}
+SB_TEXT :: rl.Color{195, 195, 210, 255}
+SB_DIM :: rl.Color{75, 75, 90, 255}
+SB_HP_BG :: rl.Color{70, 15, 15, 255}
+SB_HP_FG :: rl.Color{45, 185, 55, 255}
+SB_HP_LOW :: rl.Color{200, 55, 40, 255}
+SB_PICK_BG :: rl.Color{35, 25, 15, 255}
+SB_PICK_OK :: rl.Color{75, 170, 75, 255}
+SB_PICK_WARN :: rl.Color{195, 175, 45, 255}
+SB_PICK_CRIT :: rl.Color{200, 55, 40, 255}
+SB_WPN :: rl.Color{195, 145, 70, 255}
+SB_ARM :: rl.Color{90, 155, 205, 255}
+SB_HLM :: rl.Color{195, 195, 50, 255}
+SB_OIL :: rl.Color{250, 195, 70, 255}
+SB_POISON :: rl.Color{115, 200, 40, 255}
+SB_BOSS :: rl.Color{210, 45, 45, 255}
+SB_KEY :: rl.Color{120, 180, 255, 255}
 
 // ─── Sidebar geometry ────────────────────────────────────────────────────────
 
-SB_X  :: i32(MAP_VIEW_WIDTH)
-SB_W  :: i32(SIDEBAR_WIDTH)
-SB_H  :: i32(MAP_VIEW_HEIGHT)
-SB_PX :: i32(8)   // inner padding-x
-SB_IW :: SB_W - SB_PX * 2  // inner content width
+SB_X :: i32(MAP_VIEW_WIDTH)
+SB_W :: i32(SIDEBAR_WIDTH)
+SB_H :: i32(MAP_VIEW_HEIGHT)
+SB_PX :: i32(8) // inner padding-x
+SB_IW :: SB_W - SB_PX * 2 // inner content width
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-sb_bar :: proc(
-	engine: ^eng.Engine,
-	y: i32,
-	ratio: f32,
-	h: i32,
-	bg, fg: rl.Color,
-) {
+sb_bar :: proc(engine: ^eng.Engine, y: i32, ratio: f32, h: i32, bg, fg: rl.Color) {
 	render_draw_rectangle(engine, SB_X + SB_PX, y, SB_IW, h, bg)
 	filled := i32(f32(SB_IW) * clamp(ratio, 0, 1))
 	if filled > 0 {
@@ -161,13 +155,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	y += 6
 
 	// ── Depth / Turn / Kills / Light ─────────────────────────────────────────
-	sb_text(
-		engine,
-		rl.TextFormat("DEPTH  %d", i32(game.depth)),
-		y,
-		13,
-		SB_TEXT,
-	)
+	sb_text(engine, rl.TextFormat("DEPTH  %d", i32(game.depth)), y, 13, SB_TEXT)
 	sb_text_right(
 		engine,
 		rl.TextFormat("TURN %d", i32(eng.turn_manager_current(turns))),
@@ -181,31 +169,13 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	for &e in game.enemies {
 		if e.alive {alive_count += 1}
 	}
-	sb_text(
-		engine,
-		rl.TextFormat("KILLS  %d", i32(game.kills)),
-		y,
-		13,
-		SB_TEXT,
-	)
-	sb_text_right(
-		engine,
-		rl.TextFormat("NEAR %d", alive_count),
-		y,
-		13,
-		SB_DIM,
-	)
+	sb_text(engine, rl.TextFormat("KILLS  %d", i32(game.kills)), y, 13, SB_TEXT)
+	sb_text_right(engine, rl.TextFormat("NEAR %d", alive_count), y, 13, SB_DIM)
 	y += 17
 
 	if game.light_boost_turns > 0 {
 		// Show light radius + remaining fuel turns
-		sb_text(
-			engine,
-			rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
-			y,
-			13,
-			SB_OIL,
-		)
+		sb_text(engine, rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_OIL)
 		sb_text_right(
 			engine,
 			rl.TextFormat("%dt fuel", i32(game.light_boost_turns)),
@@ -214,20 +184,8 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			SB_OIL,
 		)
 	} else {
-		sb_text(
-			engine,
-			rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
-			y,
-			13,
-			SB_TEXT,
-		)
-		sb_text_right(
-			engine,
-			rl.TextFormat("ITEMS %d", i32(game.items_found)),
-			y,
-			13,
-			SB_DIM,
-		)
+		sb_text(engine, rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_TEXT)
+		sb_text_right(engine, rl.TextFormat("ITEMS %d", i32(game.items_found)), y, 13, SB_DIM)
 	}
 	y += 17
 
@@ -282,7 +240,11 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	y += 15
 
 	// ── Status effects ───────────────────────────────────────────────────────
-	has_status := game.light_boost_turns > 0 || game.poison_turns > 0 || game.burning_turns > 0 || game.frozen_turns > 0
+	has_status :=
+		game.light_boost_turns > 0 ||
+		game.poison_turns > 0 ||
+		game.burning_turns > 0 ||
+		game.frozen_turns > 0
 	if has_status {
 		y += 2
 		sb_divider(engine, y)

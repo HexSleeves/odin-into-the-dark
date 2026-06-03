@@ -188,8 +188,10 @@ advance_turn :: proc(
 		eng.vfx_manager_shake(vfx, 4.0)
 		spawn_hit_particles(
 			particles,
-			game.player.pos.x, game.player.pos.y,
-			game_camera_x(camera), game_camera_y(camera),
+			game.player.pos.x,
+			game.player.pos.y,
+			game_camera_x(camera),
+			game_camera_y(camera),
 		)
 	}
 }
@@ -289,7 +291,12 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		game.player.hp -= 3
 		game.poison_turns = max(game.poison_turns, 5)
 		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{160, 180, 40, 255}, 0.4)
-		add_message(messages, game, "Toxic gas burns you! Poisoned! (-3 HP)", rl.Color{160, 180, 40, 255})
+		add_message(
+			messages,
+			game,
+			"Toxic gas burns you! Poisoned! (-3 HP)",
+			rl.Color{160, 180, 40, 255},
+		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Suffocated by toxic gas"
 			game.state = .Game_Over
@@ -304,9 +311,19 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 			game.player.hp += heal
 			// Consume the fountain — one use only
 			cur_tile.type = .Floor
-			add_message(messages, game, fmt.tprintf("The fountain restores your health! (+%d HP)", heal), rl.Color{80, 180, 220, 255})
+			add_message(
+				messages,
+				game,
+				fmt.tprintf("The fountain restores your health! (+%d HP)", heal),
+				rl.Color{80, 180, 220, 255},
+			)
 		} else {
-			add_message(messages, game, "You drink from the fountain. (Already at full health)", rl.Color{80, 180, 220, 255})
+			add_message(
+				messages,
+				game,
+				"You drink from the fountain. (Already at full health)",
+				rl.Color{80, 180, 220, 255},
+			)
 			cur_tile.type = .Floor
 		}
 	}
@@ -316,7 +333,12 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		game.player.hp -= 2
 		game.burning_turns = max(game.burning_turns, 4)
 		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{255, 120, 20, 255}, 0.4)
-		add_message(messages, game, "Flames scorch you! Burning! (-2 HP)", rl.Color{255, 120, 20, 255})
+		add_message(
+			messages,
+			game,
+			"Flames scorch you! Burning! (-2 HP)",
+			rl.Color{255, 120, 20, 255},
+		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Burned alive by a fire vent"
 			game.state = .Game_Over

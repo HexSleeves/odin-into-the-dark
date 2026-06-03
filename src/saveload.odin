@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: "savegame.dat"
-SAVE_VERSION    :: u32(4)
+SAVE_VERSION :: u32(4)
 SAVE_VERSION_V3 :: u32(3)
 SAVE_VERSION_V2 :: u32(2)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
@@ -504,9 +504,9 @@ load_game_from_storage :: proc(
 		p_def := content_manager_player_def(content)
 		qn := 100 if p_def.quickness == 0 else p_def.quickness
 		ms := 100 if p_def.move_speed == 0 else p_def.move_speed
-		game.player.quickness  = qn
+		game.player.quickness = qn
 		game.player.move_speed = ms
-		game.player.energy     = qn * 10 // restore to full AP — mid-round state is not saved
+		game.player.energy = qn * 10 // restore to full AP — mid-round state is not saved
 	}
 	game.depth = data.depth
 	eng.turn_manager_set(turns, data.turn_count)
@@ -538,12 +538,12 @@ load_game_from_storage :: proc(
 		se := &data.enemies[i]
 		etype := save_to_string(content, &se.enemy_type)
 		def := content_manager_enemy_def(content, etype)
-		qn  := 100
-		ms  := 100
+		qn := 100
+		ms := 100
 		beh := ""
 		if def != nil {
-			qn  = 100 if def.quickness == 0 else def.quickness
-			ms  = 100 if def.move_speed == 0 else def.move_speed
+			qn = 100 if def.quickness == 0 else def.quickness
+			ms = 100 if def.move_speed == 0 else def.move_speed
 			beh = def.behavior
 		}
 		append(

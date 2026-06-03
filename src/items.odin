@@ -163,8 +163,10 @@ use_item :: proc(
 			if def.effect.type == "heal" || def.effect.type == "timed_light_boost" {
 				spawn_pickup_particles(
 					particles,
-					game.player.pos.x, game.player.pos.y,
-					game_camera_x(cam), game_camera_y(cam),
+					game.player.pos.x,
+					game.player.pos.y,
+					game_camera_x(cam),
+					game_camera_y(cam),
 				)
 			}
 		}
@@ -216,9 +218,19 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 	if game.frozen_turns > 0 {
 		game.frozen_turns -= 1
 		if game.frozen_turns > 0 {
-			add_message(messages, game, "You are frozen! Movement costs double.", rl.Color{100, 180, 255, 255})
+			add_message(
+				messages,
+				game,
+				"You are frozen! Movement costs double.",
+				rl.Color{100, 180, 255, 255},
+			)
 		} else {
-			add_message(messages, game, "The ice thaws. You can move freely.", rl.Color{150, 200, 255, 255})
+			add_message(
+				messages,
+				game,
+				"The ice thaws. You can move freely.",
+				rl.Color{150, 200, 255, 255},
+			)
 		}
 	}
 

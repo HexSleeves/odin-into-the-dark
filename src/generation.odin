@@ -437,7 +437,7 @@ spawn_fountain :: proc(game: ^Game) {
 
 spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 	if game.depth < 3 || len(game.rooms) < 4 {return}
-	if rand.int_max(4) != 0 {return} // 25% chance
+	if rand.int_max(4) != 0 {return} 	// 25% chance
 
 	// Pick a room that isn't the first (player start) or last (descent)
 	room_idx := rand.int_max(len(game.rooms) - 2) + 1
@@ -522,7 +522,7 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 	// Place a vault key in a DIFFERENT room
 	for _ in 0 ..< 100 {
 		key_room_idx := rand.int_max(len(game.rooms))
-		if key_room_idx == room_idx {continue} // not in the vault itself
+		if key_room_idx == room_idx {continue} 	// not in the vault itself
 		key_room := game.rooms[key_room_idx]
 		x := rand.int_max(key_room.x2 - key_room.x1) + key_room.x1
 		y := rand.int_max(key_room.y2 - key_room.y1) + key_room.y1
@@ -532,7 +532,15 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 		key_def := find_item_def("vault_key")
 		if key_def == nil {break}
 		append(&game.items, item_make_from_def(key_def, Vec2{x, y}))
-		logger_debugf(.Gen, "vault key at (%v,%v), door at (%v,%v) depth=%v", x, y, door_x, door_y, game.depth)
+		logger_debugf(
+			.Gen,
+			"vault key at (%v,%v), door at (%v,%v) depth=%v",
+			x,
+			y,
+			door_x,
+			door_y,
+			game.depth,
+		)
 		break
 	}
 }

@@ -69,11 +69,21 @@ handle_input :: proc(
 		if t != nil && t.type == .Locked_Door {
 			if remove_item_from_inventory(game, "vault_key") {
 				t.type = .Floor
-				add_message(messages, game, "You unlock the door with the Vault Key!", rl.Color{255, 215, 0, 255})
+				add_message(
+					messages,
+					game,
+					"You unlock the door with the Vault Key!",
+					rl.Color{255, 215, 0, 255},
+				)
 				game.player.energy -= BASE_ACTION_COST
 				return .Moved
 			} else {
-				add_message(messages, game, "The door is locked. You need a key.", rl.Color{180, 180, 180, 255})
+				add_message(
+					messages,
+					game,
+					"The door is locked. You need a key.",
+					rl.Color{180, 180, 180, 255},
+				)
 			}
 		}
 		return .None
