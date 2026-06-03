@@ -1,6 +1,6 @@
 package engine
 
-ENGINE_BOOL_GRID_MAX_CELLS :: 4096
+ENGINE_BOOL_GRID_MAX_CELLS :: 8192
 
 Bool_Grid_Manager :: struct {
 	grid:   Engine_Grid_2D,

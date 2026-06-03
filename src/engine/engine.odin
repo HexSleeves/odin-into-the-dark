@@ -1,5 +1,7 @@
 package engine
 
+import "base:runtime"
+
 // ─── Engine runtime boundary ─────────────────────────────────────────────────
 
 Engine_Config :: struct {
@@ -172,6 +174,13 @@ engine_texture_backend :: proc(engine: ^Engine) -> Engine_Texture_Backend {
 	return engine_texture_backend_or_default(engine.texture)
 }
 
+engine_frame_allocator :: proc(engine: ^Engine) -> runtime.Allocator {
+	if engine == nil {
+		return context.allocator
+	}
+	return frame_manager_allocator(&engine.frame_manager)
+}
+
 engine_run :: proc(
 	config: Engine_Config,
 	services_config: Engine_Services_Config,
@@ -198,6 +207,7 @@ engine_run :: proc(
 	message_manager_bind_turns(&engine.message_manager, &engine.turn_manager)
 	engine.particle_manager = particle_manager_make()
 	defer texture_manager_unload_all(&engine.texture_manager)
+	defer frame_manager_destroy(&engine.frame_manager)
 	platform := engine_platform_backend_or_default(config.platform)
 
 	engine_services_init_diagnostics(&services)

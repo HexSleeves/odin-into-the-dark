@@ -98,6 +98,7 @@ Data_Registry :: struct {
 	items:   Item_Data,
 	player:  Player_Def,
 	loaded:  bool,
+	owned:   bool,
 }
 
 g_data: Data_Registry
@@ -142,6 +143,7 @@ data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
 	registry.items = items
 	registry.player = player
 	registry.loaded = true
+	registry.owned = true
 
 	logger_debugf(
 		.Data,
@@ -153,6 +155,43 @@ data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
 
 	return true
 }
+load_json5_from_bytes :: proc($T: typeid, data: []u8) -> (result: T, ok: bool) {
+	parse_err := json.unmarshal(data, &result, spec = .JSON5)
+	if parse_err != nil {
+		logger_errorf(.Data, "parse failed: %v", parse_err)
+		return {}, false
+	}
+	return result, true
+}
+
+data_registry_destroy :: proc(registry: ^Data_Registry) {
+	if registry == nil || !registry.owned {return}
+	for &e in registry.enemies.enemies {
+		delete(e.id)
+		delete(e.name)
+		delete(e.glyph)
+		delete(e.ability.type)
+	}
+	delete(registry.enemies.enemies)
+	for &t in registry.enemies.spawn_tables {
+		for &w in t.weights {delete(w.id)}
+		delete(t.weights)
+	}
+	delete(registry.enemies.spawn_tables)
+	for &item in registry.items.items {
+		delete(item.id)
+		delete(item.name)
+		delete(item.glyph)
+		delete(item.effect.type)
+		delete(item.equipment_slot)
+	}
+	delete(registry.items.items)
+	for &w in registry.items.spawn_weights {delete(w.id)}
+	delete(registry.items.spawn_weights)
+	delete(registry.player.glyph)
+	registry^ = {}
+}
+
 
 // ─── Data lookup helpers ──────────────────────────────────────────────────────
 

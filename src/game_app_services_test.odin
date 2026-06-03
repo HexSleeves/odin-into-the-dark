@@ -44,6 +44,10 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, register_handler != nil)
 	testing.expect(t, game_engine_register_app_services(&engine))
 	testing.expect(t, game_engine_content_manager(&engine) != nil)
+	testing.expect(
+		t,
+		game_engine_content_manager(&engine).storage.file_system.ctx == rawptr(&file_system_state),
+	)
 	testing.expect(t, game_engine_save_manager(&engine) != nil)
 	testing.expect(
 		t,

@@ -1,8 +1,8 @@
 package engine
 
-ENGINE_TILE_STATE_MAX_CELLS :: 4096
+ENGINE_TILE_STATE_MAX_CELLS :: 8192
 
-Tile_State :: struct {
+Tile_State :: struct #packed {
 	visible:     bool,
 	explored:    bool,
 	light_level: f32,
