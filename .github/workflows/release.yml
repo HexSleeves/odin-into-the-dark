@@ -19,7 +19,7 @@ jobs:
       - name: Install system dependencies
         run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build
         run: |
@@ -31,7 +31,7 @@ jobs:
           cp -r assets build/linux/
           cd build/linux && tar czf ../../into_the_depths-linux-x86_64.tar.gz into_the_depths assets/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: linux-x86_64
           path: into_the_depths-linux-x86_64.tar.gz
@@ -47,7 +47,7 @@ jobs:
       - name: Install lld
         run: brew install lld
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Build
         run: |
@@ -61,7 +61,7 @@ jobs:
         run: |
           cd build/macos && tar czf ../../into_the_depths-macos-arm64.tar.gz "Into the Depths.app"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: macos-arm64
           path: into_the_depths-macos-arm64.tar.gz
@@ -91,7 +91,7 @@ jobs:
         run: |
           cd build/macos && tar czf ../../into_the_depths-macos-x86_64.tar.gz "Into the Depths.app"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: macos-x86_64
           path: into_the_depths-macos-x86_64.tar.gz
