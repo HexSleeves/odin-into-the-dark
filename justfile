@@ -46,6 +46,14 @@ release-linux:
 release-web:
     bash scripts/build_karl2d_web.sh
 
+# Bind to 127.0.0.1 (not the [::] wildcard) so the browser treats it as a secure
+# context — karl2d's Web Audio worklet requires one.
+
+# Build the web bundle and serve it at http://localhost:8080
+run-web port="8080": release-web
+    @echo "Serving at http://localhost:{{port}}  (Ctrl+C to stop)"
+    python3 -m http.server -d build/web --bind 127.0.0.1 {{port}}
+
 # Build with debug info for profiling
 profile:
     odin build {{src}} -out:{{binary}} -o:speed -debug
