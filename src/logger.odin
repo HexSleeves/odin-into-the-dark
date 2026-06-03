@@ -3,7 +3,6 @@ package main
 import eng "./engine"
 import "core:fmt"
 import "core:log"
-import "core:os"
 
 // ─── Game diagnostics logger ─────────────────────────────────────────────────
 
@@ -40,7 +39,7 @@ Game_Logger :: struct {
 	config:        Game_Logger_Config,
 	console:       log.Logger,
 	file:          log.Logger,
-	file_handle:   ^os.File,
+	file_handle:   rawptr, // ^os.File on desktop, nil on WASM
 	console_ready: bool,
 	file_ready:    bool,
 }
@@ -77,41 +76,11 @@ logger_init_from_config :: proc(logger: ^Game_Logger, config: ^eng.Config_Manage
 		logger.console_ready = true
 	}
 
-	if logger.config.file_enabled {
-		file_options := options - log.Options{.Terminal_Color}
-		file, open_err := os.open(
-			logger.config.file_path,
-			os.File_Flags{.Write, .Create, .Append},
-			os.Permissions_Default_File,
-		)
-		if open_err != nil {
-			fmt.eprintfln(
-				"[logger] ERROR: could not open log file '%s': %v",
-				logger.config.file_path,
-				open_err,
-			)
-		} else {
-			logger.file_handle = file
-			logger.file = log.create_file_logger(
-				file,
-				logger.config.file_level,
-				file_options,
-				"itd",
-			)
-			logger.file_ready = true
-		}
-	}
+	logger_init_file(logger, options)
 }
 
 logger_destroy :: proc(logger: ^Game_Logger) {
-	if logger.file_ready {
-		if logger.config.flush_file && logger.file_handle != nil {
-			os.flush(logger.file_handle)
-		}
-		log.destroy_file_logger(logger.file)
-		logger.file_ready = false
-		logger.file_handle = nil
-	}
+	logger_destroy_file(logger)
 	if logger.console_ready {
 		log.destroy_console_logger(logger.console)
 		logger.console_ready = false
@@ -138,10 +107,7 @@ logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Co
 		base_level,
 	)
 
-	file_path, file_path_ok := eng.config_manager_get(config, "ITD_LOG_FILE_PATH")
-	if !file_path_ok {
-		file_path = os.get_env("ITD_LOG_FILE_PATH", context.allocator)
-	}
+	file_path := logger_config_file_path(config)
 	if file_path == "" {
 		file_path = LOGGER_DEFAULT_FILE_PATH
 	}
@@ -163,12 +129,7 @@ logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Co
 	}
 }
 
-logger_config_value :: proc(config: ^eng.Config_Manager, key: string) -> string {
-	if value, ok := eng.config_manager_get(config, key); ok {
-		return value
-	}
-	return os.get_env(key, context.temp_allocator)
-}
+// logger_config_value and logger_config_file_path are in logger_desktop.odin / logger_web.odin
 
 logger_parse_bool :: proc(value: string, fallback: bool) -> bool {
 	trimmed := logger_trim_ascii(value)
@@ -379,9 +340,7 @@ logger_logf :: proc(
 
 	if logger.file_ready && level >= logger.config.file_level {
 		logger.file.procedure(logger.file.data, level, message, logger.file.options, location)
-		if logger.config.flush_file && logger.file_handle != nil {
-			os.flush(logger.file_handle)
-		}
+		logger_flush_file(logger)
 	}
 }
 

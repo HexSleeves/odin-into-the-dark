@@ -31,7 +31,7 @@ jobs:
           cp -r assets build/linux/
           cd build/linux && tar czf ../../into_the_depths-linux-x86_64.tar.gz into_the_depths assets/
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         with:
           name: linux-x86_64
           path: into_the_depths-linux-x86_64.tar.gz
@@ -61,42 +61,41 @@ jobs:
         run: |
           cd build/macos && tar czf ../../into_the_depths-macos-arm64.tar.gz "Into the Depths.app"
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         with:
           name: macos-arm64
           path: into_the_depths-macos-arm64.tar.gz
 
-  build-macos-x86_64:
-    runs-on: macos-13
+  build-web:
+    runs-on: ubuntu-latest
     steps:
       - uses: laytan/setup-odin@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release: nightly
 
-      - name: Install lld
-        run: brew install lld
+      - name: Install system dependencies
+        run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v14
 
       - uses: actions/checkout@v6
 
-      - name: Build
-        run: |
-          mkdir -p build/macos
-          odin build src/ -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check
-
-      - name: Bundle .app
-        run: bash scripts/bundle_macos.sh build/macos/into_the_depths
+      - name: Build WASM
+        run: EMSDK_DIR="$EMSDK" bash scripts/build_web.sh
 
       - name: Package
-        run: |
-          cd build/macos && tar czf ../../into_the_depths-macos-x86_64.tar.gz "Into the Depths.app"
+        run: cd build/web && zip -r ../../into_the_depths-web.zip .
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         with:
-          name: macos-x86_64
-          path: into_the_depths-macos-x86_64.tar.gz
+          name: web
+          path: into_the_depths-web.zip
+
   release:
-    needs: [build-linux, build-macos-arm64, build-macos-x86_64]
+    needs: [build-linux, build-macos-arm64]
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -107,7 +106,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
             into_the_depths-linux-x86_64.tar.gz
             into_the_depths-macos-arm64.tar.gz
-            into_the_depths-macos-x86_64.tar.gz
+            into_the_depths-web.zip
