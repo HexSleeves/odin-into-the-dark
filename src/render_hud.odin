@@ -197,20 +197,38 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 	y += 17
 
-	sb_text(
-		engine,
-		rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
-		y,
-		13,
-		SB_TEXT,
-	)
-	sb_text_right(
-		engine,
-		rl.TextFormat("ITEMS %d", i32(game.items_found)),
-		y,
-		13,
-		SB_DIM,
-	)
+	if game.light_boost_turns > 0 {
+		// Show light radius + remaining fuel turns
+		sb_text(
+			engine,
+			rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
+			y,
+			13,
+			SB_OIL,
+		)
+		sb_text_right(
+			engine,
+			rl.TextFormat("%dt fuel", i32(game.light_boost_turns)),
+			y,
+			13,
+			SB_OIL,
+		)
+	} else {
+		sb_text(
+			engine,
+			rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)),
+			y,
+			13,
+			SB_TEXT,
+		)
+		sb_text_right(
+			engine,
+			rl.TextFormat("ITEMS %d", i32(game.items_found)),
+			y,
+			13,
+			SB_DIM,
+		)
+	}
 	y += 17
 
 	y += 2

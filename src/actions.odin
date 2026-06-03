@@ -302,9 +302,12 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		heal := min(5, game.player.max_hp - game.player.hp)
 		if heal > 0 {
 			game.player.hp += heal
+			// Consume the fountain — one use only
+			cur_tile.type = .Floor
 			add_message(messages, game, fmt.tprintf("The fountain restores your health! (+%d HP)", heal), rl.Color{80, 180, 220, 255})
 		} else {
 			add_message(messages, game, "You drink from the fountain. (Already at full health)", rl.Color{80, 180, 220, 255})
+			cur_tile.type = .Floor
 		}
 	}
 
