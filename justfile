@@ -11,7 +11,7 @@ default:
 
 # Type-check without building
 check:
-    odin check {{src}}
+    odin check {{src}} -vet -strict-style
 
 # Build debug binary
 build:
@@ -42,9 +42,9 @@ release-macos:
 release-linux:
     odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check
 
-# Build web/WASM (requires Emscripten SDK)
+# Build web/WASM via karl2d's native WebGL backend (no Emscripten required)
 release-web:
-    bash scripts/build_web.sh
+    bash scripts/build_karl2d_web.sh
 
 # Build with debug info for profiling
 profile:

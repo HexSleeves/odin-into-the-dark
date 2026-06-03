@@ -14,11 +14,18 @@ KARL2D_DIR="${REPO_DIR}/../karl2d"
 OUT_DIR="${REPO_DIR}/build/web"
 ODIN_ROOT="${ODIN_ROOT:-$(odin root)}"
 
-# Verify karl2d exists
+# CI may check out karl2d inside the repo (actions/checkout path: karl2d).
+# If karl2d isn't at the sibling location, check inside the repo.
 if [ ! -f "${KARL2D_DIR}/karl2d.odin" ]; then
-    echo "ERROR: karl2d not found at ${KARL2D_DIR}" >&2
-    echo "Clone it: git clone https://github.com/karl-zylinski/karl2d.git ${KARL2D_DIR}" >&2
-    exit 1
+    if [ -f "${REPO_DIR}/karl2d/karl2d.odin" ]; then
+        KARL2D_DIR="${REPO_DIR}/karl2d"
+        # Create sibling symlink so the Odin import path resolves
+        ln -sfn "${KARL2D_DIR}" "${REPO_DIR}/../karl2d"
+    else
+        echo "ERROR: karl2d not found at ${KARL2D_DIR} or ${REPO_DIR}/karl2d" >&2
+        echo "Clone it: git clone https://github.com/karl-zylinski/karl2d.git ${KARL2D_DIR}" >&2
+        exit 1
+    fi
 fi
 
 mkdir -p "${OUT_DIR}"
@@ -27,10 +34,7 @@ mkdir -p "${OUT_DIR}"
 echo "Compiling to WASM (karl2d backend)..."
 odin build "${REPO_DIR}/src/" \
     -target:js_wasm32 \
-    -out:"${OUT_DIR}/main.wasm" \
-    -o:size \
-    -disable-assert \
-    -no-bounds-check
+    -out:"${OUT_DIR}/main.wasm"
 
 # Step 2: Copy Odin JS runtime
 cp "${ODIN_ROOT}/core/sys/wasm/js/odin.js" "${OUT_DIR}/"
