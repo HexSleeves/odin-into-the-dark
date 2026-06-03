@@ -15,8 +15,9 @@ audio_manager_make_wraps_current_audio_backend :: proc(t: ^testing.T) {
 	saved := g_audio
 	defer g_audio = saved
 
+	test_state := Test_Game_Audio_Backend_State{enabled = true}
 	g_audio.enabled = true
-	g_audio.backend = test_game_audio_backend_make(&Test_Game_Audio_Backend_State{enabled = true})
+	g_audio.backend = test_game_audio_backend_make(&test_state)
 	audio := audio_manager_make()
 
 	testing.expect(t, eng.audio_manager_is_enabled(&audio))
