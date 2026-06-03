@@ -19,4 +19,7 @@ cp scripts/Info.plist "${BUNDLE_DIR}/Contents/"
 # Copy assets (sprites loaded at runtime by Raylib)
 cp -r assets "${BUNDLE_DIR}/Contents/Resources/"
 
+
+# Ad-hoc sign so macOS Gatekeeper doesn't flag it as "damaged"
+codesign --force --deep --sign - "${BUNDLE_DIR}"
 echo "Created ${BUNDLE_DIR}"
