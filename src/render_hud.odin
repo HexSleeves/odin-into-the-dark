@@ -96,6 +96,31 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	y += 14
 	sb_bar(engine, y, hp_ratio, 10, SB_HP_BG, hp_fg)
 	y += 15
+	// ── Weapon speed ─────────────────────────────────────────────────────────
+	// Show attack cadence relative to BASE_ACTION_COST (1000 AP) so the player
+	// understands how their equipped weapon affects timing — not raw AP numbers.
+	{
+		cost := effective_attack_cost(game)
+		spd_label: cstring
+		spd_color: rl.Color
+		if cost <= 700 {
+			spd_label = "Fast"
+			spd_color = rl.Color{80, 220, 100, 255}
+		} else if cost <= 1100 {
+			spd_label = "Normal"
+			spd_color = SB_TEXT
+		} else if cost <= 1600 {
+			spd_label = "Slow"
+			spd_color = rl.Color{220, 170, 60, 255}
+		} else {
+			spd_label = "Very Slow"
+			spd_color = rl.Color{220, 80, 60, 255}
+		}
+		sb_text(engine, "ATK", y, 12, SB_HEADER)
+		sb_text_right(engine, spd_label, y, 12, spd_color)
+		y += 14
+	}
+
 
 	// ── Pickaxe durability (only when equipped) ──────────────────────────────
 	if game.equipped_weapon.occupied {

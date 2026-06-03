@@ -25,14 +25,16 @@ Ability_Def :: struct {
 }
 
 Enemy_Def :: struct {
-	id:      string,
-	name:    string,
-	glyph:   string,
-	color:   Color_Array,
-	hp:      int,
-	attack:  int,
-	ability:  Ability_Def,
-	behavior: string, // "berserker", "lurker", or "" for standard
+	id:         string,
+	name:       string,
+	glyph:      string,
+	color:      Color_Array,
+	hp:         int,
+	attack:     int,
+	quickness:  int, // AP per round = quickness*10; 0 in data → defaults to 100
+	move_speed: int, // move cost modifier; 0 in data → defaults to 100
+	ability:    Ability_Def,
+	behavior:   string, // "lurker" or "" for standard
 }
 
 Spawn_Weight :: struct {
@@ -75,6 +77,7 @@ Item_Def :: struct {
 	effect:         Item_Effect,
 	equipment_slot: string,
 	durability:     int, // max durability (0 = no durability tracking)
+	action_cost:    int, // AP cost to attack with this weapon (0 = use BASE_ACTION_COST)
 }
 
 Item_Spawn_Weight :: struct {
@@ -97,6 +100,8 @@ Player_Def :: struct {
 	light_radius: int,
 	glyph:        string,
 	color:        Color_Array,
+	quickness:    int, // 0 in data → defaults to 100
+	move_speed:   int, // 0 in data → defaults to 100
 }
 
 // ─── Global data registry ─────────────────────────────────────────────────────
@@ -230,20 +235,23 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		g = rune(def.glyph[0])
 	}
 	return Enemy {
-		pos = pos,
-		hp = def.hp,
-		max_hp = def.hp,
-		attack = def.attack,
-		enemy_type = def.id,
-		glyph = g,
-		color = json5_color_to_rl(def.color),
-		alive = true,
-		name = def.name,
-		ability_type = def.ability.type,
+		pos              = pos,
+		hp               = def.hp,
+		max_hp           = def.hp,
+		attack           = def.attack,
+		enemy_type       = def.id,
+		glyph            = g,
+		color            = json5_color_to_rl(def.color),
+		alive            = true,
+		name             = def.name,
+		ability_type     = def.ability.type,
 		ability_cooldown = 0,
-		ability_max_cd = def.ability.cooldown,
-		ability_range = def.ability.range,
-		behavior = def.behavior,
+		ability_max_cd   = def.ability.cooldown,
+		ability_range    = def.ability.range,
+		behavior         = def.behavior,
+		quickness        = 100 if def.quickness == 0 else def.quickness,
+		move_speed       = 100 if def.move_speed == 0 else def.move_speed,
+		energy           = 0, // granted at start of each enemy round
 	}
 }
 
@@ -289,17 +297,18 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		g = rune(def.glyph[0])
 	}
 	return Item {
-		pos = pos,
-		item_type = def.id,
-		glyph = g,
-		color = json5_color_to_rl(def.color),
-		picked_up = false,
-		quantity = 1,
-		name = def.name,
+		pos            = pos,
+		item_type      = def.id,
+		glyph          = g,
+		color          = json5_color_to_rl(def.color),
+		picked_up      = false,
+		quantity       = 1,
+		name           = def.name,
 		equipment_slot = def.equipment_slot,
-		stat_bonus = def.effect.value,
-		durability = def.durability,
+		stat_bonus     = def.effect.value,
+		durability     = def.durability,
 		max_durability = def.durability,
+		action_cost    = def.action_cost,
 	}
 }
 

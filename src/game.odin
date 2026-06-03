@@ -85,6 +85,8 @@ init_player_from_content :: proc(content: ^Content_Manager, game: ^Game) {
 	p := content_manager_player_def(content)
 	p_glyph: rune = '@'
 	if len(p.glyph) > 0 {p_glyph = rune(p.glyph[0])}
+	qn := 100 if p.quickness == 0 else p.quickness
+	ms := 100 if p.move_speed == 0 else p.move_speed
 	game.player = Player {
 		pos          = Vec2{0, 0},
 		hp           = p.hp,
@@ -93,6 +95,9 @@ init_player_from_content :: proc(content: ^Content_Manager, game: ^Game) {
 		light_radius = p.light_radius,
 		glyph        = p_glyph,
 		color        = json5_color_to_rl(p.color),
+		quickness    = qn,
+		move_speed   = ms,
+		energy       = qn * 10, // start ready to act (one full round of AP)
 	}
 }
 

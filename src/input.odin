@@ -38,7 +38,8 @@ handle_input :: proc(
 	}
 
 	if action_pressed(im, .Wait) {
-		eng.turn_manager_advance(turns)
+		// Deduct AP; trigger_enemy_rounds fires in handle_player_action
+		game.player.energy -= BASE_ACTION_COST
 		add_message(messages, game, "You wait...", rl.Color{180, 180, 180, 255})
 		return .Waited
 	}
@@ -69,13 +70,15 @@ handle_input :: proc(
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
 		resolve_attack_player_on_enemy(messages, game, target_enemy)
-		eng.turn_manager_advance(turns)
+		// Deduct weapon-specific AP cost; trigger_enemy_rounds fires in handle_player_action
+		game.player.energy -= effective_attack_cost(game)
 		return .Moved
 	}
 
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
-	eng.turn_manager_advance(turns)
+	// Deduct move AP (player move_speed is 100 in Phase 1 → cost = BASE_MOVE_COST)
+	game.player.energy -= BASE_MOVE_COST
 
 	t := tile_at(game, target_x, target_y)
 	if t != nil && t.type == .Descent {
@@ -86,28 +89,23 @@ handle_input :: proc(
 	return .Moved
 }
 
-handle_forced_turn :: proc(
-	turns: ^eng.Turn_Manager,
-	camera: ^eng.Camera_Manager,
-	vfx: ^eng.Vfx_Manager,
-	messages: ^Message_Manager,
-	game: ^Game,
-	particles: ^eng.Particle_Manager,
-) -> bool {
+handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
+	messages := game_engine_message_manager(engine)
+
 	if game.skip_next_turn {
 		game.skip_next_turn = false
-		eng.turn_manager_advance(turns)
-		hp_before := game.player.hp
-		advance_turn(turns, camera, vfx, messages, game, hp_before, particles)
+		// Drain a full round of AP — player loses their turn in the web
+		game.player.energy -= game.player.quickness * 10
+		trigger_enemy_rounds(engine, game)
 		add_message(messages, game, "You break free from the web.", rl.Color{200, 200, 100, 255})
 		return true
 	}
 
 	if game.water_slow_active {
 		game.water_slow_active = false
-		eng.turn_manager_advance(turns)
-		hp_before := game.player.hp
-		advance_turn(turns, camera, vfx, messages, game, hp_before, particles)
+		// Drain a full round of AP — moving through water costs an extra beat
+		game.player.energy -= game.player.quickness * 10
+		trigger_enemy_rounds(engine, game)
 		add_message(messages, game, "You push through the water.", rl.Color{40, 80, 180, 255})
 		return true
 	}
@@ -130,7 +128,8 @@ handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 	if mdx != 0 || mdy != 0 {
 		ui.mining_mode = false
 		if mine_wall(game_engine_content_manager(engine), messages, game, mdx, mdy) {
-			eng.turn_manager_advance(game_engine_turn_manager(engine))
+			// Mining costs one action's worth of AP
+			game.player.energy -= BASE_ACTION_COST
 			audio_manager_play_sfx(game_engine_audio_manager(engine), .Mine)
 			spawn_mine_particles(
 				game_engine_particle_manager(engine),
@@ -139,16 +138,7 @@ handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 				game_camera_x(game_engine_camera_manager(engine)),
 				game_camera_y(game_engine_camera_manager(engine)),
 			)
-			hp_before := game.player.hp
-			advance_turn(
-				game_engine_turn_manager(engine),
-				game_engine_camera_manager(engine),
-				game_engine_vfx_manager(engine),
-				messages,
-				game,
-				hp_before,
-				game_engine_particle_manager(engine),
-			)
+			trigger_enemy_rounds(engine, game)
 		}
 	}
 
@@ -379,15 +369,7 @@ handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 }
 
 update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
-	messages := game_engine_message_manager(engine)
-	if handle_forced_turn(
-		game_engine_turn_manager(engine),
-		game_engine_camera_manager(engine),
-		game_engine_vfx_manager(engine),
-		messages,
-		game,
-		game_engine_particle_manager(engine),
-	) {return}
+	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}
 	if handle_playing_hotkeys(engine, game, im) {return}
 	return handle_player_action(engine, game)

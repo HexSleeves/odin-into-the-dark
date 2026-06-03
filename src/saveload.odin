@@ -499,6 +499,15 @@ load_game_from_storage :: proc(
 	tile_states_import_from_tiles(game, data.tiles[:])
 	eng.bool_grid_manager_import(&game.web_tiles, data.web_tiles[:])
 	game.player = data.player
+	// Reconstruct energy system fields from content (not persisted — derived from player_def)
+	{
+		p_def := content_manager_player_def(content)
+		qn := 100 if p_def.quickness == 0 else p_def.quickness
+		ms := 100 if p_def.move_speed == 0 else p_def.move_speed
+		game.player.quickness  = qn
+		game.player.move_speed = ms
+		game.player.energy     = qn * 10 // restore to full AP — mid-round state is not saved
+	}
 	game.depth = data.depth
 	eng.turn_manager_set(turns, data.turn_count)
 	game.kills = data.kills
@@ -527,23 +536,37 @@ load_game_from_storage :: proc(
 	game.enemies = make([dynamic]Enemy)
 	for i in 0 ..< data.enemy_count {
 		se := &data.enemies[i]
+		etype := save_to_string(content, &se.enemy_type)
+		def := content_manager_enemy_def(content, etype)
+		qn  := 100
+		ms  := 100
+		beh := ""
+		if def != nil {
+			qn  = 100 if def.quickness == 0 else def.quickness
+			ms  = 100 if def.move_speed == 0 else def.move_speed
+			beh = def.behavior
+		}
 		append(
 			&game.enemies,
 			Enemy {
-				pos = se.pos,
-				hp = se.hp,
-				max_hp = se.max_hp,
-				attack = se.attack,
-				enemy_type = save_to_string(content, &se.enemy_type),
-				name = save_to_string(content, &se.name),
-				glyph = se.glyph,
-				color = se.color,
-				alive = se.alive,
-				ability_type = save_to_string(content, &se.ability_type),
+				pos              = se.pos,
+				hp               = se.hp,
+				max_hp           = se.max_hp,
+				attack           = se.attack,
+				enemy_type       = etype,
+				name             = save_to_string(content, &se.name),
+				glyph            = se.glyph,
+				color            = se.color,
+				alive            = se.alive,
+				ability_type     = save_to_string(content, &se.ability_type),
 				ability_cooldown = se.ability_cooldown,
-				ability_max_cd = se.ability_max_cd,
-				ability_range = se.ability_range,
-				is_boss = se.is_boss,
+				ability_max_cd   = se.ability_max_cd,
+				ability_range    = se.ability_range,
+				is_boss          = se.is_boss,
+				behavior         = beh,
+				quickness        = qn,
+				move_speed       = ms,
+				energy           = 0, // granted at start of next enemy round
 			},
 		)
 	}
@@ -578,6 +601,30 @@ load_game_from_storage :: proc(
 	}
 
 	// ── Reconstruct transient state ──
+	// action_cost on items is not persisted — recover it from item defs
+	for &it in game.items {
+		def := content_manager_item_def(content, it.item_type)
+		if def != nil {it.action_cost = def.action_cost}
+	}
+	for i in 0 ..< MAX_INVENTORY {
+		if game.inventory[i].occupied {
+			def := content_manager_item_def(content, game.inventory[i].item.item_type)
+			if def != nil {game.inventory[i].item.action_cost = def.action_cost}
+		}
+	}
+	// Reconstruct action_cost on equipped items
+	if game.equipped_weapon.occupied {
+		def := content_manager_item_def(content, game.equipped_weapon.item.item_type)
+		if def != nil {game.equipped_weapon.item.action_cost = def.action_cost}
+	}
+	if game.equipped_armor.occupied {
+		def := content_manager_item_def(content, game.equipped_armor.item.item_type)
+		if def != nil {game.equipped_armor.item.action_cost = def.action_cost}
+	}
+	if game.equipped_helmet.occupied {
+		def := content_manager_item_def(content, game.equipped_helmet.item.item_type)
+		if def != nil {game.equipped_helmet.item.action_cost = def.action_cost}
+	}
 	game.palette = palette_for_depth(game.depth)
 	compute_fov(game)
 	game_camera_update(camera, game, true)

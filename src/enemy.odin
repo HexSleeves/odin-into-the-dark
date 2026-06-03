@@ -153,7 +153,8 @@ compute_dijkstra_map :: proc(game: ^Game) {
 	}
 }
 
-// ─── Process enemy turns ─────────────────────────────────────────────────────
+
+// ─── Process enemy turns (energy-based) ──────────────────────────────────────
 
 process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 	// Recompute dijkstra map so enemies have fresh pathfinding
@@ -162,167 +163,56 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 	for &enemy in game.enemies {
 		if !enemy.alive {continue}
 
-		// Check if this enemy's tile is currently visible to the player
-		is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
+		// Grant this round's AP (accumulates on any debt from previous rounds)
+		enemy.energy += enemy.quickness * 10
 
-		switch enemy.behavior {
-		case "berserker":
-			// Berserkers charge toward the player when visible; wait in place otherwise
-			if is_visible {
-				berserker_chase(messages, game, &enemy)
-			}
-		case "lurker":
-			// Lurkers only act when the player is adjacent; otherwise they stay still
-			if is_visible {
-				lurker_behavior(messages, game, &enemy)
-			}
-		case:
-			if is_visible {
-				chase_player(messages, game, &enemy)
-			} else {
-				wander(game, &enemy)
-			}
+		// Let the enemy act until it runs out of AP
+		for enemy.energy > 0 {
+			is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
+			if !enemy_act_once(messages, game, &enemy, is_visible) {break}
+			if !enemy.alive {break}
 		}
+	}
+}
+
+// ─── Single-action dispatcher ─────────────────────────────────────────────────
+
+// enemy_act_once performs exactly one action and deducts its AP cost.
+// Returns true if an action was taken, false if the enemy should stop acting.
+@(private = "file")
+enemy_act_once :: proc(
+	messages: ^Message_Manager,
+	game: ^Game,
+	enemy: ^Enemy,
+	is_visible: bool,
+) -> bool {
+	move_cost := max(1, BASE_MOVE_COST * enemy.move_speed / 100)
+
+	switch enemy.behavior {
+	case "lurker":
+		if is_visible {
+			return lurker_act_once(messages, game, enemy)
+		}
+		// Lurker stays completely still when the player can't see it
+		enemy.energy = 0
+		return false
+	case:
+		if is_visible {
+			return chase_act_once(messages, game, enemy, move_cost)
+		}
+		return wander_act_once(game, enemy, move_cost)
 	}
 }
 
 // ─── Chase behavior (dijkstra downhill) ──────────────────────────────────────
 
 @(private = "file")
-chase_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
-	// 1. Check if adjacent to player -> attack
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
-	dx := DX
-	dy := DY
-	for dir in 0 ..< 4 {
-		nx := enemy.pos.x + dx[dir]
-		ny := enemy.pos.y + dy[dir]
-		if nx == game.player.pos.x && ny == game.player.pos.y {
-			resolve_attack_enemy_on_player(messages, game, enemy)
-			return
-		}
-	}
-
-	// 2. Follow the precomputed Dijkstra map downhill toward the player.
-	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
-	current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
-	if current_dist >= DMAP_UNREACHABLE {
-		wander(game, enemy)
-		return
-	}
-
-	best_pos := enemy.pos
-	best_dist := current_dist
-	for dir in 0 ..< 4 {
-		nx := enemy.pos.x + dx[dir]
-		ny := enemy.pos.y + dy[dir]
-		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
-		if !is_walkable(game, nx, ny) {continue}
-		if enemy_at(game, nx, ny) != nil {continue}
-
-		n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
-		if n_dist < best_dist {
-			best_dist = n_dist
-			best_pos = Vec2{nx, ny}
-		}
-	}
-
-	if best_pos != enemy.pos {
-		enemy.pos = best_pos
-		return
-	}
-
-	wander(game, enemy)
-}
-
-// ─── Wander behavior (random movement) ──────────────────────────────────────
-
-@(private = "file")
-wander :: proc(game: ^Game, enemy: ^Enemy) {
-	if rand.int_max(2) == 0 {return}
-
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
-
-	dx := DX
-	dy := DY
-
-	dir := rand.int_max(4)
-	nx := enemy.pos.x + dx[dir]
-	ny := enemy.pos.y + dy[dir]
-
-	if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {return}
-	if !is_walkable(game, nx, ny) {return}
-	if enemy_at(game, nx, ny) != nil {return}
-	if nx == game.player.pos.x && ny == game.player.pos.y {return}
-
-	enemy.pos.x = nx
-	enemy.pos.y = ny
-}
-
-// ─── Berserker behavior (charges 2 tiles per turn) ───────────────────────────
-
-@(private = "file")
-berserker_chase :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
-	dx := DX
-	dy := DY
-
-	// Check if adjacent -> attack immediately
-	for dir in 0 ..< 4 {
-		nx := enemy.pos.x + dx[dir]
-		ny := enemy.pos.y + dy[dir]
-		if nx == game.player.pos.x && ny == game.player.pos.y {
-			resolve_attack_enemy_on_player(messages, game, enemy)
-			return
-		}
-	}
-
-	// Move up to 2 tiles per turn (berserker speed)
-	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
-	for step in 0 ..< 2 {
-		current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
-		if current_dist >= DMAP_UNREACHABLE || current_dist == 0 {break}
-
-		best_pos := enemy.pos
-		best_dist := current_dist
-		for dir in 0 ..< 4 {
-			nx := enemy.pos.x + dx[dir]
-			ny := enemy.pos.y + dy[dir]
-			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
-			if !is_walkable(game, nx, ny) {continue}
-			if enemy_at(game, nx, ny) != nil {continue}
-			// Don't step onto player tile during movement sweep; handle via adjacency check
-			if nx == game.player.pos.x && ny == game.player.pos.y {continue}
-
-			n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
-			if n_dist < best_dist {
-				best_dist = n_dist
-				best_pos = Vec2{nx, ny}
-			}
-		}
-
-		if best_pos == enemy.pos {break}
-		enemy.pos = best_pos
-
-		// After each step check if now adjacent and attack
-		for dir in 0 ..< 4 {
-			nx := enemy.pos.x + dx[dir]
-			ny := enemy.pos.y + dy[dir]
-			if nx == game.player.pos.x && ny == game.player.pos.y {
-				resolve_attack_enemy_on_player(messages, game, enemy)
-				return
-			}
-		}
-	}
-}
-
-// ─── Lurker behavior (stays still until adjacent, then attacks) ───────────────
-
-@(private = "file")
-lurker_behavior :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
+chase_act_once :: proc(
+	messages: ^Message_Manager,
+	game: ^Game,
+	enemy: ^Enemy,
+	move_cost: int,
+) -> bool {
 	DX :: [4]int{0, 0, -1, 1}
 	DY :: [4]int{-1, 1, 0, 0}
 	dx := DX
@@ -334,11 +224,113 @@ lurker_behavior :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) 
 		ny := enemy.pos.y + dy[dir]
 		if nx == game.player.pos.x && ny == game.player.pos.y {
 			resolve_attack_enemy_on_player(messages, game, enemy)
-			return
+			enemy.energy -= BASE_ACTION_COST
+			return true
 		}
 	}
-	// Not adjacent: lurker stays still — do nothing
+
+	// Move toward player via Dijkstra map
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
+	current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
+	if current_dist >= DMAP_UNREACHABLE {
+		// Unreachable — fall back to wander
+		return wander_act_once(game, enemy, move_cost)
+	}
+
+	best_pos := enemy.pos
+	best_dist := current_dist
+	for dir in 0 ..< 4 {
+		nx := enemy.pos.x + dx[dir]
+		ny := enemy.pos.y + dy[dir]
+		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
+		if !is_walkable(game, nx, ny) {continue}
+		if enemy_at(game, nx, ny) != nil {continue}
+		if nx == game.player.pos.x && ny == game.player.pos.y {continue}
+
+		n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
+		if n_dist < best_dist {
+			best_dist = n_dist
+			best_pos = Vec2{nx, ny}
+		}
+	}
+
+	if best_pos != enemy.pos {
+		enemy.pos = best_pos
+		enemy.energy -= move_cost
+		return true
+	}
+
+	// Stuck — drain AP to prevent spin
+	enemy.energy = 0
+	return false
 }
+
+// ─── Wander behavior (random movement) ──────────────────────────────────────
+
+@(private = "file")
+wander_act_once :: proc(game: ^Game, enemy: ^Enemy, move_cost: int) -> bool {
+	// 50% chance to stay put each time (preserves existing wandering feel)
+	if rand.int_max(2) == 0 {
+		enemy.energy = 0
+		return false
+	}
+
+	DX :: [4]int{0, 0, -1, 1}
+	DY :: [4]int{-1, 1, 0, 0}
+	dx := DX
+	dy := DY
+
+	dir := rand.int_max(4)
+	nx := enemy.pos.x + dx[dir]
+	ny := enemy.pos.y + dy[dir]
+
+	if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {
+		enemy.energy = 0
+		return false
+	}
+	if !is_walkable(game, nx, ny) {
+		enemy.energy = 0
+		return false
+	}
+	if enemy_at(game, nx, ny) != nil {
+		enemy.energy = 0
+		return false
+	}
+	if nx == game.player.pos.x && ny == game.player.pos.y {
+		enemy.energy = 0
+		return false
+	}
+
+	enemy.pos = Vec2{nx, ny}
+	enemy.energy -= move_cost
+	return true
+}
+
+// ─── Lurker behavior (stays still until adjacent, then attacks) ──────────────
+
+@(private = "file")
+lurker_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -> bool {
+	DX :: [4]int{0, 0, -1, 1}
+	DY :: [4]int{-1, 1, 0, 0}
+	dx := DX
+	dy := DY
+
+	// Attack if adjacent
+	for dir in 0 ..< 4 {
+		nx := enemy.pos.x + dx[dir]
+		ny := enemy.pos.y + dy[dir]
+		if nx == game.player.pos.x && ny == game.player.pos.y {
+			resolve_attack_enemy_on_player(messages, game, enemy)
+			enemy.energy -= BASE_ACTION_COST
+			return true
+		}
+	}
+
+	// Not adjacent: lurker stays completely still
+	enemy.energy = 0
+	return false
+}
+
 
 // ─── Process special abilities ───────────────────────────────────────────────
 

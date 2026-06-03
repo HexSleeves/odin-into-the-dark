@@ -9,6 +9,8 @@
       color: [150, 120, 80, 255],
       hp: 3,
       attack: 2,  // was 1 — now a minor threat, not ignorable
+      quickness: 110,
+      move_speed: 80,
     },
     {
       id: "miner_husk",
@@ -17,6 +19,8 @@
       color: [180, 180, 160, 255],
       hp: 8,     // was 6 — tougher mid-tier
       attack: 3,
+      quickness: 90,
+      move_speed: 110,
     },
     {
       id: "cave_crawler",
@@ -25,6 +29,8 @@
       color: [100, 200, 100, 255],
       hp: 12,    // was 10 — beefier with ability
       attack: 4,
+      quickness: 100,
+      move_speed: 100,
       ability: { type: "web", cooldown: 5, range: 1 },  // cd was 4 — slightly slower
     },
     {
@@ -34,6 +40,8 @@
       color: [180, 50, 220, 255],
       hp: 18,    // was 15 — proper boss-tier
       attack: 6,
+      quickness: 80,
+      move_speed: 100,
       ability: { type: "pull", cooldown: 6, range: 4 },  // cd was 5 — slightly slower
     },
     {
@@ -43,6 +51,8 @@
       color: [120, 200, 40, 255],
       hp: 5,
       attack: 2,
+      quickness: 80,
+      move_speed: 120,
       ability: { type: "poison_cloud", cooldown: 0, range: 0 },
     },
     {
@@ -52,6 +62,8 @@
       color: [80, 40, 120, 255],
       hp: 14,
       attack: 5,
+      quickness: 130,
+      move_speed: 70,
       ability: { type: "teleport", cooldown: 3, range: 5 },
     },
     {
@@ -61,7 +73,8 @@
       color: [120, 90, 150, 255],
       hp: 5,
       attack: 3,
-      behavior: "berserker",
+      quickness: 150,
+      move_speed: 60,
     },
     {
       id: "stone_thrower",
@@ -70,6 +83,8 @@
       color: [160, 140, 110, 255],
       hp: 9,
       attack: 4,
+      quickness: 100,
+      move_speed: 120,
       ability: { type: "ranged_shoot", cooldown: 2, range: 5 },
     },
     {
@@ -79,6 +94,8 @@
       color: [60, 60, 100, 255],
       hp: 18,
       attack: 8,
+      quickness: 80,
+      move_speed: 100,
       behavior: "lurker",
     },
     // Bosses
@@ -89,6 +106,8 @@
       color: [220, 180, 60, 255],
       hp: 50,
       attack: 8,
+      quickness: 80,
+      move_speed: 100,
       ability: { type: "slam", cooldown: 3, range: 1 },
     },
     {
@@ -98,6 +117,8 @@
       color: [150, 30, 200, 255],
       hp: 75,
       attack: 10,
+      quickness: 90,
+      move_speed: 90,
       ability: { type: "darkness", cooldown: 4, range: 6 },
     },
   ],

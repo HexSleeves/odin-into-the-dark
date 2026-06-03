@@ -21,21 +21,11 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	}
 	audio_manager_play_sfx(game_engine_audio_manager(engine), .Footstep)
 
-	hp_before := game.player.hp
+	// Process tile effects (web, hazards, collapse) — no advance_turn here;
+	// trigger_enemy_rounds is called by handle_player_action after this.
 	consume_web_if_present(messages, game)
 	apply_current_tile_effects(engine, game)
 	collapse_unstable_previous_tile(messages, game)
-
-	advance_turn(
-		game_engine_turn_manager(engine),
-		game_engine_camera_manager(engine),
-		game_engine_vfx_manager(engine),
-		messages,
-		game,
-		hp_before,
-		game_engine_particle_manager(engine),
-	)
-	announce_item_under_player(messages, game)
 }
 
 handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
@@ -57,17 +47,12 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		return true
 	case .Moved:
 		handle_player_moved(engine, game, kills_before)
+		// Energy was deducted in handle_input; fire enemy rounds until player has AP
+		trigger_enemy_rounds(engine, game)
+		announce_item_under_player(messages, game)
 	case .Waited:
-		hp_before := game.player.hp
-		advance_turn(
-			game_engine_turn_manager(engine),
-			game_engine_camera_manager(engine),
-			game_engine_vfx_manager(engine),
-			messages,
-			game,
-			hp_before,
-			game_engine_particle_manager(engine),
-		)
+		// Energy was deducted in handle_input
+		trigger_enemy_rounds(engine, game)
 	case .Descended:
 		handle_player_descended(engine, game)
 	case .None:
@@ -173,7 +158,7 @@ advance_turn :: proc(
 	hp_before: int,
 	particles: ^eng.Particle_Manager = nil,
 ) {
-	_ = turns
+	eng.turn_manager_advance(turns) // advance round counter
 	process_enemy_turns(messages, game)
 	process_enemy_abilities(messages, game)
 	remove_dead_enemies(messages, game, particles, game_camera_x(camera), game_camera_y(camera))
@@ -188,6 +173,26 @@ advance_turn :: proc(
 			game.player.pos.x, game.player.pos.y,
 			game_camera_x(camera), game_camera_y(camera),
 		)
+	}
+}
+
+// trigger_enemy_rounds fires one enemy round for each round of AP debt the
+// player has accumulated, then grants the player a fresh round of AP.
+// This is the Qud-style "player exhausts AP → all enemies act" flow.
+trigger_enemy_rounds :: proc(engine: ^eng.Engine, game: ^Game) {
+	for game.player.energy <= 0 {
+		if game.state != .Playing {break}
+		hp_before := game.player.hp
+		advance_turn(
+			game_engine_turn_manager(engine),
+			game_engine_camera_manager(engine),
+			game_engine_vfx_manager(engine),
+			game_engine_message_manager(engine),
+			game,
+			hp_before,
+			game_engine_particle_manager(engine),
+		)
+		game.player.energy += game.player.quickness * 10
 	}
 }
 

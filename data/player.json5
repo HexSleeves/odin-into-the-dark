@@ -3,6 +3,8 @@
   hp: 25,
   attack: 5,
   light_radius: 8,
+  quickness: 100,
+  move_speed: 100,
   glyph: "@",
   color: [255, 255, 0, 255],
 }

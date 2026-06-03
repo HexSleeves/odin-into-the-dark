@@ -157,3 +157,12 @@ effective_light_bonus :: proc(game: ^Game) -> int {
 	if game.equipped_helmet.occupied {return game.equipped_helmet.item.stat_bonus}
 	return 0
 }
+
+// Returns the AP cost to attack with the currently equipped weapon.
+// Weapons with action_cost > 0 in data use that value; otherwise BASE_ACTION_COST.
+effective_attack_cost :: proc(game: ^Game) -> int {
+	if game.equipped_weapon.occupied && game.equipped_weapon.item.action_cost > 0 {
+		return game.equipped_weapon.item.action_cost
+	}
+	return BASE_ACTION_COST
+}

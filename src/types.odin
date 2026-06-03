@@ -52,6 +52,10 @@ Player :: struct {
 	light_radius: int,
 	glyph:        rune,
 	color:        rl.Color,
+	// Energy system (Qud-style AP scheduling)
+	energy:       int, // current action points (may be negative = debt)
+	quickness:    int, // AP generated per round = quickness * 10. Default 100.
+	move_speed:   int, // movement cost modifier (100 = normal). Default 100.
 }
 
 // ─── Enemies ──────────────────────────────────────────────────────────────────
@@ -67,12 +71,16 @@ Enemy :: struct {
 	color:            rl.Color,
 	alive:            bool,
 	// Special ability fields (data-driven)
-	ability_type:     string, // "web", "pull", or "" for none
+	ability_type:     string, // "web", "pull", "ranged_shoot", or "" for none
 	ability_cooldown: int, // current cooldown (decrements each turn)
 	ability_max_cd:   int, // max cooldown for reset
 	ability_range:    int, // range of the ability
 	is_boss:          bool,
-	behavior:         string, // "berserker", "lurker", or "" for standard
+	behavior:         string, // "lurker" or "" for standard (berserker removed — use high quickness)
+	// Energy system (Qud-style AP scheduling)
+	energy:           int, // current action points (may be negative = debt)
+	quickness:        int, // AP generated per round = quickness * 10. Default 100.
+	move_speed:       int, // movement cost modifier (100 = normal). Default 100.
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────
@@ -89,6 +97,7 @@ Item :: struct {
 	stat_bonus:     int, // bonus value when equipped
 	durability:     int, // current durability (0 = broken, -1 = no durability)
 	max_durability: int, // max durability (0 = item has no durability)
+	action_cost:    int, // AP to attack with this weapon (0 = use BASE_ACTION_COST)
 }
 
 Inventory_Slot :: struct {
