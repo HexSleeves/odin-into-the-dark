@@ -16,8 +16,9 @@ chmod +x "${BUNDLE_DIR}/Contents/MacOS/into_the_depths"
 # Copy Info.plist
 cp scripts/Info.plist "${BUNDLE_DIR}/Contents/"
 
-# Copy assets (sprites loaded at runtime by Raylib)
+# Copy runtime data (assets loaded by Raylib, data loaded by content manager)
 cp -r assets "${BUNDLE_DIR}/Contents/Resources/"
+cp -r data "${BUNDLE_DIR}/Contents/Resources/"
 
 
 # Ad-hoc sign so macOS Gatekeeper doesn't flag it as "damaged"
