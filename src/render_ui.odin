@@ -2,11 +2,16 @@ package main
 
 import eng "./engine"
 import "core:fmt"
-import rl "vendor:raylib"
+
 
 // ─── Shared overlay helpers ───────────────────────────────────────────────────
 
-draw_centered_text :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: rl.Color) {
+draw_centered_text :: proc(
+	engine: ^eng.Engine,
+	text: cstring,
+	y, size: i32,
+	color: eng.Engine_Color,
+) {
 	text_w := render_measure_text(engine, text, size)
 	x := (i32(SCREEN_WIDTH) - text_w) / 2
 	render_draw_text(engine, text, x, y, size, color)
@@ -26,7 +31,7 @@ draw_score_rows :: proc(
 			"No scores yet.",
 			base_y,
 			row_size,
-			rl.Color{120, 120, 120, 255},
+			eng.Engine_Color{120, 120, 120, 255},
 		)
 		return
 	}
@@ -35,7 +40,8 @@ draw_score_rows :: proc(
 		y := base_y + i32(i) * row_h
 		s := table.scores[i]
 		is_current := (i == highlight_rank)
-		color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+		color :=
+			eng.Engine_Color{255, 220, 100, 255} if is_current else eng.Engine_Color{180, 180, 180, 255}
 		prefix := ">" if is_current else " "
 		cause_display := s.cause if len(s.cause) > 0 else "Unknown"
 		row_text := fmt.ctprintf(
@@ -62,16 +68,16 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 230},
+		eng.Engine_Color{0, 0, 0, 230},
 	)
 
-	draw_centered_text(engine, "INTO THE DEPTHS", 110, 48, rl.Color{255, 230, 120, 255})
+	draw_centered_text(engine, "INTO THE DEPTHS", 110, 48, eng.Engine_Color{255, 230, 120, 255})
 	draw_centered_text(
 		engine,
 		"A turn-based mining roguelike",
 		166,
 		18,
-		rl.Color{180, 180, 180, 255},
+		eng.Engine_Color{180, 180, 180, 255},
 	)
 
 	options := [TITLE_OPTION_COUNT]cstring{"New Game", "Continue", "High Scores", "Help", "Quit"}
@@ -84,9 +90,10 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		y := base_y + i32(idx) * row_h
 		disabled := idx == TITLE_CONTINUE && !has_save
 		selected := idx == ui.title_choice
-		color := rl.Color{90, 90, 90, 255} if disabled else rl.Color{220, 220, 220, 255}
+		color :=
+			eng.Engine_Color{90, 90, 90, 255} if disabled else eng.Engine_Color{220, 220, 220, 255}
 		if selected && !disabled {
-			color = rl.Color{255, 220, 100, 255}
+			color = eng.Engine_Color{255, 220, 100, 255}
 		}
 		text := fmt.ctprintf("%s %s", ">" if selected else " ", label)
 		draw_centered_text(engine, text, y, 24, color)
@@ -98,7 +105,7 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 			"No save file found — Continue is disabled",
 			base_y + row_h * TITLE_OPTION_COUNT + 12,
 			14,
-			rl.Color{120, 120, 120, 255},
+			eng.Engine_Color{120, 120, 120, 255},
 		)
 	}
 
@@ -108,7 +115,13 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 	defer score_table_destroy(&table)
 	if table.count > 0 {
 		score_y := base_y + row_h * TITLE_OPTION_COUNT + 20
-		draw_centered_text(engine, "RECENT SCORES", score_y, 14, rl.Color{180, 160, 80, 255})
+		draw_centered_text(
+			engine,
+			"RECENT SCORES",
+			score_y,
+			14,
+			eng.Engine_Color{180, 160, 80, 255},
+		)
 		score_y += 20
 		show_count := min(table.count, 3)
 		for i in 0 ..< show_count {
@@ -126,7 +139,7 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 				row,
 				score_y + i32(i) * 18,
 				13,
-				rl.Color{140, 140, 140, 255},
+				eng.Engine_Color{140, 140, 140, 255},
 			)
 		}
 	}
@@ -137,9 +150,15 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		"Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit",
 		i32(SCREEN_HEIGHT) - 48,
 		14,
-		rl.Color{150, 150, 150, 255},
+		eng.Engine_Color{150, 150, 150, 255},
 	)
-	draw_centered_text(engine, "v0.1.0", i32(SCREEN_HEIGHT) - 28, 12, rl.Color{80, 80, 80, 255})
+	draw_centered_text(
+		engine,
+		"v0.1.0",
+		i32(SCREEN_HEIGHT) - 28,
+		12,
+		eng.Engine_Color{80, 80, 80, 255},
+	)
 }
 
 render_high_scores :: proc(engine: ^eng.Engine, game: ^Game) {
@@ -151,16 +170,16 @@ render_high_scores :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 230},
+		eng.Engine_Color{0, 0, 0, 230},
 	)
-	draw_centered_text(engine, "HIGH SCORES", 80, 34, rl.Color{255, 220, 50, 255})
+	draw_centered_text(engine, "HIGH SCORES", 80, 34, eng.Engine_Color{255, 220, 50, 255})
 	draw_score_rows(engine, scores, 145, 16, 28)
 	draw_centered_text(
 		engine,
 		"Press ESC or H to return",
 		i32(SCREEN_HEIGHT) - 40,
 		16,
-		rl.Color{150, 150, 150, 255},
+		eng.Engine_Color{150, 150, 150, 255},
 	)
 }
 
@@ -176,20 +195,27 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 200},
+		eng.Engine_Color{0, 0, 0, 200},
 	)
 
 	title := cstring("INVENTORY")
 	title_size :: i32(30)
 	title_w := render_measure_text(engine, title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	render_draw_text(engine, title, title_x, 100, title_size, rl.WHITE)
+	render_draw_text(engine, title, title_x, 100, title_size, eng.Engine_Color{255, 255, 255, 255})
 
 	subtitle := cstring("1-9=Use | D=Drop | E=Equip | Up/Down=Inspect | I/ESC=Close")
 	subtitle_size :: i32(14)
 	sub_w := render_measure_text(engine, subtitle, subtitle_size)
 	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
-	render_draw_text(engine, subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
+	render_draw_text(
+		engine,
+		subtitle,
+		sub_x,
+		140,
+		subtitle_size,
+		eng.Engine_Color{150, 150, 150, 255},
+	)
 
 	// Drop mode indicator
 	if ui.dropping {
@@ -197,7 +223,14 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 		drop_size :: i32(16)
 		drop_w := render_measure_text(engine, drop_text, drop_size)
 		drop_x := (i32(SCREEN_WIDTH) - drop_w) / 2
-		render_draw_text(engine, drop_text, drop_x, 160, drop_size, rl.Color{255, 200, 80, 255})
+		render_draw_text(
+			engine,
+			drop_text,
+			drop_x,
+			160,
+			drop_size,
+			eng.Engine_Color{255, 200, 80, 255},
+		)
 	}
 
 	// Equip mode indicator
@@ -212,13 +245,13 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 			equip_x,
 			160,
 			equip_size,
-			rl.Color{100, 200, 255, 255},
+			eng.Engine_Color{100, 200, 255, 255},
 		)
 	}
 
 	slot_size :: i32(16)
 	slot_x :: i32(440)
-	empty_color :: rl.Color{80, 80, 80, 255}
+	empty_color :: eng.Engine_Color{80, 80, 80, 255}
 
 	for idx in 0 ..< MAX_INVENTORY {
 		y_pos := i32(180) + i32(idx) * 28
@@ -231,7 +264,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				y_pos - 2,
 				260,
 				22,
-				rl.Color{60, 60, 80, 200},
+				eng.Engine_Color{60, 60, 80, 200},
 			)
 			render_draw_text(
 				engine,
@@ -239,7 +272,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				slot_x - 14,
 				y_pos,
 				slot_size,
-				rl.Color{255, 220, 100, 255},
+				eng.Engine_Color{255, 220, 100, 255},
 			)
 		}
 
@@ -249,7 +282,14 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 			text_x := slot_x
 			if ui.use_sprites {
 				spr := sprite_manager_item(sprites, it.item_type)
-				sprite_manager_draw(engine, sprites, spr, slot_x, y_pos, rl.WHITE)
+				sprite_manager_draw(
+					engine,
+					sprites,
+					spr,
+					slot_x,
+					y_pos,
+					eng.Engine_Color{255, 255, 255, 255},
+				)
 				text_x = slot_x + 20
 			}
 			if it.quantity > 1 {
@@ -285,53 +325,67 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	// Equipment section
 	eq_y := i32(180) + i32(MAX_INVENTORY) * 28 + 20
-	render_draw_text(engine, "EQUIPMENT", slot_x, eq_y, 18, rl.Color{200, 200, 100, 255})
+	render_draw_text(engine, "EQUIPMENT", slot_x, eq_y, 18, eng.Engine_Color{200, 200, 100, 255})
 	eq_y += 24
 
 	// Equipment slots with cursor support (slots 9, 10, 11)
 	equip_slots := [3]struct {
 		label: cstring,
 		slot:  ^Equipment,
-		color: rl.Color,
+		color: eng.Engine_Color,
 		idx:   int,
 	} {
 		{
 			label = "Weapon:",
 			slot = &game.equipped_weapon,
-			color = rl.Color{200, 150, 80, 255},
+			color = eng.Engine_Color{200, 150, 80, 255},
 			idx = MAX_INVENTORY,
 		},
 		{
 			label = "Armor: ",
 			slot = &game.equipped_armor,
-			color = rl.Color{100, 160, 200, 255},
+			color = eng.Engine_Color{100, 160, 200, 255},
 			idx = MAX_INVENTORY + 1,
 		},
 		{
 			label = "Helmet:",
 			slot = &game.equipped_helmet,
-			color = rl.Color{200, 200, 50, 255},
+			color = eng.Engine_Color{200, 200, 50, 255},
 			idx = MAX_INVENTORY + 2,
 		},
 	}
 	for es in equip_slots {
 		// Highlight if cursor is on this equipment slot
 		if ui.inspect_slot == es.idx {
-			render_draw_rectangle(engine, slot_x - 4, eq_y - 2, 260, 22, rl.Color{60, 60, 80, 200})
+			render_draw_rectangle(
+				engine,
+				slot_x - 4,
+				eq_y - 2,
+				260,
+				22,
+				eng.Engine_Color{60, 60, 80, 200},
+			)
 			render_draw_text(
 				engine,
 				">",
 				slot_x - 14,
 				eq_y,
 				slot_size,
-				rl.Color{255, 220, 100, 255},
+				eng.Engine_Color{255, 220, 100, 255},
 			)
 		}
 		if es.slot.occupied {
 			eq_text_x := slot_x
 			if ui.use_sprites {
 				spr := sprite_manager_item(sprites, es.slot.item.item_type)
-				sprite_manager_draw(engine, sprites, spr, slot_x, eq_y, rl.WHITE)
+				sprite_manager_draw(
+					engine,
+					sprites,
+					spr,
+					slot_x,
+					eq_y,
+					eng.Engine_Color{255, 255, 255, 255},
+				)
 				eq_text_x = slot_x + 20
 			}
 			bonus_label: cstring
@@ -394,7 +448,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 			panel_y,
 			panel_w,
 			panel_h,
-			rl.Color{30, 30, 40, 230},
+			eng.Engine_Color{30, 30, 40, 230},
 		)
 		render_draw_rectangle_lines(
 			engine,
@@ -402,7 +456,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 			panel_y,
 			panel_w,
 			panel_h,
-			rl.Color{80, 80, 100, 255},
+			eng.Engine_Color{80, 80, 100, 255},
 		)
 
 		dy := panel_y + 8
@@ -419,7 +473,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{150, 150, 150, 255},
+				eng.Engine_Color{150, 150, 150, 255},
 			)
 		} else if def != nil && def.effect.type == "material" {
 			render_draw_text(
@@ -428,7 +482,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{150, 150, 150, 255},
+				eng.Engine_Color{150, 150, 150, 255},
 			)
 		} else if def != nil && def.effect.type == "heal" {
 			render_draw_text(
@@ -437,7 +491,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{150, 150, 150, 255},
+				eng.Engine_Color{150, 150, 150, 255},
 			)
 		} else if def != nil &&
 		   (def.effect.type == "light_boost" || def.effect.type == "timed_light_boost") {
@@ -447,7 +501,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{150, 150, 150, 255},
+				eng.Engine_Color{150, 150, 150, 255},
 			)
 		} else {
 			render_draw_text(
@@ -456,7 +510,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{150, 150, 150, 255},
+				eng.Engine_Color{150, 150, 150, 255},
 			)
 		}
 		dy += 20
@@ -470,7 +524,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 					panel_x + 10,
 					dy,
 					14,
-					rl.Color{100, 255, 100, 255},
+					eng.Engine_Color{100, 255, 100, 255},
 				)
 				dy += 18
 			} else if def.effect.type == "light_boost" {
@@ -480,7 +534,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 					panel_x + 10,
 					dy,
 					14,
-					rl.Color{255, 200, 80, 255},
+					eng.Engine_Color{255, 200, 80, 255},
 				)
 				dy += 18
 			} else if def.effect.type == "timed_light_boost" {
@@ -490,7 +544,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 					panel_x + 10,
 					dy,
 					14,
-					rl.Color{255, 200, 80, 255},
+					eng.Engine_Color{255, 200, 80, 255},
 				)
 				dy += 18
 			} else if def.effect.type == "equip" {
@@ -501,7 +555,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 						panel_x + 10,
 						dy,
 						14,
-						rl.Color{200, 150, 80, 255},
+						eng.Engine_Color{200, 150, 80, 255},
 					)
 				} else if it.equipment_slot == "armor" {
 					render_draw_text(
@@ -510,7 +564,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 						panel_x + 10,
 						dy,
 						14,
-						rl.Color{100, 160, 200, 255},
+						eng.Engine_Color{100, 160, 200, 255},
 					)
 				} else if it.equipment_slot == "helmet" {
 					render_draw_text(
@@ -519,7 +573,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 						panel_x + 10,
 						dy,
 						14,
-						rl.Color{200, 200, 50, 255},
+						eng.Engine_Color{200, 200, 50, 255},
 					)
 				}
 				dy += 18
@@ -530,7 +584,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 					panel_x + 10,
 					dy,
 					14,
-					rl.Color{180, 180, 100, 255},
+					eng.Engine_Color{180, 180, 100, 255},
 				)
 				dy += 18
 			}
@@ -544,7 +598,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{180, 180, 180, 255},
+				eng.Engine_Color{180, 180, 180, 255},
 			)
 			dy += 18
 		}
@@ -558,7 +612,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				panel_x + 10,
 				dy,
 				14,
-				rl.Color{180, 180, 180, 255},
+				eng.Engine_Color{180, 180, 180, 255},
 			)
 			dy += 18
 			bar_w :: i32(200)
@@ -566,11 +620,18 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 			bar_x := panel_x + 10
 			ratio := f32(it.durability) / f32(max(it.max_durability, 1))
 			// Background
-			render_draw_rectangle(engine, bar_x, dy, bar_w, bar_h, rl.Color{40, 30, 20, 255})
+			render_draw_rectangle(
+				engine,
+				bar_x,
+				dy,
+				bar_w,
+				bar_h,
+				eng.Engine_Color{40, 30, 20, 255},
+			)
 			// Fill
-			bar_color: rl.Color
+			bar_color: eng.Engine_Color
 			if ratio >
-			   0.5 {bar_color = rl.Color{80, 180, 80, 255}} else if ratio > 0.25 {bar_color = rl.Color{200, 180, 50, 255}} else {bar_color = rl.Color{200, 60, 60, 255}}
+			   0.5 {bar_color = eng.Engine_Color{80, 180, 80, 255}} else if ratio > 0.25 {bar_color = eng.Engine_Color{200, 180, 50, 255}} else {bar_color = eng.Engine_Color{200, 60, 60, 255}}
 			if it.durability > 0 {
 				render_draw_rectangle(engine, bar_x, dy, i32(f32(bar_w) * ratio), bar_h, bar_color)
 			}
@@ -580,7 +641,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 				bar_x + 4,
 				dy + 1,
 				12,
-				rl.WHITE,
+				eng.Engine_Color{255, 255, 255, 255},
 			)
 			dy += 20
 			if it.durability <= 0 {
@@ -590,7 +651,7 @@ render_inventory :: proc(engine: ^eng.Engine, game: ^Game) {
 					panel_x + 10,
 					dy,
 					14,
-					rl.Color{255, 80, 80, 255},
+					eng.Engine_Color{255, 80, 80, 255},
 				)
 			}
 		}
@@ -608,7 +669,7 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 220},
+		eng.Engine_Color{0, 0, 0, 220},
 	)
 
 	sw := i32(SCREEN_WIDTH)
@@ -617,7 +678,14 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 	title := cstring("GAME OVER")
 	title_size :: i32(36)
 	title_w := render_measure_text(engine, title, title_size)
-	render_draw_text(engine, title, (sw - title_w) / 2, 40, title_size, rl.RED)
+	render_draw_text(
+		engine,
+		title,
+		(sw - title_w) / 2,
+		40,
+		title_size,
+		eng.Engine_Color{230, 41, 55, 255},
+	)
 
 	// Death cause
 	cause_text := fmt.ctprintf(
@@ -626,10 +694,17 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 	cause_size :: i32(18)
 	cause_w := render_measure_text(engine, cause_text, cause_size)
-	render_draw_text(engine, cause_text, (sw - cause_w) / 2, 82, cause_size, rl.WHITE)
+	render_draw_text(
+		engine,
+		cause_text,
+		(sw - cause_w) / 2,
+		82,
+		cause_size,
+		eng.Engine_Color{255, 255, 255, 255},
+	)
 
 	// Run stats
-	stats_text := rl.TextFormat(
+	stats_text := fmt.ctprintf(
 		"Depth: %d  |  Kills: %d  |  Turns: %d",
 		i32(game.depth),
 		i32(game.kills),
@@ -643,14 +718,21 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 		(sw - stats_w) / 2,
 		110,
 		stats_size,
-		rl.Color{180, 180, 180, 255},
+		eng.Engine_Color{180, 180, 180, 255},
 	)
 
 	// High Scores header
 	hs_title := cstring("HIGH SCORES")
 	hs_size :: i32(18)
 	hs_w := render_measure_text(engine, hs_title, hs_size)
-	render_draw_text(engine, hs_title, (sw - hs_w) / 2, 145, hs_size, rl.Color{255, 220, 50, 255})
+	render_draw_text(
+		engine,
+		hs_title,
+		(sw - hs_w) / 2,
+		145,
+		hs_size,
+		eng.Engine_Color{255, 220, 50, 255},
+	)
 
 	// Load and display score table
 	table := score_manager_load(scores)
@@ -668,7 +750,7 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 			(sw - empty_w) / 2,
 			base_y,
 			row_size,
-			rl.Color{120, 120, 120, 255},
+			eng.Engine_Color{120, 120, 120, 255},
 		)
 	} else {
 		for i in 0 ..< table.count {
@@ -676,7 +758,8 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 			s := table.scores[i]
 
 			is_current := (i == game.last_score_rank)
-			color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+			color :=
+				eng.Engine_Color{255, 220, 100, 255} if is_current else eng.Engine_Color{180, 180, 180, 255}
 			prefix := ">" if is_current else " "
 
 			cause_display := s.cause if len(s.cause) > 0 else "Unknown"
@@ -705,7 +788,7 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 		(sw - footer_w) / 2,
 		i32(SCREEN_HEIGHT) - 30,
 		footer_size,
-		rl.Color{150, 150, 150, 255},
+		eng.Engine_Color{150, 150, 150, 255},
 	)
 }
 
@@ -719,20 +802,27 @@ render_crafting :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 200},
+		eng.Engine_Color{0, 0, 0, 200},
 	)
 
 	title := cstring("CRAFTING")
 	title_size :: i32(30)
 	title_w := render_measure_text(engine, title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	render_draw_text(engine, title, title_x, 100, title_size, rl.WHITE)
+	render_draw_text(engine, title, title_x, 100, title_size, eng.Engine_Color{255, 255, 255, 255})
 
 	subtitle := cstring("Press 1-4 to craft | C or ESC to close")
 	subtitle_size :: i32(14)
 	sub_w := render_measure_text(engine, subtitle, subtitle_size)
 	sub_x := (i32(SCREEN_WIDTH) - sub_w) / 2
-	render_draw_text(engine, subtitle, sub_x, 140, subtitle_size, rl.Color{150, 150, 150, 255})
+	render_draw_text(
+		engine,
+		subtitle,
+		sub_x,
+		140,
+		subtitle_size,
+		eng.Engine_Color{150, 150, 150, 255},
+	)
 
 	recipes := RECIPES
 	slot_x :: i32(340)
@@ -744,7 +834,8 @@ render_crafting :: proc(engine: ^eng.Engine, game: ^Game) {
 		have := count_material(game, recipe.material_id)
 		can_craft := have >= recipe.material_qty
 
-		color := rl.Color{100, 255, 100, 255} if can_craft else rl.Color{150, 80, 80, 255}
+		color :=
+			eng.Engine_Color{100, 255, 100, 255} if can_craft else eng.Engine_Color{150, 80, 80, 255}
 
 		// Get material display name
 		mat_def := content_manager_item_def(content, recipe.material_id)
@@ -780,7 +871,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 220},
+		eng.Engine_Color{0, 0, 0, 220},
 	)
 
 	sw := i32(SCREEN_WIDTH)
@@ -789,13 +880,27 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	title := cstring("VICTORY!")
 	title_size :: i32(48)
 	title_w := render_measure_text(engine, title, title_size)
-	render_draw_text(engine, title, (sw - title_w) / 2, 80, title_size, rl.Color{255, 215, 0, 255})
+	render_draw_text(
+		engine,
+		title,
+		(sw - title_w) / 2,
+		80,
+		title_size,
+		eng.Engine_Color{255, 215, 0, 255},
+	)
 
 	// Subtitle
 	sub := cstring("You have conquered the depths!")
 	sub_size :: i32(20)
 	sub_w := render_measure_text(engine, sub, sub_size)
-	render_draw_text(engine, sub, (sw - sub_w) / 2, 140, sub_size, rl.Color{200, 200, 100, 255})
+	render_draw_text(
+		engine,
+		sub,
+		(sw - sub_w) / 2,
+		140,
+		sub_size,
+		eng.Engine_Color{200, 200, 100, 255},
+	)
 
 	// Stats
 	stats_y :: i32(190)
@@ -803,16 +908,16 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	stat_col := center_x - 120
 	val_col := center_x + 60
-	stat_color :: rl.Color{180, 180, 180, 255}
-	val_color :: rl.Color{255, 255, 200, 255}
+	stat_color :: eng.Engine_Color{180, 180, 180, 255}
+	val_color :: eng.Engine_Color{255, 255, 200, 255}
 
 	render_draw_text(engine, "Depth Reached", stat_col, stats_y, 18, stat_color)
-	render_draw_text(engine, rl.TextFormat("%d", i32(game.depth)), val_col, stats_y, 18, val_color)
+	render_draw_text(engine, fmt.ctprintf("%d", i32(game.depth)), val_col, stats_y, 18, val_color)
 
 	render_draw_text(engine, "Enemies Slain", stat_col, stats_y + 25, 18, stat_color)
 	render_draw_text(
 		engine,
-		rl.TextFormat("%d", i32(game.kills)),
+		fmt.ctprintf("%d", i32(game.kills)),
 		val_col,
 		stats_y + 25,
 		18,
@@ -822,7 +927,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_draw_text(engine, "Items Found", stat_col, stats_y + 50, 18, stat_color)
 	render_draw_text(
 		engine,
-		rl.TextFormat("%d", i32(game.items_found)),
+		fmt.ctprintf("%d", i32(game.items_found)),
 		val_col,
 		stats_y + 50,
 		18,
@@ -832,7 +937,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_draw_text(engine, "Turns Survived", stat_col, stats_y + 75, 18, stat_color)
 	render_draw_text(
 		engine,
-		rl.TextFormat("%d", i32(eng.turn_manager_current(turns))),
+		fmt.ctprintf("%d", i32(eng.turn_manager_current(turns))),
 		val_col,
 		stats_y + 75,
 		18,
@@ -842,15 +947,22 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_draw_text(engine, "HP Remaining", stat_col, stats_y + 100, 18, stat_color)
 	render_draw_text(
 		engine,
-		rl.TextFormat("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+		fmt.ctprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
 		val_col,
 		stats_y + 100,
 		18,
-		rl.Color{100, 255, 100, 255},
+		eng.Engine_Color{100, 255, 100, 255},
 	)
 
 	// Divider
-	render_draw_rectangle(engine, center_x - 100, stats_y + 130, 200, 1, rl.Color{80, 80, 80, 255})
+	render_draw_rectangle(
+		engine,
+		center_x - 100,
+		stats_y + 130,
+		200,
+		1,
+		eng.Engine_Color{80, 80, 80, 255},
+	)
 
 	// High Scores
 	hs_title := cstring("HIGH SCORES")
@@ -862,7 +974,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		(sw - hs_w) / 2,
 		stats_y + 145,
 		hs_size,
-		rl.Color{255, 220, 50, 255},
+		eng.Engine_Color{255, 220, 50, 255},
 	)
 
 	table := score_manager_load(scores)
@@ -880,7 +992,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 			(sw - empty_w) / 2,
 			base_y,
 			row_size,
-			rl.Color{120, 120, 120, 255},
+			eng.Engine_Color{120, 120, 120, 255},
 		)
 	} else {
 		for i in 0 ..< table.count {
@@ -888,7 +1000,8 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 			s := table.scores[i]
 
 			is_current := (i == game.last_score_rank)
-			color := rl.Color{255, 220, 100, 255} if is_current else rl.Color{180, 180, 180, 255}
+			color :=
+				eng.Engine_Color{255, 220, 100, 255} if is_current else eng.Engine_Color{180, 180, 180, 255}
 			prefix := ">" if is_current else " "
 
 			cause_display := s.cause if len(s.cause) > 0 else "Unknown"
@@ -917,7 +1030,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		(sw - prompt_w) / 2,
 		i32(SCREEN_HEIGHT) - 60,
 		prompt_size,
-		rl.Color{150, 150, 150, 255},
+		eng.Engine_Color{150, 150, 150, 255},
 	)
 }
 
@@ -931,22 +1044,22 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		0,
 		i32(SCREEN_WIDTH),
 		i32(SCREEN_HEIGHT),
-		rl.Color{0, 0, 0, 220},
+		eng.Engine_Color{0, 0, 0, 220},
 	)
 
 	title := cstring("CONTROLS & HELP")
 	title_size :: i32(28)
 	title_w := render_measure_text(engine, title, title_size)
 	title_x := (i32(SCREEN_WIDTH) - title_w) / 2
-	render_draw_text(engine, title, title_x, 60, title_size, rl.WHITE)
+	render_draw_text(engine, title, title_x, 60, title_size, eng.Engine_Color{255, 255, 255, 255})
 
 	col1_x :: i32(180)
 	col2_x :: i32(580)
 	start_y :: i32(110)
 	line_h :: i32(22)
-	head_color :: rl.Color{255, 220, 100, 255}
-	key_color :: rl.Color{100, 200, 255, 255}
-	desc_color :: rl.Color{200, 200, 200, 255}
+	head_color :: eng.Engine_Color{255, 220, 100, 255}
+	key_color :: eng.Engine_Color{100, 200, 255, 255}
+	desc_color :: eng.Engine_Color{200, 200, 200, 255}
 
 	// ── Column 1: Movement & Actions ──
 	render_draw_text(engine, "MOVEMENT", col1_x, start_y, 16, head_color)
@@ -1104,14 +1217,21 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 
 	render_draw_text(engine, "TILE LEGEND", col2_x, start_y + line_h * 10, 16, head_color)
-	render_draw_text(engine, "@  You", col2_x, start_y + line_h * 11, 14, rl.YELLOW)
+	render_draw_text(
+		engine,
+		"@  You",
+		col2_x,
+		start_y + line_h * 11,
+		14,
+		eng.Engine_Color{253, 249, 0, 255},
+	)
 	render_draw_text(
 		engine,
 		">  Descent to next depth",
 		col2_x,
 		start_y + line_h * 12,
 		14,
-		rl.Color{0, 200, 200, 255},
+		eng.Engine_Color{0, 200, 200, 255},
 	)
 	render_draw_text(
 		engine,
@@ -1119,7 +1239,7 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		col2_x,
 		start_y + line_h * 13,
 		14,
-		rl.Color{200, 120, 50, 255},
+		eng.Engine_Color{200, 120, 50, 255},
 	)
 	render_draw_text(
 		engine,
@@ -1127,7 +1247,7 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		col2_x,
 		start_y + line_h * 14,
 		14,
-		rl.Color{40, 80, 180, 255},
+		eng.Engine_Color{40, 80, 180, 255},
 	)
 	render_draw_text(
 		engine,
@@ -1135,7 +1255,7 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		col2_x,
 		start_y + line_h * 15,
 		14,
-		rl.Color{160, 180, 40, 255},
+		eng.Engine_Color{160, 180, 40, 255},
 	)
 	render_draw_text(
 		engine,
@@ -1143,7 +1263,7 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		col2_x,
 		start_y + line_h * 16,
 		14,
-		rl.Color{180, 120, 60, 255},
+		eng.Engine_Color{180, 120, 60, 255},
 	)
 	render_draw_text(
 		engine,
@@ -1151,7 +1271,7 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		col2_x,
 		start_y + line_h * 17,
 		14,
-		rl.Color{160, 160, 170, 255},
+		eng.Engine_Color{160, 160, 170, 255},
 	)
 
 	render_draw_text(engine, "TIPS", col2_x, start_y + line_h * 19, 16, head_color)
@@ -1189,6 +1309,6 @@ render_help :: proc(engine: ^eng.Engine, game: ^Game) {
 		(i32(SCREEN_WIDTH) - footer_w) / 2,
 		i32(SCREEN_HEIGHT) - 40,
 		14,
-		rl.Color{120, 120, 120, 255},
+		eng.Engine_Color{120, 120, 120, 255},
 	)
 }

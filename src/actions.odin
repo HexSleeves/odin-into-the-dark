@@ -3,7 +3,6 @@ package main
 import eng "./engine"
 import "core:fmt"
 import "core:strings"
-import rl "vendor:raylib"
 
 
 handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int) {
@@ -134,21 +133,26 @@ descend :: proc(
 		messages,
 		game,
 		fmt.tprintf("You descend to depth %d...", game.depth),
-		rl.Color{0, 200, 200, 255},
+		eng.Engine_Color{0, 200, 200, 255},
 	)
 }
 
 start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {
 	can_mine := false
 	if !game.equipped_weapon.occupied {
-		add_message(messages, game, "You need a pickaxe to mine!", rl.Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"You need a pickaxe to mine!",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 	} else if game.equipped_weapon.item.max_durability > 0 &&
 	   game.equipped_weapon.item.durability <= 0 {
 		add_message(
 			messages,
 			game,
 			fmt.tprintf("Your %s is broken!", game.equipped_weapon.item.name),
-			rl.Color{255, 100, 100, 255},
+			eng.Engine_Color{255, 100, 100, 255},
 		)
 	} else {
 		can_mine = true
@@ -160,7 +164,7 @@ start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Ga
 			messages,
 			game,
 			"Mine which direction? (WASD/arrows, ESC cancel)",
-			rl.Color{200, 200, 100, 255},
+			eng.Engine_Color{200, 200, 100, 255},
 		)
 	}
 }
@@ -261,7 +265,7 @@ restart_game :: proc(
 	game.score_saved = false
 	game.death_cause = ""
 	game.last_score_rank = -1
-	add_message(messages, game, "A new journey begins...", rl.Color{200, 200, 100, 255})
+	add_message(messages, game, "A new journey begins...", eng.Engine_Color{200, 200, 100, 255})
 }
 
 // ─── Tile effect helpers ───────────────────────────────────────────────────────
@@ -271,7 +275,12 @@ consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 	if web_tile_at_idx(game, pidx) {
 		web_tile_set_idx(game, pidx, false)
 		game.skip_next_turn = true
-		add_message(messages, game, "You are stuck in a web!", rl.Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You are stuck in a web!",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 	}
 }
 
@@ -283,24 +292,33 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.water_slow_active = true
 		audio_manager_play_sfx(game_engine_audio_manager(engine), .Water)
-		add_message(messages, game, "You wade through water...", rl.Color{40, 80, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You wade through water...",
+			eng.Engine_Color{40, 80, 180, 255},
+		)
 	}
 
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 3
 		game.poison_turns = max(game.poison_turns, 5)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{160, 180, 40, 255}, 0.4)
+		eng.vfx_manager_flash(
+			game_engine_vfx_manager(engine),
+			eng.Engine_Color{160, 180, 40, 255},
+			0.4,
+		)
 		add_message(
 			messages,
 			game,
 			"Toxic gas burns you! Poisoned! (-3 HP)",
-			rl.Color{160, 180, 40, 255},
+			eng.Engine_Color{160, 180, 40, 255},
 		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Suffocated by toxic gas"
 			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 		}
 	}
 
@@ -315,14 +333,14 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 				messages,
 				game,
 				fmt.tprintf("The fountain restores your health! (+%d HP)", heal),
-				rl.Color{80, 180, 220, 255},
+				eng.Engine_Color{80, 180, 220, 255},
 			)
 		} else {
 			add_message(
 				messages,
 				game,
 				"You drink from the fountain. (Already at full health)",
-				rl.Color{80, 180, 220, 255},
+				eng.Engine_Color{80, 180, 220, 255},
 			)
 			cur_tile.type = .Floor
 		}
@@ -332,17 +350,21 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 2
 		game.burning_turns = max(game.burning_turns, 4)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{255, 120, 20, 255}, 0.4)
+		eng.vfx_manager_flash(
+			game_engine_vfx_manager(engine),
+			eng.Engine_Color{255, 120, 20, 255},
+			0.4,
+		)
 		add_message(
 			messages,
 			game,
 			"Flames scorch you! Burning! (-2 HP)",
-			rl.Color{255, 120, 20, 255},
+			eng.Engine_Color{255, 120, 20, 255},
 		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Burned alive by a fire vent"
 			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 		}
 	}
 }
@@ -359,7 +381,7 @@ collapse_unstable_previous_tile :: proc(messages: ^Message_Manager, game: ^Game)
 			messages,
 			game,
 			"The ground collapses behind you!",
-			rl.Color{180, 120, 60, 255},
+			eng.Engine_Color{180, 120, 60, 255},
 		)
 	}
 }
@@ -371,6 +393,6 @@ announce_item_under_player :: proc(messages: ^Message_Manager, game: ^Game) {
 		messages,
 		game,
 		fmt.tprintf("You see a %s here.", item_display_name(it)),
-		rl.Color{255, 255, 100, 255},
+		eng.Engine_Color{255, 255, 100, 255},
 	)
 }

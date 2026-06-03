@@ -1,7 +1,7 @@
 package main
 
+import eng "./engine"
 import "core:fmt"
-import rl "vendor:raylib"
 
 // ─── Starter gear ─────────────────────────────────────────────────────────────
 
@@ -50,7 +50,12 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 
 	item := &game.inventory[slot_index].item
 	if item.equipment_slot == "" {
-		add_message(messages, game, "That item cannot be equipped.", rl.Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"That item cannot be equipped.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
@@ -58,7 +63,12 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 	equip_slot: ^Equipment
 	if item.equipment_slot ==
 	   "weapon" {equip_slot = &game.equipped_weapon} else if item.equipment_slot == "armor" {equip_slot = &game.equipped_armor} else if item.equipment_slot == "helmet" {equip_slot = &game.equipped_helmet} else {
-		add_message(messages, game, "Unknown equipment slot.", rl.Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Unknown equipment slot.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
@@ -73,7 +83,7 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 				messages,
 				game,
 				"No inventory space to swap equipment!",
-				rl.Color{255, 100, 100, 255},
+				eng.Engine_Color{255, 100, 100, 255},
 			)
 			return false
 		}
@@ -85,7 +95,7 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 			messages,
 			game,
 			fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
-			rl.Color{180, 180, 100, 255},
+			eng.Engine_Color{180, 180, 100, 255},
 		)
 	}
 
@@ -96,7 +106,7 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 		messages,
 		game,
 		fmt.tprintf("You equip the %s.", item_display_name(item)),
-		rl.Color{100, 200, 255, 255},
+		eng.Engine_Color{100, 200, 255, 255},
 	)
 
 	// Remove from inventory
@@ -122,7 +132,7 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 			messages,
 			game,
 			"Inventory full! Cannot unequip.",
-			rl.Color{255, 100, 100, 255},
+			eng.Engine_Color{255, 100, 100, 255},
 		)
 		return false
 	}
@@ -134,7 +144,7 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 		messages,
 		game,
 		fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
-		rl.Color{180, 180, 100, 255},
+		eng.Engine_Color{180, 180, 100, 255},
 	)
 	equip_slot^ = {}
 	return true

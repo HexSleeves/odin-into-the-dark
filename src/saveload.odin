@@ -3,7 +3,7 @@ package main
 import "core:mem"
 
 import eng "./engine"
-import rl "vendor:raylib"
+
 
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
@@ -35,7 +35,7 @@ Save_Enemy :: struct {
 	enemy_type:       Save_String,
 	name:             Save_String,
 	glyph:            rune,
-	color:            rl.Color,
+	color:            eng.Engine_Color,
 	alive:            bool,
 	ability_type:     Save_String,
 	ability_cooldown: int,
@@ -49,7 +49,7 @@ Save_Item :: struct {
 	item_type:      Save_String,
 	name:           Save_String,
 	glyph:          rune,
-	color:          rl.Color,
+	color:          eng.Engine_Color,
 	picked_up:      bool,
 	quantity:       int,
 	equipment_slot: Save_String,
@@ -60,7 +60,7 @@ Save_Item :: struct {
 
 Save_Ore_Vein :: struct {
 	ore_type: Save_String,
-	color:    rl.Color,
+	color:    eng.Engine_Color,
 }
 
 Save_Inventory_Slot :: struct {
@@ -629,7 +629,7 @@ load_game_from_storage :: proc(
 	compute_fov(game)
 	game_camera_update(camera, game, true)
 	clear_messages(messages)
-	add_message(messages, game, "Game loaded.", rl.Color{100, 255, 100, 255})
+	add_message(messages, game, "Game loaded.", eng.Engine_Color{100, 255, 100, 255})
 
 	// Reset transient UI modes on load.
 	ui_manager_reset_transient(ui)

@@ -4,15 +4,15 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:math/rand"
 
-import rl "vendor:raylib"
+import eng "./engine"
 
 // ─── JSON5 data structures (mirrors the .json5 files) ─────────────────────────
 
 // Color as 4-element array [r, g, b, a]
 Color_Array :: [4]u8
 
-json5_color_to_rl :: proc(c: Color_Array) -> rl.Color {
-	return rl.Color{c[0], c[1], c[2], c[3]}
+json5_color_to_engine :: proc(c: Color_Array) -> eng.Engine_Color {
+	return eng.Engine_Color{c[0], c[1], c[2], c[3]}
 }
 
 // ── Enemy data ──
@@ -231,7 +231,7 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		attack           = def.attack,
 		enemy_type       = def.id,
 		glyph            = g,
-		color            = json5_color_to_rl(def.color),
+		color            = json5_color_to_engine(def.color),
 		alive            = true,
 		name             = def.name,
 		ability_type     = def.ability.type,
@@ -290,7 +290,7 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		pos = pos,
 		item_type = def.id,
 		glyph = g,
-		color = json5_color_to_rl(def.color),
+		color = json5_color_to_engine(def.color),
 		picked_up = false,
 		quantity = 1,
 		name = def.name,
@@ -368,7 +368,7 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			messages,
 			game,
 			fmt.tprintf("You use a %s. Restored %d HP.", def.name, actual_heal),
-			rl.Color{100, 255, 100, 255},
+			eng.Engine_Color{100, 255, 100, 255},
 		)
 	} else if eff.type == "light_boost" {
 		max_r := eff.max_radius
@@ -378,7 +378,7 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			messages,
 			game,
 			fmt.tprintf("You use a %s. Light radius increased.", def.name),
-			rl.Color{255, 180, 50, 255},
+			eng.Engine_Color{255, 180, 50, 255},
 		)
 	} else if eff.type == "timed_light_boost" {
 		game.light_boost_bonus = eff.value
@@ -387,21 +387,21 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			messages,
 			game,
 			"You apply lantern oil. Light burns brighter!",
-			rl.Color{255, 200, 80, 255},
+			eng.Engine_Color{255, 200, 80, 255},
 		)
 	} else if eff.type == "equip" {
 		add_message(
 			messages,
 			game,
 			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
-			rl.Color{180, 180, 180, 255},
+			eng.Engine_Color{180, 180, 180, 255},
 		)
 	} else if eff.type == "material" {
 		add_message(
 			messages,
 			game,
 			"Raw materials cannot be used directly. Find an anvil to craft.",
-			rl.Color{180, 180, 100, 255},
+			eng.Engine_Color{180, 180, 100, 255},
 		)
 	} else if eff.type == "cure_poison" {
 		if game.poison_turns > 0 {
@@ -410,14 +410,14 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 				messages,
 				game,
 				"You drink the antidote. Poison cured!",
-				rl.Color{120, 220, 80, 255},
+				eng.Engine_Color{120, 220, 80, 255},
 			)
 		} else {
 			add_message(
 				messages,
 				game,
 				"You drink the antidote. (You weren't poisoned)",
-				rl.Color{120, 220, 80, 255},
+				eng.Engine_Color{120, 220, 80, 255},
 			)
 		}
 	} else {
@@ -425,7 +425,7 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			messages,
 			game,
 			fmt.tprintf("You use a %s. Nothing happens.", def.name),
-			rl.Color{180, 180, 180, 255},
+			eng.Engine_Color{180, 180, 180, 255},
 		)
 	}
 }

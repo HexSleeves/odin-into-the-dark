@@ -2,7 +2,6 @@ package main
 
 import eng "./engine"
 import "core:strconv"
-import rl "vendor:raylib"
 
 // ─── Into the Depths app adapter ─────────────────────────────────────────────
 
@@ -72,7 +71,8 @@ game_diagnostics_shutdown :: proc() {
 }
 
 game_runtime_assets_init :: proc() {
-	audio_init()
+	backend := game_audio_backend(&g_audio)
+	audio_init(backend)
 	music_init()
 	audio_set_master_volume(g_game_config.master_volume)
 	music_set_volume(g_game_config.music_volume)
@@ -284,7 +284,7 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 		game_engine_message_manager(engine),
 		game,
 		"Welcome to the depths. Tread carefully...",
-		rl.Color{200, 200, 100, 255},
+		eng.Engine_Color{200, 200, 100, 255},
 	)
 
 	return true

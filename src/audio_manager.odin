@@ -8,7 +8,7 @@ import rl "vendor:raylib"
 Audio_Manager :: eng.Audio_Manager
 
 audio_manager_make :: proc() -> Audio_Manager {
-	return eng.audio_manager_make(game_audio_backend(&g_audio))
+	return eng.audio_manager_make(g_audio.backend)
 }
 
 audio_manager_is_enabled :: proc(audio: ^Audio_Manager) -> bool {
@@ -16,65 +16,19 @@ audio_manager_is_enabled :: proc(audio: ^Audio_Manager) -> bool {
 }
 
 audio_manager_play_sfx :: proc(audio: ^Audio_Manager, stype: Sound_Type) {
-	eng.audio_manager_play(audio, int(stype))
+	eng.audio_manager_play(audio, g_audio.sounds[stype])
 }
 
 audio_manager_toggle :: proc(audio: ^Audio_Manager) -> bool {
 	return eng.audio_manager_toggle(audio)
 }
 
-game_audio_backend :: proc(audio: ^Game_Audio) -> eng.Engine_Audio_Backend {
-	return eng.Engine_Audio_Backend {
-		ctx = audio,
-		play = game_audio_backend_play,
-		is_enabled = game_audio_backend_is_enabled,
-		set_enabled = game_audio_backend_set_enabled,
-		toggle = game_audio_backend_toggle,
-		stop = game_audio_backend_stop,
-		set_volume = game_audio_backend_set_volume,
-		set_master_volume = game_audio_backend_set_master_volume,
-		play_looped = game_audio_backend_play_looped,
-		update = game_audio_backend_update,
-	}
-}
-
-game_audio_backend_play :: proc(ctx: rawptr, sound_id: int) {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || !audio.enabled || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
-		return
-	}
-	rl.PlaySound(audio.sounds[Sound_Type(sound_id)])
-}
-
-game_audio_backend_is_enabled :: proc(ctx: rawptr) -> bool {
-	audio := cast(^Game_Audio)ctx
-	return audio != nil && audio.enabled
-}
-
-game_audio_backend_set_enabled :: proc(ctx: rawptr, enabled: bool) -> bool {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || !rl.IsAudioDeviceReady() {
-		return false
-	}
-	audio.enabled = enabled
-	return audio.enabled
-}
-
-game_audio_backend_toggle :: proc(ctx: rawptr) -> bool {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || !rl.IsAudioDeviceReady() {
-		return false
-	}
-	audio.enabled = !audio.enabled
-	return audio.enabled
-}
-
 audio_manager_stop_sfx :: proc(audio: ^Audio_Manager, stype: Sound_Type) {
-	eng.audio_manager_stop(audio, int(stype))
+	eng.audio_manager_stop(audio, g_audio.sounds[stype])
 }
 
 audio_manager_set_sfx_volume :: proc(audio: ^Audio_Manager, stype: Sound_Type, volume: f32) {
-	eng.audio_manager_set_volume(audio, int(stype), volume)
+	eng.audio_manager_set_volume(audio, g_audio.sounds[stype], volume)
 }
 
 audio_manager_set_master_volume :: proc(audio: ^Audio_Manager, volume: f32) {
@@ -82,54 +36,251 @@ audio_manager_set_master_volume :: proc(audio: ^Audio_Manager, volume: f32) {
 }
 
 audio_manager_play_sfx_looped :: proc(audio: ^Audio_Manager, stype: Sound_Type) {
-	eng.audio_manager_play_looped(audio, int(stype))
+	eng.audio_manager_play_looped(audio, g_audio.sounds[stype])
 }
 
-game_audio_backend_stop :: proc(ctx: rawptr, sound_id: int) {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
-		return
+// ─── Raylib audio backend implementation ─────────────────────────────────────
+
+MAX_RAYLIB_SOUNDS :: 32
+
+Raylib_Audio_State :: struct {
+	sounds:  [MAX_RAYLIB_SOUNDS]rl.Sound,
+	looping: [MAX_RAYLIB_SOUNDS]bool,
+	count:   int,
+	enabled: bool,
+}
+
+g_raylib_audio: Raylib_Audio_State
+
+game_audio_backend :: proc(audio: ^Game_Audio) -> eng.Engine_Audio_Backend {
+	return eng.Engine_Audio_Backend {
+		ctx = &g_raylib_audio,
+		init_audio = raylib_audio_init,
+		shutdown_audio = raylib_audio_shutdown,
+		is_audio_ready = raylib_audio_is_ready,
+		load_sound = raylib_audio_load_sound,
+		unload_sound = raylib_audio_unload_sound,
+		play = raylib_audio_play,
+		stop = raylib_audio_stop,
+		set_volume = raylib_audio_set_volume,
+		play_looped = raylib_audio_play_looped,
+		is_playing = raylib_audio_is_playing,
+		is_enabled = raylib_audio_is_enabled,
+		set_enabled = raylib_audio_set_enabled,
+		toggle = raylib_audio_toggle,
+		set_master_volume = raylib_audio_set_master_volume,
+		update = raylib_audio_update,
+		load_music = raylib_audio_load_music,
+		unload_music = raylib_audio_unload_music,
+		play_music = raylib_audio_play_music,
+		stop_music = raylib_audio_stop_music,
+		pause_music = raylib_audio_pause_music,
+		resume_music = raylib_audio_resume_music,
+		set_music_volume = raylib_audio_set_music_volume,
+		update_music = raylib_audio_update_music,
+		is_music_valid = raylib_audio_is_music_valid,
+		set_music_looping = raylib_audio_set_music_looping,
+		get_frame_time = raylib_audio_get_frame_time,
 	}
-	stype := Sound_Type(sound_id)
-	audio.looping[stype] = false
-	rl.StopSound(audio.sounds[stype])
 }
 
-game_audio_backend_set_volume :: proc(ctx: rawptr, sound_id: int, volume: f32) {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
-		return
-	}
-	rl.SetSoundVolume(audio.sounds[Sound_Type(sound_id)], volume)
-}
+// ── Device lifecycle ──
 
-game_audio_backend_set_master_volume :: proc(ctx: rawptr, volume: f32) {
+raylib_audio_init :: proc(ctx: rawptr) -> bool {
+	state := cast(^Raylib_Audio_State)ctx
+	rl.InitAudioDevice()
 	if !rl.IsAudioDeviceReady() {
-		return
+		state.enabled = false
+		return false
 	}
+	state.enabled = true
+	return true
+}
+
+raylib_audio_shutdown :: proc(ctx: rawptr) {
+	rl.CloseAudioDevice()
+}
+
+raylib_audio_is_ready :: proc(ctx: rawptr) -> bool {
+	return rl.IsAudioDeviceReady()
+}
+
+// ── Sound loading ──
+
+raylib_audio_load_sound :: proc(ctx: rawptr, desc: eng.Engine_Sound_Desc) -> int {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || state.count >= MAX_RAYLIB_SOUNDS {return -1}
+	wave := rl.Wave {
+		frameCount = desc.frame_count,
+		sampleRate = desc.sample_rate,
+		sampleSize = desc.sample_size,
+		channels   = desc.channels,
+		data       = desc.samples,
+	}
+	sound := rl.LoadSoundFromWave(wave)
+	rl.SetSoundVolume(sound, desc.volume)
+	id := state.count
+	state.sounds[id] = sound
+	state.count += 1
+	return id
+}
+
+raylib_audio_unload_sound :: proc(ctx: rawptr, sound_id: int) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || sound_id < 0 || sound_id >= state.count {return}
+	rl.UnloadSound(state.sounds[sound_id])
+}
+
+// ── Playback ──
+
+raylib_audio_play :: proc(ctx: rawptr, sound_id: int) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || !state.enabled || sound_id < 0 || sound_id >= state.count {return}
+	rl.PlaySound(state.sounds[sound_id])
+}
+
+raylib_audio_stop :: proc(ctx: rawptr, sound_id: int) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || sound_id < 0 || sound_id >= state.count {return}
+	state.looping[sound_id] = false
+	rl.StopSound(state.sounds[sound_id])
+}
+
+raylib_audio_set_volume :: proc(ctx: rawptr, sound_id: int, volume: f32) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || sound_id < 0 || sound_id >= state.count {return}
+	rl.SetSoundVolume(state.sounds[sound_id], volume)
+}
+
+raylib_audio_play_looped :: proc(ctx: rawptr, sound_id: int) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || !state.enabled || sound_id < 0 || sound_id >= state.count {return}
+	state.looping[sound_id] = true
+	if !rl.IsSoundPlaying(state.sounds[sound_id]) {
+		rl.PlaySound(state.sounds[sound_id])
+	}
+}
+
+raylib_audio_is_playing :: proc(ctx: rawptr, sound_id: int) -> bool {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || sound_id < 0 || sound_id >= state.count {return false}
+	return rl.IsSoundPlaying(state.sounds[sound_id])
+}
+
+// ── Global controls ──
+
+raylib_audio_is_enabled :: proc(ctx: rawptr) -> bool {
+	state := cast(^Raylib_Audio_State)ctx
+	return state != nil && state.enabled
+}
+
+raylib_audio_set_enabled :: proc(ctx: rawptr, enabled: bool) -> bool {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || !rl.IsAudioDeviceReady() {return false}
+	state.enabled = enabled
+	return state.enabled
+}
+
+raylib_audio_toggle :: proc(ctx: rawptr) -> bool {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || !rl.IsAudioDeviceReady() {return false}
+	state.enabled = !state.enabled
+	return state.enabled
+}
+
+raylib_audio_set_master_volume :: proc(ctx: rawptr, volume: f32) {
+	if !rl.IsAudioDeviceReady() {return}
 	rl.SetMasterVolume(clamp(volume, 0, 1))
 }
 
-game_audio_backend_play_looped :: proc(ctx: rawptr, sound_id: int) {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || !audio.enabled || sound_id < 0 || sound_id >= int(len(audio.sounds)) {
-		return
-	}
-	stype := Sound_Type(sound_id)
-	audio.looping[stype] = true
-	if !rl.IsSoundPlaying(audio.sounds[stype]) {
-		rl.PlaySound(audio.sounds[stype])
+raylib_audio_update :: proc(ctx: rawptr) {
+	state := cast(^Raylib_Audio_State)ctx
+	if state == nil || !state.enabled {return}
+	for i in 0 ..< state.count {
+		if state.looping[i] && !rl.IsSoundPlaying(state.sounds[i]) {
+			rl.PlaySound(state.sounds[i])
+		}
 	}
 }
 
-game_audio_backend_update :: proc(ctx: rawptr) {
-	audio := cast(^Game_Audio)ctx
-	if audio == nil || !audio.enabled {
-		return
+// ── Music ──
+
+raylib_audio_load_music :: proc(
+	ctx: rawptr,
+	format: string,
+	data: rawptr,
+	data_len: i32,
+) -> eng.Engine_Music_Handle {
+	cs := rl.Music{}
+	// Raylib needs a C-style extension string
+	ext: cstring
+	switch format {
+	case ".wav":
+		ext = ".wav"
+	case ".ogg":
+		ext = ".ogg"
+	case ".mp3":
+		ext = ".mp3"
+	case:
+		ext = ".wav"
 	}
-	for stype in Sound_Type {
-		if audio.looping[stype] && !rl.IsSoundPlaying(audio.sounds[stype]) {
-			rl.PlaySound(audio.sounds[stype])
-		}
-	}
+	cs = rl.LoadMusicStreamFromMemory(ext, data, data_len)
+	handle := new(rl.Music)
+	handle^ = cs
+	return eng.Engine_Music_Handle(handle)
+}
+
+raylib_audio_unload_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	m := cast(^rl.Music)handle
+	rl.UnloadMusicStream(m^)
+	free(m)
+}
+
+raylib_audio_play_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	rl.PlayMusicStream((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_stop_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	rl.StopMusicStream((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_pause_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	rl.PauseMusicStream((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_resume_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	rl.ResumeMusicStream((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_set_music_volume :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle, volume: f32) {
+	if handle == nil {return}
+	rl.SetMusicVolume((cast(^rl.Music)handle)^, volume)
+}
+
+raylib_audio_update_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	if handle == nil {return}
+	rl.UpdateMusicStream((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_is_music_valid :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) -> bool {
+	if handle == nil {return false}
+	return rl.IsMusicValid((cast(^rl.Music)handle)^)
+}
+
+raylib_audio_set_music_looping :: proc(
+	ctx: rawptr,
+	handle: eng.Engine_Music_Handle,
+	looping: bool,
+) {
+	if handle == nil {return}
+	(cast(^rl.Music)handle).looping = looping
+}
+
+raylib_audio_get_frame_time :: proc(ctx: rawptr) -> f32 {
+	return rl.GetFrameTime()
 }

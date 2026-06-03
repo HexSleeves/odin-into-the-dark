@@ -94,7 +94,7 @@ init_player_from_content :: proc(content: ^Content_Manager, game: ^Game) {
 		attack       = p.attack,
 		light_radius = p.light_radius,
 		glyph        = p_glyph,
-		color        = json5_color_to_rl(p.color),
+		color        = json5_color_to_engine(p.color),
 		quickness    = qn,
 		move_speed   = ms,
 		energy       = qn * 10, // start ready to act (one full round of AP)

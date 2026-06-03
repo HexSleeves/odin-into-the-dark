@@ -1,8 +1,8 @@
 package main
 
+import eng "./engine"
 import "core:math/rand"
 import "core:slice"
-import rl "vendor:raylib"
 
 // ─── Generation constants ─────────────────────────────────────────────────────
 
@@ -286,10 +286,10 @@ spawn_ore_veins :: proc(game: ^Game) {
 	depth := game.depth
 
 	// Define ore colors
-	iron_color := rl.Color{200, 120, 50, 255}
-	copper_color := rl.Color{80, 180, 80, 255}
-	crystal_color := rl.Color{100, 150, 255, 255}
-	gold_color := rl.Color{255, 215, 0, 255}
+	iron_color := eng.Engine_Color{200, 120, 50, 255}
+	copper_color := eng.Engine_Color{80, 180, 80, 255}
+	crystal_color := eng.Engine_Color{100, 150, 255, 255}
+	gold_color := eng.Engine_Color{255, 215, 0, 255}
 
 	// Scan all wall tiles, ~10% chance to become ore vein
 	for y in 1 ..< MAP_HEIGHT - 1 {
@@ -326,7 +326,7 @@ spawn_ore_veins :: proc(game: ^Game) {
 
 			// Weighted ore type selection by depth
 			ore_type: string
-			ore_color: rl.Color
+			ore_color: eng.Engine_Color
 			roll := rand.int_max(100)
 
 			if depth >= 8 {

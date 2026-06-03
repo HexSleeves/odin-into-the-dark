@@ -1,30 +1,30 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
+import "core:fmt"
 
 // ─── Sidebar palette ─────────────────────────────────────────────────────────
 
-SB_BG :: rl.Color{12, 12, 20, 255}
-SB_DIVIDER :: rl.Color{35, 35, 52, 255}
-SB_TITLE :: rl.Color{200, 175, 90, 255}
-SB_HEADER :: rl.Color{130, 130, 155, 255}
-SB_TEXT :: rl.Color{195, 195, 210, 255}
-SB_DIM :: rl.Color{75, 75, 90, 255}
-SB_HP_BG :: rl.Color{70, 15, 15, 255}
-SB_HP_FG :: rl.Color{45, 185, 55, 255}
-SB_HP_LOW :: rl.Color{200, 55, 40, 255}
-SB_PICK_BG :: rl.Color{35, 25, 15, 255}
-SB_PICK_OK :: rl.Color{75, 170, 75, 255}
-SB_PICK_WARN :: rl.Color{195, 175, 45, 255}
-SB_PICK_CRIT :: rl.Color{200, 55, 40, 255}
-SB_WPN :: rl.Color{195, 145, 70, 255}
-SB_ARM :: rl.Color{90, 155, 205, 255}
-SB_HLM :: rl.Color{195, 195, 50, 255}
-SB_OIL :: rl.Color{250, 195, 70, 255}
-SB_POISON :: rl.Color{115, 200, 40, 255}
-SB_BOSS :: rl.Color{210, 45, 45, 255}
-SB_KEY :: rl.Color{120, 180, 255, 255}
+SB_BG :: eng.Engine_Color{12, 12, 20, 255}
+SB_DIVIDER :: eng.Engine_Color{35, 35, 52, 255}
+SB_TITLE :: eng.Engine_Color{200, 175, 90, 255}
+SB_HEADER :: eng.Engine_Color{130, 130, 155, 255}
+SB_TEXT :: eng.Engine_Color{195, 195, 210, 255}
+SB_DIM :: eng.Engine_Color{75, 75, 90, 255}
+SB_HP_BG :: eng.Engine_Color{70, 15, 15, 255}
+SB_HP_FG :: eng.Engine_Color{45, 185, 55, 255}
+SB_HP_LOW :: eng.Engine_Color{200, 55, 40, 255}
+SB_PICK_BG :: eng.Engine_Color{35, 25, 15, 255}
+SB_PICK_OK :: eng.Engine_Color{75, 170, 75, 255}
+SB_PICK_WARN :: eng.Engine_Color{195, 175, 45, 255}
+SB_PICK_CRIT :: eng.Engine_Color{200, 55, 40, 255}
+SB_WPN :: eng.Engine_Color{195, 145, 70, 255}
+SB_ARM :: eng.Engine_Color{90, 155, 205, 255}
+SB_HLM :: eng.Engine_Color{195, 195, 50, 255}
+SB_OIL :: eng.Engine_Color{250, 195, 70, 255}
+SB_POISON :: eng.Engine_Color{115, 200, 40, 255}
+SB_BOSS :: eng.Engine_Color{210, 45, 45, 255}
+SB_KEY :: eng.Engine_Color{120, 180, 255, 255}
 
 // ─── Sidebar geometry ────────────────────────────────────────────────────────
 
@@ -36,7 +36,7 @@ SB_IW :: SB_W - SB_PX * 2 // inner content width
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-sb_bar :: proc(engine: ^eng.Engine, y: i32, ratio: f32, h: i32, bg, fg: rl.Color) {
+sb_bar :: proc(engine: ^eng.Engine, y: i32, ratio: f32, h: i32, bg, fg: eng.Engine_Color) {
 	render_draw_rectangle(engine, SB_X + SB_PX, y, SB_IW, h, bg)
 	filled := i32(f32(SB_IW) * clamp(ratio, 0, 1))
 	if filled > 0 {
@@ -48,11 +48,11 @@ sb_divider :: proc(engine: ^eng.Engine, y: i32) {
 	render_draw_rectangle(engine, SB_X, y, SB_W, 1, SB_DIVIDER)
 }
 
-sb_text :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: rl.Color) {
+sb_text :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: eng.Engine_Color) {
 	render_draw_text(engine, text, SB_X + SB_PX, y, size, color)
 }
 
-sb_text_right :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: rl.Color) {
+sb_text_right :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: eng.Engine_Color) {
 	w := render_measure_text(engine, text, size)
 	render_draw_text(engine, text, SB_X + SB_W - SB_PX - w, y, size, color)
 }
@@ -81,7 +81,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	sb_text(engine, "HP", y, 12, SB_HEADER)
 	sb_text_right(
 		engine,
-		rl.TextFormat("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+		fmt.ctprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
 		y,
 		12,
 		SB_TEXT,
@@ -95,19 +95,19 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	{
 		cost := effective_attack_cost(game)
 		spd_label: cstring
-		spd_color: rl.Color
+		spd_color: eng.Engine_Color
 		if cost <= 700 {
 			spd_label = "Fast"
-			spd_color = rl.Color{80, 220, 100, 255}
+			spd_color = eng.Engine_Color{80, 220, 100, 255}
 		} else if cost <= 1100 {
 			spd_label = "Normal"
 			spd_color = SB_TEXT
 		} else if cost <= 1600 {
 			spd_label = "Slow"
-			spd_color = rl.Color{220, 170, 60, 255}
+			spd_color = eng.Engine_Color{220, 170, 60, 255}
 		} else {
 			spd_label = "Very Slow"
-			spd_color = rl.Color{220, 80, 60, 255}
+			spd_color = eng.Engine_Color{220, 80, 60, 255}
 		}
 		sb_text(engine, "ATK", y, 12, SB_HEADER)
 		sb_text_right(engine, spd_label, y, 12, spd_color)
@@ -120,7 +120,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		wpn := game.equipped_weapon.item
 		if wpn.max_durability > 0 {
 			pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
-			pick_fg: rl.Color
+			pick_fg: eng.Engine_Color
 			if wpn.durability <= 0 {
 				pick_fg = SB_PICK_CRIT
 			} else if pick_ratio > 0.5 {
@@ -137,7 +137,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 				sb_text(engine, pick_label, y, 12, SB_HEADER)
 				sb_text_right(
 					engine,
-					rl.TextFormat("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
+					fmt.ctprintf("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
 					y,
 					12,
 					SB_TEXT,
@@ -154,10 +154,10 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	y += 6
 
 	// ── Depth / Turn / Kills / Light ─────────────────────────────────────────
-	sb_text(engine, rl.TextFormat("DEPTH  %d", i32(game.depth)), y, 13, SB_TEXT)
+	sb_text(engine, fmt.ctprintf("DEPTH  %d", i32(game.depth)), y, 13, SB_TEXT)
 	sb_text_right(
 		engine,
-		rl.TextFormat("TURN %d", i32(eng.turn_manager_current(turns))),
+		fmt.ctprintf("TURN %d", i32(eng.turn_manager_current(turns))),
 		y,
 		13,
 		SB_DIM,
@@ -168,23 +168,17 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	for &e in game.enemies {
 		if e.alive {alive_count += 1}
 	}
-	sb_text(engine, rl.TextFormat("KILLS  %d", i32(game.kills)), y, 13, SB_TEXT)
-	sb_text_right(engine, rl.TextFormat("NEAR %d", alive_count), y, 13, SB_DIM)
+	sb_text(engine, fmt.ctprintf("KILLS  %d", i32(game.kills)), y, 13, SB_TEXT)
+	sb_text_right(engine, fmt.ctprintf("NEAR %d", alive_count), y, 13, SB_DIM)
 	y += 17
 
 	if game.light_boost_turns > 0 {
 		// Show light radius + remaining fuel turns
-		sb_text(engine, rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_OIL)
-		sb_text_right(
-			engine,
-			rl.TextFormat("%dt fuel", i32(game.light_boost_turns)),
-			y,
-			13,
-			SB_OIL,
-		)
+		sb_text(engine, fmt.ctprintf("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_OIL)
+		sb_text_right(engine, fmt.ctprintf("%dt fuel", i32(game.light_boost_turns)), y, 13, SB_OIL)
 	} else {
-		sb_text(engine, rl.TextFormat("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_TEXT)
-		sb_text_right(engine, rl.TextFormat("ITEMS %d", i32(game.items_found)), y, 13, SB_DIM)
+		sb_text(engine, fmt.ctprintf("LIGHT  %d", i32(game.player.light_radius)), y, 13, SB_TEXT)
+		sb_text_right(engine, fmt.ctprintf("ITEMS %d", i32(game.items_found)), y, 13, SB_DIM)
 	}
 	y += 17
 
@@ -200,7 +194,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		wpn := &game.equipped_weapon.item
 		sb_text(
 			engine,
-			rl.TextFormat("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
+			fmt.ctprintf("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
 			y,
 			12,
 			SB_WPN,
@@ -214,7 +208,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		arm := &game.equipped_armor.item
 		sb_text(
 			engine,
-			rl.TextFormat("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
+			fmt.ctprintf("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
 			y,
 			12,
 			SB_ARM,
@@ -228,7 +222,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		hlm := &game.equipped_helmet.item
 		sb_text(
 			engine,
-			rl.TextFormat("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
+			fmt.ctprintf("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
 			y,
 			12,
 			SB_HLM,
@@ -254,7 +248,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		if game.light_boost_turns > 0 {
 			sb_text(
 				engine,
-				rl.TextFormat("OIL   %dt remaining", i32(game.light_boost_turns)),
+				fmt.ctprintf("OIL   %dt remaining", i32(game.light_boost_turns)),
 				y,
 				12,
 				SB_OIL,
@@ -264,7 +258,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		if game.poison_turns > 0 {
 			sb_text(
 				engine,
-				rl.TextFormat("POISON  %dt remaining", i32(game.poison_turns)),
+				fmt.ctprintf("POISON  %dt remaining", i32(game.poison_turns)),
 				y,
 				12,
 				SB_POISON,
@@ -274,20 +268,20 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		if game.burning_turns > 0 {
 			sb_text(
 				engine,
-				rl.TextFormat("BURNING (%d)", i32(game.burning_turns)),
+				fmt.ctprintf("BURNING (%d)", i32(game.burning_turns)),
 				y,
 				12,
-				rl.Color{255, 120, 20, 255},
+				eng.Engine_Color{255, 120, 20, 255},
 			)
 			y += 14
 		}
 		if game.frozen_turns > 0 {
 			sb_text(
 				engine,
-				rl.TextFormat("FROZEN (%d)", i32(game.frozen_turns)),
+				fmt.ctprintf("FROZEN (%d)", i32(game.frozen_turns)),
 				y,
 				12,
-				rl.Color{100, 180, 255, 255},
+				eng.Engine_Color{100, 180, 255, 255},
 			)
 			y += 14
 		}
@@ -300,17 +294,17 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		y += 2
 		sb_divider(engine, y)
 		y += 6
-		sb_text(engine, rl.TextFormat("%s", enemy.name), y, 12, SB_BOSS)
+		sb_text(engine, fmt.ctprintf("%s", enemy.name), y, 12, SB_BOSS)
 		sb_text_right(
 			engine,
-			rl.TextFormat("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
+			fmt.ctprintf("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
 			y,
 			12,
 			SB_TEXT,
 		)
 		y += 16
 		boss_ratio := f32(max(enemy.hp, 0)) / f32(max(enemy.max_hp, 1))
-		sb_bar(engine, y, boss_ratio, 8, rl.Color{50, 15, 15, 255}, SB_BOSS)
+		sb_bar(engine, y, boss_ratio, 8, eng.Engine_Color{50, 15, 15, 255}, SB_BOSS)
 		y += 12
 		break
 	}
@@ -340,7 +334,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			(i32(MAP_VIEW_WIDTH) - mine_w) / 2,
 			4,
 			14,
-			rl.Color{255, 200, 80, 255},
+			eng.Engine_Color{255, 200, 80, 255},
 		)
 	}
 
@@ -355,7 +349,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			(i32(MAP_VIEW_WIDTH) - anvil_w) / 2,
 			i32(MAP_VIEW_HEIGHT) - 22,
 			14,
-			rl.Color{160, 160, 170, 255},
+			eng.Engine_Color{160, 160, 170, 255},
 		)
 	}
 
@@ -369,7 +363,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			(i32(MAP_VIEW_WIDTH) - fount_w) / 2,
 			i32(MAP_VIEW_HEIGHT) - 22,
 			14,
-			rl.Color{80, 180, 220, 255},
+			eng.Engine_Color{80, 180, 220, 255},
 		)
 	}
 }

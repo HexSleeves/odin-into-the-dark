@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
 
 MAX_PARTICLES :: eng.ENGINE_MAX_PARTICLES
 Particle :: eng.Particle
@@ -19,7 +18,7 @@ particle_manager_active_count :: proc(particles: ^Particle_Manager) -> int {
 particle_manager_spawn :: proc(
 	particles: ^Particle_Manager,
 	tile_x, tile_y: int,
-	color: rl.Color,
+	color: eng.Engine_Color,
 	count: int,
 	speed: f32 = 2.0,
 	camera_x: int = 0,
@@ -28,7 +27,7 @@ particle_manager_spawn :: proc(
 	// Convert tile position to screen pixel center
 	cx := f32(tile_x * TILE_SIZE + TILE_SIZE / 2) - f32(camera_x)
 	cy := f32(tile_y * TILE_SIZE + TILE_SIZE / 2) - f32(camera_y)
-	eng.particle_manager_spawn_pixels(particles, cx, cy, engine_color_from_rl(color), count, speed)
+	eng.particle_manager_spawn_pixels(particles, cx, cy, color, count, speed)
 }
 
 // Update all active particles (call once per frame)
@@ -48,7 +47,7 @@ spawn_hit_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x,
 		particles,
 		tile_x,
 		tile_y,
-		rl.Color{255, 60, 60, 255},
+		eng.Engine_Color{255, 60, 60, 255},
 		8,
 		2.5,
 		cam_x,
@@ -61,7 +60,7 @@ spawn_mine_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_x
 		particles,
 		tile_x,
 		tile_y,
-		rl.Color{255, 200, 50, 255},
+		eng.Engine_Color{255, 200, 50, 255},
 		12,
 		3.0,
 		cam_x,
@@ -74,7 +73,7 @@ spawn_pickup_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam
 		particles,
 		tile_x,
 		tile_y,
-		rl.Color{80, 255, 80, 255},
+		eng.Engine_Color{80, 255, 80, 255},
 		6,
 		1.5,
 		cam_x,
@@ -87,7 +86,7 @@ spawn_death_particles :: proc(particles: ^Particle_Manager, tile_x, tile_y, cam_
 		particles,
 		tile_x,
 		tile_y,
-		rl.Color{255, 0, 0, 255},
+		eng.Engine_Color{255, 0, 0, 255},
 		30,
 		4.0,
 		cam_x,

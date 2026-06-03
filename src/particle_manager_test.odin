@@ -2,7 +2,6 @@ package main
 
 import eng "./engine"
 import "core:testing"
-import rl "vendor:raylib"
 
 @(test)
 particle_manager_make_wraps_current_particle_pool :: proc(t: ^testing.T) {
@@ -29,7 +28,7 @@ particle_handlers_accept_manager_context :: proc(t: ^testing.T) {
 	spawn_handler: proc(
 			particles: ^Particle_Manager,
 			tile_x, tile_y: int,
-			color: rl.Color,
+			color: eng.Engine_Color,
 			count: int,
 			speed: f32,
 			camera_x: int,

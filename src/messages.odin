@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
 
 // ─── Message panel layout ────────────────────────────────────────────────────
 
@@ -23,11 +22,16 @@ message_manager_bind_turns :: proc(messages: ^Message_Manager, turns: ^eng.Turn_
 
 // ─── Add a message to the ring buffer ────────────────────────────────────────
 
-add_message :: proc(messages: ^Message_Manager, game: ^Game, text: string, color: rl.Color) {
+add_message :: proc(
+	messages: ^Message_Manager,
+	game: ^Game,
+	text: string,
+	color: eng.Engine_Color,
+) {
 	if messages == nil || game == nil {
 		return
 	}
-	eng.message_manager_add(messages, text, engine_color_from_rl(color))
+	eng.message_manager_add(messages, text, color)
 }
 
 // ─── Clear all messages ──────────────────────────────────────────────────────

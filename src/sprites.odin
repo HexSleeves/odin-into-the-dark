@@ -2,12 +2,11 @@ package main
 
 import eng "./engine"
 import "core:encoding/json"
-import rl "vendor:raylib"
 
 // ─── Sprite types ─────────────────────────────────────────────────────────────
 
 Sprite :: struct {
-	src: rl.Rectangle,
+	src: eng.Engine_Rect,
 }
 
 // ─── JSON5 data structures for sprite mappings ────────────────────────────────
@@ -44,7 +43,7 @@ g_sprites: Sprite_Atlas
 
 sprite_at :: proc(col, row, size: int) -> Sprite {
 	return Sprite {
-		src = rl.Rectangle {
+		src = eng.Engine_Rect {
 			x = f32(col * size),
 			y = f32(row * size),
 			width = f32(size),
@@ -148,15 +147,28 @@ sprites_cleanup :: proc(engine: ^eng.Engine) {
 
 // ─── Drawing ──────────────────────────────────────────────────────────────────
 
-draw_sprite :: proc(engine: ^eng.Engine, spr: Sprite, x, y: i32, tint: rl.Color = rl.WHITE) {
+draw_sprite :: proc(
+	engine: ^eng.Engine,
+	spr: Sprite,
+	x, y: i32,
+	tint: eng.Engine_Color = eng.Engine_Color{255, 255, 255, 255},
+) {
 	if !g_sprites.loaded {return}
-	dest := rl.Rectangle {
+	dest := eng.Engine_Rect {
 		x      = f32(x),
 		y      = f32(y),
 		width  = f32(TILE_SIZE),
 		height = f32(TILE_SIZE),
 	}
-	render_draw_texture_region(engine, g_sprites.texture, spr.src, dest, {0, 0}, 0, tint)
+	eng.engine_render_draw_texture_region(
+		engine,
+		g_sprites.texture,
+		spr.src,
+		dest,
+		eng.Engine_Vec2{0, 0},
+		0,
+		tint,
+	)
 }
 
 // ─── Lookup helpers ───────────────────────────────────────────────────────────

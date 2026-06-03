@@ -1,7 +1,7 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
+
 
 // ─── Minimap overlay ──────────────────────────────────────────────────────────
 
@@ -16,7 +16,14 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 	mm_y := MINIMAP_MARGIN
 
 	// Semi-transparent background
-	render_draw_rectangle(engine, mm_x - 2, mm_y - 2, mm_w + 4, mm_h + 4, rl.Color{0, 0, 0, 180})
+	render_draw_rectangle(
+		engine,
+		mm_x - 2,
+		mm_y - 2,
+		mm_w + 4,
+		mm_h + 4,
+		eng.Engine_Color{0, 0, 0, 180},
+	)
 
 	// Draw tiles
 	for y in 0 ..< MAP_HEIGHT {
@@ -29,33 +36,33 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 			py := mm_y + i32(y) * MINIMAP_TILE_SIZE
 
 			if state.visible {
-				c: rl.Color
+				c: eng.Engine_Color
 				#partial switch tile.type {
 				case .Wall:
-					c = rl.Color{80, 80, 90, 255}
+					c = eng.Engine_Color{80, 80, 90, 255}
 				case .Floor:
-					c = rl.Color{160, 120, 60, 255}
+					c = eng.Engine_Color{160, 120, 60, 255}
 				case .Rubble:
-					c = rl.Color{140, 130, 90, 255}
+					c = eng.Engine_Color{140, 130, 90, 255}
 				case .Descent:
-					c = rl.Color{0, 255, 255, 255}
+					c = eng.Engine_Color{0, 255, 255, 255}
 				case:
-					c = rl.Color{120, 100, 80, 255}
+					c = eng.Engine_Color{120, 100, 80, 255}
 				}
 				render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
 			} else if state.explored {
-				c: rl.Color
+				c: eng.Engine_Color
 				#partial switch tile.type {
 				case .Wall:
-					c = rl.Color{30, 30, 35, 255}
+					c = eng.Engine_Color{30, 30, 35, 255}
 				case .Floor:
-					c = rl.Color{60, 45, 25, 255}
+					c = eng.Engine_Color{60, 45, 25, 255}
 				case .Rubble:
-					c = rl.Color{55, 50, 35, 255}
+					c = eng.Engine_Color{55, 50, 35, 255}
 				case .Descent:
-					c = rl.Color{0, 80, 80, 255}
+					c = eng.Engine_Color{0, 80, 80, 255}
 				case:
-					c = rl.Color{50, 40, 30, 255}
+					c = eng.Engine_Color{50, 40, 30, 255}
 				}
 				render_draw_rectangle(engine, px, py, MINIMAP_TILE_SIZE, MINIMAP_TILE_SIZE, c)
 			}
@@ -75,7 +82,7 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 			ey,
 			MINIMAP_TILE_SIZE,
 			MINIMAP_TILE_SIZE,
-			rl.Color{255, 60, 60, 255},
+			eng.Engine_Color{255, 60, 60, 255},
 		)
 	}
 
@@ -88,6 +95,6 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 		player_py,
 		MINIMAP_TILE_SIZE,
 		MINIMAP_TILE_SIZE,
-		rl.Color{255, 255, 0, 255},
+		eng.Engine_Color{255, 255, 0, 255},
 	)
 }

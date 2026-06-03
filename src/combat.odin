@@ -3,7 +3,6 @@ package main
 import "core:fmt"
 
 import eng "engine"
-import rl "vendor:raylib"
 
 // ─── Combat resolution ──────────────────────────────────────────────────────
 
@@ -21,7 +20,7 @@ resolve_attack_player_on_enemy :: proc(
 		messages,
 		game,
 		fmt.tprintf("You hit the %s for %d damage.", enemy_display_name(enemy), damage),
-		rl.Color{200, 200, 200, 255},
+		eng.Engine_Color{200, 200, 200, 255},
 	)
 
 	if engine != nil {
@@ -39,7 +38,7 @@ resolve_attack_player_on_enemy :: proc(
 				messages,
 				game,
 				fmt.tprintf("You defeated the %s!", enemy_display_name(enemy)),
-				rl.Color{255, 220, 50, 255},
+				eng.Engine_Color{255, 220, 50, 255},
 			)
 			if engine != nil {
 				vfx := game_engine_vfx_manager(engine)
@@ -51,7 +50,7 @@ resolve_attack_player_on_enemy :: proc(
 				messages,
 				game,
 				fmt.tprintf("The %s is killed!", enemy_display_name(enemy)),
-				rl.Color{0, 255, 0, 255},
+				eng.Engine_Color{0, 255, 0, 255},
 			)
 		}
 	}
@@ -65,12 +64,12 @@ resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, 
 		messages,
 		game,
 		fmt.tprintf("The %s hits you for %d damage!", enemy_display_name(enemy), damage),
-		rl.Color{255, 100, 100, 255},
+		eng.Engine_Color{255, 100, 100, 255},
 	)
 
 	if game.player.hp <= 0 {
 		game.death_cause = fmt.tprintf("Killed by a %s", enemy_display_name(enemy))
 		game.state = .Game_Over
-		add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+		add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 	}
 }

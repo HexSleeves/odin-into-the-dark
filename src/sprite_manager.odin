@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
 
 // ─── Sprite manager facade ───────────────────────────────────────────────────
 
@@ -25,7 +24,7 @@ sprite_manager_draw :: proc(
 	sprites: ^Sprite_Manager,
 	spr: Sprite,
 	x, y: i32,
-	tint: rl.Color = rl.WHITE,
+	tint: eng.Engine_Color = eng.Engine_Color{255, 255, 255, 255},
 ) {
 	if sprites == nil || sprites.backend == nil || sprites.backend == &g_sprites {
 		draw_sprite(engine, spr, x, y, tint)
@@ -34,13 +33,21 @@ sprite_manager_draw :: proc(
 	if !sprites.backend.loaded {
 		return
 	}
-	dest := rl.Rectangle {
+	dest := eng.Engine_Rect {
 		x      = f32(x),
 		y      = f32(y),
 		width  = f32(TILE_SIZE),
 		height = f32(TILE_SIZE),
 	}
-	render_draw_texture_region(engine, sprites.backend.texture, spr.src, dest, {0, 0}, 0, tint)
+	eng.engine_render_draw_texture_region(
+		engine,
+		sprites.backend.texture,
+		spr.src,
+		dest,
+		eng.Engine_Vec2{0, 0},
+		0,
+		tint,
+	)
 }
 
 sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> Sprite {
@@ -118,13 +125,4 @@ sprite_manager_fallback :: proc(sprites: ^Sprite_Manager) -> Sprite {
 	}
 	size := sprites.backend.tile_size if sprites.backend.tile_size > 0 else SPRITE_SIZE
 	return sprite_at(0, 0, size)
-}
-
-sprite_manager_texture :: proc(sprites: ^Sprite_Manager) -> rl.Texture2D {
-	tex := &g_sprites.texture
-	if sprites != nil && sprites.backend != nil && sprites.backend != &g_sprites {
-		tex = &sprites.backend.texture
-	}
-	if tex.handle == nil {return {}}
-	return (cast(^rl.Texture2D)tex.handle)^
 }

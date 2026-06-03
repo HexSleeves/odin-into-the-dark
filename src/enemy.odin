@@ -4,7 +4,6 @@ import "core:fmt"
 import "core:math/rand"
 
 import eng "./engine"
-import rl "vendor:raylib"
 
 // ─── Enemy factory (data-driven) ─────────────────────────────────────────────
 
@@ -23,7 +22,7 @@ enemy_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Enemy {
 		enemy_type = id,
 		name = id,
 		glyph = '?',
-		color = rl.RED,
+		color = eng.Engine_Color{230, 41, 55, 255},
 		alive = true,
 	}
 }
@@ -363,7 +362,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							messages,
 							game,
 							fmt.tprintf("The %s spins a web!", enemy_display_name(&enemy)),
-							rl.Color{100, 200, 100, 255},
+							eng.Engine_Color{100, 200, 100, 255},
 						)
 						break
 					}
@@ -406,7 +405,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							messages,
 							game,
 							"The Deep Watcher pulls you closer!",
-							rl.Color{180, 50, 220, 255},
+							eng.Engine_Color{180, 50, 220, 255},
 						)
 					}
 				}
@@ -432,7 +431,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 									"The %s appears from the shadows!",
 									enemy_display_name(&enemy),
 								),
-								rl.Color{80, 40, 120, 255},
+								eng.Engine_Color{80, 40, 120, 255},
 							)
 							break
 						}
@@ -448,7 +447,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						messages,
 						game,
 						"The Mine Guardian slams the ground! (-4 HP)",
-						rl.Color{220, 180, 60, 255},
+						eng.Engine_Color{220, 180, 60, 255},
 					)
 					if game.player.hp <= 0 {
 						game.death_cause = "Crushed by the Mine Guardian"
@@ -457,7 +456,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							messages,
 							game,
 							"You have been slain...",
-							rl.Color{255, 0, 0, 255},
+							eng.Engine_Color{255, 0, 0, 255},
 						)
 					}
 				}
@@ -473,7 +472,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					messages,
 					game,
 					"The Abyssal Lord shrouds you in darkness!",
-					rl.Color{150, 30, 200, 255},
+					eng.Engine_Color{150, 30, 200, 255},
 				)
 			}
 		} else if enemy.ability_type == "ranged_shoot" {
@@ -491,7 +490,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							enemy_display_name(&enemy),
 							dmg,
 						),
-						rl.Color{200, 160, 80, 255},
+						eng.Engine_Color{200, 160, 80, 255},
 					)
 					if game.player.hp <= 0 {
 						game.death_cause = fmt.tprintf(
@@ -503,7 +502,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							messages,
 							game,
 							"You have been slain...",
-							rl.Color{255, 0, 0, 255},
+							eng.Engine_Color{255, 0, 0, 255},
 						)
 					}
 				}
@@ -521,7 +520,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 							"The %s freezes you with its gaze!",
 							enemy_display_name(&enemy),
 						),
-						rl.Color{100, 180, 255, 255},
+						eng.Engine_Color{100, 180, 255, 255},
 					)
 				}
 			}
@@ -551,7 +550,7 @@ remove_dead_enemies :: proc(
 						messages,
 						game,
 						fmt.tprintf("The %s releases toxic gas!", game.enemies[i].name),
-						rl.Color{120, 200, 40, 255},
+						eng.Engine_Color{120, 200, 40, 255},
 					)
 				}
 			}

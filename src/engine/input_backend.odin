@@ -42,6 +42,8 @@ Engine_Key :: enum {
 	Nine,
 	Left_Shift,
 	Right_Shift,
+	Left_Bracket,
+	Right_Bracket,
 }
 
 Engine_Mouse_Position :: struct {
@@ -263,6 +265,10 @@ engine_key_to_raylib :: proc(key: Engine_Key) -> rl.KeyboardKey {
 		return .LEFT_SHIFT
 	case .Right_Shift:
 		return .RIGHT_SHIFT
+	case .Left_Bracket:
+		return .LEFT_BRACKET
+	case .Right_Bracket:
+		return .RIGHT_BRACKET
 	case:
 		return .KEY_NULL
 	}

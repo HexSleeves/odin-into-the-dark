@@ -4,7 +4,6 @@ import "core:fmt"
 import "core:math/rand"
 
 import eng "./engine"
-import rl "vendor:raylib"
 
 // ─── Item factory (data-driven) ───────────────────────────────────────────────
 
@@ -20,7 +19,7 @@ item_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Item {
 		item_type = id,
 		name = id,
 		glyph = '?',
-		color = rl.WHITE,
+		color = eng.Engine_Color{255, 255, 255, 255},
 		picked_up = false,
 		quantity = 1,
 	}
@@ -56,7 +55,12 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	it := item_at(game, game.player.pos.x, game.player.pos.y)
 	if it == nil {
-		add_message(messages, game, "Nothing to pick up here.", rl.Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Nothing to pick up here.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
@@ -80,7 +84,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 						slot.item.quantity,
 						stack_limit,
 					),
-					rl.Color{100, 255, 100, 255},
+					eng.Engine_Color{100, 255, 100, 255},
 				)
 				return true
 			}
@@ -97,7 +101,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	}
 
 	if slot_idx < 0 {
-		add_message(messages, game, "Inventory is full!", rl.Color{255, 100, 100, 255})
+		add_message(messages, game, "Inventory is full!", eng.Engine_Color{255, 100, 100, 255})
 		return false
 	}
 
@@ -112,7 +116,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 		messages,
 		game,
 		fmt.tprintf("Picked up %s.", item_display_name(it)),
-		rl.Color{100, 255, 100, 255},
+		eng.Engine_Color{100, 255, 100, 255},
 	)
 	return true
 }
@@ -142,7 +146,7 @@ use_item :: proc(
 				messages,
 				game,
 				fmt.tprintf("Press E in inventory to equip the %s.", def.name),
-				rl.Color{180, 180, 180, 255},
+				eng.Engine_Color{180, 180, 180, 255},
 			)
 			return false
 		}
@@ -152,7 +156,7 @@ use_item :: proc(
 				messages,
 				game,
 				"Raw materials cannot be used directly. Find an anvil to craft.",
-				rl.Color{180, 180, 100, 255},
+				eng.Engine_Color{180, 180, 100, 255},
 			)
 			return false
 		}
@@ -171,7 +175,7 @@ use_item :: proc(
 			}
 		}
 	} else {
-		add_message(messages, game, "Nothing happens.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Nothing happens.", eng.Engine_Color{180, 180, 180, 255})
 	}
 
 	// Decrement stack quantity; clear slot only when empty
@@ -189,29 +193,44 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 		game.light_boost_turns -= 1
 		if game.light_boost_turns <= 0 {
 			game.light_boost_bonus = 0
-			add_message(messages, game, "The lantern oil burns out.", rl.Color{180, 130, 50, 255})
+			add_message(
+				messages,
+				game,
+				"The lantern oil burns out.",
+				eng.Engine_Color{180, 130, 50, 255},
+			)
 		}
 	}
 
 	if game.poison_turns > 0 {
 		game.poison_turns -= 1
 		game.player.hp -= 1
-		add_message(messages, game, "Poison damages you! (-1 HP)", rl.Color{120, 200, 40, 255})
+		add_message(
+			messages,
+			game,
+			"Poison damages you! (-1 HP)",
+			eng.Engine_Color{120, 200, 40, 255},
+		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Died from poison"
 			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 		}
 	}
 
 	if game.burning_turns > 0 {
 		game.burning_turns -= 1
 		game.player.hp -= 1
-		add_message(messages, game, "You are burning! (-1 HP)", rl.Color{255, 120, 20, 255})
+		add_message(
+			messages,
+			game,
+			"You are burning! (-1 HP)",
+			eng.Engine_Color{255, 120, 20, 255},
+		)
 		if game.player.hp <= 0 {
 			game.death_cause = "Burned to death"
 			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 		}
 	}
 
@@ -222,14 +241,14 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 				messages,
 				game,
 				"You are frozen! Movement costs double.",
-				rl.Color{100, 180, 255, 255},
+				eng.Engine_Color{100, 180, 255, 255},
 			)
 		} else {
 			add_message(
 				messages,
 				game,
 				"The ice thaws. You can move freely.",
-				rl.Color{150, 200, 255, 255},
+				eng.Engine_Color{150, 200, 255, 255},
 			)
 		}
 	}
@@ -245,7 +264,7 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 					messages,
 					game,
 					"The darkness closes in... your light fades.",
-					rl.Color{100, 100, 140, 255},
+					eng.Engine_Color{100, 100, 140, 255},
 				)
 			}
 		}
@@ -279,7 +298,7 @@ drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> b
 		messages,
 		game,
 		fmt.tprintf("You drop a %s.", item_display_name(&slot.item)),
-		rl.Color{180, 180, 100, 255},
+		eng.Engine_Color{180, 180, 100, 255},
 	)
 
 	// Decrement stack or clear slot

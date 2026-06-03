@@ -3,46 +3,45 @@ package main
 import eng "./engine"
 import "core:fmt"
 import "core:math"
-import rl "vendor:raylib"
 
 // ─── Depth palette definitions ────────────────────────────────────────────────
 
 PALETTE_MINE :: Floor_Palette {
-	wall    = rl.Color{40, 40, 45, 255},
-	floor   = rl.Color{139, 90, 43, 255},
-	rubble  = rl.Color{180, 160, 100, 255},
-	descent = rl.Color{0, 200, 200, 255},
+	wall    = eng.Engine_Color{40, 40, 45, 255},
+	floor   = eng.Engine_Color{139, 90, 43, 255},
+	rubble  = eng.Engine_Color{180, 160, 100, 255},
+	descent = eng.Engine_Color{0, 200, 200, 255},
 }
 
 PALETTE_STONE :: Floor_Palette {
-	wall    = rl.Color{50, 50, 55, 255},
-	floor   = rl.Color{100, 100, 110, 255},
-	rubble  = rl.Color{130, 130, 120, 255},
-	descent = rl.Color{0, 200, 200, 255},
+	wall    = eng.Engine_Color{50, 50, 55, 255},
+	floor   = eng.Engine_Color{100, 100, 110, 255},
+	rubble  = eng.Engine_Color{130, 130, 120, 255},
+	descent = eng.Engine_Color{0, 200, 200, 255},
 }
 
 PALETTE_CRYSTAL :: Floor_Palette {
-	wall    = rl.Color{30, 45, 60, 255},
-	floor   = rl.Color{50, 90, 100, 255},
-	rubble  = rl.Color{80, 140, 130, 255},
-	descent = rl.Color{0, 255, 200, 255},
+	wall    = eng.Engine_Color{30, 45, 60, 255},
+	floor   = eng.Engine_Color{50, 90, 100, 255},
+	rubble  = eng.Engine_Color{80, 140, 130, 255},
+	descent = eng.Engine_Color{0, 255, 200, 255},
 }
 
 PALETTE_FLOODED :: Floor_Palette {
-	wall    = rl.Color{25, 40, 55, 255},
-	floor   = rl.Color{35, 65, 80, 255},
-	rubble  = rl.Color{50, 90, 85, 255},
-	descent = rl.Color{0, 200, 255, 255},
+	wall    = eng.Engine_Color{25, 40, 55, 255},
+	floor   = eng.Engine_Color{35, 65, 80, 255},
+	rubble  = eng.Engine_Color{50, 90, 85, 255},
+	descent = eng.Engine_Color{0, 200, 255, 255},
 }
 
 PALETTE_DEEP :: Floor_Palette {
-	wall    = rl.Color{35, 20, 45, 255},
-	floor   = rl.Color{70, 40, 80, 255},
-	rubble  = rl.Color{110, 60, 120, 255},
-	descent = rl.Color{200, 100, 255, 255},
+	wall    = eng.Engine_Color{35, 20, 45, 255},
+	floor   = eng.Engine_Color{70, 40, 80, 255},
+	rubble  = eng.Engine_Color{110, 60, 120, 255},
+	descent = eng.Engine_Color{200, 100, 255, 255},
 }
 
-UNSEEN_COLOR :: rl.Color{0, 0, 0, 255}
+UNSEEN_COLOR :: eng.Engine_Color{0, 0, 0, 255}
 
 // Dimming multiplier for explored-but-not-visible tiles (used in S03 FOV)
 EXPLORED_DIM :: 0.55
@@ -59,11 +58,16 @@ palette_for_depth :: proc(depth: int) -> Floor_Palette {
 
 // ─── Tile color helpers ───────────────────────────────────────────────────────
 
-dim_color :: proc(c: rl.Color, factor: f32) -> rl.Color {
-	return rl.Color{u8(f32(c.r) * factor), u8(f32(c.g) * factor), u8(f32(c.b) * factor), c.a}
+dim_color :: proc(c: eng.Engine_Color, factor: f32) -> eng.Engine_Color {
+	return eng.Engine_Color {
+		u8(f32(c.r) * factor),
+		u8(f32(c.g) * factor),
+		u8(f32(c.b) * factor),
+		c.a,
+	}
 }
 
-base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
+base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> eng.Engine_Color {
 	#partial switch type {
 	case .Wall:
 		return palette.wall
@@ -74,26 +78,30 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 	case .Descent:
 		return palette.descent
 	case .Water:
-		return rl.Color{40, 80, 180, 255}
+		return eng.Engine_Color{40, 80, 180, 255}
 	case .Fountain:
-		return rl.Color{40, 120, 220, 255}
+		return eng.Engine_Color{40, 120, 220, 255}
 	case .Gas_Vent:
-		return rl.Color{160, 180, 40, 255}
+		return eng.Engine_Color{160, 180, 40, 255}
 	case .Unstable:
-		return rl.Color{180, 120, 60, 255}
+		return eng.Engine_Color{180, 120, 60, 255}
 	case .Chasm:
-		return rl.Color{10, 10, 15, 255}
+		return eng.Engine_Color{10, 10, 15, 255}
 	case .Anvil:
-		return rl.Color{160, 160, 170, 255}
+		return eng.Engine_Color{160, 160, 170, 255}
 	case .Fire_Vent:
-		return rl.Color{200, 80, 20, 255}
+		return eng.Engine_Color{200, 80, 20, 255}
 	case .Locked_Door:
-		return rl.Color{180, 140, 50, 255}
+		return eng.Engine_Color{180, 140, 50, 255}
 	}
 	return UNSEEN_COLOR
 }
 
-get_tile_color :: proc(tile: Tile, state: eng.Tile_State, palette: Floor_Palette) -> rl.Color {
+get_tile_color :: proc(
+	tile: Tile,
+	state: eng.Tile_State,
+	palette: Floor_Palette,
+) -> eng.Engine_Color {
 	if state.visible {
 		return dim_color(base_tile_color(tile.type, palette), max(state.light_level, 0.5))
 	}
@@ -148,10 +156,10 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 				render_draw_rectangle(engine, sx, sy, i32(TILE_SIZE), i32(TILE_SIZE), UNSEEN_COLOR)
 			} else {
 				base := base_tile_color(tile.type, palette)
-				tint: rl.Color
+				tint: eng.Engine_Color
 				if state.visible {
 					brightness := max(state.light_level, 0.5)
-					tint = rl.Color {
+					tint = eng.Engine_Color {
 						u8(f32(base.r) * brightness),
 						u8(f32(base.g) * brightness),
 						u8(f32(base.b) * brightness),
@@ -159,7 +167,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 					}
 				} else {
 					dim := f32(EXPLORED_DIM)
-					tint = rl.Color {
+					tint = eng.Engine_Color {
 						u8(f32(base.r) * dim),
 						u8(f32(base.g) * dim),
 						u8(f32(base.b) * dim),
@@ -224,7 +232,14 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 
 			if ui.use_sprites {
 				spr := sprite_manager_named(sprites, "tile", "web")
-				sprite_manager_draw(engine, sprites, spr, sx, sy, rl.Color{180, 180, 180, 150})
+				sprite_manager_draw(
+					engine,
+					sprites,
+					spr,
+					sx,
+					sy,
+					eng.Engine_Color{180, 180, 180, 150},
+				)
 			} else {
 				render_draw_text(
 					engine,
@@ -232,7 +247,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 					sx + 4,
 					sy + 4,
 					i32(TILE_SIZE) - 8,
-					rl.Color{180, 180, 180, 150},
+					eng.Engine_Color{180, 180, 180, 150},
 				)
 			}
 		}
@@ -314,8 +329,8 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 
 // ─── Mouse hover tooltip (camera-aware) ───────────────────────────────────────
 
-TOOLTIP_BG_COLOR :: rl.Color{20, 20, 25, 230}
-TOOLTIP_TEXT_COLOR :: rl.WHITE
+TOOLTIP_BG_COLOR :: eng.Engine_Color{20, 20, 25, 230}
+TOOLTIP_TEXT_COLOR :: eng.Engine_Color{255, 255, 255, 255}
 TOOLTIP_FONT_SIZE :: i32(14)
 TOOLTIP_PAD_X :: i32(6)
 TOOLTIP_PAD_Y :: i32(4)

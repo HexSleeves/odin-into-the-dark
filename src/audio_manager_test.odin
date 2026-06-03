@@ -5,57 +5,80 @@ import "core:testing"
 
 @(test)
 audio_manager_make_wraps_current_audio_backend :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
+	g_audio.enabled = true
+	g_audio.backend = test_game_audio_backend_make(&Test_Game_Audio_Backend_State{enabled = true})
 	audio := audio_manager_make()
 
-	testing.expect(t, eng.audio_manager_is_enabled(&audio) == g_audio.enabled)
+	testing.expect(t, eng.audio_manager_is_enabled(&audio))
 }
 
 @(test)
 audio_manager_reports_enabled_state_from_backend :: proc(t: ^testing.T) {
-	audio := audio_manager_make()
-	was_enabled := g_audio.enabled
-	defer g_audio.enabled = was_enabled
+	state := Test_Game_Audio_Backend_State {
+		enabled = false,
+	}
+	audio := eng.audio_manager_make(test_game_audio_backend_make(&state))
 
-	g_audio.enabled = false
 	testing.expect(t, !audio_manager_is_enabled(&audio))
 
-	g_audio.enabled = true
+	state.enabled = true
 	testing.expect(t, audio_manager_is_enabled(&audio))
 }
 
 @(test)
 audio_manager_play_sfx_delegates_to_engine_audio_backend :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Mine] = 42
 
+	audio := eng.audio_manager_make(backend)
 	audio_manager_play_sfx(&audio, .Mine)
 	testing.expect_value(t, state.play_count, 1)
-	testing.expect_value(t, state.last_sound_id, int(Sound_Type.Mine))
+	testing.expect_value(t, state.last_sound_id, 42)
 }
 
 @(test)
 audio_manager_stop_sfx_delegates_to_backend :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Hit] = 7
 
+	audio := eng.audio_manager_make(backend)
 	audio_manager_stop_sfx(&audio, .Hit)
 	testing.expect_value(t, state.stop_count, 1)
-	testing.expect_value(t, state.last_stopped_id, int(Sound_Type.Hit))
+	testing.expect_value(t, state.last_stopped_id, 7)
 }
 
 @(test)
 audio_manager_set_sfx_volume_delegates_to_backend :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Death] = 13
 
+	audio := eng.audio_manager_make(backend)
 	audio_manager_set_sfx_volume(&audio, .Death, 0.75)
-	testing.expect_value(t, state.last_volume_id, int(Sound_Type.Death))
+	testing.expect_value(t, state.last_volume_id, 13)
 	testing.expect_value(t, state.last_volume, f32(0.75))
 }
 
@@ -64,7 +87,7 @@ audio_manager_set_master_volume_delegates_to_backend :: proc(t: ^testing.T) {
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	audio := eng.audio_manager_make(test_game_audio_backend_make(&state))
 
 	audio_manager_set_master_volume(&audio, 0.5)
 	testing.expect_value(t, state.master_volume, f32(0.5))
@@ -72,14 +95,20 @@ audio_manager_set_master_volume_delegates_to_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_play_sfx_looped_delegates_to_backend :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Water] = 99
 
+	audio := eng.audio_manager_make(backend)
 	audio_manager_play_sfx_looped(&audio, .Water)
 	testing.expect_value(t, state.play_looped_count, 1)
-	testing.expect_value(t, state.last_looped_id, int(Sound_Type.Water))
+	testing.expect_value(t, state.last_looped_id, 99)
 }
 
 @(test)
@@ -87,7 +116,7 @@ audio_manager_update_delegates_to_backend :: proc(t: ^testing.T) {
 	state := Test_Game_Audio_Backend_State {
 		enabled = true,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	audio := eng.audio_manager_make(test_game_audio_backend_make(&state))
 
 	eng.audio_manager_update(&audio)
 	testing.expect_value(t, state.update_count, 1)
@@ -95,25 +124,39 @@ audio_manager_update_delegates_to_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_stop_when_disabled_still_delegates :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = false,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Footstep] = 3
 
+	audio := eng.audio_manager_make(backend)
 	audio_manager_stop_sfx(&audio, .Footstep)
 	testing.expect_value(t, state.stop_count, 1)
 }
 
 @(test)
 audio_manager_play_looped_skipped_when_disabled :: proc(t: ^testing.T) {
+	saved := g_audio
+	defer g_audio = saved
+
 	state := Test_Game_Audio_Backend_State {
 		enabled = false,
 	}
-	audio := eng.audio_manager_make(test_game_audio_backend(&state))
+	backend := test_game_audio_backend_make(&state)
+	g_audio.backend = backend
+	g_audio.sounds[.Footstep] = 3
 
-	audio_manager_play_sfx_looped(&audio, .Water)
+	audio := eng.audio_manager_make(backend)
+	audio_manager_play_sfx_looped(&audio, .Footstep)
 	testing.expect_value(t, state.play_looped_count, 0)
 }
+
+// ─── Test backend ────────────────────────────────────────────────────────────
 
 Test_Game_Audio_Backend_State :: struct {
 	enabled:           bool,
@@ -129,7 +172,7 @@ Test_Game_Audio_Backend_State :: struct {
 	update_count:      int,
 }
 
-test_game_audio_backend :: proc(
+test_game_audio_backend_make :: proc(
 	state: ^Test_Game_Audio_Backend_State,
 ) -> eng.Engine_Audio_Backend {
 	return eng.Engine_Audio_Backend {

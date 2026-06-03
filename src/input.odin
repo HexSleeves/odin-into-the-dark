@@ -2,7 +2,6 @@ package main
 
 import eng "./engine"
 import "core:fmt"
-import rl "vendor:raylib"
 
 // ─── Input result ─────────────────────────────────────────────────────────────
 
@@ -40,7 +39,7 @@ handle_input :: proc(
 	if action_pressed(im, .Wait) {
 		// Deduct AP; trigger_enemy_rounds fires in handle_player_action
 		game.player.energy -= BASE_ACTION_COST
-		add_message(messages, game, "You wait...", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "You wait...", eng.Engine_Color{180, 180, 180, 255})
 		return .Waited
 	}
 
@@ -73,7 +72,7 @@ handle_input :: proc(
 					messages,
 					game,
 					"You unlock the door with the Vault Key!",
-					rl.Color{255, 215, 0, 255},
+					eng.Engine_Color{255, 215, 0, 255},
 				)
 				game.player.energy -= BASE_ACTION_COST
 				return .Moved
@@ -82,7 +81,7 @@ handle_input :: proc(
 					messages,
 					game,
 					"The door is locked. You need a key.",
-					rl.Color{180, 180, 180, 255},
+					eng.Engine_Color{180, 180, 180, 255},
 				)
 			}
 		}
@@ -121,7 +120,12 @@ handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 		// Drain a full round of AP — player loses their turn in the web
 		game.player.energy -= game.player.quickness * 10
 		trigger_enemy_rounds(engine, game)
-		add_message(messages, game, "You break free from the web.", rl.Color{200, 200, 100, 255})
+		add_message(
+			messages,
+			game,
+			"You break free from the web.",
+			eng.Engine_Color{200, 200, 100, 255},
+		)
 		return true
 	}
 
@@ -130,7 +134,12 @@ handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 		// Drain a full round of AP — moving through water costs an extra beat
 		game.player.energy -= game.player.quickness * 10
 		trigger_enemy_rounds(engine, game)
-		add_message(messages, game, "You push through the water.", rl.Color{40, 80, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You push through the water.",
+			eng.Engine_Color{40, 80, 180, 255},
+		)
 		return true
 	}
 
@@ -144,7 +153,7 @@ handle_mining_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 
 	if action_pressed(im, .Quit) {
 		ui.mining_mode = false
-		add_message(messages, game, "Mining cancelled.", rl.Color{180, 180, 180, 255})
+		add_message(messages, game, "Mining cancelled.", eng.Engine_Color{180, 180, 180, 255})
 		return true
 	}
 
@@ -182,7 +191,7 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 			messages,
 			game,
 			"You need to stand on an anvil to craft.",
-			rl.Color{180, 180, 180, 255},
+			eng.Engine_Color{180, 180, 180, 255},
 		)
 	}
 
@@ -199,27 +208,27 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		audio := game_engine_audio_manager(engine)
 		enabled := audio_manager_toggle(audio)
 		if enabled {
-			add_message(messages, game, "Sound: ON", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
 		} else {
-			add_message(messages, game, "Sound: OFF", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Sound: OFF", eng.Engine_Color{180, 180, 180, 255})
 		}
 	}
 
 	if action_pressed(im, .Toggle_Sprites) {
 		ui.use_sprites = !ui.use_sprites
 		if ui.use_sprites {
-			add_message(messages, game, "Render: SPRITES", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Render: SPRITES", eng.Engine_Color{180, 180, 180, 255})
 		} else {
-			add_message(messages, game, "Render: ASCII", rl.Color{180, 180, 180, 255})
+			add_message(messages, game, "Render: ASCII", eng.Engine_Color{180, 180, 180, 255})
 		}
 	}
 
 	if action_pressed(im, .Save) {
 		saves := game_engine_save_manager(engine)
 		if save_manager_save_game(saves, game_engine_turn_manager(engine), game) {
-			add_message(messages, game, "Game saved.", rl.Color{100, 255, 100, 255})
+			add_message(messages, game, "Game saved.", eng.Engine_Color{100, 255, 100, 255})
 		} else {
-			add_message(messages, game, "Save failed!", rl.Color{255, 100, 100, 255})
+			add_message(messages, game, "Save failed!", eng.Engine_Color{255, 100, 100, 255})
 		}
 	}
 
@@ -248,24 +257,24 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		game.state = .Viewing_Help
 		return true
 	}
-	if rl.IsKeyPressed(.LEFT_BRACKET) {
+	if eng.engine_input_key_pressed(eng.engine_input_backend(engine), .Left_Bracket) {
 		g_game_config.master_volume = max(0, g_game_config.master_volume - 0.1)
 		audio_set_master_volume(g_game_config.master_volume)
 		add_message(
 			messages,
 			game,
 			fmt.tprintf("Volume: %d%%", int(g_game_config.master_volume * 100 + 0.5)),
-			rl.Color{180, 180, 180, 255},
+			eng.Engine_Color{180, 180, 180, 255},
 		)
 	}
-	if rl.IsKeyPressed(.RIGHT_BRACKET) {
+	if eng.engine_input_key_pressed(eng.engine_input_backend(engine), .Right_Bracket) {
 		g_game_config.master_volume = min(1, g_game_config.master_volume + 0.1)
 		audio_set_master_volume(g_game_config.master_volume)
 		add_message(
 			messages,
 			game,
 			fmt.tprintf("Volume: %d%%", int(g_game_config.master_volume * 100 + 0.5)),
-			rl.Color{180, 180, 180, 255},
+			eng.Engine_Color{180, 180, 180, 255},
 		)
 	}
 
@@ -352,7 +361,7 @@ activate_title_choice :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) 
 					game_engine_message_manager(engine),
 					game,
 					"Save file could not be loaded.",
-					rl.Color{255, 180, 50, 255},
+					eng.Engine_Color{255, 180, 50, 255},
 				)
 			}
 		}
@@ -386,7 +395,7 @@ handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 				game_engine_message_manager(engine),
 				game,
 				"No save file found.",
-				rl.Color{255, 180, 50, 255},
+				eng.Engine_Color{255, 180, 50, 255},
 			)
 		}
 	}

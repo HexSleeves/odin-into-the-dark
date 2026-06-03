@@ -1,7 +1,7 @@
 package main
 
 import eng "./engine"
-import rl "vendor:raylib"
+
 
 // ─── Message Log ──────────────────────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ Player :: struct {
 	attack:       int,
 	light_radius: int,
 	glyph:        rune,
-	color:        rl.Color,
+	color:        eng.Engine_Color,
 	// Energy system (Qud-style AP scheduling)
 	energy:       int, // current action points (may be negative = debt)
 	quickness:    int, // AP generated per round = quickness * 10. Default 100.
@@ -70,7 +70,7 @@ Enemy :: struct {
 	enemy_type:       string, // data-driven ID (e.g. "rat", "cave_crawler")
 	name:             string, // display name from data
 	glyph:            rune,
-	color:            rl.Color,
+	color:            eng.Engine_Color,
 	alive:            bool,
 	// Special ability fields (data-driven)
 	ability_type:     string, // "web", "pull", "ranged_shoot", or "" for none
@@ -92,7 +92,7 @@ Item :: struct {
 	item_type:      string, // data-driven ID (e.g. "health_potion", "torch")
 	name:           string, // display name from data
 	glyph:          rune,
-	color:          rl.Color,
+	color:          eng.Engine_Color,
 	picked_up:      bool,
 	quantity:       int,
 	equipment_slot: string, // "", "weapon", "armor", "helmet"
@@ -132,17 +132,17 @@ Light_Source :: struct {
 // ─── Floor Palette (depth-themed tile colors) ────────────────────────────────
 
 Floor_Palette :: struct {
-	wall:    rl.Color,
-	floor:   rl.Color,
-	rubble:  rl.Color,
-	descent: rl.Color,
+	wall:    eng.Engine_Color,
+	floor:   eng.Engine_Color,
+	rubble:  eng.Engine_Color,
+	descent: eng.Engine_Color,
 }
 
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
 Ore_Vein :: struct {
 	ore_type: string, // "iron_ore", "copper_ore", "crystal_shard", "gold_nugget", or ""
-	color:    rl.Color, // visual tint for the wall
+	color:    eng.Engine_Color, // visual tint for the wall
 }
 
 // ─── UI State ─────────────────────────────────────────────────────────────────
@@ -213,7 +213,6 @@ Game :: struct {
 	render_map_dirty:      bool,
 	render_last_cam_x:     int,
 	render_last_cam_y:     int,
-	render_map_texture:    rl.RenderTexture2D,
 	// Status effects (volatile — not saved; resets on load)
 	poison_turns:          int,
 	burning_turns:         int,
