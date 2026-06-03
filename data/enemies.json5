@@ -42,7 +42,7 @@
       attack: 6,
       quickness: 80,
       move_speed: 100,
-      ability: { type: "pull", cooldown: 6, range: 4 },  // cd was 5 — slightly slower
+      ability: { type: "freeze", cooldown: 4, range: 3 },
     },
     {
       id: "toxic_spore",

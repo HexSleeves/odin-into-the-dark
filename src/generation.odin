@@ -96,6 +96,7 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	// Spawn optional fountain (depth 2+)
 	spawn_fountain(game)
 	spawn_monster_den(content, game)
+	spawn_treasure_vault(content, game)
 
 	// Clear hazard state
 	game.water_slow_active = false
@@ -471,4 +472,67 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 
 	logger_debugf(.Gen, "monster den in room %v at depth %v", room_idx, game.depth)
+}
+// ─── Treasure vault (locked room with guaranteed rare loot) ──────────────────
+
+spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
+	// Only at depth 4+; 20% chance; need at least 4 rooms
+	if game.depth < 4 || len(game.rooms) < 4 {return}
+	if rand.int_max(5) != 0 {return}
+
+	// Pick a room that isn't player start or descent
+	room_idx := rand.int_max(len(game.rooms) - 2) + 1
+	room := game.rooms[room_idx]
+
+	// Find a floor tile on the room perimeter to place the locked door
+	door_placed := false
+	door_x, door_y: int
+	edges := [2]int{room.y1, room.y2 - 1}
+	for try_x in room.x1 ..< room.x2 {
+		for ei in 0 ..< 2 {
+			try_y := edges[ei]
+			idx := pos_to_idx(try_x, try_y)
+			if game.tiles[idx].type == .Floor {
+				door_x = try_x
+				door_y = try_y
+				door_placed = true
+				break
+			}
+		}
+		if door_placed {break}
+	}
+	if !door_placed {return}
+
+	// Place locked door
+	game.tiles[pos_to_idx(door_x, door_y)].type = .Locked_Door
+
+	// Place a guaranteed rare item inside the room
+	for _ in 0 ..< 50 {
+		x := rand.int_max(room.x2 - room.x1) + room.x1
+		y := rand.int_max(room.y2 - room.y1) + room.y1
+		if x == door_x && y == door_y {continue}
+		if !is_walkable(game, x, y) {continue}
+		if item_at(game, x, y) != nil {continue}
+		def := content_manager_pick_item_def_for_depth(content, game.depth)
+		if def == nil {break}
+		append(&game.items, item_make_from_def(def, Vec2{x, y}))
+		break
+	}
+
+	// Place a vault key in a DIFFERENT room
+	for _ in 0 ..< 100 {
+		key_room_idx := rand.int_max(len(game.rooms))
+		if key_room_idx == room_idx {continue} // not in the vault itself
+		key_room := game.rooms[key_room_idx]
+		x := rand.int_max(key_room.x2 - key_room.x1) + key_room.x1
+		y := rand.int_max(key_room.y2 - key_room.y1) + key_room.y1
+		if !is_walkable(game, x, y) {continue}
+		if item_at(game, x, y) != nil {continue}
+		if x == game.player.pos.x && y == game.player.pos.y {continue}
+		key_def := find_item_def("vault_key")
+		if key_def == nil {break}
+		append(&game.items, item_make_from_def(key_def, Vec2{x, y}))
+		logger_debugf(.Gen, "vault key at (%v,%v), door at (%v,%v) depth=%v", x, y, door_x, door_y, game.depth)
+		break
+	}
 }

@@ -508,6 +508,23 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					}
 				}
 			}
+		} else if enemy.ability_type == "freeze" {
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist <= enemy.ability_range {
+				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+					game.frozen_turns = max(game.frozen_turns, 3)
+					enemy.ability_cooldown = enemy.ability_max_cd
+					add_message(
+						messages,
+						game,
+						fmt.tprintf(
+							"The %s freezes you with its gaze!",
+							enemy_display_name(&enemy),
+						),
+						rl.Color{100, 180, 255, 255},
+					)
+				}
+			}
 		}
 	}
 }

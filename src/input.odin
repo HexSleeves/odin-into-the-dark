@@ -64,6 +64,18 @@ handle_input :: proc(
 	target_y := game.player.pos.y + dy
 
 	if !is_walkable(game, target_x, target_y) {
+		// Check if bumping into a locked door with a key
+		t := tile_at(game, target_x, target_y)
+		if t != nil && t.type == .Locked_Door {
+			if remove_item_from_inventory(game, "vault_key") {
+				t.type = .Floor
+				add_message(messages, game, "You unlock the door with the Vault Key!", rl.Color{255, 215, 0, 255})
+				game.player.energy -= BASE_ACTION_COST
+				return .Moved
+			} else {
+				add_message(messages, game, "The door is locked. You need a key.", rl.Color{180, 180, 180, 255})
+			}
+		}
 		return .None
 	}
 
@@ -78,7 +90,9 @@ handle_input :: proc(
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
 	// Deduct move AP (player move_speed is 100 in Phase 1 → cost = BASE_MOVE_COST)
-	game.player.energy -= BASE_MOVE_COST
+	move_cost := BASE_MOVE_COST
+	if game.frozen_turns > 0 {move_cost *= 2}
+	game.player.energy -= move_cost
 
 	t := tile_at(game, target_x, target_y)
 	if t != nil && t.type == .Descent {

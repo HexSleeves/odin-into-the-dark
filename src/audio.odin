@@ -12,6 +12,8 @@ Sound_Type :: enum {
 	Descent,
 	Water,
 	Boss_Kill,
+	Step_Rubble,
+	Step_Stone,
 }
 
 Game_Audio :: struct {
@@ -103,6 +105,10 @@ audio_init :: proc() {
 	// Water: bubbly low-frequency noise splash
 	g_audio.sounds[.Water] = load_generated_sound(generate_noise(0.12, 0.25), 0.35)
 	g_audio.sounds[.Boss_Kill] = load_generated_sound(generate_tone(440, 0.6, 0.7), 0.7)
+
+	// Tile-specific footstep sounds
+	g_audio.sounds[.Step_Rubble] = load_generated_sound(generate_noise(0.06, 0.25), 0.35)
+	g_audio.sounds[.Step_Stone] = load_generated_sound(generate_tone(150, 0.04, 0.2), 0.25)
 }
 
 audio_cleanup :: proc() {

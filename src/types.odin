@@ -34,6 +34,7 @@ Tile_Type :: enum {
 	Anvil,
 	Fountain,
 	Fire_Vent,
+	Locked_Door, // treasure vault door — blocks entry until player has a key
 }
 
 Tile :: struct {
@@ -216,6 +217,7 @@ Game :: struct {
 	// Status effects (volatile — not saved; resets on load)
 	poison_turns:           int,
 	burning_turns:          int,
+	frozen_turns:           int,
 	boss_killed_this_turn:  bool,
 	// Run statistics
 	items_found:            int,

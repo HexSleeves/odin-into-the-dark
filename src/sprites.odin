@@ -197,6 +197,8 @@ get_tile_sprite :: proc(tile_type: Tile_Type) -> Sprite {
 		key = "anvil"
 	case .Fountain:
 		key = "water"
+	case .Locked_Door:
+		key = "anvil"
 	case:
 		key = "floor"
 	}

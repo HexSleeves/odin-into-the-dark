@@ -213,6 +213,15 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 		}
 	}
 
+	if game.frozen_turns > 0 {
+		game.frozen_turns -= 1
+		if game.frozen_turns > 0 {
+			add_message(messages, game, "You are frozen! Movement costs double.", rl.Color{100, 180, 255, 255})
+		} else {
+			add_message(messages, game, "The ice thaws. You can move freely.", rl.Color{150, 200, 255, 255})
+		}
+	}
+
 	// Passive light drain — darkness encroaches without a light source (depth 3+)
 	if game.depth >= 3 && game.light_boost_turns <= 0 {
 		game.light_drain_timer += 1
@@ -383,4 +392,15 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 		len(game.rooms) - 1,
 		game.depth,
 	)
+}
+// ─── Remove item from inventory by type ──────────────────────────────────────
+
+remove_item_from_inventory :: proc(game: ^Game, item_type: string) -> bool {
+	for i in 0 ..< MAX_INVENTORY {
+		if game.inventory[i].occupied && game.inventory[i].item.item_type == item_type {
+			game.inventory[i].occupied = false
+			return true
+		}
+	}
+	return false
 }

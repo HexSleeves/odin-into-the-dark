@@ -87,6 +87,8 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 		return rl.Color{160, 160, 170, 255}
 	case .Fire_Vent:
 		return rl.Color{200, 80, 20, 255}
+	case .Locked_Door:
+		return rl.Color{180, 140, 50, 255}
 	}
 	return UNSEEN_COLOR
 }

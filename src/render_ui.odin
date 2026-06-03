@@ -770,37 +770,41 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	stats_y :: i32(190)
 	center_x := sw / 2
 
+	stat_col := center_x - 120
+	val_col := center_x + 60
+	stat_color :: rl.Color{180, 180, 180, 255}
+	val_color :: rl.Color{255, 255, 200, 255}
+
+	render_draw_text(engine, "Depth Reached", stat_col, stats_y, 18, stat_color)
+	render_draw_text(engine, rl.TextFormat("%d", i32(game.depth)), val_col, stats_y, 18, val_color)
+
+	render_draw_text(engine, "Enemies Slain", stat_col, stats_y + 25, 18, stat_color)
+	render_draw_text(engine, rl.TextFormat("%d", i32(game.kills)), val_col, stats_y + 25, 18, val_color)
+
+	render_draw_text(engine, "Items Found", stat_col, stats_y + 50, 18, stat_color)
+	render_draw_text(engine, rl.TextFormat("%d", i32(game.items_found)), val_col, stats_y + 50, 18, val_color)
+
+	render_draw_text(engine, "Turns Survived", stat_col, stats_y + 75, 18, stat_color)
+	render_draw_text(engine, rl.TextFormat("%d", i32(eng.turn_manager_current(turns))), val_col, stats_y + 75, 18, val_color)
+
+	render_draw_text(engine, "HP Remaining", stat_col, stats_y + 100, 18, stat_color)
 	render_draw_text(
 		engine,
-		rl.TextFormat("Depth Reached: %d", i32(game.depth)),
-		center_x - 100,
-		stats_y,
-		18,
-		rl.Color{200, 200, 200, 255},
-	)
-	render_draw_text(
-		engine,
-		rl.TextFormat("Enemies Slain: %d", i32(game.kills)),
-		center_x - 100,
-		stats_y + 25,
-		18,
-		rl.Color{200, 200, 200, 255},
-	)
-	render_draw_text(
-		engine,
-		rl.TextFormat("Turns Survived: %d", i32(eng.turn_manager_current(turns))),
-		center_x - 100,
-		stats_y + 50,
-		18,
-		rl.Color{200, 200, 200, 255},
-	)
-	render_draw_text(
-		engine,
-		rl.TextFormat("HP Remaining: %d/%d", i32(game.player.hp), i32(game.player.max_hp)),
-		center_x - 100,
-		stats_y + 75,
+		rl.TextFormat("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+		val_col,
+		stats_y + 100,
 		18,
 		rl.Color{100, 255, 100, 255},
+	)
+
+	// Divider
+	render_draw_rectangle(
+		engine,
+		center_x - 100,
+		stats_y + 130,
+		200,
+		1,
+		rl.Color{80, 80, 80, 255},
 	)
 
 	// High Scores
@@ -811,7 +815,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		engine,
 		hs_title,
 		(sw - hs_w) / 2,
-		stats_y + 115,
+		stats_y + 145,
 		hs_size,
 		rl.Color{255, 220, 50, 255},
 	)
@@ -819,7 +823,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	table := score_manager_load(scores)
 	defer score_table_destroy(&table)
 	row_h :: i32(22)
-	base_y := stats_y + 140
+	base_y := stats_y + 170
 	row_size :: i32(14)
 
 	if table.count == 0 {
@@ -858,16 +862,16 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		}
 	}
 
-	// Footer
-	footer := cstring("Press R to play again  |  ESC to quit")
-	footer_size :: i32(16)
-	footer_w := render_measure_text(engine, footer, footer_size)
+	// Prompt
+	prompt := cstring("Press [R] to play again or [Q] to quit")
+	prompt_size :: i32(16)
+	prompt_w := render_measure_text(engine, prompt, prompt_size)
 	render_draw_text(
 		engine,
-		footer,
-		(sw - footer_w) / 2,
-		i32(SCREEN_HEIGHT) - 30,
-		footer_size,
+		prompt,
+		(sw - prompt_w) / 2,
+		i32(SCREEN_HEIGHT) - 60,
+		prompt_size,
 		rl.Color{150, 150, 150, 255},
 	)
 }
