@@ -55,7 +55,9 @@ sprite_at :: proc(col, row, size: int) -> Sprite {
 // ─── Init / Cleanup ───────────────────────────────────────────────────────────
 
 sprites_init :: proc(engine: ^eng.Engine) {
-	// Compile-time embedded sprite data — no runtime file I/O
+	// Compile-time embedded sprite data — no runtime file I/O.
+	// json.unmarshal returns strings pointing into this constant data,
+	// so we must NOT delete them (they aren't heap-allocated).
 	EMBEDDED_SPRITES :: #load("../data/sprites.json5")
 
 	sprite_data: Sprite_Data
@@ -65,12 +67,6 @@ sprites_init :: proc(engine: ^eng.Engine) {
 		return
 	}
 
-	if sprite_data.tileset != "" {
-		defer delete(sprite_data.tileset)
-	}
-	defer delete(sprite_data.tiles)
-	defer delete(sprite_data.characters)
-	defer delete(sprite_data.items)
 
 	// Load the tileset texture
 	tileset_path := sprite_data.tileset
