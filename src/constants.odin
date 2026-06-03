@@ -37,3 +37,7 @@ DMAP_UNREACHABLE :: 9999
 BASE_ACTION_COST  :: 1000 // default AP cost for any action
 BASE_MOVE_COST    :: 1000 // base AP cost to move one tile (scaled by move_speed)
 BASE_AP_PER_ROUND :: 1000 // AP a QN=100 actor generates per round
+
+// ─── Light drain ──────────────────────────────────────────────────────────────
+LIGHT_DRAIN_INTERVAL :: 30  // rounds between passive light radius loss
+LIGHT_DRAIN_MIN      :: 2   // minimum light radius from drain

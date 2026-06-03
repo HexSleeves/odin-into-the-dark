@@ -104,6 +104,7 @@ descend :: proc(
 	if game.depth >= 8 {min_light = 2}
 	player_def := content_manager_player_def(content)
 	game.player.light_radius = max(player_def.light_radius - game.depth + 1, min_light)
+	game.light_drain_timer = 0
 
 	// Regenerate the map (clears tiles, web_tiles, rooms, spawns enemies)
 	generate_map(content, game)
@@ -287,6 +288,19 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 			add_message(messages, game, fmt.tprintf("The fountain restores your health! (+%d HP)", heal), rl.Color{80, 180, 220, 255})
 		} else {
 			add_message(messages, game, "You drink from the fountain. (Already at full health)", rl.Color{80, 180, 220, 255})
+		}
+	}
+
+	if cur_tile.type == .Fire_Vent {
+		messages := game_engine_message_manager(engine)
+		game.player.hp -= 2
+		game.burning_turns = max(game.burning_turns, 4)
+		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{255, 120, 20, 255}, 0.4)
+		add_message(messages, game, "Flames scorch you! Burning! (-2 HP)", rl.Color{255, 120, 20, 255})
+		if game.player.hp <= 0 {
+			game.death_cause = "Burned alive by a fire vent"
+			game.state = .Game_Over
+			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
 		}
 	}
 }

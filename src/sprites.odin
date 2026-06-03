@@ -187,6 +187,8 @@ get_tile_sprite :: proc(tile_type: Tile_Type) -> Sprite {
 		key = "water"
 	case .Gas_Vent:
 		key = "gas_vent"
+	case .Fire_Vent:
+		key = "gas_vent"
 	case .Unstable:
 		key = "unstable"
 	case .Chasm:

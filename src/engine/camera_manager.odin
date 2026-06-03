@@ -52,11 +52,14 @@ camera_manager_update :: proc(
 	LERP_SPEED :: 0.2
 	diff_x := cam_x - camera.x
 	diff_y := cam_y - camera.y
-	camera.x += int(f32(diff_x) * LERP_SPEED)
-	camera.y += int(f32(diff_y) * LERP_SPEED)
-
-	if camera_manager_abs(diff_x) <= 1 {camera.x = cam_x}
-	if camera_manager_abs(diff_y) <= 1 {camera.y = cam_y}
+	// Integer lerp with minimum step of 1 to guarantee convergence.
+	// Without this, diffs of 2-5 produce int(f32(diff)*0.2) = 0, stalling the camera.
+	step_x := int(f32(diff_x) * LERP_SPEED)
+	step_y := int(f32(diff_y) * LERP_SPEED)
+	if diff_x != 0 && step_x == 0 { step_x = 1 if diff_x > 0 else -1 }
+	if diff_y != 0 && step_y == 0 { step_y = 1 if diff_y > 0 else -1 }
+	camera.x += step_x
+	camera.y += step_y
 }
 
 @(private = "file")

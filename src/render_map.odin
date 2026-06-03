@@ -85,6 +85,8 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 		return rl.Color{10, 10, 15, 255}
 	case .Anvil:
 		return rl.Color{160, 160, 170, 255}
+	case .Fire_Vent:
+		return rl.Color{200, 80, 20, 255}
 	}
 	return UNSEEN_COLOR
 }
@@ -118,7 +120,6 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 	camera := game_engine_camera_manager(engine)
 	cam_x := game_camera_x(camera)
 	cam_y := game_camera_y(camera)
-
 
 	sprites := game_engine_sprite_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
@@ -374,3 +375,9 @@ render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 		TOOLTIP_TEXT_COLOR,
 	)
 }
+
+// ─── Render texture stubs (texture approach reverted; kept for game_cleanup call) ──
+
+render_map_ensure_texture :: proc(game: ^Game) {}
+
+render_map_free_texture :: proc(game: ^Game) {}

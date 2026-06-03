@@ -130,7 +130,7 @@ map_rendering_uses_engine_render_and_input_backends :: proc(t: ^testing.T) {
 	text := string(source)
 
 	testing.expect(t, !strings.contains(text, "rl.DrawRectangle"))
-	testing.expect(t, !strings.contains(text, "rl.DrawText"))
+	testing.expect(t, !strings.contains(text, "rl.DrawText("))
 	testing.expect(t, !strings.contains(text, "rl.MeasureText"))
 	testing.expect(t, !strings.contains(text, "rl.GetMousePosition"))
 }

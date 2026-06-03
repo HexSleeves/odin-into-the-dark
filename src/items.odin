@@ -201,6 +201,37 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
 		}
 	}
+
+	if game.burning_turns > 0 {
+		game.burning_turns -= 1
+		game.player.hp -= 1
+		add_message(messages, game, "You are burning! (-1 HP)", rl.Color{255, 120, 20, 255})
+		if game.player.hp <= 0 {
+			game.death_cause = "Burned to death"
+			game.state = .Game_Over
+			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+		}
+	}
+
+	// Passive light drain — darkness encroaches without a light source (depth 3+)
+	if game.depth >= 3 && game.light_boost_turns <= 0 {
+		game.light_drain_timer += 1
+		if game.light_drain_timer >= LIGHT_DRAIN_INTERVAL {
+			game.light_drain_timer = 0
+			if game.player.light_radius > LIGHT_DRAIN_MIN {
+				game.player.light_radius -= 1
+				add_message(
+					messages,
+					game,
+					"The darkness closes in... your light fades.",
+					rl.Color{100, 100, 140, 255},
+				)
+			}
+		}
+	} else {
+		// Reset drain timer while a light source is active
+		game.light_drain_timer = 0
+	}
 }
 
 // ─── Drop an item from inventory onto the map ────────────────────────────────

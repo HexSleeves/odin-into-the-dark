@@ -119,3 +119,12 @@ sprite_manager_fallback :: proc(sprites: ^Sprite_Manager) -> Sprite {
 	size := sprites.backend.tile_size if sprites.backend.tile_size > 0 else SPRITE_SIZE
 	return sprite_at(0, 0, size)
 }
+
+sprite_manager_texture :: proc(sprites: ^Sprite_Manager) -> rl.Texture2D {
+	tex := &g_sprites.texture
+	if sprites != nil && sprites.backend != nil && sprites.backend != &g_sprites {
+		tex = &sprites.backend.texture
+	}
+	if tex.handle == nil {return {}}
+	return (cast(^rl.Texture2D)tex.handle)^
+}

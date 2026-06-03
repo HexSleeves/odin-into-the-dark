@@ -95,6 +95,7 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 
 	// Spawn optional fountain (depth 2+)
 	spawn_fountain(game)
+	spawn_monster_den(content, game)
 
 	// Clear hazard state
 	game.water_slow_active = false
@@ -250,6 +251,22 @@ spawn_hazards :: proc(game: ^Game) {
 			if game.tiles[idx].type != .Floor {continue}
 			if x == game.player.pos.x && y == game.player.pos.y {continue}
 			game.tiles[idx].type = .Unstable
+			placed += 1
+		}
+	}
+
+	// Fire vents: depths 4+, 2-3 tiles
+	if depth >= 4 {
+		count := rand.int_max(2) + 2
+		placed := 0
+		for _ in 0 ..< count * 20 {
+			if placed >= count {break}
+			x := rand.int_max(MAP_WIDTH - 2) + 1
+			y := rand.int_max(MAP_HEIGHT - 2) + 1
+			idx := pos_to_idx(x, y)
+			if game.tiles[idx].type != .Floor {continue}
+			if x == game.player.pos.x && y == game.player.pos.y {continue}
+			game.tiles[idx].type = .Fire_Vent
 			placed += 1
 		}
 	}
@@ -414,4 +431,44 @@ spawn_fountain :: proc(game: ^Game) {
 		logger_debugf(.Gen, "fountain at (%v,%v) depth=%v", x, y, game.depth)
 		return
 	}
+}
+// ─── Monster den spawning (depth-gated) ──────────────────────────────────────
+
+spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
+	if game.depth < 3 || len(game.rooms) < 4 {return}
+	if rand.int_max(4) != 0 {return} // 25% chance
+
+	// Pick a room that isn't the first (player start) or last (descent)
+	room_idx := rand.int_max(len(game.rooms) - 2) + 1
+	room := game.rooms[room_idx]
+
+	// Spawn 3-5 extra enemies in the room
+	extra := rand.int_max(3) + 3
+	for _ in 0 ..< extra {
+		for _ in 0 ..< 20 {
+			x := rand.int_max(room.x2 - room.x1) + room.x1
+			y := rand.int_max(room.y2 - room.y1) + room.y1
+			if !is_walkable(game, x, y) {continue}
+			if enemy_at(game, x, y) != nil {continue}
+			if x == game.player.pos.x && y == game.player.pos.y {continue}
+			def := content_manager_enemy_def_for_depth(content, game.depth)
+			if def == nil {break}
+			append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+			break
+		}
+	}
+
+	// Place 1 guaranteed item in the den
+	for _ in 0 ..< 50 {
+		x := rand.int_max(room.x2 - room.x1) + room.x1
+		y := rand.int_max(room.y2 - room.y1) + room.y1
+		if !is_walkable(game, x, y) {continue}
+		if item_at(game, x, y) != nil {continue}
+		def := content_manager_pick_item_def_for_depth(content, game.depth)
+		if def == nil {break}
+		append(&game.items, item_make_from_def(def, Vec2{x, y}))
+		break
+	}
+
+	logger_debugf(.Gen, "monster den in room %v at depth %v", room_idx, game.depth)
 }

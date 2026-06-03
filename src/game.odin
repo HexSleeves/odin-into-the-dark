@@ -137,6 +137,7 @@ game_camera_y :: proc(camera: ^eng.Camera_Manager) -> int {
 
 // Release dynamic allocations (rooms, enemies, light_sources)
 game_cleanup :: proc(game: ^Game) {
+	render_map_free_texture(game)
 	delete(game.rooms)
 	delete(game.enemies)
 	delete(game.items)

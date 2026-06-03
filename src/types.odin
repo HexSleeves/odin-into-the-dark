@@ -33,6 +33,7 @@ Tile_Type :: enum {
 	Chasm,
 	Anvil,
 	Fountain,
+	Fire_Vent,
 }
 
 Tile :: struct {
@@ -188,6 +189,7 @@ Game :: struct {
 	// Timed light boost (from lantern oil)
 	light_boost_bonus: int,
 	light_boost_turns: int,
+	light_drain_timer: int, // counts rounds until next light drain
 	// Web tiles (Cave Crawler ability)
 	web_tiles:         eng.Bool_Grid_Manager,
 	tile_states:       eng.Tile_State_Manager,
@@ -210,8 +212,10 @@ Game :: struct {
 	render_map_dirty:       bool,
 	render_last_cam_x:      int,
 	render_last_cam_y:      int,
+	render_map_texture:     rl.RenderTexture2D,
 	// Status effects (volatile — not saved; resets on load)
 	poison_turns:           int,
+	burning_turns:          int,
 	boss_killed_this_turn:  bool,
 	// Run statistics
 	items_found:            int,

@@ -90,6 +90,17 @@
       effect: { type: "equip", value: 1 },
       equipment_slot: "helmet",
     },
+    // ── Fast weapon (dagger — low damage, fast attack speed) ──
+    {
+      id: "mine_dagger",
+      name: "Mine Dagger",
+      glyph: "d",
+      color: [190, 190, 210, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 1 },
+      equipment_slot: "weapon",
+      action_cost: 700,
+    },
     // ── Tier 2 Equipment (deeper floors) ──
     {
       id: "steel_pickaxe",
@@ -119,6 +130,17 @@
       stack_limit: 1,
       effect: { type: "equip", value: 2 },
       equipment_slot: "helmet",
+    },
+    // ── Heavy weapon (greatsword — high damage, very slow) ──
+    {
+      id: "greatsword",
+      name: "Greatsword",
+      glyph: "G",
+      color: [200, 200, 220, 255],
+      stack_limit: 1,
+      effect: { type: "equip", value: 7 },
+      equipment_slot: "weapon",
+      action_cost: 2100,
     },
     // ── Materials (from mining) ──
     {
@@ -193,6 +215,8 @@
     { id: "steel_pickaxe", weight: 3 },
     { id: "chainmail", weight: 3 },
     { id: "crystal_lamp", weight: 3 },
+    { id: "mine_dagger", weight: 2 },
+    { id: "greatsword", weight: 1 },
   ],
   // Depth-weighted spawn tables — better gear at deeper floors
   item_spawn_tables: [
@@ -220,6 +244,7 @@
         { id: "rusty_pickaxe", weight: 7 },
         { id: "leather_vest", weight: 6 },
         { id: "miners_helmet", weight: 4 },
+        { id: "mine_dagger", weight: 5 },
       ],
     },
     {
@@ -236,6 +261,8 @@
         { id: "torch", weight: 5 },
         { id: "rusty_pickaxe", weight: 2 },
         { id: "leather_vest", weight: 1 },
+        { id: "mine_dagger", weight: 5 },
+        { id: "greatsword", weight: 4 },
       ],
     },
   ],

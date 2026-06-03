@@ -264,7 +264,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	y += 15
 
 	// ── Status effects ───────────────────────────────────────────────────────
-	has_status := game.light_boost_turns > 0 || game.poison_turns > 0
+	has_status := game.light_boost_turns > 0 || game.poison_turns > 0 || game.burning_turns > 0
 	if has_status {
 		y += 2
 		sb_divider(engine, y)
@@ -291,6 +291,16 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 				SB_POISON,
 			)
 			y += 15
+		}
+		if game.burning_turns > 0 {
+			sb_text(
+				engine,
+				rl.TextFormat("BURNING (%d)", i32(game.burning_turns)),
+				y,
+				12,
+				rl.Color{255, 120, 20, 255},
+			)
+			y += 14
 		}
 	}
 
