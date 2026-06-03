@@ -1,10 +1,17 @@
 package main
 
 import eng "./engine"
+import "core:sync"
 import "core:testing"
+
+@(private = "file")
+audio_manager_test_g_audio_mutex: sync.Mutex
 
 @(test)
 audio_manager_make_wraps_current_audio_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -30,6 +37,9 @@ audio_manager_reports_enabled_state_from_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_play_sfx_delegates_to_engine_audio_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -48,6 +58,9 @@ audio_manager_play_sfx_delegates_to_engine_audio_backend :: proc(t: ^testing.T) 
 
 @(test)
 audio_manager_stop_sfx_delegates_to_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -66,6 +79,9 @@ audio_manager_stop_sfx_delegates_to_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_set_sfx_volume_delegates_to_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -95,6 +111,9 @@ audio_manager_set_master_volume_delegates_to_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_play_sfx_looped_delegates_to_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -124,6 +143,9 @@ audio_manager_update_delegates_to_backend :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_stop_when_disabled_still_delegates :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
@@ -141,6 +163,9 @@ audio_manager_stop_when_disabled_still_delegates :: proc(t: ^testing.T) {
 
 @(test)
 audio_manager_play_looped_skipped_when_disabled :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
 	saved := g_audio
 	defer g_audio = saved
 
