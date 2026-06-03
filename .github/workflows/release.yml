@@ -31,7 +31,7 @@ jobs:
           cp -r assets build/linux/
           cd build/linux && tar czf ../../into_the_depths-linux-x86_64.tar.gz into_the_depths assets/
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: linux-x86_64
           path: into_the_depths-linux-x86_64.tar.gz
@@ -61,7 +61,7 @@ jobs:
         run: |
           cd build/macos && tar czf ../../into_the_depths-macos-arm64.tar.gz "Into the Depths.app"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: macos-arm64
           path: into_the_depths-macos-arm64.tar.gz
@@ -88,7 +88,7 @@ jobs:
       - name: Package
         run: cd build/web && zip -r ../../into_the_depths-web.zip .
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: web
           path: into_the_depths-web.zip
@@ -98,12 +98,12 @@ jobs:
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           merge-multiple: true
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
           fail_on_unmatched_files: false
