@@ -67,6 +67,8 @@ sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> S
 		key = "chasm"
 	case .Anvil:
 		key = "anvil"
+	case .Fountain:
+		key = "water"
 	case:
 		key = "floor"
 	}

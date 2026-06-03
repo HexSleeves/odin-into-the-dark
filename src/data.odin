@@ -364,6 +364,13 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			"Raw materials cannot be used directly. Find an anvil to craft.",
 			rl.Color{180, 180, 100, 255},
 		)
+	} else if eff.type == "cure_poison" {
+		if game.poison_turns > 0 {
+			game.poison_turns = 0
+			add_message(messages, game, "You drink the antidote. Poison cured!", rl.Color{120, 220, 80, 255})
+		} else {
+			add_message(messages, game, "You drink the antidote. (You weren't poisoned)", rl.Color{120, 220, 80, 255})
+		}
 	} else {
 		add_message(
 			messages,

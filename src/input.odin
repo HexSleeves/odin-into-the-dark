@@ -31,6 +31,7 @@ handle_input :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 	im: ^Input_Manager,
+	engine: ^eng.Engine = nil,
 ) -> Input_Result {
 	if action_pressed(im, .Quit) {
 		return .Quit

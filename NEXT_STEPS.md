@@ -1,129 +1,124 @@
 # Into the Depths — Next Steps
 
-## What shipped this session
+## What shipped across all sessions
 
-### Engine (parity with karl2d)
-
+### Engine
 | Feature | Details |
 |---|---|
 | `Tile_State #packed` | 8→6 bytes/cell, eliminates implicit padding |
-| Cell limits 4096→8192 | Tile state + bool grid; supports up to ~90×90 maps |
-| Frame arena allocator | `engine_frame_allocator(engine)` resets each frame; zero-cost scratch allocation |
+| Cell limits 4096→8192 | Tile state + bool grid; supports ~90×90 maps |
+| Frame arena allocator | `engine_frame_allocator(engine)` resets each frame |
 | Audio backend expansion | `stop`, `set_volume`, `set_master_volume`, `play_looped`, `update` vtable procs |
-| Audio loop replay | `audio_manager_update` in game loop drives looping sounds without rl.Music overhead |
+| Screen shake | `vfx_manager_shake(vfx, amount)`, decays per tick, applied to render origin |
+| Fix: music `encode_wav` | `for i, s in []i16` infers `i` as `i16` → overflow. Fixed with `mem.copy`. |
+| Fix: render flicker | Dirty-tile early-return wrong for immediate-mode Raylib. Removed. |
 
-### Game improvements
-
+### Game
 | Feature | Details |
 |---|---|
-| 3-tier ambient BGM | `Music_Tier`: Shallow (depth 1–3), Mid (4–6), Deep (7+); procedural additive-sine drones |
-| Depth-reactive music | `music_set_tier_by_depth` called on descent; crossfades between tiers |
-| Master volume ramp | Volume increases 0.6→1.0 with depth (0.02/floor) |
-| Volume settings | `[` / `]` keys adjust volume live; `ITD_MASTER_VOLUME` / `ITD_MUSIC_VOLUME` in `.env` |
-| `Game_Config` struct | `master_volume`, `music_volume`; loaded from `.env`, applied at startup |
-| Dirty tile rendering | `render_map` early-exits on idle frames (no FOV change + camera stable = 0 tile draws) |
-| Audio controls | `audio_stop_sfx`, `audio_set_sfx_volume`, `audio_set_master_volume`, `audio_play_sfx_looped` |
+| 3-tier ambient BGM | Shallow/Mid/Deep drones; crossfades on descent |
+| Volume settings | `[` / `]` live adjustment; `.env` config |
+| Death/hit particles | Enemy death burst at enemy tile; player damage hit particles |
+| Heal particles | Green burst on potion/oil use |
+| Screen shake on damage | Player taking damage triggers shake + flash |
+| hp_before fix | Gas_Vent damage now correctly triggers shake/particles |
+| **Poison status** | Gas_Vent inflicts 5 turns of poison (1 HP/turn); HUD indicator; Antidote cures it |
+| **Antidote item** | `data/items.json5`; cure_poison effect; spawns in world |
+| **Fountain tiles** | Appears in rooms at depth 2+; restores up to 5 HP on step |
+| **items_found counter** | Tracked per run; saved in v4 format; shown in score table |
+| **Score v4** | Includes items_found; save migrates cleanly from v3/v2 |
+| **Combat flash** | Yellow flash on every player attack; big flash+shake on boss kill |
+| **Boss_Kill sound** | Triumphant 440Hz tone on boss death; special kill message |
+| **boss_killed_this_turn** | Flag set by combat.odin and enemy.odin for future use |
+| **HUD: poison + kills** | Poison turns displayed; kills shown in stats line |
+| **Score display** | Items column added to score table rows |
 
 ---
 
-## Next steps (prioritized)
+## Remaining work (prioritized)
 
-### Priority 1 — Core gameplay depth
+### Priority 1 — Still missing
 
-**1.1 Enemy variety and AI**
-- Add 2–3 more enemy behaviors: ranged attacker (throws rocks), berserker (charges in straight line), lurker (waits until adjacent)
-- Enemy abilities from `data/enemies.json5` `ability.type` are parsed but most do nothing — wire them
-- Boss rooms at depths 5, 10, 15
+**1.1 Status effects depth**
+- Burning/Frozen status not yet added
+- Enemies could inflict status effects (deep_watcher could freeze, etc.)
+- Show status icons (small colored glyphs) rather than text in HUD
 
-**1.2 Items and equipment**
-- Equipment slots (armor, weapon, amulet) are in the data but effects are minimal
-- Add: weapon swing animation (VFX flash), armor damage reduction in combat formula
-- Consumables: potions have effects defined in JSON but need wiring
+**1.2 Enemy AI depth**
+- Ranged attacker AI (enemy throws projectile, doesn't need to be adjacent)
+- Berserker AI (charges in straight line toward player)
+- Lurker AI (stays still until adjacent, then attacks)
+- Currently all enemies chase or wander — more behavioral variety needed
 
-**1.3 Status effects system**
-- Poisoned, Burning, Frozen — store as bitset on Player/Enemy
-- Applied by certain enemies/items; proc each turn in `advance_turn`
-- Show status icons in HUD
+**1.3 More special rooms**
+- Monster den (extra enemies + better loot)
+- Treasure vault (locked room with guaranteed good item)
+- Currently only Fountain and Anvil as special rooms
 
 ### Priority 2 — Game feel
 
-**2.1 Visual feedback**
-- Screen shake on taking damage (VFX manager already has flash — add shake)
-- Particle burst on enemy death (particle manager already exists)
-- Death animation for enemies before removal
+**2.1 Render texture map layer (performance)**
+- Camera scroll still redraws ~3200 tiles per frame
+- Approach: `rl.RenderTexture2D` for the map; redraw only when dirty; blit at camera offset
+- Saves 99% of tile draw calls during scrolling
 
-**2.2 Sound design**
-- Add level-up / boss-kill sound effects to the generated audio palette
-- Ambient sound per tile type (water tiles: play Water sfx with low frequency loop)
-- Different footstep sounds on different floor types
+**2.2 Better footstep sounds**
+- Different sfx on Water, Stone, Rubble tile types
+- Currently all tiles use the same Footstep sound
 
-**2.3 Camera polish**
-- Smooth camera lerp is already in — tune `LERP_SPEED` constant
-- Add subtle camera zoom-in on boss encounter
+**2.3 Depth-appropriate camera zoom**
+- Zoom in slightly on boss encounters
+- Currently camera stays at fixed zoom
 
-### Priority 3 — Progression and content
+### Priority 3 — Progression
 
-**3.1 Difficulty scaling**
-- Enemy stats scale with depth (already partially done via spawn tables)
-- Loot quality curve: better items spawn deeper
-- Hunger/torch mechanic: light radius decreases over time without torches
+**3.1 Loot scaling by depth**
+- Better items should appear more frequently at deeper depths
+- Currently all items have equal spawn probability regardless of depth
+- `content_manager_pick_item_def` could filter by depth
 
-**3.2 Map generation variety**
-- Add a "cavern" generator variant (cellular automata) for mid-depths
-- Special rooms: treasure vault, monster den, fountain (restore HP)
-- Secret doors (hidden walls that can be found with search action)
+**3.2 Hunger / resource drain**
+- Light radius decreases slowly without torches
+- Adds urgency and resource management
 
-**3.3 Score and achievements**
-- Score system exists (`scores.odin`) but only tracks runs
-- Add: kill count, items found, floors cleared to score breakdown
-- High score display on title screen
+**3.3 Victory condition improvements**
+- Currently victory = reach depth 10 and kill abyssal lord
+- Add a proper ending sequence / victory screen with full score breakdown
 
 ### Priority 4 — Engine maturity
 
-**4.1 Adopt frame allocator**
-- Identify per-frame scratch allocations still using `context.allocator`
-- Port UI text format strings to `engine_frame_allocator`
-- Port FOV/pathfinding temporary buffers
+**4.1 Frame allocator adoption**
+- `engine_frame_allocator` exists but no game code uses it yet
+- `fmt.ctprintf` + `fmt.tprintf` calls allocate temp memory via `context.temp_allocator`
+- These are fine as-is (Raylib's temp allocator), but explicit frame arena would be cleaner
 
-**4.2 Render texture map layer**
-- Current dirty-tile system skips draws on idle frames, but camera scroll still redraws
-- For smoother scrolling: render the full map to an `rl.RenderTexture2D` once
-- On player action: redraw dirty tiles into the texture; each frame: blit texture at camera offset
-- Reduces per-scroll work from ~3200 draw calls to 1
+**4.2 Render texture map (see 2.1)**
 
-**4.3 Audio streaming for music**
-- Current BGM is synthesized sine waves (~344KB/track loaded at startup)
-- For longer, richer music: embed actual OGG files with `#load` and stream via `rl.LoadMusicStreamFromMemory`
-- `vendor:stb/vorbis` is available in Odin
-
-**4.4 `#load` for embedded assets**
-- Currently all assets are runtime file reads
-- Embed with `#load` for single-executable shipping: sprites JSON, character PNGs
-- Implement `data_load_all_embedded` path using `load_json5_from_bytes` (already exists)
+**4.3 `#load` for embedded assets**
+- Assets currently loaded from disk at runtime
+- `#load("data/enemies.json5")` at compile time → single-executable shipping
+- `load_json5_from_bytes` already exists for this path
 
 ### Priority 5 — Shipping
 
 **5.1 Title screen polish**
-- Add animated title (subtle particle drift or waving effect)
-- Show high scores on title
-- Key hints for new players
+- Currently static text + menu
+- Add: subtle particle ambient effect, animated title glow
+- Show last 3 scores directly on title (without going to High Scores screen)
 
-**5.2 Save system hardening**
-- Current save uses JSON with versioning (V2/V3) — add migration for new fields
-- Auto-save on each floor descent (already hooked)
-- Save slot selection for multiple runs
+**5.2 macOS bundle**
+- Bundle into `.app` with Info.plist for Gatekeeper compliance
 
-**5.3 Platform**
-- macOS: bundle into `.app` with proper Info.plist
-- Web: Odin WASM target (requires replacing `core:os` I/O with WASM-safe storage)
-- The storage abstraction (`Engine_File_System`) is already in place for this
+**5.3 WASM / web target**
+- Odin WASM target requires replacing `core:os` file I/O
+- `Engine_File_System` abstraction is already in place for this path
 
 ---
 
-## Immediate actionable items (next session)
+## Immediate actionable items
 
-1. `just run` and play-test the new audio/music changes
-2. Wire enemy abilities from JSON (`ability.type` in `enemies.json5`)  
-3. Add particle burst on enemy death (particle_manager already available)
-4. Add screen shake to `vfx_manager` (extend current flash impl)
-5. Port 2–3 remaining `context.allocator` scratch uses to `engine_frame_allocator`
+1. `just run` and play-test all new features (poison, fountain, boss kill, combat flash)
+2. Render texture map layer — biggest remaining performance win
+3. Loot scaling by depth (data-only change, no new procs needed)
+4. Ranged attacker AI (new behavior in `enemy.odin`)
+5. Title screen: show 3 recent scores inline

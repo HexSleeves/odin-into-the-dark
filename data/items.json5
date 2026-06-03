@@ -14,6 +14,17 @@
       },
     },
     {
+      id: "antidote",
+      name: "Antidote",
+      glyph: "!",
+      color: [120, 220, 80, 255],
+      stack_limit: 3,
+      effect: {
+        type: "cure_poison",
+        value: 0,
+      },
+    },
+    {
       id: "torch",
       name: "Torch",
       glyph: "t",

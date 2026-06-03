@@ -9,10 +9,11 @@ MAX_SCORES :: 10
 SCORES_FILE :: "scores.json"
 
 Score_Entry :: struct {
-	depth: int,
-	kills: int,
-	turns: int,
-	cause: string,
+	depth:       int,
+	kills:       int,
+	turns:       int,
+	items_found: int,
+	cause:       string,
 }
 
 Score_Table :: struct {

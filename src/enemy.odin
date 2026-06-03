@@ -407,6 +407,9 @@ remove_dead_enemies :: proc(
 	i := 0
 	for i < len(game.enemies) {
 		if !game.enemies[i].alive {
+			if game.enemies[i].is_boss {
+				game.boss_killed_this_turn = true
+			}
 			if game.enemies[i].ability_type == "poison_cloud" {
 				t := tile_at(game, game.enemies[i].pos.x, game.enemies[i].pos.y)
 				if t != nil && (t.type == .Floor || t.type == .Rubble) {

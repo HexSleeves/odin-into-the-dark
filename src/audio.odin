@@ -11,6 +11,7 @@ Sound_Type :: enum {
 	Death,
 	Descent,
 	Water,
+	Boss_Kill,
 }
 
 Game_Audio :: struct {
@@ -101,6 +102,7 @@ audio_init :: proc() {
 
 	// Water: bubbly low-frequency noise splash
 	g_audio.sounds[.Water] = load_generated_sound(generate_noise(0.12, 0.25), 0.35)
+	g_audio.sounds[.Boss_Kill] = load_generated_sound(generate_tone(440, 0.6, 0.7), 0.7)
 }
 
 audio_cleanup :: proc() {

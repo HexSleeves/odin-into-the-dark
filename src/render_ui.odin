@@ -39,11 +39,12 @@ draw_score_rows :: proc(
 		prefix := ">" if is_current else " "
 		cause_display := s.cause if len(s.cause) > 0 else "Unknown"
 		row_text := fmt.ctprintf(
-			"%s #%d  Depth %d  Kills %d  Turns %d  %s",
+			"%s #%d  Depth %d  Kills %d  Items %d  Turns %d  %s",
 			prefix,
 			i + 1,
 			s.depth,
 			s.kills,
+			s.items_found,
 			s.turns,
 			cause_display,
 		)

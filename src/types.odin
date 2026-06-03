@@ -32,6 +32,7 @@ Tile_Type :: enum {
 	Unstable,
 	Chasm,
 	Anvil,
+	Fountain,
 }
 
 Tile :: struct {
@@ -196,8 +197,12 @@ Game :: struct {
 	death_cause:       string,
 	score_saved:       bool,
 	last_score_rank:   int,
-	// Render dirty tracking — zero-value means "redraw everything on first frame"
-	render_map_dirty:  bool,
-	render_last_cam_x: int,
-	render_last_cam_y: int,
+	render_map_dirty:       bool,
+	render_last_cam_x:      int,
+	render_last_cam_y:      int,
+	// Status effects (volatile — not saved; resets on load)
+	poison_turns:           int,
+	boss_killed_this_turn:  bool,
+	// Run statistics
+	items_found:            int,
 }

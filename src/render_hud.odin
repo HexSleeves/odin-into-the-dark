@@ -61,8 +61,9 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_draw_text(
 		engine,
 		rl.TextFormat(
-			"Depth: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  X=Mine  M=Map  ?=Help",
+			"Depth: %d  |  Kills: %d  |  Light: %d  |  Enemies: %d  |  Turn: %d  |  G=Grab  I=Inv  X=Mine  M=Map  ?=Help",
 			i32(game.depth),
+			i32(game.kills),
 			i32(game.player.light_radius),
 			alive_count,
 			i32(eng.turn_manager_current(turns)),
@@ -78,6 +79,13 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		oil_text := rl.TextFormat("Oil: %dt", i32(game.light_boost_turns))
 		oil_x := hp_x + hp_bar_w + 16
 		render_draw_text(engine, oil_text, oil_x, hp_y + 1, 14, rl.Color{255, 200, 80, 255})
+	}
+
+	// Poison status indicator
+	if game.poison_turns > 0 {
+		poison_text := rl.TextFormat("POISON (%dt)", i32(game.poison_turns))
+		poison_x := hp_x + hp_bar_w + 16
+		render_draw_text(engine, poison_text, poison_x, hp_y + 18, 14, rl.Color{120, 200, 40, 255})
 	}
 
 	// Pickaxe durability bar

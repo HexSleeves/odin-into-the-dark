@@ -93,6 +93,9 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	// Spawn boss on milestone depths
 	spawn_boss(content, game)
 
+	// Spawn optional fountain (depth 2+)
+	spawn_fountain(game)
+
 	// Clear hazard state
 	game.water_slow_active = false
 
@@ -390,5 +393,25 @@ spawn_boss :: proc(content: ^Content_Manager, game: ^Game) {
 				return
 			}
 		}
+	}
+}
+
+// ─── Fountain spawning (depth-gated) ─────────────────────────────────────────
+
+spawn_fountain :: proc(game: ^Game) {
+	if game.depth < 2 || len(game.rooms) < 3 {return}
+	if rand.int_max(2) != 0 {return}
+	for _ in 0 ..< 50 {
+		room_idx := rand.int_max(len(game.rooms) - 1) + 1
+		room := game.rooms[room_idx]
+		x := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
+		y := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+		idx := pos_to_idx(x, y)
+		if game.tiles[idx].type != .Floor {continue}
+		pos := Vec2{x, y}
+		if pos == game.player.pos {continue}
+		game.tiles[idx].type = .Fountain
+		logger_debugf(.Gen, "fountain at (%v,%v) depth=%v", x, y, game.depth)
+		return
 	}
 }

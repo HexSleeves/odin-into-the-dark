@@ -8,7 +8,8 @@ import rl "vendor:raylib"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: "savegame.dat"
-SAVE_VERSION :: u32(3)
+SAVE_VERSION    :: u32(4)
+SAVE_VERSION_V3 :: u32(3)
 SAVE_VERSION_V2 :: u32(2)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
@@ -79,15 +80,14 @@ Save_Header :: struct {
 	version: u32,
 }
 
+// Current save format (v4) — v3 is a strict prefix of this struct.
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
 	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
 	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
 	ore_veins:         [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
-
 	// Player (no strings — safe)
 	player:            Player,
-
 	// Dynamic arrays flattened to fixed-size + count
 	enemy_count:       int,
 	enemies:           [MAX_SAVE_ENEMIES]Save_Enemy,
@@ -95,14 +95,40 @@ Save_Data :: struct {
 	items:             [MAX_SAVE_ITEMS]Save_Item,
 	room_count:        int,
 	rooms:             [MAX_SAVE_ROOMS]Room,
-
 	// Inventory and equipment
 	inventory:         [MAX_INVENTORY]Save_Inventory_Slot,
 	equipped_weapon:   Save_Equipment,
 	equipped_armor:    Save_Equipment,
 	equipped_helmet:   Save_Equipment,
-
 	// Scalar game state
+	depth:             int,
+	turn_count:        int,
+	kills:             int,
+	seed:              u64,
+	light_boost_bonus: int,
+	light_boost_turns: int,
+	skip_next_turn:    bool,
+	water_slow_active: bool,
+	// v4 additions
+	items_found:       int,
+}
+
+// v3 save format — byte-for-byte identical to Save_Data minus items_found.
+Save_Data_V3 :: struct {
+	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:         [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	player:            Player,
+	enemy_count:       int,
+	enemies:           [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:        int,
+	items:             [MAX_SAVE_ITEMS]Save_Item,
+	room_count:        int,
+	rooms:             [MAX_SAVE_ROOMS]Room,
+	inventory:         [MAX_INVENTORY]Save_Inventory_Slot,
+	equipped_weapon:   Save_Equipment,
+	equipped_armor:    Save_Equipment,
+	equipped_helmet:   Save_Equipment,
 	depth:             int,
 	turn_count:        int,
 	kills:             int,
@@ -283,6 +309,7 @@ save_game_to_storage :: proc(
 	data.light_boost_turns = game.light_boost_turns
 	data.skip_next_turn = game.skip_next_turn
 	data.water_slow_active = game.water_slow_active
+	data.items_found = game.items_found
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
@@ -378,20 +405,31 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 		return data, true
 	}
 
+	if header.version == SAVE_VERSION_V3 {
+		expected_size := size_of(Save_Header) + size_of(Save_Data_V3)
+		if len(buf) != expected_size {return nil, false}
+		old := new(Save_Data_V3)
+		if old == nil {return nil, false}
+		defer free(old)
+		mem.copy(old, &buf[data_offset], size_of(Save_Data_V3))
+		data = new(Save_Data)
+		if data == nil {return nil, false}
+		// V4 is V3 + items_found(int). Copy V3 prefix; items_found zero-inits.
+		mem.copy(data, old, size_of(Save_Data_V3))
+		return data, true
+	}
+
 	if header.version == SAVE_VERSION_V2 {
 		expected_size := size_of(Save_Header) + size_of(Save_Data_V2)
 		if len(buf) != expected_size {return nil, false}
-
 		old := new(Save_Data_V2)
 		if old == nil {return nil, false}
 		defer free(old)
 		mem.copy(old, &buf[data_offset], size_of(Save_Data_V2))
-
 		data = new(Save_Data)
 		if data == nil {return nil, false}
-		// v3 is the byte-for-byte prefix of v2. The trailing legacy pickaxe
-		// durability fields are intentionally discarded.
-		mem.copy(data, old, size_of(Save_Data))
+		// V4 is a superset of V3 which is a prefix of V2. Copy V3-sized prefix.
+		mem.copy(data, old, size_of(Save_Data_V3))
 		return data, true
 	}
 
@@ -469,6 +507,7 @@ load_game_from_storage :: proc(
 	game.light_boost_turns = data.light_boost_turns
 	game.skip_next_turn = data.skip_next_turn
 	game.water_slow_active = data.water_slow_active
+	game.items_found = data.items_found
 	game.state = .Playing
 
 	// ── Restore ore veins ──

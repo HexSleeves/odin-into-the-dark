@@ -49,6 +49,7 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		messages,
 		game,
 		game_engine_input_manager(engine),
+		engine,
 	)
 
 	switch result {
@@ -202,10 +203,11 @@ save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^
 		}
 	}
 	entry := Score_Entry {
-		depth = game.depth,
-		kills = game.kills,
-		turns = eng.turn_manager_current(turns),
-		cause = cause,
+		depth       = game.depth,
+		kills       = game.kills,
+		turns       = eng.turn_manager_current(turns),
+		items_found = game.items_found,
+		cause       = cause,
 	}
 	game.last_score_rank = insert_score(&table, entry)
 	if game.last_score_rank < 0 && len(cause) > 0 {
@@ -262,12 +264,24 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= 3
+		game.poison_turns = max(game.poison_turns, 5)
 		eng.vfx_manager_flash(game_engine_vfx_manager(engine), rl.Color{160, 180, 40, 255}, 0.4)
-		add_message(messages, game, "Toxic gas burns you! (-3 HP)", rl.Color{160, 180, 40, 255})
+		add_message(messages, game, "Toxic gas burns you! Poisoned! (-3 HP)", rl.Color{160, 180, 40, 255})
 		if game.player.hp <= 0 {
 			game.death_cause = "Suffocated by toxic gas"
 			game.state = .Game_Over
 			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
+		}
+	}
+
+	if cur_tile.type == .Fountain {
+		messages := game_engine_message_manager(engine)
+		heal := min(5, game.player.max_hp - game.player.hp)
+		if heal > 0 {
+			game.player.hp += heal
+			add_message(messages, game, fmt.tprintf("The fountain restores your health! (+%d HP)", heal), rl.Color{80, 180, 220, 255})
+		} else {
+			add_message(messages, game, "You drink from the fountain. (Already at full health)", rl.Color{80, 180, 220, 255})
 		}
 	}
 }

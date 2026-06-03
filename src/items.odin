@@ -70,6 +70,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 			if slot.occupied && slot.item.item_type == itype && slot.item.quantity < stack_limit {
 				slot.item.quantity += 1
 				it.picked_up = true
+				game.items_found += 1
 				add_message(
 					messages,
 					game,
@@ -105,6 +106,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	game.inventory[slot_idx].item = it^
 	game.inventory[slot_idx].item.quantity = 1
 	it.picked_up = true
+	game.items_found += 1
 
 	add_message(
 		messages,
@@ -186,6 +188,17 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 		if game.light_boost_turns <= 0 {
 			game.light_boost_bonus = 0
 			add_message(messages, game, "The lantern oil burns out.", rl.Color{180, 130, 50, 255})
+		}
+	}
+
+	if game.poison_turns > 0 {
+		game.poison_turns -= 1
+		game.player.hp -= 1
+		add_message(messages, game, "Poison damages you! (-1 HP)", rl.Color{120, 200, 40, 255})
+		if game.player.hp <= 0 {
+			game.death_cause = "Died from poison"
+			game.state = .Game_Over
+			add_message(messages, game, "You have been slain...", rl.Color{255, 0, 0, 255})
 		}
 	}
 }

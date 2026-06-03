@@ -75,6 +75,8 @@ base_tile_color :: proc(type: Tile_Type, palette: Floor_Palette) -> rl.Color {
 		return palette.descent
 	case .Water:
 		return rl.Color{40, 80, 180, 255}
+	case .Fountain:
+		return rl.Color{40, 120, 220, 255}
 	case .Gas_Vent:
 		return rl.Color{160, 180, 40, 255}
 	case .Unstable:
