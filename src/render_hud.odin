@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import "core:fmt"
 import rl "vendor:raylib"
 
 // ─── Sidebar palette ─────────────────────────────────────────────────────────
