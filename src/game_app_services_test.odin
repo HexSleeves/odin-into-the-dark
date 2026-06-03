@@ -1,6 +1,7 @@
 package main
 
 import eng "./engine"
+import "base:runtime"
 import "core:testing"
 
 @(test)
@@ -9,10 +10,20 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	defer eng.engine_services_destroy(&services)
 	input_backend_state := Test_Game_App_Input_Backend_State{}
 	audio_backend_state := Test_Game_App_Audio_Backend_State{}
+	file_system_state := Test_Game_App_File_System_State{}
 	audio_backend := test_game_app_audio_backend(&audio_backend_state)
+	file_system := eng.Engine_File_System {
+		ctx               = &file_system_state,
+		read_entire_file  = test_game_app_file_system_read_entire_file,
+		write_entire_file = test_game_app_file_system_write_entire_file,
+		exists            = test_game_app_file_system_exists,
+		remove            = test_game_app_file_system_remove,
+	}
 	engine := eng.Engine {
 		config = game_engine_config(),
 		services = &services,
+		file_system = file_system,
+		storage_manager = eng.storage_manager_make(file_system),
 		audio = audio_backend,
 		audio_manager = eng.audio_manager_make(audio_backend),
 		camera_manager = eng.camera_manager_make(),
@@ -34,6 +45,10 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, game_engine_register_app_services(&engine))
 	testing.expect(t, game_engine_content_manager(&engine) != nil)
 	testing.expect(t, game_engine_save_manager(&engine) != nil)
+	testing.expect(
+		t,
+		game_engine_save_manager(&engine).storage.file_system.ctx == rawptr(&file_system_state),
+	)
 	testing.expect(t, game_engine_audio_manager(&engine) != nil)
 	testing.expect(t, game_engine_audio_manager(&engine) == &engine.audio_manager)
 	testing.expect(
@@ -94,6 +109,8 @@ Test_Game_App_Audio_Backend_State :: struct {
 	enabled: bool,
 }
 
+Test_Game_App_File_System_State :: struct {}
+
 test_game_app_audio_backend :: proc(
 	state: ^Test_Game_App_Audio_Backend_State,
 ) -> eng.Engine_Audio_Backend {
@@ -123,4 +140,27 @@ test_game_app_audio_toggle :: proc(ctx: rawptr) -> bool {
 	state := cast(^Test_Game_App_Audio_Backend_State)ctx
 	state.enabled = !state.enabled
 	return state.enabled
+}
+
+test_game_app_file_system_read_entire_file :: proc(
+	ctx: rawptr,
+	path: string,
+	allocator: runtime.Allocator,
+) -> (
+	[]u8,
+	bool,
+) {
+	return {}, false
+}
+
+test_game_app_file_system_write_entire_file :: proc(ctx: rawptr, path: string, data: []u8) -> bool {
+	return false
+}
+
+test_game_app_file_system_exists :: proc(ctx: rawptr, path: string) -> bool {
+	return false
+}
+
+test_game_app_file_system_remove :: proc(ctx: rawptr, path: string) -> bool {
+	return false
 }

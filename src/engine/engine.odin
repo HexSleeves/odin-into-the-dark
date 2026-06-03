@@ -23,6 +23,7 @@ Engine :: struct {
 	event_manager:    Event_Manager,
 	texture_manager:  Texture_Manager,
 	audio_manager:    Audio_Manager,
+	storage_manager:  Storage_Manager,
 	camera_manager:   Camera_Manager,
 	turn_manager:     Turn_Manager,
 	vfx_manager:      Vfx_Manager,
@@ -92,6 +93,13 @@ engine_audio_manager :: proc(engine: ^Engine) -> ^Audio_Manager {
 		return nil
 	}
 	return &engine.audio_manager
+}
+
+engine_storage_manager :: proc(engine: ^Engine) -> ^Storage_Manager {
+	if engine == nil {
+		return nil
+	}
+	return &engine.storage_manager
 }
 
 engine_camera_manager :: proc(engine: ^Engine) -> ^Camera_Manager {
@@ -182,6 +190,7 @@ engine_run :: proc(
 	}
 	engine.texture_manager = texture_manager_make(engine.texture)
 	engine.audio_manager = audio_manager_make(engine.audio)
+	engine.storage_manager = storage_manager_make(engine.file_system)
 	engine.camera_manager = camera_manager_make()
 	engine.turn_manager = turn_manager_make()
 	engine.vfx_manager = vfx_manager_make()

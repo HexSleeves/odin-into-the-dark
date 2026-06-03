@@ -19,6 +19,7 @@ draw_score_rows :: proc(
 	highlight_rank: int = -1,
 ) {
 	table := score_manager_load(scores)
+	defer score_table_destroy(&table)
 	if table.count == 0 {
 		draw_centered_text(
 			engine,
@@ -621,6 +622,7 @@ render_game_over :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	// Load and display score table
 	table := score_manager_load(scores)
+	defer score_table_destroy(&table)
 	row_h :: i32(22)
 	base_y :: i32(170)
 	row_size :: i32(14)
@@ -814,6 +816,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 
 	table := score_manager_load(scores)
+	defer score_table_destroy(&table)
 	row_h :: i32(22)
 	base_y := stats_y + 140
 	row_size :: i32(14)

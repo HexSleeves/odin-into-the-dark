@@ -1,7 +1,6 @@
 package main
 
 import "core:mem"
-import "core:os"
 
 import eng "./engine"
 import rl "vendor:raylib"
@@ -256,6 +255,16 @@ save_game :: proc(turns: ^eng.Turn_Manager, game: ^Game) -> bool {
 }
 
 save_game_to_path :: proc(turns: ^eng.Turn_Manager, game: ^Game, path: string) -> bool {
+	storage := eng.storage_manager_make()
+	return save_game_to_storage(turns, game, &storage, path)
+}
+
+save_game_to_storage :: proc(
+	turns: ^eng.Turn_Manager,
+	game: ^Game,
+	storage: ^eng.Storage_Manager,
+	path: string,
+) -> bool {
 	// Heap-allocate — Save_Data is large (~600KB+)
 	data := new(Save_Data)
 	if data == nil {return false}
@@ -351,8 +360,7 @@ save_game_to_path :: proc(turns: ^eng.Turn_Manager, game: ^Game, path: string) -
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 	mem.copy(&buf[size_of(Save_Header)], data, size_of(Save_Data))
 
-	write_err := os.write_entire_file(path, buf)
-	return write_err == nil
+	return eng.storage_manager_write(storage, path, buf)
 }
 
 load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok: bool) {
@@ -414,8 +422,23 @@ load_game_from_path :: proc(
 	game: ^Game,
 	path: string,
 ) -> bool {
-	buf, read_err := os.read_entire_file(path, context.allocator)
-	if read_err != nil {return false}
+	storage := eng.storage_manager_make()
+	return load_game_from_storage(content, turns, camera, vfx, ui, messages, game, &storage, path)
+}
+
+load_game_from_storage :: proc(
+	content: ^Content_Manager,
+	turns: ^eng.Turn_Manager,
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	ui: ^UI_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+	storage: ^eng.Storage_Manager,
+	path: string,
+) -> bool {
+	buf, read_ok := eng.storage_manager_read(storage, path, context.allocator)
+	if !read_ok {return false}
 	defer delete(buf, context.allocator)
 
 	if len(buf) < size_of(Save_Header) {return false}
@@ -530,7 +553,7 @@ load_game_from_path :: proc(
 	eng.vfx_manager_reset(vfx)
 
 	// ── Delete save file (roguelike: one load per save) ──
-	os.remove(path)
+	eng.storage_manager_remove(storage, path)
 
 	return true
 }
@@ -542,5 +565,10 @@ save_exists :: proc() -> bool {
 }
 
 save_exists_at :: proc(path: string) -> bool {
-	return os.exists(path)
+	storage := eng.storage_manager_make()
+	return save_exists_in_storage(&storage, path)
+}
+
+save_exists_in_storage :: proc(storage: ^eng.Storage_Manager, path: string) -> bool {
+	return eng.storage_manager_exists(storage, path)
 }

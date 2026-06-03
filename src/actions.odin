@@ -2,6 +2,7 @@ package main
 
 import eng "./engine"
 import "core:fmt"
+import "core:strings"
 import rl "vendor:raylib"
 
 
@@ -177,13 +178,24 @@ advance_turn :: proc(
 save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^Game) {
 	game.score_saved = true
 	table := score_manager_load(scores)
+	defer score_table_destroy(&table)
+	cause := ""
+	if len(game.death_cause) > 0 {
+		cloned, clone_err := strings.clone(game.death_cause, context.allocator)
+		if clone_err == nil {
+			cause = cloned
+		}
+	}
 	entry := Score_Entry {
 		depth = game.depth,
 		kills = game.kills,
 		turns = eng.turn_manager_current(turns),
-		cause = game.death_cause,
+		cause = cause,
 	}
 	game.last_score_rank = insert_score(&table, entry)
+	if game.last_score_rank < 0 && len(cause) > 0 {
+		delete(cause, context.allocator)
+	}
 	score_manager_save(scores, &table)
 }
 

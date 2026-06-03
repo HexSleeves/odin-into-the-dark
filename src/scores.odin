@@ -1,7 +1,7 @@
 package main
 
+import eng "./engine"
 import "core:encoding/json"
-import "core:os"
 
 // ─── High Score Table ─────────────────────────────────────────────────────────
 
@@ -22,10 +22,14 @@ Score_Table :: struct {
 
 Score_Manager :: struct {
 	file_path: string,
+	storage:   eng.Storage_Manager,
 }
 
 score_manager_make :: proc() -> Score_Manager {
-	return Score_Manager{file_path = SCORES_FILE}
+	return Score_Manager {
+		file_path = SCORES_FILE,
+		storage   = eng.storage_manager_make(),
+	}
 }
 
 score_manager_path :: proc(scores: ^Score_Manager) -> string {
@@ -35,14 +39,30 @@ score_manager_path :: proc(scores: ^Score_Manager) -> string {
 	return scores.file_path
 }
 
+score_table_destroy :: proc(table: ^Score_Table) {
+	if table == nil {
+		return
+	}
+	for i in 0 ..< table.count {
+		if len(table.scores[i].cause) > 0 {
+			delete(table.scores[i].cause, context.allocator)
+		}
+	}
+	table^ = {}
+}
+
 // ─── Load / Save ──────────────────────────────────────────────────────────────
 
 score_manager_load :: proc(scores: ^Score_Manager) -> Score_Table {
 	result: Score_Table
 	path := score_manager_path(scores)
 
-	data, read_err := os.read_entire_file(path, context.allocator)
-	if read_err != nil {
+	storage: ^eng.Storage_Manager = nil
+	if scores != nil {
+		storage = &scores.storage
+	}
+	data, read_ok := eng.storage_manager_read(storage, path, context.allocator)
+	if !read_ok {
 		// No file yet — return empty table
 		return result
 	}
@@ -66,9 +86,12 @@ score_manager_save :: proc(scores: ^Score_Manager, table: ^Score_Table) {
 	}
 	defer delete(data, context.allocator)
 
-	write_err := os.write_entire_file(path, data)
-	if write_err != nil {
-		logger_errorf(.Scores, "write failed for %s: %v", path, write_err)
+	storage: ^eng.Storage_Manager = nil
+	if scores != nil {
+		storage = &scores.storage
+	}
+	if !eng.storage_manager_write(storage, path, data) {
+		logger_errorf(.Scores, "write failed for %s", path)
 	}
 }
 
@@ -91,6 +114,11 @@ insert_score :: proc(table: ^Score_Table, entry: Score_Entry) -> int {
 	// If it doesn't make the table, bail
 	if insert_pos >= MAX_SCORES {
 		return -1
+	}
+
+	if table.count >= MAX_SCORES && len(table.scores[MAX_SCORES - 1].cause) > 0 {
+		delete(table.scores[MAX_SCORES - 1].cause, context.allocator)
+		table.scores[MAX_SCORES - 1].cause = ""
 	}
 
 	// Shift entries down (drop the last one if full)
