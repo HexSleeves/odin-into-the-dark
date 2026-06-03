@@ -1,7 +1,5 @@
 package engine
 
-import rl "vendor:raylib"
-
 // Engine platform backend boundary.
 //
 // The default backend is Raylib, but engine_run only depends on this contract.
@@ -31,16 +29,12 @@ engine_platform_backend_or_default :: proc(
 	if engine_platform_backend_is_valid(platform) {
 		return platform
 	}
-	return engine_platform_backend_raylib()
-}
-
-engine_platform_backend_raylib :: proc() -> Engine_Platform_Backend {
-	return Engine_Platform_Backend {
-		init = raylib_platform_init,
-		shutdown = raylib_platform_shutdown,
-		set_target_fps = raylib_platform_set_target_fps,
-		disable_exit_key = raylib_platform_disable_exit_key,
-		window_should_close = raylib_platform_window_should_close,
+	// Raylib on desktop (platform_backend_raylib.odin); nil on JS, where Raylib
+	// cannot link and the game injects the karl2d platform backend.
+	when ODIN_OS == .JS {
+		return engine_platform_backend_nil()
+	} else {
+		return engine_platform_backend_raylib()
 	}
 }
 
@@ -52,32 +46,6 @@ engine_platform_backend_nil :: proc() -> Engine_Platform_Backend {
 		disable_exit_key = nil_platform_disable_exit_key,
 		window_should_close = nil_platform_window_should_close,
 	}
-}
-
-@(private = "file")
-raylib_platform_init :: proc(ctx: rawptr, config: Engine_Config) -> bool {
-	rl.InitWindow(config.window_width, config.window_height, config.window_title)
-	return true
-}
-
-@(private = "file")
-raylib_platform_shutdown :: proc(ctx: rawptr) {
-	rl.CloseWindow()
-}
-
-@(private = "file")
-raylib_platform_set_target_fps :: proc(ctx: rawptr, target_fps: i32) {
-	rl.SetTargetFPS(target_fps)
-}
-
-@(private = "file")
-raylib_platform_disable_exit_key :: proc(ctx: rawptr) {
-	rl.SetExitKey(rl.KeyboardKey.KEY_NULL)
-}
-
-@(private = "file")
-raylib_platform_window_should_close :: proc(ctx: rawptr) -> bool {
-	return rl.WindowShouldClose()
 }
 
 @(private = "file")

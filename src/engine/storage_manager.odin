@@ -25,6 +25,10 @@ storage_manager_file_system :: proc(storage: ^Storage_Manager) -> Engine_File_Sy
 	return engine_file_system_or_default(storage.file_system)
 }
 
+// Persistence degrades gracefully when no filesystem is available (e.g. WASM,
+// where the default FS is empty and no backend is injected): reads/exists report
+// "not found" and writes/removes report failure, instead of trapping on a nil
+// function pointer mid-frame.
 storage_manager_read :: proc(
 	storage: ^Storage_Manager,
 	path: string,
@@ -34,20 +38,32 @@ storage_manager_read :: proc(
 	bool,
 ) {
 	file_system := storage_manager_file_system(storage)
+	if file_system.read_entire_file == nil {
+		return nil, false
+	}
 	return file_system.read_entire_file(file_system.ctx, path, allocator)
 }
 
 storage_manager_write :: proc(storage: ^Storage_Manager, path: string, data: []u8) -> bool {
 	file_system := storage_manager_file_system(storage)
+	if file_system.write_entire_file == nil {
+		return false
+	}
 	return file_system.write_entire_file(file_system.ctx, path, data)
 }
 
 storage_manager_exists :: proc(storage: ^Storage_Manager, path: string) -> bool {
 	file_system := storage_manager_file_system(storage)
+	if file_system.exists == nil {
+		return false
+	}
 	return file_system.exists(file_system.ctx, path)
 }
 
 storage_manager_remove :: proc(storage: ^Storage_Manager, path: string) -> bool {
 	file_system := storage_manager_file_system(storage)
+	if file_system.remove == nil {
+		return false
+	}
 	return file_system.remove(file_system.ctx, path)
 }

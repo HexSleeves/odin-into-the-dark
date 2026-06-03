@@ -1,7 +1,5 @@
 package engine
 
-import rl "vendor:raylib"
-
 Engine_Texture :: struct {
 	handle: rawptr,
 	width:  i32,
@@ -31,8 +29,14 @@ engine_texture_backend_or_default :: proc(
 	return engine_texture_backend_default()
 }
 
+// Raylib on desktop (texture_backend_raylib.odin); nil on JS, where Raylib
+// cannot link and the game injects the karl2d texture backend.
 engine_texture_backend_default :: proc() -> Engine_Texture_Backend {
-	return Engine_Texture_Backend{load = raylib_texture_load, unload = raylib_texture_unload}
+	when ODIN_OS == .JS {
+		return engine_texture_backend_nil()
+	} else {
+		return engine_texture_backend_raylib()
+	}
 }
 
 engine_texture_backend_nil :: proc() -> Engine_Texture_Backend {
@@ -50,43 +54,6 @@ engine_texture_unload :: proc(engine: ^Engine, texture: ^Engine_Texture) {
 	}
 	backend := engine_texture_backend(engine)
 	backend.unload(backend.ctx, texture)
-	texture^ = {}
-}
-
-@(private = "file")
-raylib_texture_load :: proc(ctx: rawptr, path: string) -> Engine_Texture {
-	path_buf: [1024]u8
-	copy_len := min(len(path), len(path_buf) - 1)
-	for i in 0 ..< copy_len {
-		path_buf[i] = path[i]
-	}
-	path_buf[copy_len] = 0
-
-	raw_texture := new(rl.Texture2D)
-	raw_texture^ = rl.LoadTexture(cast(cstring)&path_buf[0])
-	if raw_texture.id == 0 {
-		free(raw_texture)
-		return {}
-	}
-
-	return Engine_Texture {
-		handle = rawptr(raw_texture),
-		width = raw_texture.width,
-		height = raw_texture.height,
-	}
-}
-
-@(private = "file")
-raylib_texture_unload :: proc(ctx: rawptr, texture: ^Engine_Texture) {
-	if texture == nil || texture.handle == nil {
-		return
-	}
-
-	raw_texture := cast(^rl.Texture2D)texture.handle
-	if raw_texture.id != 0 {
-		rl.UnloadTexture(raw_texture^)
-	}
-	free(raw_texture)
 	texture^ = {}
 }
 

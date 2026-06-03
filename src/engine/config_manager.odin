@@ -37,6 +37,12 @@ config_manager_load_env_file_with_file_system :: proc(
 		return false
 	}
 	file_system := engine_file_system_or_default(fs)
+	// No filesystem available (e.g. WASM, where the default FS is empty): treat
+	// a missing .env as "no overrides", not a crash. Dereferencing a nil fn ptr
+	// would trap with "null function" before the game ever renders.
+	if file_system.read_entire_file == nil {
+		return false
+	}
 	buf, ok := file_system.read_entire_file(file_system.ctx, path, context.allocator)
 	if !ok {
 		return false
