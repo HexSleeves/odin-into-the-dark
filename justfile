@@ -4,6 +4,8 @@ src := "src/"
 engine_src := "src/engine"
 binary := "into_the_depths"
 cheat_define := if env_var_or_default("CHEATS", "false") == "true" { "-define:CHEATS=true" } else { "" }
+sprite_define := if env_var_or_default("SPRITES", "false") == "true" { "-define:SPRITES=true" } else { "" }
+build_defines := cheat_define + " " + sprite_define
 
 
 default:
@@ -13,15 +15,15 @@ default:
 
 # Type-check without building
 check:
-    odin check {{src}} -vet -strict-style {{cheat_define}}
+    odin check {{src}} -vet -strict-style {{build_defines}}
 
 # Build debug binary
 build:
-    odin build {{src}} -out:{{binary}} {{cheat_define}}
+    odin build {{src}} -out:{{binary}} {{build_defines}}
 
 # Build and run
 run:
-    odin run {{src}} {{cheat_define}}
+    odin run {{src}} {{build_defines}}
 
 # Build then run the binary
 run-built: build

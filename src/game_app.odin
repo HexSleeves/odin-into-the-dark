@@ -109,7 +109,7 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	scores.storage = eng.storage_manager_make(eng.engine_file_system(engine))
 	input := input_manager_make()
 	input.backend = eng.engine_input_backend(engine)
-	ui := ui_manager_make(g_sprites.loaded)
+	ui := ui_manager_make(DEFAULT_USE_SPRITES)
 	return(
 		eng.engine_services_register_value(
 			engine.services,

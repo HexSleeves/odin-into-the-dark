@@ -259,7 +259,7 @@ restart_game :: proc(
 	game^ = {}
 	eng.turn_manager_reset(turns)
 	eng.vfx_manager_reset(vfx)
-	ui_manager_reset_for_new_game(ui, g_sprites.loaded)
+	ui_manager_reset_for_new_game(ui, DEFAULT_USE_SPRITES)
 	game_reinit(content, messages, game)
 	compute_fov(game)
 	game_camera_update(camera, game, true)

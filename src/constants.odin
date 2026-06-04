@@ -28,6 +28,7 @@ MAX_MSG_LEN :: eng.ENGINE_MAX_MESSAGE_LEN
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
 
+DEFAULT_USE_SPRITES :: #config(SPRITES, false)
 MAX_INVENTORY :: 9
 
 // ─── Dijkstra ─────────────────────────────────────────────────────────────────

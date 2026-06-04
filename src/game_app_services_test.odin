@@ -40,6 +40,10 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 			frame_time = test_game_app_input_frame_time,
 		},
 	}
+	was_sprites_loaded := g_sprites.loaded
+	defer g_sprites.loaded = was_sprites_loaded
+	g_sprites.loaded = true
+
 	register_handler: proc(engine: ^eng.Engine) -> bool = game_engine_register_app_services
 
 	testing.expect(t, register_handler != nil)
@@ -76,6 +80,7 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, game_engine_vfx_manager(&engine) != nil)
 	testing.expect(t, game_engine_vfx_manager(&engine) == &engine.vfx_manager)
 	testing.expect(t, game_engine_ui_manager(&engine) != nil)
+	testing.expect(t, !ui_manager_state(game_engine_ui_manager(&engine)).use_sprites)
 	testing.expect_value(t, services.service_count, 6)
 	for i in 0 ..< services.service_count {
 		testing.expect(t, services.services[i].owned)
