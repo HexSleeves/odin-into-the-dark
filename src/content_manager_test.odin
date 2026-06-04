@@ -2,6 +2,7 @@
 package main
 
 import "base:runtime"
+import "core:mem"
 import "core:testing"
 
 @(test)
@@ -23,6 +24,23 @@ content_manager_load_all_uses_embedded_data :: proc(t: ^testing.T) {
 	testing.expect(t, len(content.registry.enemies.enemies) > 0)
 	testing.expect(t, len(content.registry.items.items) > 0)
 	testing.expect(t, content.registry.player.hp > 0)
+}
+
+@(test)
+content_manager_destroy_releases_json_owned_registry_allocations :: proc(t: ^testing.T) {
+	track: mem.Tracking_Allocator
+	previous_allocator := context.allocator
+	mem.tracking_allocator_init(&track, previous_allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	context.allocator = mem.tracking_allocator(&track)
+	content := content_manager_make()
+	loaded := content_manager_load_all(&content)
+	content_manager_destroy(&content)
+	context.allocator = previous_allocator
+
+	testing.expect(t, loaded)
+	testing.expect_value(t, len(track.allocation_map), 0)
 }
 
 @(test)

@@ -24,6 +24,20 @@ Sprite_Data :: struct {
 	items:       map[string]Sprite_Pos,
 }
 
+sprite_data_destroy :: proc(data: ^Sprite_Data, delete_strings := true) {
+	if data == nil {return}
+	if delete_strings {
+		delete(data.tileset)
+		for id in data.tiles {delete(id)}
+		for id in data.characters {delete(id)}
+		for id in data.items {delete(id)}
+	}
+	delete(data.tiles)
+	delete(data.characters)
+	delete(data.items)
+	data^ = {}
+}
+
 // ─── Global sprite atlas ──────────────────────────────────────────────────────
 
 Sprite_Atlas :: struct {
@@ -56,14 +70,14 @@ sprite_at :: proc(col, row, size: int) -> Sprite {
 
 sprites_init :: proc(engine: ^eng.Engine) {
 	// Compile-time embedded sprite data — no runtime file I/O.
-	// json.unmarshal returns strings pointing into this constant data,
-	// so we must NOT delete them (they aren't heap-allocated).
+	// json.unmarshal still allocates strings/maps; ownership is moved into g_sprites.
 	EMBEDDED_SPRITES :: #load("../data/sprites.json5")
 
 	sprite_data: Sprite_Data
 	parse_err := json.unmarshal(EMBEDDED_SPRITES, &sprite_data, spec = .JSON5)
 	if parse_err != nil {
 		logger_errorf(.Sprites, "parse failed for data/sprites.json5: %v", parse_err)
+		sprite_data_destroy(&sprite_data)
 		return
 	}
 
@@ -76,6 +90,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	g_sprites.texture = eng.engine_texture_manager_get(engine, g_sprites.texture_handle)
 	if !eng.engine_texture_is_valid(g_sprites.texture) {
 		logger_errorf(.Sprites, "failed to load texture '%s'", tileset_path)
+		sprite_data_destroy(&sprite_data)
 		return
 	}
 
@@ -86,6 +101,9 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	g_sprites.char_map = make(map[string]Sprite)
 	g_sprites.item_map = make(map[string]Sprite)
 	g_sprites.owned_strings = make([dynamic]string)
+	if sprite_data.tileset != "" {
+		append(&g_sprites.owned_strings, sprite_data.tileset)
+	}
 
 	// Build tile sprite map
 	for id, pos in sprite_data.tiles {
@@ -110,6 +128,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	tile_count := len(sprite_data.tiles)
 	char_count := len(sprite_data.characters)
 	item_count := len(sprite_data.items)
+	sprite_data_destroy(&sprite_data, delete_strings = false)
 	logger_debugf(
 		.Sprites,
 		"loaded '%s' (%dx%d) - %d tiles, %d chars, %d items",

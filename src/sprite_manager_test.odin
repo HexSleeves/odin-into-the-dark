@@ -2,7 +2,12 @@
 package main
 
 import eng "./engine"
+import "core:mem"
+import "core:sync"
 import "core:testing"
+
+@(private = "file")
+sprite_manager_test_g_sprites_mutex: sync.Mutex
 
 @(test)
 sprite_manager_make_wraps_current_sprite_atlas :: proc(t: ^testing.T) {
@@ -13,6 +18,9 @@ sprite_manager_make_wraps_current_sprite_atlas :: proc(t: ^testing.T) {
 
 @(test)
 sprite_manager_reports_loaded_state_from_backend :: proc(t: ^testing.T) {
+	sync.mutex_lock(&sprite_manager_test_g_sprites_mutex)
+	defer sync.mutex_unlock(&sprite_manager_test_g_sprites_mutex)
+
 	sprites := sprite_manager_make()
 	was_loaded := g_sprites.loaded
 	defer g_sprites.loaded = was_loaded
@@ -26,6 +34,9 @@ sprite_manager_reports_loaded_state_from_backend :: proc(t: ^testing.T) {
 
 @(test)
 sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
+	sync.mutex_lock(&sprite_manager_test_g_sprites_mutex)
+	defer sync.mutex_unlock(&sprite_manager_test_g_sprites_mutex)
+
 	state := Test_Sprite_Texture_Backend_State{}
 	texture_backend := test_sprite_texture_backend(&state)
 	engine := eng.Engine {
@@ -43,6 +54,33 @@ sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
 	sprites_cleanup(&engine)
 	testing.expect_value(t, eng.texture_manager_loaded_count(engine.texture_manager), 0)
 	testing.expect_value(t, state.unload_count, 1)
+}
+
+@(test)
+sprites_cleanup_releases_json_owned_sprite_metadata_allocations :: proc(t: ^testing.T) {
+	sync.mutex_lock(&sprite_manager_test_g_sprites_mutex)
+	defer sync.mutex_unlock(&sprite_manager_test_g_sprites_mutex)
+
+	track: mem.Tracking_Allocator
+	previous_allocator := context.allocator
+	mem.tracking_allocator_init(&track, previous_allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	state := Test_Sprite_Texture_Backend_State{}
+	texture_backend := test_sprite_texture_backend(&state)
+	engine := eng.Engine {
+		texture         = texture_backend,
+		texture_manager = eng.texture_manager_make(texture_backend),
+	}
+
+	context.allocator = mem.tracking_allocator(&track)
+	sprites_init(&engine)
+	loaded := g_sprites.loaded
+	sprites_cleanup(&engine)
+	context.allocator = previous_allocator
+
+	testing.expect(t, loaded)
+	testing.expect_value(t, len(track.allocation_map), 0)
 }
 
 Test_Sprite_Texture_Backend_State :: struct {

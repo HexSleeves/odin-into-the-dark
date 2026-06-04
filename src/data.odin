@@ -174,6 +174,7 @@ data_registry_destroy :: proc(registry: ^Data_Registry) {
 		delete(e.name)
 		delete(e.glyph)
 		delete(e.ability.type)
+		delete(e.behavior)
 	}
 	delete(registry.enemies.enemies)
 	for &t in registry.enemies.spawn_tables {
