@@ -473,6 +473,60 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 
 	logger_debugf(.Gen, "monster den in room %v at depth %v", room_idx, game.depth)
 }
+room_contains_point :: proc(room: Room, x, y: int) -> bool {
+	return x >= room.x1 && x < room.x2 && y >= room.y1 && y < room.y2
+}
+
+room_perimeter_contains_point :: proc(room: Room, x, y: int) -> bool {
+	if !room_contains_point(room, x, y) {return false}
+	return x == room.x1 || x == room.x2 - 1 || y == room.y1 || y == room.y2 - 1
+}
+
+find_vault_door_position :: proc(game: ^Game, room: Room) -> (door: Vec2, ok: bool) {
+	dx := [4]int{0, 1, 0, -1}
+	dy := [4]int{-1, 0, 1, 0}
+	for y in room.y1 ..< room.y2 {
+		for x in room.x1 ..< room.x2 {
+			if !room_perimeter_contains_point(room, x, y) {continue}
+			if game.tiles[pos_to_idx(x, y)].type != .Floor {continue}
+			for dir in 0 ..< 4 {
+				out_x := x + dx[dir]
+				out_y := y + dy[dir]
+				in_x := x - dx[dir]
+				in_y := y - dy[dir]
+				if room_contains_point(room, out_x, out_y) {continue}
+				if !room_contains_point(room, in_x, in_y) {continue}
+				if out_x < 0 || out_x >= MAP_WIDTH || out_y < 0 || out_y >= MAP_HEIGHT {continue}
+				if game.tiles[pos_to_idx(out_x, out_y)].type != .Floor {continue}
+				if game.tiles[pos_to_idx(in_x, in_y)].type != .Floor {continue}
+				return Vec2{x, y}, true
+			}
+		}
+	}
+	return {}, false
+}
+
+seal_room_perimeter_for_vault :: proc(game: ^Game, room: Room, door: Vec2) {
+	for y in room.y1 ..< room.y2 {
+		for x in room.x1 ..< room.x2 {
+			if !room_perimeter_contains_point(room, x, y) {continue}
+			if x == door.x && y == door.y {
+				game.tiles[pos_to_idx(x, y)].type = .Locked_Door
+			} else {
+				game.tiles[pos_to_idx(x, y)].type = .Wall
+			}
+		}
+	}
+}
+
+vault_loot_def :: proc(content: ^Content_Manager, depth: int) -> ^Item_Def {
+	if depth >= 6 {
+		if def := content_manager_item_def(content, "greatsword"); def != nil {return def}
+	}
+	if def := content_manager_item_def(content, "mine_dagger"); def != nil {return def}
+	return content_manager_pick_item_def_for_depth(content, depth)
+}
+
 // ─── Treasure vault (locked room with guaranteed rare loot) ──────────────────
 
 spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
@@ -484,38 +538,22 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 	room_idx := rand.int_max(len(game.rooms) - 2) + 1
 	room := game.rooms[room_idx]
 
-	// Find a floor tile on the room perimeter to place the locked door
-	door_placed := false
-	door_x, door_y: int
-	edges := [2]int{room.y1, room.y2 - 1}
-	for try_x in room.x1 ..< room.x2 {
-		for ei in 0 ..< 2 {
-			try_y := edges[ei]
-			idx := pos_to_idx(try_x, try_y)
-			if game.tiles[idx].type == .Floor {
-				door_x = try_x
-				door_y = try_y
-				door_placed = true
-				break
-			}
-		}
-		if door_placed {break}
-	}
-	if !door_placed {return}
+	door, door_ok := find_vault_door_position(game, room)
+	if !door_ok {return}
 
-	// Place locked door
-	game.tiles[pos_to_idx(door_x, door_y)].type = .Locked_Door
+	key_def := content_manager_item_def(content, "vault_key")
+	if key_def == nil {return}
+	loot_def := vault_loot_def(content, game.depth)
+	if loot_def == nil {return}
 
-	// Place a guaranteed rare item inside the room
+	seal_room_perimeter_for_vault(game, room, door)
+
+	// Place a guaranteed rare item inside the sealed room.
 	for _ in 0 ..< 50 {
-		x := rand.int_max(room.x2 - room.x1) + room.x1
-		y := rand.int_max(room.y2 - room.y1) + room.y1
-		if x == door_x && y == door_y {continue}
-		if !is_walkable(game, x, y) {continue}
+		x := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
+		y := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
 		if item_at(game, x, y) != nil {continue}
-		def := content_manager_pick_item_def_for_depth(content, game.depth)
-		if def == nil {break}
-		append(&game.items, item_make_from_def(def, Vec2{x, y}))
+		append(&game.items, item_make_from_def(loot_def, Vec2{x, y}))
 		break
 	}
 
@@ -529,16 +567,14 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 		if !is_walkable(game, x, y) {continue}
 		if item_at(game, x, y) != nil {continue}
 		if x == game.player.pos.x && y == game.player.pos.y {continue}
-		key_def := find_item_def("vault_key")
-		if key_def == nil {break}
 		append(&game.items, item_make_from_def(key_def, Vec2{x, y}))
 		logger_debugf(
 			.Gen,
 			"vault key at (%v,%v), door at (%v,%v) depth=%v",
 			x,
 			y,
-			door_x,
-			door_y,
+			door.x,
+			door.y,
 			game.depth,
 		)
 		break

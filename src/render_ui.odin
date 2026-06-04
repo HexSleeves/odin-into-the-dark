@@ -862,6 +862,13 @@ render_crafting :: proc(engine: ^eng.Engine, game: ^Game) {
 
 // ─── Victory screen overlay ──────────────────────────────────────────────────
 
+victory_boss_status_text :: proc(game: ^Game) -> cstring {
+	if game != nil && game.boss_killed_this_turn {
+		return cstring("Defeated")
+	}
+	return cstring("Not defeated")
+}
+
 render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	scores := game_engine_score_manager(engine)
 	turns := game_engine_turn_manager(engine)
@@ -954,11 +961,21 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		eng.Engine_Color{100, 255, 100, 255},
 	)
 
+	render_draw_text(engine, "Boss Defeated", stat_col, stats_y + 125, 18, stat_color)
+	render_draw_text(
+		engine,
+		victory_boss_status_text(game),
+		val_col,
+		stats_y + 125,
+		18,
+		val_color,
+	)
+
 	// Divider
 	render_draw_rectangle(
 		engine,
 		center_x - 100,
-		stats_y + 130,
+		stats_y + 155,
 		200,
 		1,
 		eng.Engine_Color{80, 80, 80, 255},
@@ -972,7 +989,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 		engine,
 		hs_title,
 		(sw - hs_w) / 2,
-		stats_y + 145,
+		stats_y + 170,
 		hs_size,
 		eng.Engine_Color{255, 220, 50, 255},
 	)
@@ -980,7 +997,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	table := score_manager_load(scores)
 	defer score_table_destroy(&table)
 	row_h :: i32(22)
-	base_y := stats_y + 170
+	base_y := stats_y + 195
 	row_size :: i32(14)
 
 	if table.count == 0 {
@@ -1007,11 +1024,12 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 			cause_display := s.cause if len(s.cause) > 0 else "Unknown"
 
 			row_text := fmt.ctprintf(
-				"%s #%d  Depth %d  Kills %d  Turns %d  %s",
+				"%s #%d  Depth %d  Kills %d  Items %d  Turns %d  %s",
 				prefix,
 				i + 1,
 				s.depth,
 				s.kills,
+				s.items_found,
 				s.turns,
 				cause_display,
 			)

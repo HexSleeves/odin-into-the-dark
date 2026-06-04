@@ -5,6 +5,18 @@ import "core:fmt"
 import "core:strings"
 
 
+footstep_sound_for_tile :: proc(tile_type: Tile_Type) -> Sound_Type {
+	#partial switch tile_type {
+	case .Water:
+		return .Water
+	case .Rubble:
+		return .Step_Rubble
+	case .Descent, .Anvil:
+		return .Step_Stone
+	}
+	return .Footstep
+}
+
 handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int) {
 	messages := game_engine_message_manager(engine)
 	camera := game_engine_camera_manager(engine)
@@ -19,23 +31,12 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 		)
 	}
 	// Play tile-appropriate footstep sound
-	{
-		step_tile := tile_at(game, game.player.pos.x, game.player.pos.y)
-		step_sfx := Sound_Type.Footstep
-		if step_tile != nil {
-			#partial switch step_tile.type {
-			case .Water:
-				step_sfx = .Water
-			case .Rubble:
-				step_sfx = .Step_Rubble
-			case .Descent, .Anvil:
-				step_sfx = .Step_Stone
-			case:
-				step_sfx = .Footstep
-			}
-		}
-		audio_manager_play_sfx(game_engine_audio_manager(engine), step_sfx)
+	step_tile := tile_at(game, game.player.pos.x, game.player.pos.y)
+	step_sfx := Sound_Type.Footstep
+	if step_tile != nil {
+		step_sfx = footstep_sound_for_tile(step_tile.type)
 	}
+	audio_manager_play_sfx(game_engine_audio_manager(engine), step_sfx)
 
 	// Process tile effects (web, hazards, collapse) — no advance_turn here;
 	// trigger_enemy_rounds is called by handle_player_action after this.
