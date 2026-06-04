@@ -99,6 +99,7 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	spawn_treasure_vault(content, game)
 
 	// Clear hazard state
+	game.minimap_reveal_enemies = false
 	game.water_slow_active = false
 
 	// Set depth-based floor palette

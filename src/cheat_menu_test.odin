@@ -56,6 +56,26 @@ when CHEATS_ENABLED {
 	}
 
 	@(test)
+	cheat_explore_map_marks_every_tile_explored_without_overriding_visibility :: proc(t: ^testing.T) {
+		game: Game
+		game_init_world(&game)
+		_ = tile_state_set(&game, 1, 1, true, true, 1)
+		_ = tile_state_set(&game, 2, 2, false, false, 0)
+		messages := message_manager_make()
+		content := content_manager_make()
+		turns := eng.turn_manager_make()
+		camera := eng.camera_manager_make()
+
+		cheat_apply(&content, &turns, &camera, &messages, &game, .Explore_Map)
+
+		testing.expect(t, tile_visible_at(&game, 1, 1))
+		testing.expect(t, !tile_visible_at(&game, 2, 2))
+		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+			testing.expect(t, tile_explored_idx(&game, i))
+		}
+	}
+
+	@(test)
 	cheat_depth_jump_clamps_and_regenerates_target_depth :: proc(t: ^testing.T) {
 		game: Game
 		game.depth = 1
@@ -66,7 +86,8 @@ when CHEATS_ENABLED {
 		game.light_sources = make([dynamic]Light_Source)
 		defer game_cleanup(&game)
 		content := content_manager_make()
-		content.registry.player.light_radius = 6
+		defer content_manager_destroy(&content)
+		testing.expect(t, content_manager_load_all(&content))
 		messages := message_manager_make()
 		turns := eng.turn_manager_make()
 		camera := eng.camera_manager_make()
@@ -77,6 +98,7 @@ when CHEATS_ENABLED {
 		_, descent_ok := cheat_find_descent(&game)
 		testing.expect(t, descent_ok)
 		testing.expect(t, game.player.pos.x > 0 || game.player.pos.y > 0)
+		testing.expect(t, len(game.enemies) > 0)
 	}
 
 	@(test)

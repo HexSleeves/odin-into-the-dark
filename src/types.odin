@@ -222,4 +222,5 @@ Game :: struct {
 	boss_killed_this_turn: bool,
 	// Run statistics
 	items_found:           int,
+	minimap_reveal_enemies: bool, // cheat/debug: show enemy dots on explored tiles
 }

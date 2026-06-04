@@ -6,6 +6,16 @@ import eng "./engine"
 // ─── Minimap overlay ──────────────────────────────────────────────────────────
 
 MINIMAP_TILE_SIZE :: i32(2) // each map tile = 2x2 pixels on minimap
+minimap_should_draw_enemy_dot :: proc(game: ^Game, enemy: ^Enemy) -> bool {
+	if game == nil || enemy == nil || !enemy.alive {
+		return false
+	}
+	if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+		return true
+	}
+	return game.minimap_reveal_enemies && tile_explored_at(game, enemy.pos.x, enemy.pos.y)
+}
+
 MINIMAP_MARGIN :: i32(8)
 
 render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
@@ -70,10 +80,9 @@ render_minimap :: proc(engine: ^eng.Engine, game: ^Game) {
 		}
 	}
 
-	// Draw enemies on visible tiles as red dots
+	// Draw enemies on visible tiles, or on explored tiles after the explore cheat.
 	for &enemy in game.enemies {
-		if !enemy.alive {continue}
-		if !tile_visible_at(game, enemy.pos.x, enemy.pos.y) {continue}
+		if !minimap_should_draw_enemy_dot(game, &enemy) {continue}
 		ex := mm_x + i32(enemy.pos.x) * MINIMAP_TILE_SIZE
 		ey := mm_y + i32(enemy.pos.y) * MINIMAP_TILE_SIZE
 		render_draw_rectangle(

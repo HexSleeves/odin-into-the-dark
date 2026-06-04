@@ -5,6 +5,14 @@ import "core:fmt"
 
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
+mineable_tile_type :: proc(tile_type: Tile_Type) -> bool {
+	#partial switch tile_type {
+	case .Wall, .Gas_Vent, .Fire_Vent, .Unstable:
+		return true
+	}
+	return false
+}
+
 mine_wall :: proc(
 	content: ^Content_Manager,
 	messages: ^Message_Manager,
@@ -18,7 +26,7 @@ mine_wall :: proc(
 	if tx < 0 || tx >= MAP_WIDTH || ty < 0 || ty >= MAP_HEIGHT {return false}
 
 	t := tile_at(game, tx, ty)
-	if t == nil || t.type != .Wall {
+	if t == nil || !mineable_tile_type(t.type) {
 		add_message(messages, game, "Nothing to mine there.", eng.Engine_Color{180, 180, 180, 255})
 		return false
 	}
@@ -46,6 +54,7 @@ mine_wall :: proc(
 
 	// Mine the wall
 	idx := pos_to_idx(tx, ty)
+	mined_tile_type := t.type
 	vein := game.ore_veins[idx]
 
 	// Convert wall to rubble
@@ -68,12 +77,16 @@ mine_wall :: proc(
 		}
 		game.ore_veins[idx] = {} // clear the vein
 	} else {
-		add_message(
-			messages,
-			game,
-			"You mine through the wall.",
-			eng.Engine_Color{180, 160, 100, 255},
-		)
+		msg := "You mine through the wall."
+		#partial switch mined_tile_type {
+		case .Gas_Vent:
+			msg = "You collapse the gas vent."
+		case .Fire_Vent:
+			msg = "You collapse the fire vent."
+		case .Unstable:
+			msg = "You break the unstable ground into rubble."
+		}
+		add_message(messages, game, msg, eng.Engine_Color{180, 160, 100, 255})
 	}
 
 	// Decrease equipped weapon durability

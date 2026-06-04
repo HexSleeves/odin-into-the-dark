@@ -12,9 +12,10 @@ when CHEATS_ENABLED {
 		Depth_Up,
 		Depth_Max,
 		Add_Vault_Key,
+		Explore_Map,
 	}
 
-	CHEAT_COMMAND_COUNT :: 7
+	CHEAT_COMMAND_COUNT :: 8
 
 	cheat_command_label :: proc(command: Cheat_Command) -> cstring {
 		switch command {
@@ -32,6 +33,8 @@ when CHEATS_ENABLED {
 			return cstring("Go to final depth")
 		case .Add_Vault_Key:
 			return cstring("Add vault key")
+		case .Explore_Map:
+			return cstring("Reveal whole map on minimap")
 		}
 		return cstring("")
 	}
@@ -104,6 +107,7 @@ when CHEATS_ENABLED {
 		game.depth = target
 		game.light_drain_timer = 0
 		game.water_slow_active = false
+		game.minimap_reveal_enemies = false
 		game.skip_next_turn = false
 		generate_map(content, game)
 		compute_fov(game)
@@ -115,6 +119,22 @@ when CHEATS_ENABLED {
 			eng.Engine_Color{255, 215, 0, 255},
 		)
 	}
+
+	cheat_explore_map :: proc(messages: ^Message_Manager, game: ^Game) {
+		if game == nil {return}
+		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+			state := tile_state_at_idx(game, i)
+			_ = tile_state_set_idx(game, i, state.visible, true, state.light_level)
+		}
+		game.minimap_reveal_enemies = true
+		add_message(
+			messages,
+			game,
+			"Cheat: map fully explored.",
+			eng.Engine_Color{255, 215, 0, 255},
+		)
+	}
+
 
 	cheat_apply :: proc(
 		content: ^Content_Manager,
@@ -172,6 +192,8 @@ when CHEATS_ENABLED {
 			cheat_set_depth(content, turns, camera, messages, game, MAX_DEPTH)
 		case .Add_Vault_Key:
 			cheat_add_item_to_inventory(content, messages, game, "vault_key")
+		case .Explore_Map:
+			cheat_explore_map(messages, game)
 		}
 	}
 
@@ -201,7 +223,7 @@ when CHEATS_ENABLED {
 			ui.cheat_choice = (ui.cheat_choice + 1) % CHEAT_COMMAND_COUNT
 		}
 
-		shortcut_actions := [7]Game_Action {
+		shortcut_actions := [8]Game_Action {
 			.Inv_Slot_1,
 			.Inv_Slot_2,
 			.Inv_Slot_3,
@@ -209,6 +231,7 @@ when CHEATS_ENABLED {
 			.Inv_Slot_5,
 			.Inv_Slot_6,
 			.Inv_Slot_7,
+			.Inv_Slot_8,
 		}
 		for action, idx in shortcut_actions {
 			if action_pressed(im, action) {
@@ -253,7 +276,7 @@ when CHEATS_ENABLED {
 			title_size,
 			eng.Engine_Color{255, 215, 0, 255},
 		)
-		help := cstring("Built with -define:CHEATS=true. Press 1-7 or Enter; Esc/Shift+C closes.")
+		help := cstring("Built with -define:CHEATS=true. Press 1-8 or Enter; Esc/Shift+C closes.")
 		help_w := render_measure_text(engine, help, 14)
 		render_draw_text(
 			engine,

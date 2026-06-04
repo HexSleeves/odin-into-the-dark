@@ -37,7 +37,7 @@ is_walkable :: proc(game: ^Game, x, y: int) -> bool {
 		return false
 	}
 	#partial switch t.type {
-	case .Floor, .Rubble, .Descent, .Water, .Gas_Vent, .Unstable, .Anvil, .Fountain:
+	case .Floor, .Rubble, .Descent, .Water, .Gas_Vent, .Unstable, .Anvil, .Fountain, .Fire_Vent:
 		return true
 	}
 	return false
