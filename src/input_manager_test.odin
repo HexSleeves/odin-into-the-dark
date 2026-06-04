@@ -67,6 +67,7 @@ test_input_backend :: proc(state: ^Test_Input_Backend_State) -> eng.Engine_Input
 		key_pressed = test_input_key_pressed,
 		key_released = test_input_key_released,
 		frame_time = test_input_frame_time,
+		mouse_position = test_input_mouse_position,
 		mouse_button_down = test_input_mouse_button_down,
 		mouse_button_released = test_input_mouse_button_released,
 		scroll_delta = test_input_scroll_delta,
@@ -91,6 +92,10 @@ test_input_key_released :: proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
 test_input_frame_time :: proc(ctx: rawptr) -> f32 {
 	state := cast(^Test_Input_Backend_State)ctx
 	return state.frame_time
+}
+
+test_input_mouse_position :: proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
+	return {}
 }
 
 test_input_mouse_button_down :: proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {

@@ -85,6 +85,7 @@ engine_run_uses_configured_platform_backend :: proc(t: ^testing.T) {
 		key_pressed           = test_run_input_key_pressed,
 		key_released          = test_run_input_key_released,
 		frame_time            = test_run_input_frame_time,
+		mouse_position        = test_run_input_mouse_position,
 		mouse_button_down     = test_run_input_mouse_button_down,
 		mouse_button_released = test_run_input_mouse_button_released,
 		scroll_delta          = test_run_input_scroll_delta,
@@ -321,6 +322,10 @@ test_run_input_key_released :: proc(ctx: rawptr, key: Engine_Key) -> bool {
 test_run_input_frame_time :: proc(ctx: rawptr) -> f32 {
 	state := cast(^Test_Run_Input_Backend_State)ctx
 	return state.frame_time
+}
+
+test_run_input_mouse_position :: proc(ctx: rawptr) -> Engine_Mouse_Position {
+	return {}
 }
 
 test_run_input_mouse_button_down :: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool {

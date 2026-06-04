@@ -36,6 +36,9 @@ jobs:
       - name: Run tests
         run: odin test src/ && odin test src/engine/
 
+      - name: Test Clay HUD
+        run: odin test src/ -define:USE_CLAY=true
+
       - name: Type check
         run: odin check src/ -vet -strict-style
 

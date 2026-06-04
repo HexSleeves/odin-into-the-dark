@@ -45,6 +45,7 @@ coverage/
 .cache/
 tmp/
 
+into_the_depths_clay
 into_the_depths
 test_main
 main
