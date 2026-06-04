@@ -12,10 +12,10 @@ mining_test_fill_tiles :: proc(game: ^Game, tile_type: Tile_Type = .Floor) {
 
 mining_test_equip_pickaxe :: proc(game: ^Game) {
 	game.equipped_weapon.occupied = true
-	game.equipped_weapon.item = Item{
-		name = "Test Pickaxe",
+	game.equipped_weapon.item = Item {
+		name           = "Test Pickaxe",
 		max_durability = 10,
-		durability = 10,
+		durability     = 10,
 	}
 }
 

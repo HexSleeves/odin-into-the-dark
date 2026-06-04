@@ -44,17 +44,26 @@ Engine_Key :: enum {
 	Right_Bracket,
 }
 
+Engine_Mouse_Button :: enum {
+	Left,
+	Right,
+	Middle,
+}
+
 Engine_Mouse_Position :: struct {
 	x, y: f32,
 }
 
 Engine_Input_Backend :: struct {
-	ctx:            rawptr,
-	key_down:       proc(ctx: rawptr, key: Engine_Key) -> bool,
-	key_pressed:    proc(ctx: rawptr, key: Engine_Key) -> bool,
-	key_released:   proc(ctx: rawptr, key: Engine_Key) -> bool,
-	frame_time:     proc(ctx: rawptr) -> f32,
-	mouse_position: proc(ctx: rawptr) -> Engine_Mouse_Position,
+	ctx:                   rawptr,
+	key_down:              proc(ctx: rawptr, key: Engine_Key) -> bool,
+	key_pressed:           proc(ctx: rawptr, key: Engine_Key) -> bool,
+	key_released:          proc(ctx: rawptr, key: Engine_Key) -> bool,
+	frame_time:            proc(ctx: rawptr) -> f32,
+	mouse_position:        proc(ctx: rawptr) -> Engine_Mouse_Position,
+	mouse_button_down:     proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool,
+	mouse_button_released: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool,
+	scroll_delta:          proc(ctx: rawptr) -> f32,
 }
 
 engine_input_backend_is_valid :: proc(input: Engine_Input_Backend) -> bool {
@@ -90,6 +99,9 @@ engine_input_backend_nil :: proc() -> Engine_Input_Backend {
 		key_released = nil_input_key_released,
 		frame_time = nil_input_frame_time,
 		mouse_position = nil_input_mouse_position,
+		mouse_button_down = nil_input_mouse_button_down,
+		mouse_button_released = nil_input_mouse_button_released,
+		scroll_delta = nil_input_scroll_delta,
 	}
 }
 
@@ -130,6 +142,36 @@ engine_input_mouse_position :: proc(input: Engine_Input_Backend) -> Engine_Mouse
 	return backend.mouse_position(backend.ctx)
 }
 
+engine_input_mouse_button_down :: proc(
+	input: Engine_Input_Backend,
+	button: Engine_Mouse_Button,
+) -> bool {
+	backend := engine_input_backend_or_default(input)
+	if backend.mouse_button_down == nil {
+		return false
+	}
+	return backend.mouse_button_down(backend.ctx, button)
+}
+
+engine_input_mouse_button_released :: proc(
+	input: Engine_Input_Backend,
+	button: Engine_Mouse_Button,
+) -> bool {
+	backend := engine_input_backend_or_default(input)
+	if backend.mouse_button_released == nil {
+		return false
+	}
+	return backend.mouse_button_released(backend.ctx, button)
+}
+
+engine_input_scroll_delta :: proc(input: Engine_Input_Backend) -> f32 {
+	backend := engine_input_backend_or_default(input)
+	if backend.scroll_delta == nil {
+		return 0
+	}
+	return backend.scroll_delta(backend.ctx)
+}
+
 engine_mouse_position :: proc(engine: ^Engine) -> Engine_Mouse_Position {
 	return engine_input_mouse_position(engine_input_backend(engine))
 }
@@ -157,4 +199,19 @@ nil_input_frame_time :: proc(ctx: rawptr) -> f32 {
 @(private = "file")
 nil_input_mouse_position :: proc(ctx: rawptr) -> Engine_Mouse_Position {
 	return Engine_Mouse_Position{}
+}
+
+@(private = "file")
+nil_input_mouse_button_down :: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool {
+	return false
+}
+
+@(private = "file")
+nil_input_mouse_button_released :: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool {
+	return false
+}
+
+@(private = "file")
+nil_input_scroll_delta :: proc(ctx: rawptr) -> f32 {
+	return 0
 }

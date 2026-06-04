@@ -5,6 +5,7 @@ import eng "./engine"
 // ─── Constants ────────────────────────────────────────────────────────────────
 CHEATS_ENABLED :: #config(CHEATS, false)
 PUBLIC_BUILD :: #config(PUBLIC_BUILD, false)
+USE_CLAY :: #config(USE_CLAY, false)
 when PUBLIC_BUILD {
 	#assert(!CHEATS_ENABLED, "Public builds must not enable CHEATS")
 }

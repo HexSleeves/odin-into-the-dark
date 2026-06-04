@@ -56,7 +56,9 @@ when CHEATS_ENABLED {
 	}
 
 	@(test)
-	cheat_explore_map_marks_every_tile_explored_without_overriding_visibility :: proc(t: ^testing.T) {
+	cheat_explore_map_marks_every_tile_explored_without_overriding_visibility :: proc(
+		t: ^testing.T,
+	) {
 		game: Game
 		game_init_world(&game)
 		_ = tile_state_set(&game, 1, 1, true, true, 1)

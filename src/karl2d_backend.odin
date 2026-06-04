@@ -134,6 +134,12 @@ karl2d_input_backend :: proc() -> eng.Engine_Input_Backend {
 		}, mouse_position = proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
 			p := k2.get_mouse_position()
 			return eng.Engine_Mouse_Position{x = p.x, y = p.y}
+		}, mouse_button_down = proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {
+			return k2.mouse_button_is_held(to_k2_mouse_button(button))
+		}, mouse_button_released = proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {
+			return k2.mouse_button_went_up(to_k2_mouse_button(button))
+		}, scroll_delta = proc(ctx: rawptr) -> f32 {
+			return k2.get_mouse_wheel_delta()
 		}}
 }
 
@@ -165,6 +171,19 @@ karl2d_texture_backend :: proc() -> eng.Engine_Texture_Backend {
 			texture^ = {}
 		},
 	}
+}
+
+@(private = "file")
+to_k2_mouse_button :: proc(button: eng.Engine_Mouse_Button) -> k2.Mouse_Button {
+	#partial switch button {
+	case .Left:
+		return .Left
+	case .Right:
+		return .Right
+	case .Middle:
+		return .Middle
+	}
+	return .Left
 }
 
 // ── Key mapping ───────────────────────────────────────────────────────────────

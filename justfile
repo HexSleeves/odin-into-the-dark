@@ -8,10 +8,11 @@ sprite_define := if env_var_or_default("SPRITES", "false") == "true" { "-define:
 no_audio_define := if env_var_or_default("NO_AUDIO", "false") == "true" { "-define:NO_AUDIO=true" } else { "" }
 no_sprites_define := if env_var_or_default("NO_SPRITES", "false") == "true" { "-define:NO_SPRITES=true" } else { "" }
 skip_title_define := if env_var_or_default("SKIP_TITLE", "false") == "true" { "-define:SKIP_TITLE=true" } else { "" }
+use_clay_define := if env_var_or_default("USE_CLAY", "false") == "true" { "-define:USE_CLAY=true" } else { "" }
 fixed_seed_value := env_var_or_default("FIXED_SEED", "")
 fixed_seed_define := if fixed_seed_value != "" { "-define:FIXED_SEED=" + fixed_seed_value } else { "" }
-build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define
-release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define + " -define:PUBLIC_BUILD=true"
+build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + use_clay_define + " " + fixed_seed_define
+release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + use_clay_define + " " + fixed_seed_define + " -define:PUBLIC_BUILD=true"
 copy_assets := if env_var_or_default("NO_SPRITES", "false") == "true" { "false" } else { "true" }
 
 default:

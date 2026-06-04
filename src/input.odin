@@ -220,7 +220,12 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		if action_pressed(im, .Toggle_Sprites) {
 			ui.use_sprites = !ui.use_sprites
 			if ui.use_sprites {
-				add_message(messages, game, "Render: SPRITES", eng.Engine_Color{180, 180, 180, 255})
+				add_message(
+					messages,
+					game,
+					"Render: SPRITES",
+					eng.Engine_Color{180, 180, 180, 255},
+				)
 			} else {
 				add_message(messages, game, "Render: ASCII", eng.Engine_Color{180, 180, 180, 255})
 			}

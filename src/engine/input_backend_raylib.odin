@@ -13,6 +13,9 @@ engine_input_backend_raylib :: proc() -> Engine_Input_Backend {
 		key_released = raylib_input_key_released,
 		frame_time = raylib_input_frame_time,
 		mouse_position = raylib_input_mouse_position,
+		mouse_button_down = raylib_input_mouse_button_down,
+		mouse_button_released = raylib_input_mouse_button_released,
+		scroll_delta = raylib_input_scroll_delta,
 	}
 }
 
@@ -40,6 +43,34 @@ raylib_input_frame_time :: proc(ctx: rawptr) -> f32 {
 raylib_input_mouse_position :: proc(ctx: rawptr) -> Engine_Mouse_Position {
 	mouse := rl.GetMousePosition()
 	return Engine_Mouse_Position{x = mouse.x, y = mouse.y}
+}
+
+@(private = "file")
+raylib_input_mouse_button_down :: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool {
+	return rl.IsMouseButtonDown(engine_mouse_button_to_raylib(button))
+}
+
+@(private = "file")
+raylib_input_mouse_button_released :: proc(ctx: rawptr, button: Engine_Mouse_Button) -> bool {
+	return rl.IsMouseButtonReleased(engine_mouse_button_to_raylib(button))
+}
+
+@(private = "file")
+raylib_input_scroll_delta :: proc(ctx: rawptr) -> f32 {
+	return rl.GetMouseWheelMove()
+}
+
+@(private = "file")
+engine_mouse_button_to_raylib :: proc(button: Engine_Mouse_Button) -> rl.MouseButton {
+	#partial switch button {
+	case .Left:
+		return .LEFT
+	case .Right:
+		return .RIGHT
+	case .Middle:
+		return .MIDDLE
+	}
+	return .LEFT
 }
 
 engine_key_to_raylib :: proc(key: Engine_Key) -> rl.KeyboardKey {

@@ -174,53 +174,53 @@ Game_State :: enum {
 }
 
 Game :: struct {
-	tiles:                 [MAP_WIDTH * MAP_HEIGHT]Tile,
-	dijkstra_map:          [MAP_WIDTH * MAP_HEIGHT]int,
-	world:                 eng.World_Manager,
-	map_width:             int,
-	map_height:            int,
-	player:                Player,
-	rooms:                 [dynamic]Room,
-	enemies:               [dynamic]Enemy,
-	items:                 [dynamic]Item,
-	inventory:             [MAX_INVENTORY]Inventory_Slot,
-	light_sources:         [dynamic]Light_Source,
-	depth:                 int,
-	kills:                 int,
-	seed:                  u64,
-	state:                 Game_State,
+	tiles:                  [MAP_WIDTH * MAP_HEIGHT]Tile,
+	dijkstra_map:           [MAP_WIDTH * MAP_HEIGHT]int,
+	world:                  eng.World_Manager,
+	map_width:              int,
+	map_height:             int,
+	player:                 Player,
+	rooms:                  [dynamic]Room,
+	enemies:                [dynamic]Enemy,
+	items:                  [dynamic]Item,
+	inventory:              [MAX_INVENTORY]Inventory_Slot,
+	light_sources:          [dynamic]Light_Source,
+	depth:                  int,
+	kills:                  int,
+	seed:                   u64,
+	state:                  Game_State,
 	// Timed light boost (from lantern oil)
-	light_boost_bonus:     int,
-	light_boost_turns:     int,
-	light_drain_timer:     int, // counts rounds until next light drain
+	light_boost_bonus:      int,
+	light_boost_turns:      int,
+	light_drain_timer:      int, // counts rounds until next light drain
 	// Web tiles (Cave Crawler ability)
-	web_tiles:             eng.Bool_Grid_Manager,
-	tile_states:           eng.Tile_State_Manager,
-	skip_next_turn:        bool, // player stuck in web
+	web_tiles:              eng.Bool_Grid_Manager,
+	tile_states:            eng.Tile_State_Manager,
+	skip_next_turn:         bool, // player stuck in web
 	// Equipment slots
-	equipped_weapon:       Equipment,
-	equipped_armor:        Equipment,
-	equipped_helmet:       Equipment,
+	equipped_weapon:        Equipment,
+	equipped_armor:         Equipment,
+	equipped_helmet:        Equipment,
 	// Depth-based floor palette
-	palette:               Floor_Palette,
+	palette:                Floor_Palette,
 	// Hazard state
-	water_slow_active:     bool, // player in water, costs next turn
-	prev_player_pos:       Vec2, // track previous position for unstable collapse
+	water_slow_active:      bool, // player in water, costs next turn
+	prev_player_pos:        Vec2, // track previous position for unstable collapse
 	// Mining system
-	ore_veins:             [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
+	ore_veins:              [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
 	// Death tracking
-	death_cause:           string,
-	score_saved:           bool,
-	last_score_rank:       int,
-	render_map_dirty:      bool,
-	render_last_cam_x:     int,
-	render_last_cam_y:     int,
+	death_cause:            string,
+	score_saved:            bool,
+	last_score_rank:        int,
+	render_map_dirty:       bool,
+	render_last_cam_x:      int,
+	render_last_cam_y:      int,
 	// Status effects (volatile — not saved; resets on load)
-	poison_turns:          int,
-	burning_turns:         int,
-	frozen_turns:          int,
-	boss_killed_this_turn: bool,
+	poison_turns:           int,
+	burning_turns:          int,
+	frozen_turns:           int,
+	boss_killed_this_turn:  bool,
 	// Run statistics
-	items_found:           int,
+	items_found:            int,
 	minimap_reveal_enemies: bool, // cheat/debug: show enemy dots on explored tiles
 }

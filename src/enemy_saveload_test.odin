@@ -28,7 +28,16 @@ save_load_round_trip_preserves_spawned_enemies :: proc(t: ^testing.T) {
 	vfx := eng.vfx_manager_make()
 	ui := ui_manager_make(false)
 	messages := message_manager_make()
-	loaded_ok := load_game_from_path(&content, &loaded_turns, &camera, &vfx, &ui, &messages, &loaded, path)
+	loaded_ok := load_game_from_path(
+		&content,
+		&loaded_turns,
+		&camera,
+		&vfx,
+		&ui,
+		&messages,
+		&loaded,
+		path,
+	)
 	defer game_cleanup(&loaded)
 
 	testing.expect(t, loaded_ok)

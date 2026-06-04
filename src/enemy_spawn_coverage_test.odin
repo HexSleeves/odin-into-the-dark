@@ -24,17 +24,35 @@ generate_map_spawns_at_least_one_enemy_across_depths_and_sample_seeds :: proc(t:
 			game.items = make([dynamic]Item)
 			game.light_sources = make([dynamic]Light_Source)
 			generate_map(&content, game)
-			testing.expectf(t, len(game.enemies) > 0, "depth=%d seed=%d had zero enemies", depth, seed)
+			testing.expectf(
+				t,
+				len(game.enemies) > 0,
+				"depth=%d seed=%d had zero enemies",
+				depth,
+				seed,
+			)
 			compute_dijkstra_map(game)
-			dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
+			dmap := eng.engine_distance_map_make(
+				game.dijkstra_map[:],
+				game_grid(game),
+				DMAP_UNREACHABLE,
+			)
 			reachable_enemies := 0
 			for enemy in game.enemies {
 				if !enemy.alive {continue}
-				if eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y) < DMAP_UNREACHABLE {
+				if eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y) <
+				   DMAP_UNREACHABLE {
 					reachable_enemies += 1
 				}
 			}
-			testing.expectf(t, reachable_enemies > 0, "depth=%d seed=%d had no reachable enemies out of %d", depth, seed, len(game.enemies))
+			testing.expectf(
+				t,
+				reachable_enemies > 0,
+				"depth=%d seed=%d had no reachable enemies out of %d",
+				depth,
+				seed,
+				len(game.enemies),
+			)
 			game_destroy(game)
 		}
 	}

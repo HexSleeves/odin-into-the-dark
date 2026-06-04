@@ -51,10 +51,13 @@ input_manager_repeat_uses_engine_input_frame_time :: proc(t: ^testing.T) {
 }
 
 Test_Input_Backend_State :: struct {
-	pressed:    [eng.Engine_Key]bool,
-	down:       [eng.Engine_Key]bool,
-	released:   [eng.Engine_Key]bool,
-	frame_time: f32,
+	pressed:        [eng.Engine_Key]bool,
+	down:           [eng.Engine_Key]bool,
+	released:       [eng.Engine_Key]bool,
+	frame_time:     f32,
+	mouse_down:     [eng.Engine_Mouse_Button]bool,
+	mouse_released: [eng.Engine_Mouse_Button]bool,
+	scroll_delta:   f32,
 }
 
 test_input_backend :: proc(state: ^Test_Input_Backend_State) -> eng.Engine_Input_Backend {
@@ -64,6 +67,9 @@ test_input_backend :: proc(state: ^Test_Input_Backend_State) -> eng.Engine_Input
 		key_pressed = test_input_key_pressed,
 		key_released = test_input_key_released,
 		frame_time = test_input_frame_time,
+		mouse_button_down = test_input_mouse_button_down,
+		mouse_button_released = test_input_mouse_button_released,
+		scroll_delta = test_input_scroll_delta,
 	}
 }
 
@@ -85,4 +91,19 @@ test_input_key_released :: proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
 test_input_frame_time :: proc(ctx: rawptr) -> f32 {
 	state := cast(^Test_Input_Backend_State)ctx
 	return state.frame_time
+}
+
+test_input_mouse_button_down :: proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {
+	state := cast(^Test_Input_Backend_State)ctx
+	return state.mouse_down[button]
+}
+
+test_input_mouse_button_released :: proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {
+	state := cast(^Test_Input_Backend_State)ctx
+	return state.mouse_released[button]
+}
+
+test_input_scroll_delta :: proc(ctx: rawptr) -> f32 {
+	state := cast(^Test_Input_Backend_State)ctx
+	return state.scroll_delta
 }

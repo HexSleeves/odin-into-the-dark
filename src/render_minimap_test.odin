@@ -14,5 +14,5 @@ explore_cheat_reveals_enemy_dots_on_minimap_for_explored_tiles :: proc(t: ^testi
 
 	testing.expect(t, !minimap_should_draw_enemy_dot(&game, &game.enemies[0]))
 	game.minimap_reveal_enemies = true
-		testing.expect(t, minimap_should_draw_enemy_dot(&game, &game.enemies[0]))
+	testing.expect(t, minimap_should_draw_enemy_dot(&game, &game.enemies[0]))
 }

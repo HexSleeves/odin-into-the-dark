@@ -59,9 +59,16 @@ sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
 @(test)
 sprite_manager_draw_uses_default_tile_size_when_no_size_is_supplied :: proc(t: ^testing.T) {
 	state := Test_Sprite_Render_Backend_State{}
-	engine := eng.Engine{render = test_sprite_render_backend(&state)}
-	atlas := Sprite_Atlas{loaded = true, texture = eng.Engine_Texture{handle = rawptr(uintptr(1)), width = 64, height = 64}}
-	sprites := Sprite_Manager{backend = &atlas}
+	engine := eng.Engine {
+		render = test_sprite_render_backend(&state),
+	}
+	atlas := Sprite_Atlas {
+		loaded = true,
+		texture = eng.Engine_Texture{handle = rawptr(uintptr(1)), width = 64, height = 64},
+	}
+	sprites := Sprite_Manager {
+		backend = &atlas,
+	}
 
 	sprite_manager_draw(&engine, &sprites, sprite_at(0, 0, 16), 4, 5)
 
@@ -73,11 +80,26 @@ sprite_manager_draw_uses_default_tile_size_when_no_size_is_supplied :: proc(t: ^
 @(test)
 sprite_manager_draw_uses_requested_destination_size :: proc(t: ^testing.T) {
 	state := Test_Sprite_Render_Backend_State{}
-	engine := eng.Engine{render = test_sprite_render_backend(&state)}
-	atlas := Sprite_Atlas{loaded = true, texture = eng.Engine_Texture{handle = rawptr(uintptr(1)), width = 64, height = 64}}
-	sprites := Sprite_Manager{backend = &atlas}
+	engine := eng.Engine {
+		render = test_sprite_render_backend(&state),
+	}
+	atlas := Sprite_Atlas {
+		loaded = true,
+		texture = eng.Engine_Texture{handle = rawptr(uintptr(1)), width = 64, height = 64},
+	}
+	sprites := Sprite_Manager {
+		backend = &atlas,
+	}
 
-	sprite_manager_draw(&engine, &sprites, sprite_at(0, 0, 16), 4, 5, eng.Engine_Color{255, 255, 255, 255}, 35)
+	sprite_manager_draw(
+		&engine,
+		&sprites,
+		sprite_at(0, 0, 16),
+		4,
+		5,
+		eng.Engine_Color{255, 255, 255, 255},
+		35,
+	)
 
 	testing.expect_value(t, state.texture_draw_count, 1)
 	testing.expect_value(t, state.last_dest.width, f32(35))
@@ -148,7 +170,9 @@ Test_Sprite_Render_Backend_State :: struct {
 	last_dest:          eng.Engine_Rect,
 }
 
-test_sprite_render_backend :: proc(state: ^Test_Sprite_Render_Backend_State) -> eng.Engine_Render_Backend {
+test_sprite_render_backend :: proc(
+	state: ^Test_Sprite_Render_Backend_State,
+) -> eng.Engine_Render_Backend {
 	return eng.Engine_Render_Backend {
 		ctx = state,
 		begin_frame = test_sprite_render_begin_frame,
@@ -169,10 +193,23 @@ test_sprite_render_end_frame :: proc(ctx: rawptr) {}
 test_sprite_render_clear :: proc(ctx: rawptr, color: eng.Engine_Color) {}
 test_sprite_render_begin_scissor :: proc(ctx: rawptr, x, y, width, height: i32) {}
 test_sprite_render_end_scissor :: proc(ctx: rawptr) {}
-test_sprite_render_draw_rectangle :: proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {}
-test_sprite_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, color: eng.Engine_Color) {}
+test_sprite_render_draw_rectangle :: proc(
+	ctx: rawptr,
+	x, y, width, height: i32,
+	color: eng.Engine_Color,
+) {}
+test_sprite_render_draw_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	x, y, size: i32,
+	color: eng.Engine_Color,
+) {}
 test_sprite_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {return 0}
-test_sprite_render_draw_rectangle_lines :: proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {}
+test_sprite_render_draw_rectangle_lines :: proc(
+	ctx: rawptr,
+	x, y, width, height: i32,
+	color: eng.Engine_Color,
+) {}
 test_sprite_render_draw_texture_region :: proc(
 	ctx: rawptr,
 	texture: eng.Engine_Texture,

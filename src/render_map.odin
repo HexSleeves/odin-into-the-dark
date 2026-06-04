@@ -291,14 +291,7 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
 		glyph_buf[1] = 0
-		render_draw_text(
-			engine,
-			cast(cstring)&glyph_buf[0],
-			px,
-			py,
-			tile_size,
-			game.player.color,
-		)
+		render_draw_text(engine, cast(cstring)&glyph_buf[0], px, py, tile_size, game.player.color)
 	}
 }
 
@@ -329,14 +322,7 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(enemy.glyph)
 			glyph_buf[1] = 0
-			render_draw_text(
-				engine,
-				cast(cstring)&glyph_buf[0],
-				ex,
-				ey,
-				tile_size,
-				enemy.color,
-			)
+			render_draw_text(engine, cast(cstring)&glyph_buf[0], ex, ey, tile_size, enemy.color)
 		}
 	}
 }

@@ -37,7 +37,18 @@ visible_enemy_moves_downhill_toward_player :: proc(t: ^testing.T) {
 	game.player.max_hp = 20
 	game.enemies = make([dynamic]Enemy)
 	defer delete(game.enemies)
-	append(&game.enemies, Enemy{pos = Vec2{4, 1}, hp = 5, max_hp = 5, alive = true, energy = 0, quickness = 100, move_speed = 100})
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{4, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
 	_ = tile_state_set(&game, 4, 1, true, true, 1)
 	messages := message_manager_make()
 
@@ -55,8 +66,30 @@ visible_enemy_does_not_enter_occupied_tile_while_chasing :: proc(t: ^testing.T) 
 	game.player.max_hp = 20
 	game.enemies = make([dynamic]Enemy)
 	defer delete(game.enemies)
-	append(&game.enemies, Enemy{pos = Vec2{4, 1}, hp = 5, max_hp = 5, alive = true, energy = 0, quickness = 100, move_speed = 100})
-	append(&game.enemies, Enemy{pos = Vec2{3, 1}, hp = 5, max_hp = 5, alive = true, energy = 0, quickness = 0, move_speed = 100})
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{4, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{3, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 0,
+			move_speed = 100,
+		},
+	)
 	_ = tile_state_set(&game, 4, 1, true, true, 1)
 	messages := message_manager_make()
 
@@ -75,7 +108,19 @@ adjacent_visible_enemy_attacks_instead_of_moving :: proc(t: ^testing.T) {
 	game.player.max_hp = 20
 	game.enemies = make([dynamic]Enemy)
 	defer delete(game.enemies)
-	append(&game.enemies, Enemy{pos = Vec2{2, 1}, hp = 5, max_hp = 5, attack = 3, alive = true, energy = 0, quickness = 100, move_speed = 100})
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{2, 1},
+			hp = 5,
+			max_hp = 5,
+			attack = 3,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
 	_ = tile_state_set(&game, 2, 1, true, true, 1)
 	messages := message_manager_make()
 
@@ -97,7 +142,18 @@ visible_unreachable_enemy_stops_instead_of_random_wandering :: proc(t: ^testing.
 	game.player.max_hp = 20
 	game.enemies = make([dynamic]Enemy)
 	defer delete(game.enemies)
-	append(&game.enemies, Enemy{pos = Vec2{5, 5}, hp = 5, max_hp = 5, alive = true, energy = 0, quickness = 100, move_speed = 100})
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{5, 5},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
 	_ = tile_state_set(&game, 5, 5, true, true, 1)
 	messages := message_manager_make()
 

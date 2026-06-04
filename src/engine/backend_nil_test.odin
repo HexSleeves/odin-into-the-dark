@@ -14,6 +14,9 @@ nil_input_backend_is_valid_and_returns_empty_state :: proc(t: ^testing.T) {
 	testing.expect_value(t, engine_input_frame_time(input), f32(0))
 	testing.expect_value(t, engine_input_mouse_position(input).x, f32(0))
 	testing.expect_value(t, engine_input_mouse_position(input).y, f32(0))
+	testing.expect(t, !engine_input_mouse_button_down(input, .Left))
+	testing.expect(t, !engine_input_mouse_button_released(input, .Left))
+	testing.expect_value(t, engine_input_scroll_delta(input), f32(0))
 }
 
 @(test)

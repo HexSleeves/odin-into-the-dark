@@ -38,6 +38,9 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 			key_pressed = test_game_app_input_key_pressed,
 			key_released = test_game_app_input_key_released,
 			frame_time = test_game_app_input_frame_time,
+			mouse_button_down = test_game_app_input_mouse_button_down,
+			mouse_button_released = test_game_app_input_mouse_button_released,
+			scroll_delta = test_game_app_input_scroll_delta,
 		},
 	}
 	was_sprites_loaded := g_sprites.loaded
@@ -114,6 +117,24 @@ test_game_app_input_key_released :: proc(ctx: rawptr, key: eng.Engine_Key) -> bo
 }
 
 test_game_app_input_frame_time :: proc(ctx: rawptr) -> f32 {
+	return 0
+}
+
+test_game_app_input_mouse_button_down :: proc(
+	ctx: rawptr,
+	button: eng.Engine_Mouse_Button,
+) -> bool {
+	return false
+}
+
+test_game_app_input_mouse_button_released :: proc(
+	ctx: rawptr,
+	button: eng.Engine_Mouse_Button,
+) -> bool {
+	return false
+}
+
+test_game_app_input_scroll_delta :: proc(ctx: rawptr) -> f32 {
 	return 0
 }
 
