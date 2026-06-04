@@ -21,7 +21,20 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_particles(engine, particles)
 	eng.engine_render_end_scissor(engine)
 
-	render_hud(engine, game)
+	when USE_CLAY {
+		clay_ui_begin_frame(engine)
+		clay_render_hud(engine, game)
+		delta_time := f32(0)
+		frames := eng.engine_frame_manager(engine)
+		if frames != nil {
+			delta_time = eng.frame_manager_delta_time(frames^)
+		}
+		commands := clay_ui_end_frame(delta_time)
+		clay_render_commands(engine, commands)
+		render_hud(engine, game)
+	} else {
+		render_hud(engine, game)
+	}
 	render_messages_for_engine(engine)
 
 	ui := ui_manager_state(game_engine_ui_manager(engine))

@@ -44,6 +44,8 @@ main()  →  engine_run(config, services, &app)
 
 Defaults use OS/Raylib implementations. Tests inject fake backends by constructing the struct directly — no mocking framework.
 
+**Clay UI path** — `USE_CLAY :: #config(USE_CLAY, false)` swaps the sidebar HUD to Clay immediate-mode layout. Clay is vendored at `src/vendor/clay/`; `src/clay_ui.odin` owns context/input/text measurement, `src/clay_renderer.odin` translates Clay commands to `Engine_Render_Backend`, and `src/clay_hud.odin` declares the sidebar. Engine code never imports Clay.
+
 ---
 
 ## Key Directories
@@ -66,6 +68,8 @@ just test            # odin test src/ && odin test src/engine/
 just check           # odin check src/   (type-check only, no binary)
 just build           # odin build src/ -out:into_the_depths
 just run             # odin run src/
+just test-clay       # odin test src/ -define:USE_CLAY=true
+just run-clay        # odin run src/ -define:USE_CLAY=true -define:CHEATS=true
 just fmt             # /Users/lecoqjacob/Developer/games/ols/odinfmt src/ -w
 just release         # odin build src/ -out:into_the_depths -o:speed -disable-assert -no-bounds-check
 just stats           # wc -l on all .odin and .json5 files
@@ -159,6 +163,8 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 | `src/input.odin` / `src/input_manager.odin` | Input routing and manager |
 | `src/render.odin` | Top-level render dispatch |
 | `src/render_map.odin` / `render_hud.odin` / `render_ui.odin` / `render_minimap.odin` | Rendering by concern |
+| `src/clay_ui.odin` / `src/clay_renderer.odin` / `src/clay_hud.odin` | Clay sidebar HUD path behind `-define:USE_CLAY=true` |
+| `src/vendor/clay/` | Vendored Clay Odin binding and prebuilt platform libraries |
 | `src/engine/engine.odin` | `Engine` struct, `engine_run` loop, all manager accessors |
 | `src/engine/engine_services.odin` | Service registry (up to 16 services, inline arena) |
 | `src/engine/file_system.odin` | `Engine_File_System` abstraction + OS default |
@@ -181,6 +187,7 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 - **LSP:** OLS with `-vet -strict-style`; inlay hints on
 - **No external dependencies** beyond Odin's standard library and vendor:raylib
 - **Engine layer must stay backend-agnostic** — no Raylib imports in `src/engine/`
+- **Clay UI:** optional sidebar HUD path behind `-define:USE_CLAY=true`; non-Clay builds must compile cleanly and remain the default
 
 ---
 

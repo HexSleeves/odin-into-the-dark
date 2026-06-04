@@ -3,6 +3,13 @@ package main
 import eng "./engine"
 import clay "./vendor/clay"
 import "core:testing"
+@(private = "file")
+clay_ui_test_import_anchor :: proc() {
+	_ = eng.Engine{}
+	_ = clay.RenderCommand{}
+	_ = testing.T{}
+}
+
 
 when USE_CLAY {
 	@(test)

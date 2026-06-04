@@ -4,6 +4,14 @@ import eng "./engine"
 import clay "./vendor/clay"
 import "base:runtime"
 import "core:mem"
+@(private = "file")
+clay_ui_import_anchor :: proc() {
+	_ = eng.Engine{}
+	_ = clay.MinMemorySize
+	_ = runtime.default_context
+	_ = mem.copy
+}
+
 
 when USE_CLAY {
 	Clay_UI_State :: struct {
