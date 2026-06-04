@@ -101,7 +101,7 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 		return false
 	}
 	content := content_manager_make()
-	content.storage = eng.storage_manager_make(eng.engine_file_system(engine))
+	// Data is #load'd at compile time — no storage backend needed.
 	saves := save_manager_make()
 	saves.storage = eng.storage_manager_make(eng.engine_file_system(engine))
 	sprites := sprite_manager_make()

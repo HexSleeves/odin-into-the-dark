@@ -1,6 +1,5 @@
 package main
 
-import eng "./engine"
 import "core:math/rand"
 
 // ─── Content manager facade ──────────────────────────────────────────────────
@@ -8,7 +7,6 @@ import "core:math/rand"
 Content_Manager :: struct {
 	loaded:   bool,
 	registry: Data_Registry,
-	storage:  eng.Storage_Manager,
 }
 
 content_manager_make :: proc() -> Content_Manager {
@@ -19,12 +17,7 @@ content_manager_load_all :: proc(content: ^Content_Manager) -> bool {
 	if content == nil {
 		return data_load_all()
 	}
-	ok: bool
-	if eng.storage_manager_is_valid(content.storage) {
-		ok = content_manager_load_from_storage(&content.registry, &content.storage)
-	} else {
-		ok = data_load_all_into(&content.registry)
-	}
+	ok := data_load_all_into(&content.registry)
 	content.loaded = ok
 	if ok {
 		g_data = content.registry
@@ -174,34 +167,4 @@ content_manager_destroy :: proc(content: ^Content_Manager) {
 	if content == nil {return}
 	data_registry_destroy(&content.registry)
 	content^ = {}
-}
-
-content_manager_load_from_storage :: proc(
-	registry: ^Data_Registry,
-	storage: ^eng.Storage_Manager,
-) -> bool {
-	e_raw, e_ok := eng.storage_manager_read(storage, "data/enemies.json5")
-	if !e_ok {return false}
-	defer delete(e_raw)
-	enemies, enemies_ok := load_json5_from_bytes(Enemy_Data, e_raw)
-	if !enemies_ok {return false}
-
-	i_raw, i_ok := eng.storage_manager_read(storage, "data/items.json5")
-	if !i_ok {return false}
-	defer delete(i_raw)
-	items, items_ok := load_json5_from_bytes(Item_Data, i_raw)
-	if !items_ok {return false}
-
-	p_raw, p_ok := eng.storage_manager_read(storage, "data/player.json5")
-	if !p_ok {return false}
-	defer delete(p_raw)
-	player, player_ok := load_json5_from_bytes(Player_Def, p_raw)
-	if !player_ok {return false}
-
-	registry.enemies = enemies
-	registry.items = items
-	registry.player = player
-	registry.loaded = true
-	registry.owned = true
-	return true
 }

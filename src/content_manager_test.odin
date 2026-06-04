@@ -1,7 +1,6 @@
 #+build !js
 package main
 
-import eng "./engine"
 import "base:runtime"
 import "core:testing"
 
@@ -14,24 +13,16 @@ content_manager_make_starts_unloaded :: proc(t: ^testing.T) {
 }
 
 @(test)
-content_manager_load_all_uses_configured_storage :: proc(t: ^testing.T) {
-	state := Content_Test_File_System_State{}
-	fs := eng.Engine_File_System {
-		ctx               = &state,
-		read_entire_file  = content_test_file_system_read_entire_file,
-		write_entire_file = content_test_file_system_write_entire_file,
-		exists            = content_test_file_system_exists,
-		remove            = content_test_file_system_remove,
-	}
+content_manager_load_all_uses_embedded_data :: proc(t: ^testing.T) {
 	content := content_manager_make()
-	content.storage = eng.storage_manager_make(fs)
 	defer content_manager_destroy(&content)
 
 	testing.expect(t, content_manager_load_all(&content))
-	testing.expect_value(t, state.read_count, 3)
-	testing.expect_value(t, content.registry.player.hp, 10)
-	testing.expect_value(t, content.registry.enemies.enemies[0].id, "rat")
-	testing.expect_value(t, content.registry.items.items[0].id, "torch")
+	testing.expect(t, content.loaded)
+	testing.expect(t, content.registry.loaded)
+	testing.expect(t, len(content.registry.enemies.enemies) > 0)
+	testing.expect(t, len(content.registry.items.items) > 0)
+	testing.expect(t, content.registry.player.hp > 0)
 }
 
 @(test)

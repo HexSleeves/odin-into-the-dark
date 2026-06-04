@@ -124,11 +124,11 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 
 karl2d_input_backend :: proc() -> eng.Engine_Input_Backend {
 	return eng.Engine_Input_Backend{key_down = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.key_is_held(to_k2_key(key))
+			return k2.web_key_is_held(to_k2_key(key))
 		}, key_pressed = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.key_went_down(to_k2_key(key))
+			return k2.web_key_went_down(to_k2_key(key))
 		}, key_released = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.key_went_up(to_k2_key(key))
+			return k2.web_key_went_up(to_k2_key(key))
 		}, frame_time = proc(ctx: rawptr) -> f32 {
 			return k2.get_frame_time()
 		}, mouse_position = proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
