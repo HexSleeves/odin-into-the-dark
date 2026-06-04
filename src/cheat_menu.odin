@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import "core:fmt"
 
 when CHEATS_ENABLED {
 	Cheat_Command :: enum {

@@ -5,8 +5,13 @@ engine_src := "src/engine"
 binary := "into_the_depths"
 cheat_define := if env_var_or_default("CHEATS", "false") == "true" { "-define:CHEATS=true" } else { "" }
 sprite_define := if env_var_or_default("SPRITES", "false") == "true" { "-define:SPRITES=true" } else { "" }
-build_defines := cheat_define + " " + sprite_define
-
+no_audio_define := if env_var_or_default("NO_AUDIO", "false") == "true" { "-define:NO_AUDIO=true" } else { "" }
+no_sprites_define := if env_var_or_default("NO_SPRITES", "false") == "true" { "-define:NO_SPRITES=true" } else { "" }
+skip_title_define := if env_var_or_default("SKIP_TITLE", "false") == "true" { "-define:SKIP_TITLE=true" } else { "" }
+fixed_seed_value := env_var_or_default("FIXED_SEED", "")
+fixed_seed_define := if fixed_seed_value != "" { "-define:FIXED_SEED=" + fixed_seed_value } else { "" }
+build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define
+copy_assets := if env_var_or_default("NO_SPRITES", "false") == "true" { "false" } else { "true" }
 
 default:
     @just --list
@@ -33,18 +38,18 @@ run-built: build
 
 # Build optimized release binary
 release:
-    odin build {{src}} -out:{{binary}} -o:speed -disable-assert -no-bounds-check
+    odin build {{src}} -out:{{binary}} -o:speed -disable-assert -no-bounds-check {{build_defines}}
 
 # ─── Platform releases ─────────────────────────────────────────────────────────
 
 # Build macOS .app bundle
 release-macos:
-    odin build {{src}} -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check
-    bash scripts/bundle_macos.sh build/macos/into_the_depths
+    odin build {{src}} -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check {{build_defines}}
+    COPY_ASSETS={{copy_assets}} bash scripts/bundle_macos.sh build/macos/into_the_depths
 
 # Build Linux x86_64 binary (for CI or native Linux)
 release-linux:
-    odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check
+    odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check {{build_defines}}
 
 # Build web/WASM via karl2d's native WebGL backend (no Emscripten required)
 release-web:

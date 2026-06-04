@@ -4,6 +4,10 @@ import eng "./engine"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 CHEATS_ENABLED :: #config(CHEATS, false)
+NO_AUDIO :: #config(NO_AUDIO, false)
+NO_SPRITES :: #config(NO_SPRITES, false)
+SKIP_TITLE :: #config(SKIP_TITLE, false)
+FIXED_SEED :: #config(FIXED_SEED, 0)
 
 
 TILE_SIZE :: 32 // render size (sprites are 16x16, drawn at 32x32)
@@ -28,7 +32,7 @@ MAX_MSG_LEN :: eng.ENGINE_MAX_MESSAGE_LEN
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
 
-DEFAULT_USE_SPRITES :: #config(SPRITES, false)
+DEFAULT_USE_SPRITES :: #config(SPRITES, false) && !NO_SPRITES
 MAX_INVENTORY :: 9
 
 // ─── Dijkstra ─────────────────────────────────────────────────────────────────

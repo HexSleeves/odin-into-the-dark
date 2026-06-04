@@ -16,6 +16,18 @@ draw_centered_text :: proc(
 	x := (i32(SCREEN_WIDTH) - text_w) / 2
 	render_draw_text(engine, text, x, y, size, color)
 }
+draw_title_embers :: proc(engine: ^eng.Engine, frame: int) {
+	for i in 0 ..< 18 {
+		phase := (frame + i * 37) % 180
+		x := i32(120 + (i * 71) % (SCREEN_WIDTH - 240))
+		y := i32(90 + phase * 2)
+		if y > 500 {y -= 360}
+		alpha := u8(max(25, 140 - phase / 2))
+		size := i32(2 + (i % 3))
+		render_draw_rectangle(engine, x, y, size, size, eng.Engine_Color{255, 180, 70, alpha})
+	}
+}
+
 
 draw_score_rows :: proc(
 	engine: ^eng.Engine,
@@ -71,7 +83,11 @@ render_title_screen :: proc(engine: ^eng.Engine, game: ^Game) {
 		eng.Engine_Color{0, 0, 0, 230},
 	)
 
+	frame := eng.frame_manager_index(game_engine_frame_manager(engine)^)
+	glow := u8(170 + (frame % 60) * 85 / 59)
+	draw_centered_text(engine, "INTO THE DEPTHS", 108, 52, eng.Engine_Color{90, 55, 20, glow})
 	draw_centered_text(engine, "INTO THE DEPTHS", 110, 48, eng.Engine_Color{255, 230, 120, 255})
+	draw_title_embers(engine, frame)
 	draw_centered_text(
 		engine,
 		"A turn-based mining roguelike",

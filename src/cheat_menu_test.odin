@@ -1,7 +1,5 @@
 #+build !js
 package main
-import eng "./engine"
-import "core:testing"
 
 
 when CHEATS_ENABLED {

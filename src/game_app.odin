@@ -41,8 +41,10 @@ game_engine_config :: proc() -> eng.Engine_Config {
 		config.input = karl2d_input_backend()
 		config.texture = karl2d_texture_backend()
 	} else {
-		// Desktop: Raylib defaults + game audio backend
-		config.audio = game_audio_backend(&g_audio)
+		// Desktop: Raylib defaults + optional game audio backend
+		when !NO_AUDIO {
+			config.audio = game_audio_backend(&g_audio)
+		}
 	}
 	return config
 }
@@ -81,18 +83,22 @@ game_diagnostics_shutdown :: proc() {
 
 game_runtime_assets_init :: proc() {
 	when ODIN_OS != .JS {
-		backend := game_audio_backend(&g_audio)
-		audio_init(backend)
-		music_init()
-		audio_set_master_volume(g_game_config.master_volume)
-		music_set_volume(g_game_config.music_volume)
+		when !NO_AUDIO {
+			backend := game_audio_backend(&g_audio)
+			audio_init(backend)
+			music_init()
+			audio_set_master_volume(g_game_config.master_volume)
+			music_set_volume(g_game_config.music_volume)
+		}
 	}
 }
 
 game_runtime_assets_shutdown :: proc() {
 	when ODIN_OS != .JS {
-		music_cleanup()
-		audio_cleanup()
+		when !NO_AUDIO {
+			music_cleanup()
+			audio_cleanup()
+		}
 	}
 }
 
@@ -224,6 +230,10 @@ game_engine_turn_manager :: proc(engine: ^eng.Engine) -> ^eng.Turn_Manager {
 game_engine_vfx_manager :: proc(engine: ^eng.Engine) -> ^eng.Vfx_Manager {
 	return eng.engine_vfx_manager(engine)
 }
+game_engine_frame_manager :: proc(engine: ^eng.Engine) -> ^eng.Frame_Manager {
+	return eng.engine_frame_manager(engine)
+}
+
 
 game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
 	if engine == nil || engine.services == nil {
@@ -254,11 +264,15 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	state := new(Into_The_Depths_App_State)
 	app.state = state
 
-	sprites_init(engine)
+	when !NO_SPRITES {
+		sprites_init(engine)
+	}
 
 	if !game_engine_register_app_services(engine) {
 		logger_fatalf(.App, "Failed to register app services. Exiting.")
-		sprites_cleanup(engine)
+		when !NO_SPRITES {
+			sprites_cleanup(engine)
+		}
 		free(state)
 		app.state = nil
 		return false
@@ -267,7 +281,9 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	content := game_engine_content_manager(engine)
 	if content == nil || !content_manager_load_all(content) {
 		logger_fatalf(.App, "Failed to load data files. Exiting.")
-		sprites_cleanup(engine)
+		when !NO_SPRITES {
+			sprites_cleanup(engine)
+		}
 		free(state)
 		app.state = nil
 		return false
@@ -282,7 +298,9 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	if !game_scene_manager_init(state.scene_descriptors[:], engine, state.game) {
 		logger_fatalf(.App, "Failed to initialize scene manager. Exiting.")
 		game_destroy(state.game)
-		sprites_cleanup(engine)
+		when !NO_SPRITES {
+			sprites_cleanup(engine)
+		}
 		free(state)
 		app.state = nil
 		return false
@@ -343,7 +361,9 @@ game_app_shutdown :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	if state.game != nil {
 		game_destroy(state.game)
 	}
-	sprites_cleanup(engine)
+	when !NO_SPRITES {
+		sprites_cleanup(engine)
+	}
 	free(state)
 	app.state = nil
 }

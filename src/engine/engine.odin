@@ -259,14 +259,20 @@ engine_step :: proc(state: ^Engine_State) -> bool {
 
 	quit := false
 	if state.app.update != nil {
+		old_context := context
+		context.allocator = engine_frame_allocator(&state.engine)
 		quit = state.app.update(&state.engine, state.app)
+		context = old_context
 	}
 	if quit || frame_manager_quit_requested(state.engine.frame_manager) {
 		return false
 	}
 
 	if state.app.render != nil {
+		old_context := context
+		context.allocator = engine_frame_allocator(&state.engine)
 		state.app.render(&state.engine, state.app)
+		context = old_context
 	}
 	return true
 }

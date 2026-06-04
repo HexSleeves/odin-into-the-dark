@@ -6,9 +6,24 @@ import "core:time"
 
 // ─── Game initialization ─────────────────────────────────────────────────────
 
+game_next_seed :: proc() -> u64 {
+	when FIXED_SEED > 0 {
+		return u64(FIXED_SEED)
+	} else {
+		return u64(time.time_to_unix_nano(time.now()))
+	}
+}
+
+game_initial_state :: proc() -> Game_State {
+	when SKIP_TITLE {
+		return .Playing
+	} else {
+		return .Title_Screen
+	}
+}
+
 game_init :: proc(content: ^Content_Manager) -> ^Game {
-	// Derive seed from current time
-	seed := u64(time.time_to_unix_nano(time.now()))
+	seed := game_next_seed()
 
 	logger_debugf(.Init, "seed = %v", seed)
 
@@ -21,7 +36,7 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game.seed = seed
 	game_init_world(game)
 	game.depth = 1
-	game.state = .Title_Screen
+	game.state = game_initial_state()
 
 	// Player defaults from data (position set by generate_map)
 	init_player_from_content(content, game)
@@ -44,7 +59,7 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 // ─── Reinitialize in place (for restart) ─────────────────────────────────────
 
 game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) {
-	seed := u64(time.time_to_unix_nano(time.now()))
+	seed := game_next_seed()
 	logger_debugf(.Init, "seed = %v", seed)
 	rand.reset(seed)
 
@@ -102,11 +117,25 @@ init_player_from_content :: proc(content: ^Content_Manager, game: ^Game) {
 }
 
 // ─── Camera ───────────────────────────────────────────────────────────────
+game_has_live_boss :: proc(game: ^Game) -> bool {
+	if game == nil {
+		return false
+	}
+	for &enemy in game.enemies {
+		if enemy.alive && enemy.is_boss {
+			return true
+		}
+	}
+	return false
+}
+
 
 game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool = false) {
 	if camera == nil || game == nil {
 		return
 	}
+	zoom := f32(1.12) if game_has_live_boss(game) else f32(1)
+	eng.camera_manager_set_zoom(camera, zoom)
 	eng.camera_manager_update(
 		camera,
 		game.player.pos.x * TILE_SIZE + TILE_SIZE / 2,

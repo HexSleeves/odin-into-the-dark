@@ -315,8 +315,7 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
-	ox := i32(game_camera_x(camera))
-	oy := i32(game_camera_y(camera))
+	tile_size := camera_tile_size(camera)
 
 	for &item in game.items {
 		if item.picked_up {continue}
@@ -324,19 +323,18 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 		// Only render items on visible tiles
 		if !tile_visible_at(game, item.pos.x, item.pos.y) {continue}
 
-		ix := i32(item.pos.x * TILE_SIZE) - ox
-		iy := i32(item.pos.y * TILE_SIZE) - oy
+		ix := camera_world_x_to_screen(camera, item.pos.x * TILE_SIZE)
+		iy := camera_world_y_to_screen(camera, item.pos.y * TILE_SIZE)
 
 		if ui.use_sprites {
 			spr := sprite_manager_item(sprites, item.item_type)
 			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color)
 		} else {
-			font_size :: i32(TILE_SIZE)
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(item.glyph)
 			glyph_buf[1] = 0
 			glyph_cstr := cast(cstring)&glyph_buf[0]
-			render_draw_text(engine, glyph_cstr, ix, iy, font_size, item.color)
+			render_draw_text(engine, glyph_cstr, ix, iy, tile_size, item.color)
 		}
 	}
 }

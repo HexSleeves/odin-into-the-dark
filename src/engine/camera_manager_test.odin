@@ -36,3 +36,18 @@ camera_manager_centers_world_smaller_than_viewport :: proc(t: ^testing.T) {
 	testing.expect_value(t, camera.x, -100)
 	testing.expect_value(t, camera.y, -60)
 }
+
+@(test)
+camera_manager_zoom_reduces_effective_viewport_and_clamps_range :: proc(t: ^testing.T) {
+	camera := camera_manager_make()
+
+	camera_manager_set_zoom(&camera, 1.12)
+	camera_manager_update(&camera, 500, 400, 200, 100, 1000, 800, true)
+
+	testing.expect_value(t, camera_manager_zoom(&camera), f32(1.12))
+	testing.expect_value(t, camera.x, 411)
+	testing.expect_value(t, camera.y, 356)
+
+	camera_manager_set_zoom(&camera, 2)
+	testing.expect_value(t, camera_manager_zoom(&camera), f32(1.2))
+}
