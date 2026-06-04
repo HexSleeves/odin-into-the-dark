@@ -4,7 +4,7 @@ import eng "./engine"
 
 // ─── Game scene boundary ─────────────────────────────────────────────────────
 
-GAME_SCENE_COUNT :: 8
+GAME_SCENE_COUNT :: 9
 
 Game_Scene :: enum {
 	Title,
@@ -15,6 +15,7 @@ Game_Scene :: enum {
 	Crafting,
 	Help,
 	Scores,
+	Cheats,
 }
 
 scene_for_state :: proc(state: Game_State) -> Game_Scene {
@@ -35,6 +36,8 @@ scene_for_state :: proc(state: Game_State) -> Game_Scene {
 		return .Help
 	case .Viewing_Scores:
 		return .Scores
+	case .Viewing_Cheats:
+		return .Cheats
 	}
 
 	return .Gameplay
@@ -102,6 +105,13 @@ game_scene_manager_init :: proc(
 		update = game_scene_scores_update,
 		render = game_scene_render,
 	}
+	scenes[8] = eng.Engine_Scene {
+		id     = game_scene_id(.Cheats),
+		ctx    = rawptr(game),
+		update = game_scene_cheats_update,
+		render = game_scene_render,
+	}
+
 
 	manager^ = eng.scene_manager_make(scenes[:GAME_SCENE_COUNT])
 	return game_scene_manager_sync(engine, game)
@@ -205,6 +215,20 @@ game_scene_help_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 game_scene_scores_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^Game)ctx
 	update_viewing_scores(game, game_engine_input_manager(engine))
+	return false
+}
+
+game_scene_cheats_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
+	game := cast(^Game)ctx
+	update_viewing_cheats(
+		game_engine_content_manager(engine),
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		game_engine_message_manager(engine),
+		game_engine_ui_manager(engine),
+		game,
+		game_engine_input_manager(engine),
+	)
 	return false
 }
 

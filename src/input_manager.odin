@@ -22,6 +22,7 @@ Game_Action :: enum {
 	Save,
 	Load,
 	Toggle_Audio,
+	Cheat_Menu,
 	Toggle_Sprites,
 	Menu_Up,
 	Menu_Down,
@@ -96,6 +97,7 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Save, {primary = .F5})
 	input_set_binding(im, .Load, {primary = .F9})
 	input_set_binding(im, .Toggle_Audio, {primary = .F1})
+	input_set_binding(im, .Cheat_Menu, {primary = .C, needs_shift = true})
 	input_set_binding(im, .Toggle_Sprites, {primary = .F2})
 	input_set_binding(im, .Menu_Up, {primary = .W, alt = .Up})
 	input_set_binding(im, .Menu_Down, {primary = .S, alt = .Down})

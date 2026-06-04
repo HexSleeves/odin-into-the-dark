@@ -156,6 +156,7 @@ UI_State :: struct {
 	use_sprites:     bool, // true = tileset sprites, false = ASCII mode
 	title_choice:    int, // selected title menu option
 	return_to_title: bool, // modal overlays should return to title instead of gameplay
+	cheat_choice:    int, // highlighted cheat menu row; only used in CHEATS builds
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────
@@ -169,6 +170,7 @@ Game_State :: enum {
 	Viewing_Crafting,
 	Viewing_Help,
 	Viewing_Scores,
+	Viewing_Cheats,
 }
 
 Game :: struct {

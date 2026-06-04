@@ -3,6 +3,8 @@ set dotenv-load
 src := "src/"
 engine_src := "src/engine"
 binary := "into_the_depths"
+cheat_define := if env_var_or_default("CHEATS", "false") == "true" { "-define:CHEATS=true" } else { "" }
+
 
 default:
     @just --list
@@ -11,15 +13,15 @@ default:
 
 # Type-check without building
 check:
-    odin check {{src}} -vet -strict-style
+    odin check {{src}} -vet -strict-style {{cheat_define}}
 
 # Build debug binary
 build:
-    odin build {{src}} -out:{{binary}}
+    odin build {{src}} -out:{{binary}} {{cheat_define}}
 
 # Build and run
 run:
-    odin run {{src}}
+    odin run {{src}} {{cheat_define}}
 
 # Build then run the binary
 run-built: build

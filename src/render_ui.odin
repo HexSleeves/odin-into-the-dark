@@ -962,14 +962,7 @@ render_victory :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 
 	render_draw_text(engine, "Boss Defeated", stat_col, stats_y + 125, 18, stat_color)
-	render_draw_text(
-		engine,
-		victory_boss_status_text(game),
-		val_col,
-		stats_y + 125,
-		18,
-		val_color,
-	)
+	render_draw_text(engine, victory_boss_status_text(game), val_col, stats_y + 125, 18, val_color)
 
 	// Divider
 	render_draw_rectangle(

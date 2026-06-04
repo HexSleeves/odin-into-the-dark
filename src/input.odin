@@ -402,6 +402,7 @@ handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 }
 
 update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+	if cheat_open_if_requested(game_engine_ui_manager(engine), game, im) {return false}
 	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}
 	if handle_playing_hotkeys(engine, game, im) {return}

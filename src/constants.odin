@@ -3,6 +3,8 @@ package main
 import eng "./engine"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
+CHEATS_ENABLED :: #config(CHEATS, false)
+
 
 TILE_SIZE :: 32 // render size (sprites are 16x16, drawn at 32x32)
 SPRITE_SIZE :: 16 // source sprite size in spritesheet
@@ -37,6 +39,9 @@ DMAP_UNREACHABLE :: 9999
 BASE_ACTION_COST :: 1000 // default AP cost for any action
 BASE_MOVE_COST :: 1000 // base AP cost to move one tile (scaled by move_speed)
 BASE_AP_PER_ROUND :: 1000 // AP a QN=100 actor generates per round
+
+// ─── Depth ────────────────────────────────────────────────────────────────────
+MAX_DEPTH :: 12
 
 // ─── Light drain ──────────────────────────────────────────────────────────────
 LIGHT_DRAIN_INTERVAL :: 30 // rounds between passive light radius loss

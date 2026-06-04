@@ -50,6 +50,9 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	if game.state == .Viewing_Scores {
 		render_high_scores(engine, game)
 	}
+	if game.state == .Viewing_Cheats {
+		render_cheats(engine, game)
+	}
 	if game.state == .Victory {
 		render_victory(engine, game)
 	}
