@@ -15,6 +15,9 @@ _set_bundle_working_dir :: proc() {}
 _web_state: eng.Engine_State
 
 @(private = "file")
+_web_app: eng.Game_App
+
+@(private = "file")
 _web_ctx: runtime.Context
 
 @(export)
@@ -35,8 +38,8 @@ web_main_init :: proc() {
 	_web_ctx = context
 	config := game_engine_config()
 	services := game_engine_services_config()
-	app := game_app_make()
-	if !eng.engine_init(&_web_state, config, services, &app) {
+	_web_app = game_app_make()
+	if !eng.engine_init(&_web_state, config, services, &_web_app) {
 		eng.engine_shutdown(&_web_state)
 	}
 }
