@@ -11,6 +11,7 @@ skip_title_define := if env_var_or_default("SKIP_TITLE", "false") == "true" { "-
 fixed_seed_value := env_var_or_default("FIXED_SEED", "")
 fixed_seed_define := if fixed_seed_value != "" { "-define:FIXED_SEED=" + fixed_seed_value } else { "" }
 build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define
+release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define + " -define:PUBLIC_BUILD=true"
 copy_assets := if env_var_or_default("NO_SPRITES", "false") == "true" { "false" } else { "true" }
 
 default:
@@ -38,18 +39,18 @@ run-built: build
 
 # Build optimized release binary
 release:
-    odin build {{src}} -out:{{binary}} -o:speed -disable-assert -no-bounds-check {{build_defines}}
+    odin build {{src}} -out:{{binary}} -o:speed -disable-assert -no-bounds-check {{release_defines}}
 
 # ─── Platform releases ─────────────────────────────────────────────────────────
 
 # Build macOS .app bundle
 release-macos:
-    odin build {{src}} -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check {{build_defines}}
+    odin build {{src}} -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check {{release_defines}}
     COPY_ASSETS={{copy_assets}} bash scripts/bundle_macos.sh build/macos/into_the_depths
 
 # Build Linux x86_64 binary (for CI or native Linux)
 release-linux:
-    odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check {{build_defines}}
+    odin build {{src}} -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check {{release_defines}}
 
 # Build web/WASM via karl2d's native WebGL backend (no Emscripten required)
 release-web:

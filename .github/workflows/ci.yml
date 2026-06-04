@@ -40,4 +40,4 @@ jobs:
         run: odin check src/ -vet -strict-style
 
       - name: Build
-        run: odin build src/ -out:into_the_depths
+        run: odin build src/ -out:into_the_depths -define:PUBLIC_BUILD=true

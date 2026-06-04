@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: |
           mkdir -p build/linux
-          odin build src/ -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check
+          odin build src/ -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check -define:PUBLIC_BUILD=true
 
       - name: Package
         run: |
@@ -55,7 +55,7 @@ jobs:
       - name: Build
         run: |
           mkdir -p build/macos
-          odin build src/ -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check
+          odin build src/ -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check -define:PUBLIC_BUILD=true
 
       - name: Bundle .app
         run: bash scripts/bundle_macos.sh build/macos/into_the_depths

@@ -34,6 +34,7 @@ mkdir -p "${OUT_DIR}"
 echo "Compiling to WASM (karl2d backend)..."
 odin build "${REPO_DIR}/src/" \
     -target:js_wasm32 \
+    -define:PUBLIC_BUILD=true \
     -out:"${OUT_DIR}/main.wasm"
 
 # Step 2: Copy Odin JS runtime
