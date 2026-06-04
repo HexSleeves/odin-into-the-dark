@@ -101,3 +101,22 @@ when CHEATS_ENABLED {
 		testing.expect_value(t, game.state, Game_State.Playing)
 	}
 }
+
+@(test)
+non_cheat_build_ignores_shift_c_cheat_menu_request :: proc(t: ^testing.T) {
+	when !CHEATS_ENABLED {
+		game: Game
+		game.state = .Playing
+		ui := ui_manager_make(false)
+		input_state := Test_Input_Backend_State{}
+		input_state.pressed[eng.Engine_Key.C] = true
+		input_state.down[eng.Engine_Key.Left_Shift] = true
+		input := input_manager_make()
+		input.backend = test_input_backend(&input_state)
+
+		opened := cheat_open_if_requested(&ui, &game, &input)
+
+		testing.expect(t, !opened)
+		testing.expect_value(t, game.state, Game_State.Playing)
+	}
+}

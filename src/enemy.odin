@@ -232,8 +232,8 @@ chase_act_once :: proc(
 	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
 	current_dist := eng.engine_distance_map_get(&dmap, enemy.pos.x, enemy.pos.y)
 	if current_dist >= DMAP_UNREACHABLE {
-		// Unreachable — fall back to wander
-		return wander_act_once(game, enemy, move_cost)
+		enemy.energy = 0
+		return false
 	}
 
 	best_pos := enemy.pos

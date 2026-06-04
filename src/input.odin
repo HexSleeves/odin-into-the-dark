@@ -204,13 +204,15 @@ handle_playing_hotkeys :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Mana
 		ui.show_minimap = !ui.show_minimap
 	}
 
-	if action_pressed(im, .Toggle_Audio) {
-		audio := game_engine_audio_manager(engine)
-		enabled := audio_manager_toggle(audio)
-		if enabled {
-			add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
-		} else {
-			add_message(messages, game, "Sound: OFF", eng.Engine_Color{180, 180, 180, 255})
+	when !NO_AUDIO {
+		if action_pressed(im, .Toggle_Audio) {
+			audio := game_engine_audio_manager(engine)
+			enabled := audio_manager_toggle(audio)
+			if enabled {
+				add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
+			} else {
+				add_message(messages, game, "Sound: OFF", eng.Engine_Color{180, 180, 180, 255})
+			}
 		}
 	}
 

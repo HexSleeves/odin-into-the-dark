@@ -7,11 +7,10 @@ import "core:time"
 // ─── Game initialization ─────────────────────────────────────────────────────
 
 game_next_seed :: proc() -> u64 {
-	when FIXED_SEED > 0 {
+	if FIXED_SEED > 0 {
 		return u64(FIXED_SEED)
-	} else {
-		return u64(time.time_to_unix_nano(time.now()))
 	}
+	return u64(time.time_to_unix_nano(time.now()))
 }
 
 game_initial_state :: proc() -> Game_State {

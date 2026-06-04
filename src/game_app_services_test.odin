@@ -91,8 +91,12 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 game_engine_config_provides_game_audio_backend :: proc(t: ^testing.T) {
 	config := game_engine_config()
 
-	testing.expect(t, eng.engine_audio_backend_is_valid(config.audio))
-	testing.expect(t, config.audio.ctx == rawptr(&g_raylib_audio))
+	when NO_AUDIO {
+		testing.expect(t, !eng.engine_audio_backend_is_valid(config.audio))
+	} else {
+		testing.expect(t, eng.engine_audio_backend_is_valid(config.audio))
+		testing.expect(t, config.audio.ctx == rawptr(&g_raylib_audio))
+	}
 }
 
 Test_Game_App_Input_Backend_State :: struct {}

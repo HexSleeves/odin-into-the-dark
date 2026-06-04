@@ -44,6 +44,40 @@ content_manager_destroy_releases_json_owned_registry_allocations :: proc(t: ^tes
 }
 
 @(test)
+content_manager_reload_releases_previous_registry_allocations :: proc(t: ^testing.T) {
+	track: mem.Tracking_Allocator
+	previous_allocator := context.allocator
+	mem.tracking_allocator_init(&track, previous_allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	context.allocator = mem.tracking_allocator(&track)
+	content := content_manager_make()
+	first_loaded := content_manager_load_all(&content)
+	second_loaded := content_manager_load_all(&content)
+	content_manager_destroy(&content)
+	context.allocator = previous_allocator
+
+	testing.expect(t, first_loaded)
+	testing.expect(t, second_loaded)
+	testing.expect_value(t, len(track.allocation_map), 0)
+}
+
+@(test)
+content_manager_load_all_with_instance_does_not_alias_global_registry :: proc(t: ^testing.T) {
+	data_registry_destroy(&g_data)
+	defer data_registry_destroy(&g_data)
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+
+	loaded := content_manager_load_all(&content)
+
+	testing.expect(t, loaded)
+	testing.expect(t, content.loaded)
+	testing.expect(t, content.registry.loaded)
+	testing.expect(t, !g_data.loaded)
+}
+
+@(test)
 content_manager_is_loaded_reads_manager_state :: proc(t: ^testing.T) {
 	content := content_manager_make()
 	testing.expect(t, !content_manager_is_loaded(&content))

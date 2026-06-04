@@ -328,7 +328,7 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 
 		if ui.use_sprites {
 			spr := sprite_manager_item(sprites, item.item_type)
-			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color)
+			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color, tile_size)
 		} else {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(item.glyph)

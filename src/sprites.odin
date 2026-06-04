@@ -69,6 +69,10 @@ sprite_at :: proc(col, row, size: int) -> Sprite {
 // ─── Init / Cleanup ───────────────────────────────────────────────────────────
 
 sprites_init :: proc(engine: ^eng.Engine) {
+	if g_sprites.loaded {
+		sprites_cleanup(engine)
+	}
+
 	// Compile-time embedded sprite data — no runtime file I/O.
 	// json.unmarshal still allocates strings/maps; ownership is moved into g_sprites.
 	EMBEDDED_SPRITES :: #load("../data/sprites.json5")
@@ -167,13 +171,15 @@ draw_sprite :: proc(
 	spr: Sprite,
 	x, y: i32,
 	tint: eng.Engine_Color = eng.Engine_Color{255, 255, 255, 255},
+	dest_size: i32 = TILE_SIZE,
 ) {
 	if !g_sprites.loaded {return}
+	size := max(dest_size, 1)
 	dest := eng.Engine_Rect {
 		x      = f32(x),
 		y      = f32(y),
-		width  = f32(TILE_SIZE),
-		height = f32(TILE_SIZE),
+		width  = f32(size),
+		height = f32(size),
 	}
 	eng.engine_render_draw_texture_region(
 		engine,

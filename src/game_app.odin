@@ -242,6 +242,15 @@ game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
 	return cast(^UI_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_UI)
 }
 
+game_app_enforce_build_flags :: proc(engine: ^eng.Engine) {
+	when NO_SPRITES {
+		ui := ui_manager_state(game_engine_ui_manager(engine))
+		if ui != nil {
+			ui.use_sprites = false
+		}
+	}
+}
+
 game_app_make :: proc() -> eng.Game_App {
 	return eng.Game_App {
 		name = "Into the Depths",
@@ -311,6 +320,7 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 
 	compute_fov(game)
 	game_camera_update(game_engine_camera_manager(engine), game, true)
+	game_app_enforce_build_flags(engine)
 	add_message(
 		game_engine_message_manager(engine),
 		game,
@@ -328,7 +338,10 @@ game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	game := state.game
-	music_update(game)
+	when !NO_AUDIO {
+		music_update(game)
+	}
+	game_app_enforce_build_flags(engine)
 	handle_global_input(engine, game, game_engine_input_manager(engine))
 	return game_scene_manager_update(engine, game)
 }

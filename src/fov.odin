@@ -146,5 +146,5 @@ is_opaque :: proc(game: ^Game, x, y: int) -> bool {
 	if t == nil {
 		return true // out-of-bounds blocks LOS
 	}
-	return t.type == .Wall || t.type == .Chasm
+	return t.type == .Wall || t.type == .Chasm || t.type == .Locked_Door
 }

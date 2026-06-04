@@ -195,7 +195,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 
 				if ui.use_sprites {
 					spr := sprite_manager_tile(sprites, tile.type)
-					sprite_manager_draw(engine, sprites, spr, sx, sy, tint)
+					sprite_manager_draw(engine, sprites, spr, sx, sy, tint, tile_size)
 				} else {
 					// ASCII mode: colored rectangle
 					render_draw_rectangle(engine, sx, sy, tile_size, tile_size, tint)
@@ -211,7 +211,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 						}
 						if ui.use_sprites {
 							spr := sprite_manager_named(sprites, "tile", "ore_vein")
-							sprite_manager_draw(engine, sprites, spr, sx, sy, ore_tint)
+							sprite_manager_draw(engine, sprites, spr, sx, sy, ore_tint, tile_size)
 						} else {
 							dot_x := sx + tile_size / 2 - 3
 							dot_y := sy + tile_size / 2 - 3
@@ -254,6 +254,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 					sx,
 					sy,
 					eng.Engine_Color{180, 180, 180, 150},
+					tile_size,
 				)
 			} else {
 				render_draw_text(
@@ -285,7 +286,7 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 	py += bob_offset
 	if ui.use_sprites {
 		spr := sprite_manager_named(sprites, "character", "player")
-		sprite_manager_draw(engine, sprites, spr, px, py, game.player.color)
+		sprite_manager_draw(engine, sprites, spr, px, py, game.player.color, tile_size)
 	} else {
 		glyph_buf: [2]u8
 		glyph_buf[0] = u8(game.player.glyph)
@@ -323,7 +324,7 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 
 		if ui.use_sprites {
 			spr := sprite_manager_enemy(sprites, enemy.enemy_type)
-			sprite_manager_draw(engine, sprites, spr, ex, ey, enemy.color)
+			sprite_manager_draw(engine, sprites, spr, ex, ey, enemy.color, tile_size)
 		} else {
 			glyph_buf: [2]u8
 			glyph_buf[0] = u8(enemy.glyph)

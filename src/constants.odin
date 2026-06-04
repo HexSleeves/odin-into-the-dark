@@ -6,6 +6,7 @@ import eng "./engine"
 CHEATS_ENABLED :: #config(CHEATS, false)
 NO_AUDIO :: #config(NO_AUDIO, false)
 NO_SPRITES :: #config(NO_SPRITES, false)
+SPRITES_REQUESTED :: #config(SPRITES, false)
 SKIP_TITLE :: #config(SKIP_TITLE, false)
 FIXED_SEED :: #config(FIXED_SEED, 0)
 
@@ -32,7 +33,7 @@ MAX_MSG_LEN :: eng.ENGINE_MAX_MESSAGE_LEN
 
 // ─── Inventory ────────────────────────────────────────────────────────────────
 
-DEFAULT_USE_SPRITES :: #config(SPRITES, false) && !NO_SPRITES
+DEFAULT_USE_SPRITES :: SPRITES_REQUESTED && !NO_SPRITES
 MAX_INVENTORY :: 9
 
 // ─── Dijkstra ─────────────────────────────────────────────────────────────────

@@ -25,19 +25,21 @@ sprite_manager_draw :: proc(
 	spr: Sprite,
 	x, y: i32,
 	tint: eng.Engine_Color = eng.Engine_Color{255, 255, 255, 255},
+	dest_size: i32 = TILE_SIZE,
 ) {
 	if sprites == nil || sprites.backend == nil || sprites.backend == &g_sprites {
-		draw_sprite(engine, spr, x, y, tint)
+		draw_sprite(engine, spr, x, y, tint, dest_size)
 		return
 	}
 	if !sprites.backend.loaded {
 		return
 	}
+	size := max(dest_size, 1)
 	dest := eng.Engine_Rect {
 		x      = f32(x),
 		y      = f32(y),
-		width  = f32(TILE_SIZE),
-		height = f32(TILE_SIZE),
+		width  = f32(size),
+		height = f32(size),
 	}
 	eng.engine_render_draw_texture_region(
 		engine,

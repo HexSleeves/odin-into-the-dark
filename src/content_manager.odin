@@ -18,11 +18,7 @@ content_manager_load_all :: proc(content: ^Content_Manager) -> bool {
 		return data_load_all()
 	}
 	ok := data_load_all_into(&content.registry)
-	content.loaded = ok
-	if ok {
-		g_data = content.registry
-		g_data.owned = false
-	}
+	content.loaded = ok && content.registry.loaded
 	return ok
 }
 

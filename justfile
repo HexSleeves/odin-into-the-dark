@@ -79,12 +79,21 @@ fmt:
 
 # Run root package and engine package tests
 test:
-    odin test {{src}}
+    odin test {{src}} {{build_defines}}
     odin test {{engine_src}}
 
+# Run compile-flag matrix tests that should stay green regardless of environment.
+test-flags:
+    odin test {{src}} -define:CHEATS=true
+    odin test {{src}} -define:NO_AUDIO=true
+    odin test {{src}} -define:SPRITES=true -define:NO_SPRITES=true
+    odin test {{src}} -define:SKIP_TITLE=true
+    odin test {{src}} -define:FIXED_SEED=12345
+    odin check {{src}} -vet -strict-style -define:CHEATS=true -define:NO_AUDIO=true -define:SPRITES=true -define:NO_SPRITES=true -define:SKIP_TITLE=true -define:FIXED_SEED=12345
+
 # Check and build (CI-style verification)
-verify: test check build
-    @echo "✓ tests + check + build passed"
+verify: test test-flags check build
+    @echo "✓ tests + flag matrix + check + build passed"
 
 # Count lines by domain
 stats:

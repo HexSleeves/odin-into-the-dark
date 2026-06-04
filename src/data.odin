@@ -133,20 +133,30 @@ data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
 	if registry == nil {
 		return false
 	}
+	next: Data_Registry
+	next.owned = true
+
 	enemies, enemies_ok := load_json5_from_bytes(Enemy_Data, EMBEDDED_ENEMIES)
 	if !enemies_ok {return false}
+	next.enemies = enemies
 
 	items, items_ok := load_json5_from_bytes(Item_Data, EMBEDDED_ITEMS)
-	if !items_ok {return false}
+	if !items_ok {
+		data_registry_destroy(&next)
+		return false
+	}
+	next.items = items
 
 	player, player_ok := load_json5_from_bytes(Player_Def, EMBEDDED_PLAYER)
-	if !player_ok {return false}
+	if !player_ok {
+		data_registry_destroy(&next)
+		return false
+	}
+	next.player = player
+	next.loaded = true
 
-	registry.enemies = enemies
-	registry.items = items
-	registry.player = player
-	registry.loaded = true
-	registry.owned = true
+	data_registry_destroy(registry)
+	registry^ = next
 
 	logger_debugf(
 		.Data,
