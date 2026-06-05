@@ -20,7 +20,9 @@ clay_overlays_import_anchor :: proc() {
 		options := [TITLE_OPTION_COUNT]string{"New Game", "Continue", "High Scores", "Help", "Quit"}
 
 		if clay.UI(clay.ID("title-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
-			clay_spacer_fixed("title-art-gap", 1, 150)
+			clay_render_title_embers(engine)
+			clay_title_text("INTO THE DEPTHS", 48, eng.Engine_Color{255, 230, 120, 255})
+			clay_spacer_fixed("title-art-gap", 1, 32)
 			clay_overlay_text("A turn-based mining roguelike", 18, eng.Engine_Color{180, 180, 180, 255})
 			clay_spacer_fixed("title-gap", 1, 12)
 			for label, idx in options {
@@ -38,6 +40,41 @@ clay_overlays_import_anchor :: proc() {
 			clay_spacer_grow("title-footer-gap")
 			clay_overlay_text("Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit", 14, eng.Engine_Color{150, 150, 150, 255})
 			clay_overlay_text("v0.1.0", 12, eng.Engine_Color{80, 80, 80, 255})
+		}
+	}
+
+	clay_render_title_embers :: proc(engine: ^eng.Engine) {
+		frame := 0
+		frames := game_engine_frame_manager(engine)
+		if frames != nil {
+			frame = eng.frame_manager_index(frames^)
+		}
+
+		for i in 0 ..< 18 {
+			phase := (frame + i * 37) % 180
+			x := i32(120 + (i * 71) % (SCREEN_WIDTH - 240))
+			y := i32(90 + phase * 2)
+			if y > 500 {y -= 360}
+			alpha := u8(max(25, 140 - phase / 2))
+			size := i32(2 + (i % 3))
+
+			if clay.UI(clay.ID("title-ember", u32(i)))(
+			clay.ElementDeclaration {
+				layout = {
+					sizing = {
+						width = clay.SizingFixed(f32(size)),
+						height = clay.SizingFixed(f32(size)),
+					},
+				},
+				backgroundColor = clay_color(eng.Engine_Color{255, 180, 70, alpha}),
+				floating = {
+					offset = {f32(x), f32(y)},
+					attachTo = .Parent,
+					attachment = {element = .LeftTop, parent = .LeftTop},
+					pointerCaptureMode = .Passthrough,
+				},
+			},
+			) {}
 		}
 	}
 

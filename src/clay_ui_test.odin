@@ -101,6 +101,31 @@ clay_ui_test_mutex: sync.Mutex
 		testing.expect(t, clay_test_rectangle_command_count(commands) > 0)
 	}
 
+	@(test)
+	clay_title_overlay_emits_visible_ember_rectangles :: proc(t: ^testing.T) {
+		sync.mutex_lock(&clay_ui_test_mutex)
+		defer sync.mutex_unlock(&clay_ui_test_mutex)
+		render_state := Clay_Test_Render_State{}
+		engine := eng.Engine {
+			input = eng.engine_input_backend_nil(),
+			render = clay_test_render_backend(&render_state),
+			frame_manager = eng.frame_manager_make(),
+		}
+		game: Game
+		game.state = .Title_Screen
+
+		testing.expect(t, clay_ui_init(&engine))
+		defer clay_ui_destroy()
+
+		clay_ui_begin_frame(&engine)
+		clay_render_screen_ui(&engine, &game)
+		commands := clay_ui_end_frame(0.016)
+		clay_render_commands(&engine, commands)
+
+		testing.expect(t, commands.length > 0)
+		testing.expect(t, render_state.ember_rectangle_count > 0)
+	}
+
 
 	clay_test_rectangle_command_count :: proc(commands: clay.ClayArray(clay.RenderCommand)) -> int {
 		count := 0
@@ -127,8 +152,9 @@ clay_ui_test_mutex: sync.Mutex
 	}
 
 	Clay_Test_Render_State :: struct {
-		rectangle_count: int,
-		text_count:      int,
+		rectangle_count:       int,
+		ember_rectangle_count: int,
+		text_count:            int,
 	}
 
 	clay_test_render_backend :: proc(state: ^Clay_Test_Render_State) -> eng.Engine_Render_Backend {
@@ -159,6 +185,9 @@ clay_ui_test_mutex: sync.Mutex
 	) {
 		state := cast(^Clay_Test_Render_State)ctx
 		state.rectangle_count += 1
+		if color.r == 255 && color.g == 180 && color.b == 70 {
+			state.ember_rectangle_count += 1
+		}
 	}
 	clay_test_render_draw_text :: proc(
 		ctx: rawptr,

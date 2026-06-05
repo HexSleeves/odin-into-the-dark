@@ -20,17 +20,6 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 	render_player(engine, game)
 	render_particles(engine, particles)
 	eng.engine_render_end_scissor(engine)
-	if game.state == .Title_Screen {
-		frame := 0
-		frames := game_engine_frame_manager(engine)
-		if frames != nil {
-			frame = eng.frame_manager_index(frames^)
-		}
-		glow := u8(170 + (frame % 60) * 85 / 59)
-		draw_centered_text(engine, "INTO THE DEPTHS", 108, 52, eng.Engine_Color{90, 55, 20, glow})
-		draw_centered_text(engine, "INTO THE DEPTHS", 110, 48, eng.Engine_Color{255, 230, 120, 255})
-		draw_title_embers(engine, frame)
-	}
 
 	clay_ui_begin_frame(engine)
 	clay_render_screen_ui(engine, game)
