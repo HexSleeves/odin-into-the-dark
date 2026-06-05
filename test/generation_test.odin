@@ -95,7 +95,11 @@ different_seeds_produce_different_tile_layouts :: proc(t: ^testing.T) {
 	generate_map(&content, game_b)
 	hash_b := tile_hash(game_b)
 
-	testing.expect(t, hash_a != hash_b, "different seeds should (almost certainly) produce different layouts")
+	testing.expect(
+		t,
+		hash_a != hash_b,
+		"different seeds should (almost certainly) produce different layouts",
+	)
 }
 
 // ─── Descent tile ─────────────────────────────────────────────────────────────
@@ -110,7 +114,11 @@ generation_always_places_at_least_one_descent_tile :: proc(t: ^testing.T) {
 	generate_map(&content, game)
 
 	descent_count := count_tiles_of_type(game, .Descent)
-	testing.expect(t, descent_count >= 1, "every generated floor must contain at least one Descent tile")
+	testing.expect(
+		t,
+		descent_count >= 1,
+		"every generated floor must contain at least one Descent tile",
+	)
 }
 
 @(test)
@@ -122,7 +130,11 @@ generation_always_places_at_least_one_descent_tile_at_depth_3 :: proc(t: ^testin
 	defer game_destroy_for_gen(game)
 	generate_map(&content, game)
 
-	testing.expect(t, count_tiles_of_type(game, .Descent) >= 1, "depth-3 mixed map must also contain a Descent tile")
+	testing.expect(
+		t,
+		count_tiles_of_type(game, .Descent) >= 1,
+		"depth-3 mixed map must also contain a Descent tile",
+	)
 }
 
 @(test)
@@ -134,7 +146,11 @@ generation_always_places_at_least_one_descent_tile_in_cave :: proc(t: ^testing.T
 	defer game_destroy_for_gen(game)
 	generate_map(&content, game)
 
-	testing.expect(t, count_tiles_of_type(game, .Descent) >= 1, "depth-6 cave map must contain a Descent tile")
+	testing.expect(
+		t,
+		count_tiles_of_type(game, .Descent) >= 1,
+		"depth-6 cave map must contain a Descent tile",
+	)
 }
 
 // ─── Boss depth gates ─────────────────────────────────────────────────────────
@@ -194,7 +210,11 @@ boss_is_not_spawned_between_depth_6_and_9 :: proc(t: ^testing.T) {
 		rand.reset(u64(depth) * 0xAAAAAAAAAAAAAAAA)
 		generate_map(&content, game)
 		for enemy in game.enemies {
-			testing.expect(t, !enemy.is_boss, "no boss enemy should be spawned between depths 6 and 9")
+			testing.expect(
+				t,
+				!enemy.is_boss,
+				"no boss enemy should be spawned between depths 6 and 9",
+			)
 		}
 	}
 }

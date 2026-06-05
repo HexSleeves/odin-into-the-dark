@@ -5,7 +5,13 @@ import "core:testing"
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 // make_enemy returns a minimal live enemy at pos with the given ability.
-make_ability_test_enemy :: proc(x, y: int, ability: string, max_cd: int = 3, range: int = 5, attack: int = 3) -> Enemy {
+make_ability_test_enemy :: proc(
+	x, y: int,
+	ability: string,
+	max_cd: int = 3,
+	range: int = 5,
+	attack: int = 3,
+) -> Enemy {
 	e: Enemy
 	e.pos = Vec2{x, y}
 	e.hp = 10

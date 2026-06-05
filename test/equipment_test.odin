@@ -7,37 +7,37 @@ import "core:testing"
 
 // make_weapon returns a minimal weapon Item with the given stat_bonus.
 make_weapon :: proc(bonus: int) -> Item {
-	return gcore.Item{
-		item_type      = "test_sword",
-		name           = "Test Sword",
+	return gcore.Item {
+		item_type = "test_sword",
+		name = "Test Sword",
 		equipment_slot = EQUIPMENT_SLOT_WEAPON,
-		stat_bonus     = bonus,
-		picked_up      = true,
-		quantity       = 1,
+		stat_bonus = bonus,
+		picked_up = true,
+		quantity = 1,
 	}
 }
 
 // make_armor returns a minimal armor Item with the given stat_bonus.
 make_armor :: proc(bonus: int) -> Item {
-	return gcore.Item{
-		item_type      = "test_armor",
-		name           = "Test Armor",
+	return gcore.Item {
+		item_type = "test_armor",
+		name = "Test Armor",
 		equipment_slot = EQUIPMENT_SLOT_ARMOR,
-		stat_bonus     = bonus,
-		picked_up      = true,
-		quantity       = 1,
+		stat_bonus = bonus,
+		picked_up = true,
+		quantity = 1,
 	}
 }
 
 // make_helmet returns a minimal helmet Item with the given stat_bonus.
 make_helmet :: proc(bonus: int) -> Item {
-	return gcore.Item{
-		item_type      = "test_helmet",
-		name           = "Test Helmet",
+	return gcore.Item {
+		item_type = "test_helmet",
+		name = "Test Helmet",
 		equipment_slot = EQUIPMENT_SLOT_HELMET,
-		stat_bonus     = bonus,
-		picked_up      = true,
-		quantity       = 1,
+		stat_bonus = bonus,
+		picked_up = true,
+		quantity = 1,
 	}
 }
 
@@ -55,7 +55,10 @@ equip_item_places_weapon_in_weapon_slot :: proc(t: ^testing.T) {
 	msgs := message_manager_make()
 
 	sword := make_weapon(5)
-	game.inventory[0] = Inventory_Slot{occupied = true, item = sword}
+	game.inventory[0] = Inventory_Slot {
+		occupied = true,
+		item     = sword,
+	}
 
 	ok := equip_item(&msgs, game, 0)
 
@@ -72,7 +75,10 @@ equip_item_places_armor_in_armor_slot :: proc(t: ^testing.T) {
 	msgs := message_manager_make()
 
 	armor := make_armor(3)
-	game.inventory[0] = Inventory_Slot{occupied = true, item = armor}
+	game.inventory[0] = Inventory_Slot {
+		occupied = true,
+		item     = armor,
+	}
 
 	ok := equip_item(&msgs, game, 0)
 
@@ -88,7 +94,10 @@ equip_item_places_helmet_in_helmet_slot :: proc(t: ^testing.T) {
 	msgs := message_manager_make()
 
 	helmet := make_helmet(2)
-	game.inventory[0] = Inventory_Slot{occupied = true, item = helmet}
+	game.inventory[0] = Inventory_Slot {
+		occupied = true,
+		item     = helmet,
+	}
 
 	ok := equip_item(&msgs, game, 0)
 
@@ -106,18 +115,33 @@ equip_item_fails_when_slot_occupied_and_inventory_full :: proc(t: ^testing.T) {
 	msgs := message_manager_make()
 
 	// Fill every inventory slot with a dummy item
-	dummy := gcore.Item{item_type = "junk", name = "Junk", equipment_slot = "", picked_up = true, quantity = 1}
+	dummy := gcore.Item {
+		item_type      = "junk",
+		name           = "Junk",
+		equipment_slot = "",
+		picked_up      = true,
+		quantity       = 1,
+	}
 	for i in 0 ..< MAX_INVENTORY {
-		game.inventory[i] = Inventory_Slot{occupied = true, item = dummy}
+		game.inventory[i] = Inventory_Slot {
+			occupied = true,
+			item     = dummy,
+		}
 	}
 
 	// Slot 0 has the new weapon we want to equip
 	new_sword := make_weapon(7)
-	game.inventory[0] = Inventory_Slot{occupied = true, item = new_sword}
+	game.inventory[0] = Inventory_Slot {
+		occupied = true,
+		item     = new_sword,
+	}
 
 	// Pre-occupy the weapon slot with a different weapon
 	old_sword := make_weapon(1)
-	game.equipped_weapon = Equipment{occupied = true, item = old_sword}
+	game.equipped_weapon = Equipment {
+		occupied = true,
+		item     = old_sword,
+	}
 
 	ok := equip_item(&msgs, game, 0)
 
@@ -153,8 +177,17 @@ equip_item_returns_false_for_non_equippable_item :: proc(t: ^testing.T) {
 	defer free(game)
 	msgs := message_manager_make()
 
-	non_equippable := Item{item_type = "potion", name = "Potion", equipment_slot = "", picked_up = true, quantity = 1}
-	game.inventory[0] = Inventory_Slot{occupied = true, item = non_equippable}
+	non_equippable := Item {
+		item_type      = "potion",
+		name           = "Potion",
+		equipment_slot = "",
+		picked_up      = true,
+		quantity       = 1,
+	}
+	game.inventory[0] = Inventory_Slot {
+		occupied = true,
+		item     = non_equippable,
+	}
 
 	ok := equip_item(&msgs, game, 0)
 	testing.expect(t, !ok, "equip_item should return false for items with no equipment slot")
@@ -169,7 +202,10 @@ unequip_slot_moves_weapon_back_to_inventory :: proc(t: ^testing.T) {
 	msgs := message_manager_make()
 
 	sword := make_weapon(5)
-	game.equipped_weapon = Equipment{occupied = true, item = sword}
+	game.equipped_weapon = Equipment {
+		occupied = true,
+		item     = sword,
+	}
 
 	ok := unequip_slot(&msgs, game, EQUIPMENT_SLOT_WEAPON)
 
@@ -192,18 +228,34 @@ unequip_slot_fails_when_inventory_full :: proc(t: ^testing.T) {
 	defer free(game)
 	msgs := message_manager_make()
 
-	dummy := Item{item_type = "junk", name = "Junk", equipment_slot = "", picked_up = true, quantity = 1}
+	dummy := Item {
+		item_type      = "junk",
+		name           = "Junk",
+		equipment_slot = "",
+		picked_up      = true,
+		quantity       = 1,
+	}
 	for i in 0 ..< MAX_INVENTORY {
-		game.inventory[i] = Inventory_Slot{occupied = true, item = dummy}
+		game.inventory[i] = Inventory_Slot {
+			occupied = true,
+			item     = dummy,
+		}
 	}
 
 	sword := make_weapon(5)
-	game.equipped_weapon = Equipment{occupied = true, item = sword}
+	game.equipped_weapon = Equipment {
+		occupied = true,
+		item     = sword,
+	}
 
 	ok := unequip_slot(&msgs, game, EQUIPMENT_SLOT_WEAPON)
 
 	testing.expect(t, !ok, "unequip_slot should fail when inventory is full")
-	testing.expect(t, game.equipped_weapon.occupied, "weapon slot should still be occupied on failure")
+	testing.expect(
+		t,
+		game.equipped_weapon.occupied,
+		"weapon slot should still be occupied on failure",
+	)
 }
 
 @(test)
@@ -224,7 +276,10 @@ effective_attack_value_applies_weapon_bonus :: proc(t: ^testing.T) {
 	defer free(game)
 
 	game.player.attack = 10
-	game.equipped_weapon = Equipment{occupied = true, item = make_weapon(4)}
+	game.equipped_weapon = Equipment {
+		occupied = true,
+		item     = make_weapon(4),
+	}
 
 	result := effective_attack(game)
 	testing.expect_value(t, result, 14)
@@ -248,7 +303,10 @@ effective_defense_value_applies_armor_bonus :: proc(t: ^testing.T) {
 	game := minimal_game()
 	defer free(game)
 
-	game.equipped_armor = Equipment{occupied = true, item = make_armor(6)}
+	game.equipped_armor = Equipment {
+		occupied = true,
+		item     = make_armor(6),
+	}
 
 	result := effective_defense(game)
 	testing.expect_value(t, result, 6)
@@ -270,7 +328,10 @@ effective_light_bonus_applies_helmet_stat_bonus :: proc(t: ^testing.T) {
 	game := minimal_game()
 	defer free(game)
 
-	game.equipped_helmet = Equipment{occupied = true, item = make_helmet(3)}
+	game.equipped_helmet = Equipment {
+		occupied = true,
+		item     = make_helmet(3),
+	}
 
 	result := effective_light_bonus(game)
 	testing.expect_value(t, result, 3)

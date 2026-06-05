@@ -26,13 +26,13 @@ enemy_with_positive_energy_acts_when_visible :: proc(t: ^testing.T) {
 	// Place enemy two steps away — it should move one step toward player.
 	append(
 		&game.enemies,
-		Enemy{
-			pos       = Vec2{3, 1},
-			hp        = 5,
-			max_hp    = 5,
-			alive     = true,
-			energy    = BASE_MOVE_COST, // already has enough AP — must act
-			quickness = 0,              // no new AP granted this round
+		Enemy {
+			pos        = Vec2{3, 1},
+			hp         = 5,
+			max_hp     = 5,
+			alive      = true,
+			energy     = BASE_MOVE_COST, // already has enough AP — must act
+			quickness  = 0, // no new AP granted this round
 			move_speed = 100,
 		},
 	)
@@ -54,13 +54,13 @@ enemy_energy_is_deducted_after_moving :: proc(t: ^testing.T) {
 	// Give enemy exactly one move's worth of AP.
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = Vec2{5, 1},
-			hp         = 5,
-			max_hp     = 5,
-			alive      = true,
-			energy     = BASE_MOVE_COST,
-			quickness  = 0,
+		Enemy {
+			pos = Vec2{5, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = BASE_MOVE_COST,
+			quickness = 0,
 			move_speed = 100,
 		},
 	)
@@ -70,7 +70,11 @@ enemy_energy_is_deducted_after_moving :: proc(t: ^testing.T) {
 	process_enemy_turns(&messages, &game)
 
 	// After one move the AP must be <= 0 (exactly 0 when move_speed == 100).
-	testing.expect(t, game.enemies[0].energy <= 0, "energy should be zero or negative after one move")
+	testing.expect(
+		t,
+		game.enemies[0].energy <= 0,
+		"energy should be zero or negative after one move",
+	)
 }
 
 @(test)
@@ -82,7 +86,7 @@ enemy_with_no_energy_does_not_move :: proc(t: ^testing.T) {
 	start_pos := Vec2{4, 1}
 	append(
 		&game.enemies,
-		Enemy{
+		Enemy {
 			pos        = start_pos,
 			hp         = 5,
 			max_hp     = 5,
@@ -119,13 +123,13 @@ energy_granted_equals_quickness_times_ten :: proc(t: ^testing.T) {
 	// Grant 50 quickness → +500 AP each round.
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = Vec2{10, 10},
-			hp         = 5,
-			max_hp     = 5,
-			alive      = true,
-			energy     = 0,
-			quickness  = 50,
+		Enemy {
+			pos = Vec2{10, 10},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 50,
 			move_speed = 100,
 		},
 	)
@@ -161,14 +165,14 @@ quickness_100_grants_one_thousand_ap_per_round :: proc(t: ^testing.T) {
 	// After one attack: energy = 1000 - 1000 = 0.
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = Vec2{2, 1},
-			hp         = 5,
-			max_hp     = 5,
-			attack     = 1,
-			alive      = true,
-			energy     = 0,
-			quickness  = 100,
+		Enemy {
+			pos = Vec2{2, 1},
+			hp = 5,
+			max_hp = 5,
+			attack = 1,
+			alive = true,
+			energy = 0,
+			quickness = 100,
 			move_speed = 100,
 		},
 	)
@@ -191,14 +195,14 @@ lurker_not_visible_to_player_drains_energy_to_zero :: proc(t: ^testing.T) {
 	start_pos := Vec2{5, 5}
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = start_pos,
-			hp         = 5,
-			max_hp     = 5,
-			alive      = true,
-			behavior   = ENEMY_BEHAVIOR_LURKER,
-			energy     = 0,
-			quickness  = 100,
+		Enemy {
+			pos = start_pos,
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			behavior = ENEMY_BEHAVIOR_LURKER,
+			energy = 0,
+			quickness = 100,
 			move_speed = 100,
 		},
 	)
@@ -220,14 +224,14 @@ lurker_visible_but_not_adjacent_stays_still :: proc(t: ^testing.T) {
 	start_pos := Vec2{5, 1}
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = start_pos,
-			hp         = 5,
-			max_hp     = 5,
-			alive      = true,
-			behavior   = ENEMY_BEHAVIOR_LURKER,
-			energy     = 0,
-			quickness  = 100,
+		Enemy {
+			pos = start_pos,
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			behavior = ENEMY_BEHAVIOR_LURKER,
+			energy = 0,
+			quickness = 100,
 			move_speed = 100,
 		},
 	)
@@ -251,15 +255,15 @@ lurker_visible_and_adjacent_attacks_player :: proc(t: ^testing.T) {
 	// player at (1,1), lurker at (2,1) — one step east = adjacent
 	append(
 		&game.enemies,
-		Enemy{
-			pos        = Vec2{2, 1},
-			hp         = 5,
-			max_hp     = 5,
-			attack     = 3,
-			alive      = true,
-			behavior   = ENEMY_BEHAVIOR_LURKER,
-			energy     = 0,
-			quickness  = 100,
+		Enemy {
+			pos = Vec2{2, 1},
+			hp = 5,
+			max_hp = 5,
+			attack = 3,
+			alive = true,
+			behavior = ENEMY_BEHAVIOR_LURKER,
+			energy = 0,
+			quickness = 100,
 			move_speed = 100,
 		},
 	)
@@ -269,6 +273,10 @@ lurker_visible_and_adjacent_attacks_player :: proc(t: ^testing.T) {
 	process_enemy_turns(&messages, &game)
 
 	// Lurker attacked — player HP reduced, lurker did not move.
-	testing.expect(t, game.player.hp < game.player.max_hp, "lurker should have attacked the player")
+	testing.expect(
+		t,
+		game.player.hp < game.player.max_hp,
+		"lurker should have attacked the player",
+	)
 	testing.expect_value(t, game.enemies[0].pos, Vec2{2, 1})
 }

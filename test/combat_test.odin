@@ -44,7 +44,7 @@ effective_attack_adds_weapon_bonus_to_base_attack :: proc(t: ^testing.T) {
 	g.player.attack = 4
 	g.equipped_weapon = Equipment {
 		occupied = true,
-		item     = Item{stat_bonus = 3},
+		item = Item{stat_bonus = 3},
 	}
 
 	testing.expect_value(t, effective_attack(&g), 7)
@@ -56,7 +56,7 @@ effective_attack_ignores_unoccupied_weapon_slot :: proc(t: ^testing.T) {
 	g.player.attack = 4
 	g.equipped_weapon = Equipment {
 		occupied = false,
-		item     = Item{stat_bonus = 99},
+		item = Item{stat_bonus = 99},
 	}
 
 	testing.expect_value(t, effective_attack(&g), 4)
@@ -76,7 +76,7 @@ effective_defense_returns_armor_stat_bonus_when_equipped :: proc(t: ^testing.T) 
 	g := make_combat_test_game()
 	g.equipped_armor = Equipment {
 		occupied = true,
-		item     = Item{stat_bonus = 2},
+		item = Item{stat_bonus = 2},
 	}
 
 	testing.expect_value(t, effective_defense(&g), 2)
@@ -102,7 +102,7 @@ player_attack_with_weapon_bonus_applies_full_damage :: proc(t: ^testing.T) {
 	g.player.attack = 2
 	g.equipped_weapon = Equipment {
 		occupied = true,
-		item     = Item{stat_bonus = 3},
+		item = Item{stat_bonus = 3},
 	}
 	e := make_combat_test_enemy(hp = 10)
 	msgs := make_combat_test_messages()
@@ -181,7 +181,7 @@ enemy_attack_reduces_player_hp_by_attack_minus_defense :: proc(t: ^testing.T) {
 	g := make_combat_test_game(hp = 20)
 	g.equipped_armor = Equipment {
 		occupied = true,
-		item     = Item{stat_bonus = 2},
+		item = Item{stat_bonus = 2},
 	}
 	e := make_combat_test_enemy(attack = 5)
 	msgs := make_combat_test_messages()
@@ -196,7 +196,7 @@ enemy_attack_damage_is_floored_at_one :: proc(t: ^testing.T) {
 	g := make_combat_test_game(hp = 10)
 	g.equipped_armor = Equipment {
 		occupied = true,
-		item     = Item{stat_bonus = 99},
+		item = Item{stat_bonus = 99},
 	}
 	e := make_combat_test_enemy(attack = 1)
 	msgs := make_combat_test_messages()
