@@ -2,13 +2,6 @@ package main
 
 import eng "./engine"
 
-// ─── Message panel layout ────────────────────────────────────────────────────
-
-MSG_PANEL_Y :: i32(MAP_VIEW_HEIGHT)
-MSG_PANEL_HEIGHT :: i32(MSG_REGION_HEIGHT)
-MSG_FONT_SIZE :: i32(14)
-MSG_LINE_HEIGHT :: i32(16)
-MSG_MAX_VISIBLE :: 7
 
 Message_Manager :: eng.Message_Manager
 
@@ -40,16 +33,6 @@ clear_messages :: proc(messages: ^Message_Manager) {
 	eng.message_manager_clear(messages)
 }
 
-// ─── Render message panel ────────────────────────────────────────────────────
-
-render_messages_for_engine :: proc(engine: ^eng.Engine) {
-	clay_render_messages(game_engine_message_manager(engine))
-}
-
-render_messages :: proc(engine: ^eng.Engine, messages: ^Message_Manager) {
-	_ = engine
-	clay_render_messages(messages)
-}
 
 // ─── Name helpers (data-driven) ──────────────────────────────────────────────
 

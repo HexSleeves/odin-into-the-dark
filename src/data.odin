@@ -372,7 +372,7 @@ pick_item_def_for_depth :: proc(depth: int) -> ^Item_Def {
 apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_Def) {
 	eff := &def.effect
 
-	if eff.type == "heal" {
+	if eff.type == ITEM_EFFECT_HEAL {
 		actual_heal := min(eff.value, game.player.max_hp - game.player.hp)
 		game.player.hp = min(game.player.hp + eff.value, game.player.max_hp)
 		add_message(
@@ -381,7 +381,7 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			fmt.tprintf("You use a %s. Restored %d HP.", def.name, actual_heal),
 			eng.Engine_Color{100, 255, 100, 255},
 		)
-	} else if eff.type == "light_boost" {
+	} else if eff.type == ITEM_EFFECT_LIGHT_BOOST {
 		max_r := eff.max_radius
 		if max_r <= 0 {max_r = 10}
 		game.player.light_radius = min(game.player.light_radius + eff.value, max_r)
@@ -391,7 +391,7 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			fmt.tprintf("You use a %s. Light radius increased.", def.name),
 			eng.Engine_Color{255, 180, 50, 255},
 		)
-	} else if eff.type == "timed_light_boost" {
+	} else if eff.type == ITEM_EFFECT_TIMED_LIGHT_BOOST {
 		game.light_boost_bonus = eff.value
 		game.light_boost_turns = eff.duration
 		add_message(
@@ -400,21 +400,21 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_De
 			"You apply lantern oil. Light burns brighter!",
 			eng.Engine_Color{255, 200, 80, 255},
 		)
-	} else if eff.type == "equip" {
+	} else if eff.type == ITEM_EFFECT_EQUIP {
 		add_message(
 			messages,
 			game,
 			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
 			eng.Engine_Color{180, 180, 180, 255},
 		)
-	} else if eff.type == "material" {
+	} else if eff.type == ITEM_EFFECT_MATERIAL {
 		add_message(
 			messages,
 			game,
 			"Raw materials cannot be used directly. Find an anvil to craft.",
 			eng.Engine_Color{180, 180, 100, 255},
 		)
-	} else if eff.type == "cure_poison" {
+	} else if eff.type == ITEM_EFFECT_CURE_POISON {
 		if game.poison_turns > 0 {
 			game.poison_turns = 0
 			add_message(

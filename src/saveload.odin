@@ -254,16 +254,16 @@ save_to_string :: proc(content: ^Content_Manager, s: ^Save_String) -> string {
 
 	// Known constant strings (string literals — always valid)
 	known := [?]string {
-		"web",
-		"pull",
-		"poison_cloud",
-		"teleport",
-		"slam",
-		"darkness",
-		"weapon",
-		"armor",
-		"helmet",
-		"material",
+		ENEMY_ABILITY_WEB,
+		ENEMY_ABILITY_PULL,
+		ENEMY_ABILITY_POISON_CLOUD,
+		ENEMY_ABILITY_TELEPORT,
+		ENEMY_ABILITY_SLAM,
+		ENEMY_ABILITY_DARKNESS,
+		EQUIPMENT_SLOT_WEAPON,
+		EQUIPMENT_SLOT_ARMOR,
+		EQUIPMENT_SLOT_HELMET,
+		ITEM_EFFECT_MATERIAL,
 	}
 	for k in known {
 		if k == temp {return k}

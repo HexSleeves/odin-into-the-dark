@@ -7,7 +7,7 @@ import "core:fmt"
 
 give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 	// Equip a Rusty Pickaxe directly into the weapon slot
-	pick_def := content_manager_item_def(content, "rusty_pickaxe")
+	pick_def := content_manager_item_def(content, ITEM_ID_RUSTY_PICKAXE)
 	if pick_def != nil {
 		pick := item_make_from_def(pick_def, Vec2{0, 0})
 		pick.picked_up = true
@@ -18,134 +18,78 @@ give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 
 	// Put a Torch in inventory slot 0
-	torch_def := content_manager_item_def(content, "torch")
+	torch_def := content_manager_item_def(content, ITEM_ID_TORCH)
 	if torch_def != nil {
 		torch := item_make_from_def(torch_def, Vec2{0, 0})
 		torch.picked_up = true
-		game.inventory[0] = Inventory_Slot {
-			occupied = true,
-			item     = torch,
-		}
-		game.inventory[0].item.quantity = 1
+		inventory_put_slot(game, 0, torch, 1)
 	}
 
 	// Put 2 Bandages in inventory slot 1
-	band_def := content_manager_item_def(content, "bandage")
+	band_def := content_manager_item_def(content, ITEM_ID_BANDAGE)
 	if band_def != nil {
 		band := item_make_from_def(band_def, Vec2{0, 0})
 		band.picked_up = true
-		game.inventory[1] = Inventory_Slot {
-			occupied = true,
-			item     = band,
-		}
-		game.inventory[1].item.quantity = 2
+		inventory_put_slot(game, 1, band, 2)
 	}
 }
 
 // ─── Equipment: equip / unequip / stat queries ────────────────────────────────
 
+game_equipment_slot :: proc(game: ^Game, slot_name: string) -> ^Equipment {
+	if game == nil {return nil}
+	if slot_name == EQUIPMENT_SLOT_WEAPON {return &game.equipped_weapon}
+	if slot_name == EQUIPMENT_SLOT_ARMOR {return &game.equipped_armor}
+	if slot_name == EQUIPMENT_SLOT_HELMET {return &game.equipped_helmet}
+	return nil
+}
+
 equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
-	if slot_index < 0 || slot_index >= MAX_INVENTORY {return false}
+	if !inventory_slot_in_bounds(slot_index) {return false}
 	if !game.inventory[slot_index].occupied {return false}
 
 	item := &game.inventory[slot_index].item
 	if item.equipment_slot == "" {
-		add_message(
-			messages,
-			game,
-			"That item cannot be equipped.",
-			eng.Engine_Color{180, 180, 180, 255},
-		)
+		add_message(messages, game, "That item cannot be equipped.", eng.Engine_Color{180, 180, 180, 255})
 		return false
 	}
 
-	// Determine which equipment slot
-	equip_slot: ^Equipment
-	if item.equipment_slot ==
-	   "weapon" {equip_slot = &game.equipped_weapon} else if item.equipment_slot == "armor" {equip_slot = &game.equipped_armor} else if item.equipment_slot == "helmet" {equip_slot = &game.equipped_helmet} else {
-		add_message(
-			messages,
-			game,
-			"Unknown equipment slot.",
-			eng.Engine_Color{180, 180, 180, 255},
-		)
+	equip_slot := game_equipment_slot(game, item.equipment_slot)
+	if equip_slot == nil {
+		add_message(messages, game, "Unknown equipment slot.", eng.Engine_Color{180, 180, 180, 255})
 		return false
 	}
 
-	// If slot already occupied, swap: put equipped item back in inventory
 	if equip_slot.occupied {
-		empty := -1
-		for i in 0 ..< MAX_INVENTORY {
-			if !game.inventory[i].occupied {empty = i; break}
-		}
+		empty := inventory_first_empty_slot(game)
 		if empty < 0 {
-			add_message(
-				messages,
-				game,
-				"No inventory space to swap equipment!",
-				eng.Engine_Color{255, 100, 100, 255},
-			)
+			add_message(messages, game, "No inventory space to swap equipment!", eng.Engine_Color{255, 100, 100, 255})
 			return false
 		}
-		// Put old equipment back
-		game.inventory[empty].occupied = true
-		game.inventory[empty].item = equip_slot.item
-		game.inventory[empty].item.quantity = 1
-		add_message(
-			messages,
-			game,
-			fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
-			eng.Engine_Color{180, 180, 100, 255},
-		)
+		inventory_put_slot(game, empty, equip_slot.item, 1)
+		add_message(messages, game, fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)), eng.Engine_Color{180, 180, 100, 255})
 	}
 
-	// Equip the new item
 	equip_slot.occupied = true
 	equip_slot.item = item^
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("You equip the %s.", item_display_name(item)),
-		eng.Engine_Color{100, 200, 255, 255},
-	)
-
-	// Remove from inventory
+	add_message(messages, game, fmt.tprintf("You equip the %s.", item_display_name(item)), eng.Engine_Color{100, 200, 255, 255})
 	game.inventory[slot_index] = {}
-
 	return true
 }
 
 unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string) -> bool {
-	equip_slot: ^Equipment
-	if slot_name ==
-	   "weapon" {equip_slot = &game.equipped_weapon} else if slot_name == "armor" {equip_slot = &game.equipped_armor} else if slot_name == "helmet" {equip_slot = &game.equipped_helmet} else {return false}
-
+	equip_slot := game_equipment_slot(game, slot_name)
+	if equip_slot == nil {return false}
 	if !equip_slot.occupied {return false}
 
-	// Find empty inventory slot
-	empty := -1
-	for i in 0 ..< MAX_INVENTORY {
-		if !game.inventory[i].occupied {empty = i; break}
-	}
+	empty := inventory_first_empty_slot(game)
 	if empty < 0 {
-		add_message(
-			messages,
-			game,
-			"Inventory full! Cannot unequip.",
-			eng.Engine_Color{255, 100, 100, 255},
-		)
+		add_message(messages, game, "Inventory full! Cannot unequip.", eng.Engine_Color{255, 100, 100, 255})
 		return false
 	}
 
-	game.inventory[empty].occupied = true
-	game.inventory[empty].item = equip_slot.item
-	game.inventory[empty].item.quantity = 1
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
-		eng.Engine_Color{180, 180, 100, 255},
-	)
+	inventory_put_slot(game, empty, equip_slot.item, 1)
+	add_message(messages, game, fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)), eng.Engine_Color{180, 180, 100, 255})
 	equip_slot^ = {}
 	return true
 }

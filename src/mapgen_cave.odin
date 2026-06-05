@@ -67,8 +67,8 @@ flood_fill_count :: proc(game: ^Game, sx, sy: int, visited: ^[MAP_WIDTH * MAP_HE
 	tail += 1
 	count := 0
 
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
+	DX :: CARDINAL_DX
+	DY :: CARDINAL_DY
 
 	for head != tail {
 		cur := queue[head]
@@ -113,8 +113,8 @@ flood_fill_mark :: proc(game: ^Game, sx, sy: int, marked: ^[MAP_WIDTH * MAP_HEIG
 	queue[tail] = {sx, sy}
 	tail += 1
 
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
+	DX :: CARDINAL_DX
+	DY :: CARDINAL_DY
 
 	for head != tail {
 		cur := queue[head]
@@ -154,8 +154,8 @@ find_farthest_floor :: proc(game: ^Game, sx, sy: int) -> Vec2 {
 
 	farthest := Vec2{sx, sy}
 
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
+	DX :: CARDINAL_DX
+	DY :: CARDINAL_DY
 
 	for head != tail {
 		cur := queue[head]
@@ -207,8 +207,8 @@ find_nearest_floor :: proc(game: ^Game, sx, sy: int) -> Vec2 {
 	queue[tail] = {csx, csy}
 	tail += 1
 
-	DX :: [4]int{0, 0, -1, 1}
-	DY :: [4]int{-1, 1, 0, 0}
+	DX :: CARDINAL_DX
+	DY :: CARDINAL_DY
 
 	for head != tail {
 		cur := queue[head]

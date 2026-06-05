@@ -127,7 +127,7 @@ locked_door_requires_and_consumes_vault_key :: proc(t: ^testing.T) {
 	game.tiles[pos_to_idx(2, 1)].type = .Locked_Door
 	game.inventory[0] = Inventory_Slot {
 		occupied = true,
-		item = Item{item_type = "vault_key", name = "Vault Key", quantity = 1},
+		item = Item{item_type = ITEM_ID_VAULT_KEY, name = "Vault Key", quantity = 1},
 	}
 
 	backend_state := Test_Input_Backend_State{}
@@ -195,7 +195,7 @@ locked_door_unlock_consumes_action_without_consuming_web_under_player :: proc(t:
 	game.tiles[pos_to_idx(2, 1)].type = .Locked_Door
 	game.inventory[0] = Inventory_Slot {
 		occupied = true,
-		item = Item{item_type = "vault_key", name = "Vault Key", quantity = 1},
+		item = Item{item_type = ITEM_ID_VAULT_KEY, name = "Vault Key", quantity = 1},
 	}
 	testing.expect(t, web_tile_set(&game, 1, 1, true))
 

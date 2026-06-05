@@ -268,7 +268,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 			if sx + tile_size < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
 			if sy + tile_size < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
 			if ui.use_sprites {
-				spr := sprite_manager_named(sprites, "tile", "web")
+				spr := sprite_manager_named(sprites, "tile", ENEMY_ABILITY_WEB)
 				sprite_manager_draw(
 					engine,
 					sprites,
@@ -348,23 +348,3 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 		}
 	}
 }
-
-// ─── Mouse hover tooltip (camera-aware) ───────────────────────────────────────
-
-TOOLTIP_BG_COLOR :: eng.Engine_Color{20, 20, 25, 230}
-TOOLTIP_TEXT_COLOR :: eng.Engine_Color{255, 255, 255, 255}
-TOOLTIP_FONT_SIZE :: i32(14)
-TOOLTIP_PAD_X :: i32(6)
-TOOLTIP_PAD_Y :: i32(4)
-TOOLTIP_OFFSET_X :: i32(12)
-TOOLTIP_OFFSET_Y :: i32(-20)
-
-render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
-	clay_render_tooltip(engine, game)
-}
-
-// ─── Render texture stubs (texture approach reverted; kept for game_cleanup call) ──
-
-render_map_ensure_texture :: proc(game: ^Game) {}
-
-render_map_free_texture :: proc(game: ^Game) {}

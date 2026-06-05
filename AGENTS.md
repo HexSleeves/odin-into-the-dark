@@ -160,8 +160,8 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 | `src/fov.odin` | Field-of-view computation |
 | `src/input.odin` / `src/input_manager.odin` | Input routing and manager |
 | `src/render.odin` | Top-level render dispatch |
-| `src/render_map.odin` / `render_hud.odin` / `render_ui.odin` / `render_minimap.odin` | Rendering by concern |
-| `src/clay_ui.odin` / `src/clay_renderer.odin` / `src/clay_hud.odin` / `src/clay_overlays.odin` | Clay immediate-mode UI path |
+| `src/render_map.odin` / `src/render_title_fx.odin` | World/map rendering and title fire backdrop effects |
+| `src/clay_ui.odin` / `src/clay_renderer.odin` / `src/clay_hud.odin` / `src/clay_overlays.odin` / `src/clay_*` | Clay immediate-mode UI path |
 | `src/vendor/clay/` | Vendored Clay Odin binding and prebuilt platform libraries |
 | `src/engine/engine.odin` | `Engine` struct, `engine_run` loop, all manager accessors |
 | `src/engine/engine_services.odin` | Service registry (up to 16 services, inline arena) |
@@ -179,7 +179,7 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 ## Runtime/Tooling Preferences
 
 - **Language:** Odin (`2026-05`)
-- **Renderer:** `vendor:raylib` (no abstraction needed for rendering primitives; raw Raylib calls in render files)
+- **Renderer:** World rendering uses game-layer `render_draw_*` helpers over `Engine_Render_Backend`; UI rendering uses Clay translated through the same backend
 - **Build tool:** `just` (justfile), not make/cmake
 - **Formatter:** `odinfmt` — run via `just fmt`; must be installed at the path in justfile
 - **LSP:** OLS with `-vet -strict-style`; inlay hints on

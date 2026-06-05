@@ -67,7 +67,7 @@ handle_input :: proc(
 		// Check if bumping into a locked door with a key
 		t := tile_at(game, target_x, target_y)
 		if t != nil && t.type == .Locked_Door {
-			if remove_item_from_inventory(game, "vault_key") {
+			if remove_item_from_inventory(game, ITEM_ID_VAULT_KEY) {
 				t.type = .Floor
 				add_message(
 					messages,

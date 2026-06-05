@@ -75,12 +75,11 @@ when CHEATS_ENABLED {
 		item_type: string,
 	) -> bool {
 		if game == nil {return false}
-		for i in 0 ..< MAX_INVENTORY {
-			if game.inventory[i].occupied {continue}
-			game.inventory[i].occupied = true
-			game.inventory[i].item = item_make(content, item_type, game.player.pos)
-			game.inventory[i].item.picked_up = true
-			game.inventory[i].item.quantity = 1
+		slot_idx := inventory_first_empty_slot(game)
+		if slot_idx >= 0 {
+			item := item_make(content, item_type, game.player.pos)
+			item.picked_up = true
+			inventory_put_slot(game, slot_idx, item, 1)
 			add_message(
 				messages,
 				game,
@@ -196,7 +195,7 @@ when CHEATS_ENABLED {
 		case .Depth_Max:
 			cheat_set_depth(content, turns, camera, messages, game, MAX_DEPTH)
 		case .Add_Vault_Key:
-			cheat_add_item_to_inventory(content, messages, game, "vault_key")
+			cheat_add_item_to_inventory(content, messages, game, ITEM_ID_VAULT_KEY)
 		case .Explore_Map:
 			cheat_explore_map(messages, game)
 		}
@@ -258,51 +257,6 @@ when CHEATS_ENABLED {
 		}
 	}
 
-	render_cheats :: proc(engine: ^eng.Engine, game: ^Game) {
-		ui := ui_manager_state(game_engine_ui_manager(engine))
-		choice := 0
-		if ui != nil {choice = ui.cheat_choice}
-		render_draw_rectangle(
-			engine,
-			0,
-			0,
-			i32(SCREEN_WIDTH),
-			i32(SCREEN_HEIGHT),
-			eng.Engine_Color{0, 0, 0, 220},
-		)
-		title := cstring("CHEAT MENU")
-		title_size :: i32(32)
-		title_w := render_measure_text(engine, title, title_size)
-		render_draw_text(
-			engine,
-			title,
-			(i32(SCREEN_WIDTH) - title_w) / 2,
-			120,
-			title_size,
-			eng.Engine_Color{255, 215, 0, 255},
-		)
-		help := cstring("Built with -define:CHEATS=true. Press 1-8 or Enter; Esc/Shift+C closes.")
-		help_w := render_measure_text(engine, help, 14)
-		render_draw_text(
-			engine,
-			help,
-			(i32(SCREEN_WIDTH) - help_w) / 2,
-			165,
-			14,
-			eng.Engine_Color{180, 180, 180, 255},
-		)
-
-		start_y :: i32(220)
-		line_h :: i32(28)
-		for i in 0 ..< CHEAT_COMMAND_COUNT {
-			command := cheat_command_for_index(i)
-			prefix := ">" if i == choice else " "
-			text := fmt.ctprintf("%s %d. %s", prefix, i + 1, cheat_command_label(command))
-			color :=
-				eng.Engine_Color{255, 220, 100, 255} if i == choice else eng.Engine_Color{220, 220, 220, 255}
-			render_draw_text(engine, text, 440, start_y + i32(i) * line_h, 18, color)
-		}
-	}
 } else {
 	cheat_open_if_requested :: proc(
 		ui_manager: ^UI_Manager,
@@ -333,8 +287,4 @@ when CHEATS_ENABLED {
 		if game != nil {game.state = .Playing}
 	}
 
-	render_cheats :: proc(engine: ^eng.Engine, game: ^Game) {
-		_ = engine
-		_ = game
-	}
 }

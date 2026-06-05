@@ -43,12 +43,10 @@ message_handlers_accept_manager_context :: proc(t: ^testing.T) {
 		) =
 		add_message
 	clear_handler: proc(messages: ^Message_Manager) = clear_messages
-	render_handler: proc(engine: ^eng.Engine, messages: ^Message_Manager) = render_messages
 
 	testing.expect(t, bind_handler != nil)
 	testing.expect(t, add_handler != nil)
 	testing.expect(t, clear_handler != nil)
-	testing.expect(t, render_handler != nil)
 }
 
 @(test)

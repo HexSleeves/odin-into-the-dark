@@ -1,7 +1,6 @@
 package main
 
 import "core:fmt"
-import "core:math/rand"
 
 import eng "./engine"
 
@@ -50,24 +49,73 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 	return nil
 }
 
+inventory_slot_in_bounds :: proc(slot_index: int) -> bool {
+	return slot_index >= 0 && slot_index < MAX_INVENTORY
+}
+
+inventory_first_empty_slot :: proc(game: ^Game) -> int {
+	if game == nil {return -1}
+	for i in 0 ..< MAX_INVENTORY {
+		if !game.inventory[i].occupied {return i}
+	}
+	return -1
+}
+
+inventory_put_slot :: proc(game: ^Game, slot_index: int, item: Item, quantity: int = 1) -> bool {
+	if game == nil || !inventory_slot_in_bounds(slot_index) {return false}
+	game.inventory[slot_index].occupied = true
+	game.inventory[slot_index].item = item
+	game.inventory[slot_index].item.quantity = quantity
+	return true
+}
+
+inventory_decrement_slot :: proc(game: ^Game, slot_index: int, amount: int = 1) -> bool {
+	if game == nil || !inventory_slot_in_bounds(slot_index) {return false}
+	if !game.inventory[slot_index].occupied {return false}
+	game.inventory[slot_index].item.quantity -= amount
+	if game.inventory[slot_index].item.quantity <= 0 {
+		game.inventory[slot_index] = {}
+	}
+	return true
+}
+
+inventory_count_item_type :: proc(game: ^Game, item_type: string) -> int {
+	if game == nil {return 0}
+	total := 0
+	for i in 0 ..< MAX_INVENTORY {
+		if game.inventory[i].occupied && game.inventory[i].item.item_type == item_type {
+			total += game.inventory[i].item.quantity
+		}
+	}
+	return total
+}
+
+inventory_consume_item_type :: proc(game: ^Game, item_type: string, amount: int) -> bool {
+	if game == nil || amount <= 0 {return false}
+	if inventory_count_item_type(game, item_type) < amount {return false}
+	remaining := amount
+	for i in 0 ..< MAX_INVENTORY {
+		if remaining <= 0 {break}
+		if !game.inventory[i].occupied {continue}
+		if game.inventory[i].item.item_type != item_type {continue}
+		take := min(game.inventory[i].item.quantity, remaining)
+		remaining -= take
+		inventory_decrement_slot(game, i, take)
+	}
+	return true
+}
+
 // ─── Pick up item at player position ──────────────────────────────────────────
 
 pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	it := item_at(game, game.player.pos.x, game.player.pos.y)
 	if it == nil {
-		add_message(
-			messages,
-			game,
-			"Nothing to pick up here.",
-			eng.Engine_Color{180, 180, 180, 255},
-		)
+		add_message(messages, game, "Nothing to pick up here.", eng.Engine_Color{180, 180, 180, 255})
 		return false
 	}
 
 	itype := it.item_type
 	stack_limit := item_stack_limit(content, itype)
-
-	// Only stackable items can merge into existing stacks
 	if item_is_stackable(content, itype) {
 		for i in 0 ..< MAX_INVENTORY {
 			slot := &game.inventory[i]
@@ -78,12 +126,7 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 				add_message(
 					messages,
 					game,
-					fmt.tprintf(
-						"Picked up %s (%d/%d).",
-						item_display_name(it),
-						slot.item.quantity,
-						stack_limit,
-					),
+					fmt.tprintf("Picked up %s (%d/%d).", item_display_name(it), slot.item.quantity, stack_limit),
 					eng.Engine_Color{100, 255, 100, 255},
 				)
 				return true
@@ -91,33 +134,16 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 		}
 	}
 
-	// Find first empty inventory slot for a new stack
-	slot_idx := -1
-	for i in 0 ..< MAX_INVENTORY {
-		if !game.inventory[i].occupied {
-			slot_idx = i
-			break
-		}
-	}
-
+	slot_idx := inventory_first_empty_slot(game)
 	if slot_idx < 0 {
 		add_message(messages, game, "Inventory is full!", eng.Engine_Color{255, 100, 100, 255})
 		return false
 	}
 
-	// Copy item into slot as a new stack of 1 and mark map item as picked up
-	game.inventory[slot_idx].occupied = true
-	game.inventory[slot_idx].item = it^
-	game.inventory[slot_idx].item.quantity = 1
+	inventory_put_slot(game, slot_idx, it^)
 	it.picked_up = true
 	game.items_found += 1
-
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("Picked up %s.", item_display_name(it)),
-		eng.Engine_Color{100, 255, 100, 255},
-	)
+	add_message(messages, game, fmt.tprintf("Picked up %s.", item_display_name(it)), eng.Engine_Color{100, 255, 100, 255})
 	return true
 }
 
@@ -130,160 +156,43 @@ use_item :: proc(
 	slot_index: int,
 	engine: ^eng.Engine = nil,
 ) -> bool {
-	if slot_index < 0 || slot_index >= MAX_INVENTORY {
-		return false
-	}
-	if !game.inventory[slot_index].occupied {
-		return false
-	}
+	if !inventory_slot_in_bounds(slot_index) {return false}
+	if !game.inventory[slot_index].occupied {return false}
 
 	itype := game.inventory[slot_index].item.item_type
 	def := content_manager_item_def(content, itype)
-	if def != nil {
-		// Equip-type items are not consumed on use; hint the player instead
-		if def.effect.type == "equip" {
-			add_message(
-				messages,
-				game,
-				fmt.tprintf("Press E in inventory to equip the %s.", def.name),
-				eng.Engine_Color{180, 180, 180, 255},
-			)
-			return false
-		}
-		// Material items cannot be consumed directly
-		if def.effect.type == "material" {
-			add_message(
-				messages,
-				game,
-				"Raw materials cannot be used directly. Find an anvil to craft.",
-				eng.Engine_Color{180, 180, 100, 255},
-			)
-			return false
-		}
-		apply_item_effect(messages, game, def)
-		if engine != nil {
-			cam := game_engine_camera_manager(engine)
-			particles := game_engine_particle_manager(engine)
-			if def.effect.type == "heal" || def.effect.type == "timed_light_boost" {
-				spawn_pickup_particles(
-					particles,
-					game.player.pos.x,
-					game.player.pos.y,
-					game_camera_x(cam),
-					game_camera_y(cam),
-				)
-			}
-		}
-	} else {
+	if def == nil {
 		add_message(messages, game, "Nothing happens.", eng.Engine_Color{180, 180, 180, 255})
 		return false
 	}
-
-	// Decrement stack quantity; clear slot only when empty
-	game.inventory[slot_index].item.quantity -= 1
-	if game.inventory[slot_index].item.quantity <= 0 {
-		game.inventory[slot_index] = {}
+	if def.effect.type == ITEM_EFFECT_EQUIP {
+		add_message(messages, game, fmt.tprintf("Press E in inventory to equip the %s.", def.name), eng.Engine_Color{180, 180, 180, 255})
+		return false
 	}
+	if def.effect.type == ITEM_EFFECT_MATERIAL {
+		add_message(messages, game, "Raw materials cannot be used directly. Find an anvil to craft.", eng.Engine_Color{180, 180, 100, 255})
+		return false
+	}
+
+	apply_item_effect(messages, game, def)
+	if engine != nil {
+		cam := game_engine_camera_manager(engine)
+		particles := game_engine_particle_manager(engine)
+		if def.effect.type == ITEM_EFFECT_HEAL || def.effect.type == ITEM_EFFECT_TIMED_LIGHT_BOOST {
+			spawn_pickup_particles(particles, game.player.pos.x, game.player.pos.y, game_camera_x(cam), game_camera_y(cam))
+		}
+	}
+	inventory_decrement_slot(game, slot_index)
 	return true
 }
 
 // ─── Tick timed effects (call once per turn) ──────────────────────────────────
 
-tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
-	if game.state == .Game_Over {return}
-
-	if game.light_boost_turns > 0 {
-		game.light_boost_turns -= 1
-		if game.light_boost_turns <= 0 {
-			game.light_boost_bonus = 0
-			add_message(
-				messages,
-				game,
-				"The lantern oil burns out.",
-				eng.Engine_Color{180, 130, 50, 255},
-			)
-		}
-	}
-
-	if game.poison_turns > 0 {
-		game.poison_turns -= 1
-		game.player.hp = max(game.player.hp - 1, 0)
-		add_message(
-			messages,
-			game,
-			"Poison damages you! (-1 HP)",
-			eng.Engine_Color{120, 200, 40, 255},
-		)
-		if game.player.hp <= 0 {
-			player_die(messages, game, "Died from poison")
-			return
-		}
-	}
-
-	if game.burning_turns > 0 {
-		game.burning_turns -= 1
-		game.player.hp = max(game.player.hp - 1, 0)
-		add_message(
-			messages,
-			game,
-			"You are burning! (-1 HP)",
-			eng.Engine_Color{255, 120, 20, 255},
-		)
-		if game.player.hp <= 0 {
-			player_die(messages, game, "Burned to death")
-			return
-		}
-	}
-
-	if game.frozen_turns > 0 {
-		game.frozen_turns -= 1
-		if game.frozen_turns > 0 {
-			add_message(
-				messages,
-				game,
-				"You are frozen! Movement costs double.",
-				eng.Engine_Color{100, 180, 255, 255},
-			)
-		} else {
-			add_message(
-				messages,
-				game,
-				"The ice thaws. You can move freely.",
-				eng.Engine_Color{150, 200, 255, 255},
-			)
-		}
-	}
-
-	// Passive light drain — darkness encroaches without a light source (depth 3+)
-	if game.depth >= 3 && game.light_boost_turns <= 0 {
-		game.light_drain_timer += 1
-		if game.light_drain_timer >= LIGHT_DRAIN_INTERVAL {
-			game.light_drain_timer = 0
-			if game.player.light_radius > LIGHT_DRAIN_MIN {
-				game.player.light_radius -= 1
-				add_message(
-					messages,
-					game,
-					"The darkness closes in... your light fades.",
-					eng.Engine_Color{100, 100, 140, 255},
-				)
-			}
-		}
-	} else {
-		// Reset drain timer while a light source is active
-		game.light_drain_timer = 0
-	}
-}
-
-// ─── Drop an item from inventory onto the map ────────────────────────────────
-
 drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
-	if slot_index < 0 || slot_index >= MAX_INVENTORY {return false}
+	if !inventory_slot_in_bounds(slot_index) {return false}
 	if !game.inventory[slot_index].occupied {return false}
 
 	slot := &game.inventory[slot_index]
-
-	// Create item on map at player position
 	dropped := Item {
 		pos       = game.player.pos,
 		item_type = slot.item.item_type,
@@ -294,144 +203,13 @@ drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> b
 		quantity  = 1,
 	}
 	append(&game.items, dropped)
-
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("You drop a %s.", item_display_name(&slot.item)),
-		eng.Engine_Color{180, 180, 100, 255},
-	)
-
-	// Decrement stack or clear slot
-	slot.item.quantity -= 1
-	if slot.item.quantity <= 0 {
-		slot^ = {}
-	}
+	add_message(messages, game, fmt.tprintf("You drop a %s.", item_display_name(&slot.item)), eng.Engine_Color{180, 180, 100, 255})
+	inventory_decrement_slot(game, slot_index)
 	return true
 }
 
 // ─── Render items on visible tiles ────────────────────────────────────────────
 
-render_items :: proc(engine: ^eng.Engine, game: ^Game) {
-	sprites := game_engine_sprite_manager(engine)
-	camera := game_engine_camera_manager(engine)
-	vfx := game_engine_vfx_manager(engine)
-	ui := ui_manager_state(game_engine_ui_manager(engine))
-	tile_size := camera_tile_size(camera)
-
-	for &item in game.items {
-		if item.picked_up {continue}
-
-		// Only render items on visible tiles
-		if !tile_visible_at(game, item.pos.x, item.pos.y) {continue}
-
-		ix := camera_world_x_to_screen_shaken(camera, vfx, item.pos.x * TILE_SIZE)
-		iy := camera_world_y_to_screen_shaken(camera, vfx, item.pos.y * TILE_SIZE)
-
-		if ui.use_sprites {
-			spr := sprite_manager_item(sprites, item.item_type)
-			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color, tile_size)
-		} else {
-			glyph_buf: [2]u8
-			glyph_buf[0] = u8(item.glyph)
-			glyph_buf[1] = 0
-			glyph_cstr := cast(cstring)&glyph_buf[0]
-			render_draw_text(engine, glyph_cstr, ix, iy, tile_size, item.color)
-		}
-	}
-}
-
-// ─── Spawn items into rooms (data-driven) ─────────────────────────────────────
-
-spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
-	clear(&game.items)
-
-	if len(game.rooms) < 2 {
-		// Cave layout: scatter items on random floor tiles
-		target := 3 + game.depth
-		if target > 10 {target = 10}
-
-		spawned := 0
-		for _ in 0 ..< target * 10 {
-			if spawned >= target {break}
-			x := rand.int_max(MAP_WIDTH - 2) + 1
-			y := rand.int_max(MAP_HEIGHT - 2) + 1
-			if !is_walkable(game, x, y) {continue}
-			pos := Vec2{x, y}
-			if pos == game.player.pos {continue}
-			t := tile_at(game, x, y)
-			if t != nil && t.type == .Descent {continue}
-			if enemy_at(game, x, y) != nil {continue}
-			if item_at(game, x, y) != nil {continue}
-
-			def := content_manager_pick_item_def_for_depth(content, game.depth)
-			if def != nil {
-				append(&game.items, item_make_from_def(def, pos))
-				spawned += 1
-			}
-		}
-		logger_debugf(.Items, "spawned %v items (cave, depth=%v)", spawned, game.depth)
-		return
-	}
-
-	room_chance := content_manager_room_item_chance(content)
-	if room_chance <= 0 {room_chance = 50}
-
-	total := 0
-
-	// Skip room 0 (player spawn), iterate remaining rooms
-	for i in 1 ..< len(game.rooms) {
-		// Percentage chance to place an item in this room
-		if rand.int_max(100) >= room_chance {
-			continue
-		}
-
-		room := game.rooms[i]
-
-		// Pick random floor position inside room
-		placed := false
-		for _ in 0 ..< 20 {
-			ix := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-			iy := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
-			pos := Vec2{ix, iy}
-
-			if !is_walkable(game, ix, iy) {continue}
-			if pos == game.player.pos {continue}
-
-			t := tile_at(game, ix, iy)
-			if t != nil && t.type == .Descent {continue}
-
-			if enemy_at(game, ix, iy) != nil {continue}
-			if item_at(game, ix, iy) != nil {continue}
-
-			def := content_manager_pick_item_def_for_depth(content, game.depth)
-			if def != nil {
-				append(&game.items, item_make_from_def(def, pos))
-				total += 1
-			}
-			placed = true
-			break
-		}
-
-		_ = placed
-	}
-
-	logger_debugf(
-		.Items,
-		"spawned %v items across %v rooms (depth=%v)",
-		total,
-		len(game.rooms) - 1,
-		game.depth,
-	)
-}
-// ─── Remove item from inventory by type ──────────────────────────────────────
-
 remove_item_from_inventory :: proc(game: ^Game, item_type: string) -> bool {
-	for i in 0 ..< MAX_INVENTORY {
-		if game.inventory[i].occupied && game.inventory[i].item.item_type == item_type {
-			game.inventory[i].occupied = false
-			return true
-		}
-	}
-	return false
+	return inventory_consume_item_type(game, item_type, 1)
 }

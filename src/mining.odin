@@ -160,30 +160,12 @@ RECIPES :: [4]Recipe {
 
 // Count how many of a material the player has in inventory
 count_material :: proc(game: ^Game, material_id: string) -> int {
-	total := 0
-	for i in 0 ..< MAX_INVENTORY {
-		if game.inventory[i].occupied && game.inventory[i].item.item_type == material_id {
-			total += game.inventory[i].item.quantity
-		}
-	}
-	return total
+	return inventory_count_item_type(game, material_id)
 }
 
 // Consume N of a material from inventory
 consume_material :: proc(game: ^Game, material_id: string, amount: int) {
-	remaining := amount
-	for i in 0 ..< MAX_INVENTORY {
-		if remaining <= 0 {break}
-		if !game.inventory[i].occupied {continue}
-		if game.inventory[i].item.item_type != material_id {continue}
-
-		take := min(game.inventory[i].item.quantity, remaining)
-		game.inventory[i].item.quantity -= take
-		remaining -= take
-		if game.inventory[i].item.quantity <= 0 {
-			game.inventory[i] = {}
-		}
-	}
+	inventory_consume_item_type(game, material_id, amount)
 }
 
 try_craft :: proc(
@@ -230,14 +212,7 @@ try_craft :: proc(
 		return
 	}
 
-	// Find empty inventory slot for crafted item
-	slot_idx := -1
-	for i in 0 ..< MAX_INVENTORY {
-		if !game.inventory[i].occupied {
-			slot_idx = i
-			break
-		}
-	}
+	slot_idx := inventory_first_empty_slot(game)
 	if slot_idx < 0 {
 		add_message(
 			messages,
@@ -257,9 +232,7 @@ try_craft :: proc(
 	consume_material(game, recipe.material_id, recipe.material_qty)
 	crafted := item_make_from_def(def, Vec2{0, 0})
 	crafted.picked_up = true
-	game.inventory[slot_idx].occupied = true
-	game.inventory[slot_idx].item = crafted
-	game.inventory[slot_idx].item.quantity = 1
+	inventory_put_slot(game, slot_idx, crafted, 1)
 
 	add_message(
 		messages,
