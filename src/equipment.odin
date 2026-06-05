@@ -50,29 +50,54 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 
 	item := &game.inventory[slot_index].item
 	if item.equipment_slot == "" {
-		add_message(messages, game, "That item cannot be equipped.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"That item cannot be equipped.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
 	equip_slot := game_equipment_slot(game, item.equipment_slot)
 	if equip_slot == nil {
-		add_message(messages, game, "Unknown equipment slot.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Unknown equipment slot.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
 	if equip_slot.occupied {
 		empty := inventory_first_empty_slot(game)
 		if empty < 0 {
-			add_message(messages, game, "No inventory space to swap equipment!", eng.Engine_Color{255, 100, 100, 255})
+			add_message(
+				messages,
+				game,
+				"No inventory space to swap equipment!",
+				eng.Engine_Color{255, 100, 100, 255},
+			)
 			return false
 		}
 		inventory_put_slot(game, empty, equip_slot.item, 1)
-		add_message(messages, game, fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)), eng.Engine_Color{180, 180, 100, 255})
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
+			eng.Engine_Color{180, 180, 100, 255},
+		)
 	}
 
 	equip_slot.occupied = true
 	equip_slot.item = item^
-	add_message(messages, game, fmt.tprintf("You equip the %s.", item_display_name(item)), eng.Engine_Color{100, 200, 255, 255})
+	add_message(
+		messages,
+		game,
+		fmt.tprintf("You equip the %s.", item_display_name(item)),
+		eng.Engine_Color{100, 200, 255, 255},
+	)
 	game.inventory[slot_index] = {}
 	return true
 }
@@ -84,12 +109,22 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 
 	empty := inventory_first_empty_slot(game)
 	if empty < 0 {
-		add_message(messages, game, "Inventory full! Cannot unequip.", eng.Engine_Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"Inventory full! Cannot unequip.",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 		return false
 	}
 
 	inventory_put_slot(game, empty, equip_slot.item, 1)
-	add_message(messages, game, fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)), eng.Engine_Color{180, 180, 100, 255})
+	add_message(
+		messages,
+		game,
+		fmt.tprintf("You unequip the %s.", item_display_name(&equip_slot.item)),
+		eng.Engine_Color{180, 180, 100, 255},
+	)
 	equip_slot^ = {}
 	return true
 }

@@ -4,7 +4,6 @@ import "core:math/rand"
 import "core:slice"
 
 
-
 MIN_ROOM_W :: 4
 MAX_ROOM_W :: 10
 MIN_ROOM_H :: 3

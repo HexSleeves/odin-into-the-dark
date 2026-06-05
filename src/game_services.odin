@@ -158,4 +158,3 @@ game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^UI_Manager {
 	}
 	return cast(^UI_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_UI)
 }
-

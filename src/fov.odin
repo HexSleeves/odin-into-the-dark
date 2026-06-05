@@ -40,7 +40,7 @@ compute_fov :: proc(game: ^Game) {
 	}
 
 	// Diagnostic: count visible tiles
-	if logger_should_log(&g_logger, log.Level.Debug, .Fov) {
+	if logger_should_log(logger_state(), log.Level.Debug, .Fov) {
 		visible_count := 0
 		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 			if tile_visible_idx(game, i) {

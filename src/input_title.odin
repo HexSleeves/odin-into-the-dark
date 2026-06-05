@@ -2,13 +2,6 @@ package main
 
 import eng "./engine"
 
-TITLE_OPTION_COUNT :: 5
-TITLE_NEW_GAME :: 0
-TITLE_CONTINUE :: 1
-TITLE_HIGH_SCORES :: 2
-TITLE_HELP :: 3
-TITLE_QUIT :: 4
-
 update_title_screen :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	if action_pressed(im, .Menu_Up) {

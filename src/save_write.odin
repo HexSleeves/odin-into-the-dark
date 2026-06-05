@@ -121,4 +121,3 @@ save_game_to_storage :: proc(
 
 	return eng.storage_manager_write(storage, path, buf)
 }
-

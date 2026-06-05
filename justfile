@@ -79,10 +79,13 @@ fmt:
 
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
-# Run root package and engine package tests
+# Run root package, engine package, and sub-package tests
 test:
     odin test {{src}} {{build_defines}}
     odin test {{engine_src}}
+    odin test src/audio
+    odin test src/io
+    odin test src/ui
 
 
 # Run compile-flag matrix tests that should stay green regardless of environment.

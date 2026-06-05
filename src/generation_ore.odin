@@ -1,8 +1,7 @@
 package main
 
-import "core:math/rand"
 import eng "./engine"
-
+import "core:math/rand"
 
 
 spawn_ore_veins :: proc(game: ^Game) {

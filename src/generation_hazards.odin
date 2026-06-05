@@ -79,4 +79,3 @@ spawn_hazards :: proc(game: ^Game) {
 }
 
 // ─── Ore vein spawning (depth-gated) ──────────────────────────────────────────
-

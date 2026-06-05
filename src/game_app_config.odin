@@ -23,7 +23,7 @@ game_engine_config :: proc() -> eng.Engine_Config {
 	} else {
 		// Desktop: Raylib defaults + optional game audio backend
 		when !NO_AUDIO {
-			config.audio = game_audio_backend(&g_audio)
+			config.audio = game_audio_backend(audio_state())
 		}
 	}
 	return config
@@ -41,7 +41,7 @@ game_engine_services_config :: proc() -> eng.Engine_Services_Config {
 game_diagnostics_init :: proc() {
 	g_config = eng.config_manager_make()
 	eng.config_manager_load_env_file(&g_config, ".env")
-	logger_init_from_config(&g_logger, &g_config)
+	logger_init_from_config(logger_state(), &g_config)
 
 	if v, ok := strconv.parse_f32(eng.config_manager_get_or(&g_config, "ITD_MASTER_VOLUME", ""));
 	   ok && v > 0 {
@@ -58,13 +58,13 @@ game_diagnostics_init :: proc() {
 }
 
 game_diagnostics_shutdown :: proc() {
-	logger_destroy(&g_logger)
+	logger_destroy(logger_state())
 }
 
 game_runtime_assets_init :: proc() {
 	when ODIN_OS != .JS {
 		when !NO_AUDIO {
-			backend := game_audio_backend(&g_audio)
+			backend := game_audio_backend(audio_state())
 			audio_init(backend)
 			music_init()
 			audio_set_master_volume(g_game_config.master_volume)
@@ -81,4 +81,3 @@ game_runtime_assets_shutdown :: proc() {
 		}
 	}
 }
-

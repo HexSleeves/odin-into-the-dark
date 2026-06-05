@@ -3,7 +3,6 @@ package main
 import "core:math/rand"
 
 
-
 spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 	clear(&game.enemies)
 

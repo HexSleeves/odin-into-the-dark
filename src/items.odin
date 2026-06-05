@@ -110,7 +110,12 @@ inventory_consume_item_type :: proc(game: ^Game, item_type: string, amount: int)
 pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	it := item_at(game, game.player.pos.x, game.player.pos.y)
 	if it == nil {
-		add_message(messages, game, "Nothing to pick up here.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Nothing to pick up here.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
@@ -126,7 +131,12 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 				add_message(
 					messages,
 					game,
-					fmt.tprintf("Picked up %s (%d/%d).", item_display_name(it), slot.item.quantity, stack_limit),
+					fmt.tprintf(
+						"Picked up %s (%d/%d).",
+						item_display_name(it),
+						slot.item.quantity,
+						stack_limit,
+					),
 					eng.Engine_Color{100, 255, 100, 255},
 				)
 				return true
@@ -143,7 +153,12 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	inventory_put_slot(game, slot_idx, it^)
 	it.picked_up = true
 	game.items_found += 1
-	add_message(messages, game, fmt.tprintf("Picked up %s.", item_display_name(it)), eng.Engine_Color{100, 255, 100, 255})
+	add_message(
+		messages,
+		game,
+		fmt.tprintf("Picked up %s.", item_display_name(it)),
+		eng.Engine_Color{100, 255, 100, 255},
+	)
 	return true
 }
 
@@ -166,11 +181,21 @@ use_item :: proc(
 		return false
 	}
 	if def.effect.type == ITEM_EFFECT_EQUIP {
-		add_message(messages, game, fmt.tprintf("Press E in inventory to equip the %s.", def.name), eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("Press E in inventory to equip the %s.", def.name),
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 	if def.effect.type == ITEM_EFFECT_MATERIAL {
-		add_message(messages, game, "Raw materials cannot be used directly. Find an anvil to craft.", eng.Engine_Color{180, 180, 100, 255})
+		add_message(
+			messages,
+			game,
+			"Raw materials cannot be used directly. Find an anvil to craft.",
+			eng.Engine_Color{180, 180, 100, 255},
+		)
 		return false
 	}
 
@@ -178,8 +203,15 @@ use_item :: proc(
 	if engine != nil {
 		cam := game_engine_camera_manager(engine)
 		particles := game_engine_particle_manager(engine)
-		if def.effect.type == ITEM_EFFECT_HEAL || def.effect.type == ITEM_EFFECT_TIMED_LIGHT_BOOST {
-			spawn_pickup_particles(particles, game.player.pos.x, game.player.pos.y, game_camera_x(cam), game_camera_y(cam))
+		if def.effect.type == ITEM_EFFECT_HEAL ||
+		   def.effect.type == ITEM_EFFECT_TIMED_LIGHT_BOOST {
+			spawn_pickup_particles(
+				particles,
+				game.player.pos.x,
+				game.player.pos.y,
+				game_camera_x(cam),
+				game_camera_y(cam),
+			)
 		}
 	}
 	inventory_decrement_slot(game, slot_index)
@@ -203,7 +235,12 @@ drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> b
 		quantity  = 1,
 	}
 	append(&game.items, dropped)
-	add_message(messages, game, fmt.tprintf("You drop a %s.", item_display_name(&slot.item)), eng.Engine_Color{180, 180, 100, 255})
+	add_message(
+		messages,
+		game,
+		fmt.tprintf("You drop a %s.", item_display_name(&slot.item)),
+		eng.Engine_Color{180, 180, 100, 255},
+	)
 	inventory_decrement_slot(game, slot_index)
 	return true
 }

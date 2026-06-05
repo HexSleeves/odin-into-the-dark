@@ -4,120 +4,34 @@ import "core:encoding/json"
 import "core:fmt"
 import "core:math/rand"
 
+import gcore "./core"
 import eng "./engine"
 
-// ─── JSON5 data structures (mirrors the .json5 files) ─────────────────────────
+// ─── Type aliases (types now live in gcore/data_defs.odin) ───────────────────
 
-// Color as 4-element array [r, g, b, a]
-Color_Array :: [4]u8
+Color_Array :: gcore.Color_Array
+Ability_Def :: gcore.Ability_Def
+Enemy_Def :: gcore.Enemy_Def
+Spawn_Weight :: gcore.Spawn_Weight
+Spawn_Table :: gcore.Spawn_Table
+Enemy_Data :: gcore.Enemy_Data
+Item_Effect :: gcore.Item_Effect
+Item_Spawn_Table :: gcore.Item_Spawn_Table
+Item_Def :: gcore.Item_Def
+Item_Spawn_Weight :: gcore.Item_Spawn_Weight
+Item_Data :: gcore.Item_Data
+Player_Def :: gcore.Player_Def
+Data_Registry :: gcore.Data_Registry
 
-json5_color_to_engine :: proc(c: Color_Array) -> eng.Engine_Color {
-	return eng.Engine_Color{c[0], c[1], c[2], c[3]}
-}
-
-// ── Enemy data ──
-
-Ability_Def :: struct {
-	type:     string,
-	cooldown: int,
-	range:    int,
-}
-
-Enemy_Def :: struct {
-	id:         string,
-	name:       string,
-	glyph:      string,
-	color:      Color_Array,
-	hp:         int,
-	attack:     int,
-	quickness:  int, // AP per round = quickness*10; 0 in data → defaults to 100
-	move_speed: int, // move cost modifier; 0 in data → defaults to 100
-	ability:    Ability_Def,
-	behavior:   string, // "lurker" or "" for standard
-}
-
-Spawn_Weight :: struct {
-	id:     string,
-	weight: int,
-}
-
-Spawn_Table :: struct {
-	depth_min: int,
-	depth_max: int,
-	weights:   []Spawn_Weight,
-}
-
-Enemy_Data :: struct {
-	enemies:      []Enemy_Def,
-	spawn_tables: []Spawn_Table,
-}
-
-// ── Item data ──
-
-Item_Effect :: struct {
-	type:       string,
-	value:      int,
-	max_radius: int, // optional, used by light_boost
-	duration:   int, // optional, used by timed_light_boost
-}
-
-Item_Spawn_Table :: struct {
-	depth_min: int,
-	depth_max: int,
-	weights:   []Item_Spawn_Weight,
-}
-
-Item_Def :: struct {
-	id:             string,
-	name:           string,
-	glyph:          string,
-	color:          Color_Array,
-	stack_limit:    int,
-	effect:         Item_Effect,
-	equipment_slot: string,
-	durability:     int, // max durability (0 = no durability tracking)
-	action_cost:    int, // AP cost to attack with this weapon (0 = use BASE_ACTION_COST)
-}
-
-Item_Spawn_Weight :: struct {
-	id:     string,
-	weight: int,
-}
-
-Item_Data :: struct {
-	items:             []Item_Def,
-	spawn_weights:     []Item_Spawn_Weight,
-	item_spawn_tables: []Item_Spawn_Table,
-	room_item_chance:  int,
-}
-
-// ── Player data ──
-
-Player_Def :: struct {
-	hp:           int,
-	attack:       int,
-	light_radius: int,
-	glyph:        string,
-	color:        Color_Array,
-	quickness:    int, // 0 in data → defaults to 100
-	move_speed:   int, // 0 in data → defaults to 100
-}
+json5_color_to_engine :: gcore.json5_color_to_engine
+data_registry_destroy :: gcore.data_registry_destroy
 
 // ─── Global data registry ─────────────────────────────────────────────────────
 
-Data_Registry :: struct {
-	enemies: Enemy_Data,
-	items:   Item_Data,
-	player:  Player_Def,
-	loaded:  bool,
-	owned:   bool,
-}
-
-g_data: Data_Registry
+g_data: gcore.Data_Registry
 
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
-// Compile-time embedded data files — no runtime file I/O needed
 @(private = "file")
 EMBEDDED_ENEMIES :: #load("../data/enemies.json5")
 @(private = "file")
@@ -129,33 +43,33 @@ data_load_all :: proc() -> bool {
 	return data_load_all_into(&g_data)
 }
 
-data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
+data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 	if registry == nil {
 		return false
 	}
-	next: Data_Registry
+	next: gcore.Data_Registry
 	next.owned = true
 
-	enemies, enemies_ok := load_json5_from_bytes(Enemy_Data, EMBEDDED_ENEMIES)
+	enemies, enemies_ok := load_json5_from_bytes(gcore.Enemy_Data, EMBEDDED_ENEMIES)
 	if !enemies_ok {return false}
 	next.enemies = enemies
 
-	items, items_ok := load_json5_from_bytes(Item_Data, EMBEDDED_ITEMS)
+	items, items_ok := load_json5_from_bytes(gcore.Item_Data, EMBEDDED_ITEMS)
 	if !items_ok {
-		data_registry_destroy(&next)
+		gcore.data_registry_destroy(&next)
 		return false
 	}
 	next.items = items
 
-	player, player_ok := load_json5_from_bytes(Player_Def, EMBEDDED_PLAYER)
+	player, player_ok := load_json5_from_bytes(gcore.Player_Def, EMBEDDED_PLAYER)
 	if !player_ok {
-		data_registry_destroy(&next)
+		gcore.data_registry_destroy(&next)
 		return false
 	}
 	next.player = player
 	next.loaded = true
 
-	data_registry_destroy(registry)
+	gcore.data_registry_destroy(registry)
 	registry^ = next
 
 	logger_debugf(
@@ -168,6 +82,7 @@ data_load_all_into :: proc(registry: ^Data_Registry) -> bool {
 
 	return true
 }
+
 load_json5_from_bytes :: proc($T: typeid, data: []u8) -> (result: T, ok: bool) {
 	parse_err := json.unmarshal(data, &result, spec = .JSON5)
 	if parse_err != nil {
@@ -177,51 +92,16 @@ load_json5_from_bytes :: proc($T: typeid, data: []u8) -> (result: T, ok: bool) {
 	return result, true
 }
 
-data_registry_destroy :: proc(registry: ^Data_Registry) {
-	if registry == nil || !registry.owned {return}
-	for &e in registry.enemies.enemies {
-		delete(e.id)
-		delete(e.name)
-		delete(e.glyph)
-		delete(e.ability.type)
-		delete(e.behavior)
-	}
-	delete(registry.enemies.enemies)
-	for &t in registry.enemies.spawn_tables {
-		for &w in t.weights {delete(w.id)}
-		delete(t.weights)
-	}
-	delete(registry.enemies.spawn_tables)
-	for &item in registry.items.items {
-		delete(item.id)
-		delete(item.name)
-		delete(item.glyph)
-		delete(item.effect.type)
-		delete(item.equipment_slot)
-	}
-	delete(registry.items.items)
-	for &w in registry.items.spawn_weights {delete(w.id)}
-	delete(registry.items.spawn_weights)
-	for &t in registry.items.item_spawn_tables {
-		for &w in t.weights {delete(w.id)}
-		delete(t.weights)
-	}
-	delete(registry.items.item_spawn_tables)
-	delete(registry.player.glyph)
-	registry^ = {}
-}
-
-
 // ─── Data lookup helpers ──────────────────────────────────────────────────────
 
-find_enemy_def :: proc(id: string) -> ^Enemy_Def {
+find_enemy_def :: proc(id: string) -> ^gcore.Enemy_Def {
 	for &def in g_data.enemies.enemies {
 		if def.id == id {return &def}
 	}
 	return nil
 }
 
-find_item_def :: proc(id: string) -> ^Item_Def {
+find_item_def :: proc(id: string) -> ^gcore.Item_Def {
 	for &def in g_data.items.items {
 		if def.id == id {return &def}
 	}
@@ -230,39 +110,35 @@ find_item_def :: proc(id: string) -> ^Item_Def {
 
 // ─── Data-driven enemy factory ────────────────────────────────────────────────
 
-enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
+enemy_make_from_def :: proc(def: ^gcore.Enemy_Def, pos: gcore.Vec2) -> gcore.Enemy {
 	g: rune = '?'
 	if len(def.glyph) > 0 {
 		g = rune(def.glyph[0])
 	}
-	return Enemy {
-		pos              = pos,
-		hp               = def.hp,
-		max_hp           = def.hp,
-		attack           = def.attack,
-		enemy_type       = def.id,
-		glyph            = g,
-		color            = json5_color_to_engine(def.color),
-		alive            = true,
-		name             = def.name,
-		ability_type     = def.ability.type,
+	return gcore.Enemy {
+		pos = pos,
+		hp = def.hp,
+		max_hp = def.hp,
+		attack = def.attack,
+		enemy_type = def.id,
+		glyph = g,
+		color = gcore.json5_color_to_engine(def.color),
+		alive = true,
+		name = def.name,
+		ability_type = def.ability.type,
 		ability_cooldown = 0,
-		ability_max_cd   = def.ability.cooldown,
-		ability_range    = def.ability.range,
-		behavior         = def.behavior,
-		quickness        = 100 if def.quickness == 0 else def.quickness,
-		move_speed       = 100 if def.move_speed == 0 else def.move_speed,
-		energy           = 0, // granted at start of each enemy round
+		ability_max_cd = def.ability.cooldown,
+		ability_range = def.ability.range,
+		behavior = def.behavior,
+		quickness = 100 if def.quickness == 0 else def.quickness,
+		move_speed = 100 if def.move_speed == 0 else def.move_speed,
+		energy = 0,
 	}
 }
 
-// ─── Data-driven enemy spawn picker ───────────────────────────────────────────
-
-pick_enemy_def_for_depth :: proc(depth: int) -> ^Enemy_Def {
-	// Find the matching spawn table
+pick_enemy_def_for_depth :: proc(depth: int) -> ^gcore.Enemy_Def {
 	for &table in g_data.enemies.spawn_tables {
 		if depth >= table.depth_min && depth <= table.depth_max {
-			// Weighted random from this table
 			total_weight := 0
 			for &w in table.weights {
 				total_weight += w.weight
@@ -282,8 +158,6 @@ pick_enemy_def_for_depth :: proc(depth: int) -> ^Enemy_Def {
 			break
 		}
 	}
-
-	// Fallback: first enemy
 	if len(g_data.enemies.enemies) > 0 {
 		return &g_data.enemies.enemies[0]
 	}
@@ -292,16 +166,16 @@ pick_enemy_def_for_depth :: proc(depth: int) -> ^Enemy_Def {
 
 // ─── Data-driven item factory ─────────────────────────────────────────────────
 
-item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
+item_make_from_def :: proc(def: ^gcore.Item_Def, pos: gcore.Vec2) -> gcore.Item {
 	g: rune = '?'
 	if len(def.glyph) > 0 {
 		g = rune(def.glyph[0])
 	}
-	return Item {
+	return gcore.Item {
 		pos = pos,
 		item_type = def.id,
 		glyph = g,
-		color = json5_color_to_engine(def.color),
+		color = gcore.json5_color_to_engine(def.color),
 		picked_up = false,
 		quantity = 1,
 		name = def.name,
@@ -313,9 +187,7 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 	}
 }
 
-// ─── Data-driven item spawn picker ────────────────────────────────────────────
-
-pick_item_def :: proc() -> ^Item_Def {
+pick_item_def :: proc() -> ^gcore.Item_Def {
 	total_weight := 0
 	for &w in g_data.items.spawn_weights {
 		total_weight += w.weight
@@ -341,7 +213,7 @@ pick_item_def :: proc() -> ^Item_Def {
 	return nil
 }
 
-pick_item_def_for_depth :: proc(depth: int) -> ^Item_Def {
+pick_item_def_for_depth :: proc(depth: int) -> ^gcore.Item_Def {
 	for &table in g_data.items.item_spawn_tables {
 		if depth >= table.depth_min && depth <= table.depth_max {
 			total_weight := 0
@@ -363,13 +235,12 @@ pick_item_def_for_depth :: proc(depth: int) -> ^Item_Def {
 			break
 		}
 	}
-	// Fallback to flat spawn_weights if no table matches
 	return pick_item_def()
 }
 
 // ─── Data-driven item use ─────────────────────────────────────────────────────
 
-apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^Item_Def) {
+apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^gcore.Item_Def) {
 	eff := &def.effect
 
 	if eff.type == ITEM_EFFECT_HEAL {

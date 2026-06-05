@@ -91,7 +91,15 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 		if item_at(game, x, y) != nil {continue}
 		if x == game.player.pos.x && y == game.player.pos.y {continue}
 		append(&game.items, item_make_from_def(key_def, Vec2{x, y}))
-		logger_debugf(.Gen, "vault key at (%v,%v), door at (%v,%v) depth=%v", x, y, door.x, door.y, game.depth)
+		logger_debugf(
+			.Gen,
+			"vault key at (%v,%v), door at (%v,%v) depth=%v",
+			x,
+			y,
+			door.x,
+			door.y,
+			game.depth,
+		)
 		break
 	}
 }

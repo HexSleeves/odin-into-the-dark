@@ -1,10 +1,11 @@
 package main
 
+import gcore "./core"
 import eng "./engine"
 
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
-SAVE_FILE :: "savegame.dat"
+SAVE_FILE :: gcore.SAVE_FILE
 SAVE_VERSION :: u32(5)
 SAVE_VERSION_V4 :: u32(4)
 SAVE_VERSION_V3 :: u32(3)
@@ -207,4 +208,3 @@ Save_Data_V2 :: struct {
 }
 
 // ─── String conversion helpers ────────────────────────────────────────────────
-

@@ -1,24 +1,13 @@
 package main
 
+import gcore "./core"
 import eng "./engine"
 
 // ─── Save manager facade ─────────────────────────────────────────────────────
 
-Save_Manager :: struct {
-	file_path: string,
-	storage:   eng.Storage_Manager,
-}
-
-save_manager_make :: proc() -> Save_Manager {
-	return Save_Manager{file_path = SAVE_FILE, storage = eng.storage_manager_make()}
-}
-
-save_manager_save_exists :: proc(saves: ^Save_Manager) -> bool {
-	if saves == nil {
-		return save_exists()
-	}
-	return save_exists_in_storage(&saves.storage, saves.file_path)
-}
+Save_Manager :: gcore.Save_Manager
+save_manager_make :: gcore.save_manager_make
+save_manager_save_exists :: gcore.save_manager_save_exists
 
 save_manager_save_game :: proc(
 	saves: ^Save_Manager,
