@@ -31,22 +31,20 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 		}
 		commands := clay_ui_end_frame(delta_time)
 		clay_render_commands(engine, commands)
-		render_hud(engine, game)
 	} else {
 		render_hud(engine, game)
-	}
-	render_messages_for_engine(engine)
+		render_messages_for_engine(engine)
 
-	ui := ui_manager_state(game_engine_ui_manager(engine))
-	if ui.show_minimap && game.state == .Playing {
-		render_minimap(engine, game)
+		ui := ui_manager_state(game_engine_ui_manager(engine))
+		if ui.show_minimap && game.state == .Playing {
+			render_minimap(engine, game)
+		}
+		if game.state == .Playing {
+			render_tooltip(engine, game)
+		}
 	}
-
 	if game.state == .Title_Screen {
 		render_title_screen(engine, game)
-	}
-	if game.state == .Playing {
-		render_tooltip(engine, game)
 	}
 	if game.state == .Game_Over {
 		render_game_over(engine, game)

@@ -6,7 +6,7 @@ import "core:fmt"
 
 @(private = "file")
 clay_hud_import_anchor :: proc() {
-	_ = fmt.ctprintf
+	_ = fmt.tprintf
 	_ = clay.ElementDeclaration{}
 	_ = eng.Engine{}
 }
@@ -52,7 +52,7 @@ when USE_CLAY {
 				clay_row(
 					"hud-hp-row",
 					"HP",
-					fmt.ctprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+					fmt.tprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
 					CLAY_HUD_FONT,
 					SB_HEADER,
 					SB_TEXT,
@@ -60,7 +60,7 @@ when USE_CLAY {
 				clay_bar("hud-hp-bar", hp_ratio, 10, SB_HP_BG, hp_fg)
 
 				cost := effective_attack_cost(game)
-				spd_label: cstring
+				spd_label: string
 				spd_color: eng.Engine_Color
 				if cost <= 700 {
 					spd_label = "Fast"
@@ -97,7 +97,7 @@ when USE_CLAY {
 							clay_row(
 								"hud-pick-row",
 								"PICK",
-								fmt.ctprintf(
+								fmt.tprintf(
 									"%d / %d",
 									i32(wpn.durability),
 									i32(wpn.max_durability),
@@ -114,8 +114,8 @@ when USE_CLAY {
 				clay_theme_divider("hud-stats-divider")
 				clay_row(
 					"hud-depth-row",
-					fmt.ctprintf("DEPTH  %d", i32(game.depth)),
-					fmt.ctprintf("TURN %d", i32(eng.turn_manager_current(turns))),
+					fmt.tprintf("DEPTH  %d", i32(game.depth)),
+					fmt.tprintf("TURN %d", i32(eng.turn_manager_current(turns))),
 					CLAY_HUD_ROW_FONT,
 					SB_TEXT,
 					SB_DIM,
@@ -127,8 +127,8 @@ when USE_CLAY {
 				}
 				clay_row(
 					"hud-kills-row",
-					fmt.ctprintf("KILLS  %d", i32(game.kills)),
-					fmt.ctprintf("NEAR %d", alive_count),
+					fmt.tprintf("KILLS  %d", i32(game.kills)),
+					fmt.tprintf("NEAR %d", alive_count),
 					CLAY_HUD_ROW_FONT,
 					SB_TEXT,
 					SB_DIM,
@@ -136,8 +136,8 @@ when USE_CLAY {
 				if game.light_boost_turns > 0 {
 					clay_row(
 						"hud-light-row",
-						fmt.ctprintf("LIGHT  %d", i32(game.player.light_radius)),
-						fmt.ctprintf("%dt fuel", i32(game.light_boost_turns)),
+						fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
+						fmt.tprintf("%dt fuel", i32(game.light_boost_turns)),
 						CLAY_HUD_ROW_FONT,
 						SB_OIL,
 						SB_OIL,
@@ -145,8 +145,8 @@ when USE_CLAY {
 				} else {
 					clay_row(
 						"hud-light-row",
-						fmt.ctprintf("LIGHT  %d", i32(game.player.light_radius)),
-						fmt.ctprintf("ITEMS %d", i32(game.items_found)),
+						fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
+						fmt.tprintf("ITEMS %d", i32(game.items_found)),
 						CLAY_HUD_ROW_FONT,
 						SB_TEXT,
 						SB_DIM,
@@ -158,7 +158,7 @@ when USE_CLAY {
 				if game.equipped_weapon.occupied {
 					wpn := &game.equipped_weapon.item
 					clay_text(
-						fmt.ctprintf("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
+						fmt.tprintf("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
 						CLAY_HUD_FONT,
 						SB_WPN,
 					)
@@ -168,7 +168,7 @@ when USE_CLAY {
 				if game.equipped_armor.occupied {
 					arm := &game.equipped_armor.item
 					clay_text(
-						fmt.ctprintf("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
+						fmt.tprintf("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
 						CLAY_HUD_FONT,
 						SB_ARM,
 					)
@@ -178,7 +178,7 @@ when USE_CLAY {
 				if game.equipped_helmet.occupied {
 					hlm := &game.equipped_helmet.item
 					clay_text(
-						fmt.ctprintf("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
+						fmt.tprintf("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
 						CLAY_HUD_FONT,
 						SB_HLM,
 					)
@@ -195,13 +195,13 @@ when USE_CLAY {
 					clay_theme_divider("hud-status-divider")
 					clay_text("STATUS", CLAY_HUD_FONT, SB_HEADER)
 					if game.light_boost_turns >
-					   0 {clay_text(fmt.ctprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, SB_OIL)}
+					   0 {clay_text(fmt.tprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, SB_OIL)}
 					if game.poison_turns >
-					   0 {clay_text(fmt.ctprintf("POISON  %dt remaining", i32(game.poison_turns)), CLAY_HUD_FONT, SB_POISON)}
+					   0 {clay_text(fmt.tprintf("POISON  %dt remaining", i32(game.poison_turns)), CLAY_HUD_FONT, SB_POISON)}
 					if game.burning_turns >
-					   0 {clay_text(fmt.ctprintf("BURNING (%d)", i32(game.burning_turns)), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
+					   0 {clay_text(fmt.tprintf("BURNING (%d)", i32(game.burning_turns)), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
 					if game.frozen_turns >
-					   0 {clay_text(fmt.ctprintf("FROZEN (%d)", i32(game.frozen_turns)), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
+					   0 {clay_text(fmt.tprintf("FROZEN (%d)", i32(game.frozen_turns)), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
 				}
 
 				for &enemy in game.enemies {
@@ -209,8 +209,8 @@ when USE_CLAY {
 					clay_theme_divider("hud-boss-divider")
 					clay_row(
 						"hud-boss-row",
-						fmt.ctprintf("%s", enemy.name),
-						fmt.ctprintf("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
+						fmt.tprintf("%s", enemy.name),
+						fmt.tprintf("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
 						CLAY_HUD_FONT,
 						SB_BOSS,
 						SB_TEXT,
@@ -236,14 +236,14 @@ when USE_CLAY {
 		}
 	}
 
-	clay_text :: proc(text: cstring, size: u16, color: eng.Engine_Color) {
+	clay_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
 		clay.TextDynamic(
-			string(text),
+			text,
 			{textColor = clay_color(color), fontSize = size, lineHeight = size},
 		)
 	}
 
-	clay_text_centered :: proc(text: cstring, size: u16, color: eng.Engine_Color) {
+	clay_text_centered :: proc(text: string, size: u16, color: eng.Engine_Color) {
 		if clay.UI(clay.ID_LOCAL("centered-text"))(
 		clay.ElementDeclaration {
 			layout = {
@@ -256,7 +256,7 @@ when USE_CLAY {
 
 	clay_row :: proc(
 		id: string,
-		left, right: cstring,
+		left, right: string,
 		size: u16,
 		left_color, right_color: eng.Engine_Color,
 	) {

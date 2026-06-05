@@ -337,61 +337,67 @@ TOOLTIP_PAD_Y :: i32(4)
 TOOLTIP_OFFSET_X :: i32(12)
 TOOLTIP_OFFSET_Y :: i32(-20)
 
-render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
-	mouse := eng.engine_mouse_position(engine)
-	camera := game_engine_camera_manager(engine)
+when !USE_CLAY {
+	render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
+		mouse := eng.engine_mouse_position(engine)
+		camera := game_engine_camera_manager(engine)
 
-	// Only show tooltips when mouse is in the map viewport region
-	if int(mouse.x) >= MAP_VIEW_WIDTH || int(mouse.y) >= MAP_VIEW_HEIGHT {return}
+		if int(mouse.x) >= MAP_VIEW_WIDTH || int(mouse.y) >= MAP_VIEW_HEIGHT {return}
 
-	// Convert screen coordinates to tile coordinates using camera offset and zoom.
-	zoom := camera_zoom(camera)
-	tile_x := (int(f32(mouse.x) / zoom) + game_camera_x(camera)) / TILE_SIZE
-	tile_y := (int(f32(mouse.y) / zoom) + game_camera_y(camera)) / TILE_SIZE
+		zoom := camera_zoom(camera)
+		tile_x := (int(f32(mouse.x) / zoom) + game_camera_x(camera)) / TILE_SIZE
+		tile_y := (int(f32(mouse.y) / zoom) + game_camera_y(camera)) / TILE_SIZE
 
-	if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
-		return
-	}
-
-	tile := tile_at(game, tile_x, tile_y)
-	if tile == nil || !tile_visible_at(game, tile_x, tile_y) {
-		return
-	}
-
-	tooltip_text: cstring
-
-	if game.player.pos.x == tile_x && game.player.pos.y == tile_y {
-		tooltip_text = fmt.ctprintf("You (%d/%d HP)", game.player.hp, game.player.max_hp)
-	} else {
-		enemy := enemy_at(game, tile_x, tile_y)
-		if enemy == nil {
+		if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
 			return
 		}
-		name := enemy_display_name(enemy)
-		tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
+
+		tile := tile_at(game, tile_x, tile_y)
+		if tile == nil || !tile_visible_at(game, tile_x, tile_y) {
+			return
+		}
+
+		tooltip_text: cstring
+
+		if game.player.pos.x == tile_x && game.player.pos.y == tile_y {
+			tooltip_text = fmt.ctprintf("You (%d/%d HP)", game.player.hp, game.player.max_hp)
+		} else {
+			enemy := enemy_at(game, tile_x, tile_y)
+			if enemy == nil {
+				return
+			}
+			name := enemy_display_name(enemy)
+			tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
+		}
+
+		text_w := render_measure_text(engine, tooltip_text, TOOLTIP_FONT_SIZE)
+		box_w := text_w + TOOLTIP_PAD_X * 2
+		box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
+
+		box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
+		box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
+
+		if box_x + box_w > i32(MAP_VIEW_WIDTH) {box_x = i32(MAP_VIEW_WIDTH) - box_w}
+		if box_x < 0 {box_x = 0}
+		if box_y < 0 {box_y = 0}
+		if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}
+
+		render_draw_rectangle(engine, box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
+		render_draw_text(
+			engine,
+			tooltip_text,
+			box_x + TOOLTIP_PAD_X,
+			box_y + TOOLTIP_PAD_Y,
+			TOOLTIP_FONT_SIZE,
+			TOOLTIP_TEXT_COLOR,
+		)
 	}
+}
 
-	text_w := render_measure_text(engine, tooltip_text, TOOLTIP_FONT_SIZE)
-	box_w := text_w + TOOLTIP_PAD_X * 2
-	box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
-
-	box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
-	box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
-
-	if box_x + box_w > i32(MAP_VIEW_WIDTH) {box_x = i32(MAP_VIEW_WIDTH) - box_w}
-	if box_x < 0 {box_x = 0}
-	if box_y < 0 {box_y = 0}
-	if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}
-
-	render_draw_rectangle(engine, box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
-	render_draw_text(
-		engine,
-		tooltip_text,
-		box_x + TOOLTIP_PAD_X,
-		box_y + TOOLTIP_PAD_Y,
-		TOOLTIP_FONT_SIZE,
-		TOOLTIP_TEXT_COLOR,
-	)
+when USE_CLAY {
+	render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
+		clay_render_tooltip(engine, game)
+	}
 }
 
 // ─── Render texture stubs (texture approach reverted; kept for game_cleanup call) ──

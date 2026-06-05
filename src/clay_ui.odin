@@ -20,6 +20,7 @@ when USE_CLAY {
 	}
 
 	g_clay_ui: Clay_UI_State
+	CLAY_UI_MEMORY_CAPACITY :: int(8 * 1024 * 1024)
 
 	clay_ui_init :: proc(engine: ^eng.Engine) -> bool {
 		if g_clay_ui.ctx != nil {
@@ -29,6 +30,9 @@ when USE_CLAY {
 		}
 
 		capacity := int(clay.MinMemorySize())
+		if capacity < CLAY_UI_MEMORY_CAPACITY {
+			capacity = CLAY_UI_MEMORY_CAPACITY
+		}
 		memory := make([]u8, capacity)
 		if len(memory) == 0 {
 			return false

@@ -41,5 +41,15 @@ when USE_CLAY {
 	@(private = "file")
 	clay_render_gameplay_ui :: proc(engine: ^eng.Engine, game: ^Game) {
 		clay_render_hud(engine, game)
+		if engine == nil || engine.services == nil {
+			return
+		}
+		clay_render_messages(game_engine_message_manager(engine))
+		ui := ui_manager_state(game_engine_ui_manager(engine))
+		if ui != nil && ui.show_minimap {
+			clay_render_minimap(game)
+		}
+		clay_render_tooltip(engine, game)
+		clay_render_gameplay_hints(engine, game)
 	}
 }

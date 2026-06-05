@@ -2,6 +2,7 @@ package main
 
 import eng "./engine"
 import clay "./vendor/clay"
+import "core:sync"
 import "core:testing"
 @(private = "file")
 clay_ui_test_import_anchor :: proc() {
@@ -10,10 +11,15 @@ clay_ui_test_import_anchor :: proc() {
 	_ = testing.T{}
 }
 
+@(private = "file")
+clay_ui_test_mutex: sync.Mutex
+
 
 when USE_CLAY {
 	@(test)
 	clay_ui_emits_and_renders_basic_rectangle_command :: proc(t: ^testing.T) {
+		sync.mutex_lock(&clay_ui_test_mutex)
+		defer sync.mutex_unlock(&clay_ui_test_mutex)
 		render_state := Clay_Test_Render_State{}
 		engine := eng.Engine {
 			input  = eng.engine_input_backend_nil(),
@@ -39,32 +45,74 @@ when USE_CLAY {
 
 	@(test)
 	clay_screen_dispatcher_playing_state_emits_hud_text_commands :: proc(t: ^testing.T) {
+		sync.mutex_lock(&clay_ui_test_mutex)
+		defer sync.mutex_unlock(&clay_ui_test_mutex)
 		render_state := Clay_Test_Render_State{}
 		engine := eng.Engine {
-			input  = eng.engine_input_backend_nil(),
+			input = eng.engine_input_backend_nil(),
 			render = clay_test_render_backend(&render_state),
 		}
-		game := Game {
-			state = .Playing,
-			player = Player {
-				hp = 7,
-				max_hp = 10,
-				light_radius = 6,
-			},
-			depth = 2,
-		}
+		content := content_manager_make()
+		game := game_init(&content)
+		defer game_destroy(game)
+		game.state = .Playing
+		game.player.hp = 7
+		game.player.max_hp = 10
+		game.player.light_radius = 6
+		game.depth = 2
 
 		testing.expect(t, clay_ui_init(&engine))
 		defer clay_ui_destroy()
 
 		clay_ui_begin_frame(&engine)
-		clay_render_screen_ui(&engine, &game)
+		clay_render_screen_ui(&engine, game)
 		commands := clay_ui_end_frame(0.016)
 		clay_render_commands(&engine, commands)
 
 		testing.expect(t, commands.length > 0)
 		testing.expect(t, clay_test_text_command_count(commands) > 0)
 		testing.expect(t, render_state.text_count > 0)
+	}
+
+	@(test)
+	clay_gameplay_surfaces_emit_message_and_minimap_commands :: proc(t: ^testing.T) {
+		sync.mutex_lock(&clay_ui_test_mutex)
+		defer sync.mutex_unlock(&clay_ui_test_mutex)
+		render_state := Clay_Test_Render_State{}
+		engine := eng.Engine {
+			input = eng.engine_input_backend_nil(),
+			render = clay_test_render_backend(&render_state),
+		}
+		content := content_manager_make()
+		game := game_init(&content)
+		defer game_destroy(game)
+		messages := message_manager_make()
+		eng.message_manager_add(&messages, "hello", eng.Engine_Color{255, 255, 255, 255})
+
+		testing.expect(t, clay_ui_init(&engine))
+		defer clay_ui_destroy()
+
+		clay_ui_begin_frame(&engine)
+		clay_render_messages(&messages)
+		clay_render_minimap(game)
+		commands := clay_ui_end_frame(0.016)
+
+		testing.expect(t, commands.length > 0)
+		testing.expect(t, clay_test_text_command_count(commands) > 0)
+		testing.expect(t, clay_test_rectangle_command_count(commands) > 0)
+	}
+
+
+	clay_test_rectangle_command_count :: proc(commands: clay.ClayArray(clay.RenderCommand)) -> int {
+		count := 0
+		command_array := commands
+		for i: i32 = 0; i < command_array.length; i += 1 {
+			command := clay.RenderCommandArray_Get(&command_array, i)
+			if command != nil && command.commandType == .Rectangle {
+				count += 1
+			}
+		}
+		return count
 	}
 
 	clay_test_text_command_count :: proc(commands: clay.ClayArray(clay.RenderCommand)) -> int {
