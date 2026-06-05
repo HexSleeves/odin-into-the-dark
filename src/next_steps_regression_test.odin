@@ -86,6 +86,31 @@ timed_effects_stop_when_poison_kills_player :: proc(t: ^testing.T) {
 }
 
 @(test)
+lethal_tile_hazard_uses_single_player_death_flow :: proc(t: ^testing.T) {
+	services := eng.engine_services_make(eng.engine_services_default_config())
+	defer eng.engine_services_destroy(&services)
+	backend_state := Test_Input_Backend_State{}
+	engine := action_result_test_engine(&services, &backend_state)
+	game := action_result_test_game()
+	defer delete(game.enemies)
+	game.player.hp = 1
+	game.tiles[pos_to_idx(1, 1)].type = .Gas_Vent
+
+	apply_current_tile_effects(&engine, &game)
+	message_count_after_death := engine.message_manager.log.count
+
+	testing.expect_value(t, game.state, Game_State.Game_Over)
+	testing.expect_value(t, game.player.hp, 0)
+	testing.expect(t, game.death_cause == "Suffocated by toxic gas")
+
+	apply_current_tile_effects(&engine, &game)
+
+	testing.expect_value(t, game.player.hp, 0)
+	testing.expect(t, game.death_cause == "Suffocated by toxic gas")
+	testing.expect_value(t, engine.message_manager.log.count, message_count_after_death)
+}
+
+@(test)
 footstep_sound_selection_matches_tile_material :: proc(t: ^testing.T) {
 	testing.expect_value(t, footstep_sound_for_tile(.Water), Sound_Type.Water)
 	testing.expect_value(t, footstep_sound_for_tile(.Rubble), Sound_Type.Step_Rubble)

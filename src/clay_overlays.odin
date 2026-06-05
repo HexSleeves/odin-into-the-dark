@@ -20,9 +20,9 @@ clay_overlays_import_anchor :: proc() {
 		options := [TITLE_OPTION_COUNT]string{"New Game", "Continue", "High Scores", "Help", "Quit"}
 
 		if clay.UI(clay.ID("title-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
-			clay_title_text("INTO THE DEPTHS", 48, eng.Engine_Color{255, 230, 120, 255})
+			clay_spacer_fixed("title-art-gap", 1, 150)
 			clay_overlay_text("A turn-based mining roguelike", 18, eng.Engine_Color{180, 180, 180, 255})
-			clay_spacer_fixed("title-gap", 1, 28)
+			clay_spacer_fixed("title-gap", 1, 12)
 			for label, idx in options {
 				disabled := idx == TITLE_CONTINUE && !has_save
 				selected := idx == choice

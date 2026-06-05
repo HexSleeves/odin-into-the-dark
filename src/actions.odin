@@ -289,6 +289,8 @@ consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 }
 
 apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
+	if game.state == .Game_Over {return}
+
 	cur_tile := tile_at(game, game.player.pos.x, game.player.pos.y)
 	if cur_tile == nil {return}
 
@@ -320,9 +322,8 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 			eng.Engine_Color{160, 180, 40, 255},
 		)
 		if game.player.hp <= 0 {
-			game.death_cause = "Suffocated by toxic gas"
-			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			player_die(messages, game, "Suffocated by toxic gas")
+			return
 		}
 	}
 
@@ -366,9 +367,8 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 			eng.Engine_Color{255, 120, 20, 255},
 		)
 		if game.player.hp <= 0 {
-			game.death_cause = "Burned alive by a fire vent"
-			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			player_die(messages, game, "Burned alive by a fire vent")
+			return
 		}
 	}
 }

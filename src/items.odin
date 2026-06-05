@@ -215,9 +215,7 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 			eng.Engine_Color{120, 200, 40, 255},
 		)
 		if game.player.hp <= 0 {
-			game_set_death_cause(game, "Died from poison")
-			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			player_die(messages, game, "Died from poison")
 			return
 		}
 	}
@@ -232,9 +230,7 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 			eng.Engine_Color{255, 120, 20, 255},
 		)
 		if game.player.hp <= 0 {
-			game_set_death_cause(game, "Burned to death")
-			game.state = .Game_Over
-			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			player_die(messages, game, "Burned to death")
 			return
 		}
 	}

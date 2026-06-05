@@ -458,14 +458,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						eng.Engine_Color{220, 180, 60, 255},
 					)
 					if game.player.hp <= 0 {
-						game_set_death_cause(game, "Crushed by the Mine Guardian")
-						game.state = .Game_Over
-						add_message(
-							messages,
-							game,
-							"You have been slain...",
-							eng.Engine_Color{255, 0, 0, 255},
-						)
+						player_die(messages, game, "Crushed by the Mine Guardian")
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd
@@ -501,16 +494,10 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						eng.Engine_Color{200, 160, 80, 255},
 					)
 					if game.player.hp <= 0 {
-						game_set_death_cause(
-							game,
-							fmt.tprintf("Pelted to death by a %s", enemy_display_name(&enemy)),
-						)
-						game.state = .Game_Over
-						add_message(
+						player_die(
 							messages,
 							game,
-							"You have been slain...",
-							eng.Engine_Color{255, 0, 0, 255},
+							fmt.tprintf("Pelted to death by a %s", enemy_display_name(&enemy)),
 						)
 					}
 				}
