@@ -12,8 +12,8 @@ clay_hud_import_anchor :: proc() {
 }
 
 when USE_CLAY {
-	CLAY_HUD_FONT :: u16(12)
-	CLAY_HUD_ROW_FONT :: u16(13)
+	CLAY_HUD_FONT :: CLAY_FONT_SMALL
+	CLAY_HUD_ROW_FONT :: CLAY_FONT_BODY
 
 	clay_render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		turns := game_engine_turn_manager(engine)
@@ -37,15 +37,15 @@ when USE_CLAY {
 						width = clay.SizingFixed(f32(SIDEBAR_WIDTH)),
 						height = clay.SizingFixed(f32(MAP_VIEW_HEIGHT)),
 					},
-					padding = clay.Padding{left = 8, right = 8, top = 4, bottom = 0},
+					padding = clay.Padding{left = CLAY_SPACE_MD, right = CLAY_SPACE_MD, top = CLAY_SPACE_SM, bottom = 0},
 					layoutDirection = .TopToBottom,
-					childGap = 4,
+					childGap = CLAY_SPACE_SM,
 				},
 				backgroundColor = clay_color(SB_BG),
 			},
 			) {
-				clay_text_centered("INTO THE DEPTHS", 14, SB_TITLE)
-				clay_divider("hud-title-divider")
+				clay_text_centered("INTO THE DEPTHS", CLAY_FONT_TITLE, SB_TITLE)
+				clay_theme_divider("hud-title-divider")
 
 				hp_ratio := f32(max(game.player.hp, 0)) / f32(max(game.player.max_hp, 1))
 				hp_fg := SB_HP_FG if hp_ratio > 0.3 else SB_HP_LOW
@@ -111,7 +111,7 @@ when USE_CLAY {
 					}
 				}
 
-				clay_divider("hud-stats-divider")
+				clay_theme_divider("hud-stats-divider")
 				clay_row(
 					"hud-depth-row",
 					fmt.ctprintf("DEPTH  %d", i32(game.depth)),
@@ -153,7 +153,7 @@ when USE_CLAY {
 					)
 				}
 
-				clay_divider("hud-equipment-divider")
+				clay_theme_divider("hud-equipment-divider")
 				clay_text("EQUIPMENT", CLAY_HUD_FONT, SB_HEADER)
 				if game.equipped_weapon.occupied {
 					wpn := &game.equipped_weapon.item
@@ -192,7 +192,7 @@ when USE_CLAY {
 					game.burning_turns > 0 ||
 					game.frozen_turns > 0
 				if has_status {
-					clay_divider("hud-status-divider")
+					clay_theme_divider("hud-status-divider")
 					clay_text("STATUS", CLAY_HUD_FONT, SB_HEADER)
 					if game.light_boost_turns >
 					   0 {clay_text(fmt.ctprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, SB_OIL)}
@@ -206,7 +206,7 @@ when USE_CLAY {
 
 				for &enemy in game.enemies {
 					if !enemy.alive || !enemy.is_boss {continue}
-					clay_divider("hud-boss-divider")
+					clay_theme_divider("hud-boss-divider")
 					clay_row(
 						"hud-boss-row",
 						fmt.ctprintf("%s", enemy.name),
@@ -227,7 +227,7 @@ when USE_CLAY {
 				}
 
 				clay_spacer_grow("hud-controls-spacer")
-				clay_divider("hud-controls-divider")
+				clay_theme_divider("hud-controls-divider")
 				clay_text("CONTROLS", CLAY_HUD_FONT, SB_HEADER)
 				clay_text("[I]nv  [G]rab  [X]Mine", CLAY_HUD_FONT, SB_KEY)
 				clay_text("[M]ap  [?]Help  [.]Wait", CLAY_HUD_FONT, SB_KEY)
@@ -298,14 +298,6 @@ when USE_CLAY {
 		}
 	}
 
-	clay_divider :: proc(id: string) {
-		if clay.UI(clay.ID(id))(
-		clay.ElementDeclaration {
-			layout = {sizing = {width = clay.SizingGrow(), height = clay.SizingFixed(1)}},
-			backgroundColor = clay_color(SB_DIVIDER),
-		},
-		) {}
-	}
 
 	clay_spacer_fixed :: proc(id: string, width, height: f32) {
 		if clay.UI(clay.ID(id))(
@@ -325,7 +317,4 @@ when USE_CLAY {
 		) {}
 	}
 
-	clay_color :: proc(color: eng.Engine_Color) -> clay.Color {
-		return {f32(color.r), f32(color.g), f32(color.b), f32(color.a)}
-	}
 }

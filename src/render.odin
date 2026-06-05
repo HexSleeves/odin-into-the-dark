@@ -23,7 +23,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	when USE_CLAY {
 		clay_ui_begin_frame(engine)
-		clay_render_hud(engine, game)
+		clay_render_screen_ui(engine, game)
 		delta_time := f32(0)
 		frames := eng.engine_frame_manager(engine)
 		if frames != nil {
