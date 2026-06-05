@@ -2,7 +2,7 @@ package main
 
 
 import eng "./engine"
-import clay "./vendor/clay"
+import clay "libs:clay"
 import "core:sync"
 import "core:testing"
 @(private = "file")

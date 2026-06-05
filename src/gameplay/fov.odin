@@ -1,7 +1,7 @@
 package gameplay
 
-import gameio "../io"
 import gcore "../core"
+import gameio "../io"
 import "core:log"
 
 compute_fov :: proc(game: ^Game) {

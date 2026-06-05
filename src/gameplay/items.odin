@@ -1,7 +1,7 @@
 package gameplay
 
-import eng "../engine"
 import gcore "../core"
+import eng "../engine"
 import "core:fmt"
 
 // item_make creates an Item from a content ID, with fallback for unknown IDs.
@@ -12,13 +12,13 @@ item_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Item {
 	}
 	logger_warnf(.Items, "unknown item id '%s'", id)
 	return Item {
-		pos       = pos,
+		pos = pos,
 		item_type = id,
-		name      = id,
-		glyph     = '?',
-		color     = eng.Engine_Color{255, 255, 255, 255},
+		name = id,
+		glyph = '?',
+		color = eng.Engine_Color{255, 255, 255, 255},
 		picked_up = false,
-		quantity  = 1,
+		quantity = 1,
 	}
 }
 
@@ -27,7 +27,12 @@ item_make :: proc(content: ^Content_Manager, id: string, pos: Vec2) -> Item {
 pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) -> bool {
 	it := item_at(game, game.player.pos.x, game.player.pos.y)
 	if it == nil {
-		add_message(messages, game, "Nothing to pick up here.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Nothing to pick up here.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
@@ -43,7 +48,12 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 				add_message(
 					messages,
 					game,
-					fmt.tprintf("Picked up %s (%d/%d).", item_display_name(it), slot.item.quantity, stack_limit),
+					fmt.tprintf(
+						"Picked up %s (%d/%d).",
+						item_display_name(it),
+						slot.item.quantity,
+						stack_limit,
+					),
 					eng.Engine_Color{100, 255, 100, 255},
 				)
 				return true
@@ -202,7 +212,12 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^gcore.I
 	} else if eff.type == ITEM_EFFECT_CURE_POISON {
 		if game.poison_turns > 0 {
 			game.poison_turns = 0
-			add_message(messages, game, "You drink the antidote. Poison cured!", eng.Engine_Color{120, 220, 80, 255})
+			add_message(
+				messages,
+				game,
+				"You drink the antidote. Poison cured!",
+				eng.Engine_Color{120, 220, 80, 255},
+			)
 		} else {
 			add_message(
 				messages,
@@ -228,7 +243,10 @@ give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 	if pick_def != nil {
 		pick := item_make_from_def(pick_def, Vec2{0, 0})
 		pick.picked_up = true
-		game.equipped_weapon = Equipment{occupied = true, item = pick}
+		game.equipped_weapon = Equipment {
+			occupied = true,
+			item     = pick,
+		}
 	}
 
 	torch_def := content_manager_item_def(content, ITEM_ID_TORCH)
@@ -252,20 +270,35 @@ equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> 
 
 	item := &game.inventory[slot_index].item
 	if item.equipment_slot == "" {
-		add_message(messages, game, "That item cannot be equipped.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"That item cannot be equipped.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
 	equip_slot := game_equipment_slot(game, item.equipment_slot)
 	if equip_slot == nil {
-		add_message(messages, game, "Unknown equipment slot.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"Unknown equipment slot.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 		return false
 	}
 
 	if equip_slot.occupied {
 		empty := inventory_first_empty_slot(game)
 		if empty < 0 {
-			add_message(messages, game, "No inventory space to swap equipment!", eng.Engine_Color{255, 100, 100, 255})
+			add_message(
+				messages,
+				game,
+				"No inventory space to swap equipment!",
+				eng.Engine_Color{255, 100, 100, 255},
+			)
 			return false
 		}
 		inventory_put_slot(game, empty, equip_slot.item, 1)
@@ -296,7 +329,12 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 
 	empty := inventory_first_empty_slot(game)
 	if empty < 0 {
-		add_message(messages, game, "Inventory full! Cannot unequip.", eng.Engine_Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"Inventory full! Cannot unequip.",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 		return false
 	}
 

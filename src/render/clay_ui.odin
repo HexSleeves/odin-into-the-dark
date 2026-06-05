@@ -3,9 +3,9 @@ package renderer
 import gcore "../core"
 
 import eng "../engine"
-import clay "../vendor/clay"
 import "base:runtime"
 import "core:mem"
+import clay "libs:clay"
 @(private = "file")
 clay_ui_import_anchor :: proc() {
 	_ = eng.Engine{}

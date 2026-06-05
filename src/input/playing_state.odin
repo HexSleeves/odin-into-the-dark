@@ -15,7 +15,12 @@ handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 		game.skip_next_turn = false
 		game.player.energy -= game.player.quickness * 10
 		trigger_enemy_rounds(engine, game)
-		add_message(messages, game, "You break free from the web.", eng.Engine_Color{200, 200, 100, 255})
+		add_message(
+			messages,
+			game,
+			"You break free from the web.",
+			eng.Engine_Color{200, 200, 100, 255},
+		)
 		return true
 	}
 
@@ -23,7 +28,12 @@ handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 		game.water_slow_active = false
 		game.player.energy -= game.player.quickness * 10
 		trigger_enemy_rounds(engine, game)
-		add_message(messages, game, "You push through the water.", eng.Engine_Color{40, 80, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You push through the water.",
+			eng.Engine_Color{40, 80, 180, 255},
+		)
 		return true
 	}
 
@@ -75,7 +85,12 @@ handle_playing_hotkeys :: proc(
 			game.state = .Viewing_Crafting
 			return true
 		}
-		add_message(messages, game, "You need to stand on an anvil to craft.", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You need to stand on an anvil to craft.",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 	}
 
 	if action_pressed(im, .Mine) {
@@ -103,7 +118,12 @@ handle_playing_hotkeys :: proc(
 		if action_pressed(im, .Toggle_Sprites) {
 			ui.use_sprites = !ui.use_sprites
 			if ui.use_sprites {
-				add_message(messages, game, "Render: SPRITES", eng.Engine_Color{180, 180, 180, 255})
+				add_message(
+					messages,
+					game,
+					"Render: SPRITES",
+					eng.Engine_Color{180, 180, 180, 255},
+				)
 			} else {
 				add_message(messages, game, "Render: ASCII", eng.Engine_Color{180, 180, 180, 255})
 			}

@@ -48,7 +48,7 @@ def run_package(package: str, args: list[str]) -> int:
     path = WORK / package
     if not path.exists():
         return 0
-    cmd = ["odin", "test", str(path)] + args
+    cmd = ["odin", "test", str(path), f"-collection:libs={ROOT / 'vendor'}"] + args
     print("$", " ".join(cmd), flush=True)
     return subprocess.run(cmd, cwd=ROOT).returncode
 

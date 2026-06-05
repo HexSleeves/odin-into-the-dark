@@ -97,7 +97,12 @@ descend :: proc(
 start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {
 	can_mine := false
 	if !game.equipped_weapon.occupied {
-		add_message(messages, game, "You need a pickaxe to mine!", eng.Engine_Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"You need a pickaxe to mine!",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 	} else if game.equipped_weapon.item.max_durability > 0 &&
 	   game.equipped_weapon.item.durability <= 0 {
 		add_message(
@@ -176,7 +181,12 @@ consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 	if web_tile_at_idx(game, pidx) {
 		web_tile_set_idx(game, pidx, false)
 		game.skip_next_turn = true
-		add_message(messages, game, "You are stuck in a web!", eng.Engine_Color{180, 180, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You are stuck in a web!",
+			eng.Engine_Color{180, 180, 180, 255},
+		)
 	}
 }
 
@@ -189,14 +199,23 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.water_slow_active = true
 		audio_manager_play_sfx(game_engine_audio_manager(engine), .Water)
-		add_message(messages, game, "You wade through water...", eng.Engine_Color{40, 80, 180, 255})
+		add_message(
+			messages,
+			game,
+			"You wade through water...",
+			eng.Engine_Color{40, 80, 180, 255},
+		)
 	}
 
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= GAS_VENT_DAMAGE
 		game.poison_turns = max(game.poison_turns, GAS_VENT_POISON_TURNS)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{160, 180, 40, 255}, 0.4)
+		eng.vfx_manager_flash(
+			game_engine_vfx_manager(engine),
+			eng.Engine_Color{160, 180, 40, 255},
+			0.4,
+		)
 		add_message(
 			messages,
 			game,
@@ -222,7 +241,12 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 				eng.Engine_Color{80, 180, 220, 255},
 			)
 		} else {
-			add_message(messages, game, "You drink from the fountain. (Already at full health)", eng.Engine_Color{80, 180, 220, 255})
+			add_message(
+				messages,
+				game,
+				"You drink from the fountain. (Already at full health)",
+				eng.Engine_Color{80, 180, 220, 255},
+			)
 			cur_tile.type = .Floor
 		}
 	}
@@ -231,7 +255,11 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= FIRE_VENT_DAMAGE
 		game.burning_turns = max(game.burning_turns, FIRE_VENT_BURNING_TURNS)
-		eng.vfx_manager_flash(game_engine_vfx_manager(engine), eng.Engine_Color{255, 120, 20, 255}, 0.4)
+		eng.vfx_manager_flash(
+			game_engine_vfx_manager(engine),
+			eng.Engine_Color{255, 120, 20, 255},
+			0.4,
+		)
 		add_message(
 			messages,
 			game,
@@ -252,7 +280,12 @@ collapse_unstable_previous_tile :: proc(messages: ^Message_Manager, game: ^Game)
 	prev_tile := tile_at(game, game.prev_player_pos.x, game.prev_player_pos.y)
 	if prev_tile != nil && prev_tile.type == .Unstable {
 		prev_tile.type = .Chasm
-		add_message(messages, game, "The ground collapses behind you!", eng.Engine_Color{180, 120, 60, 255})
+		add_message(
+			messages,
+			game,
+			"The ground collapses behind you!",
+			eng.Engine_Color{180, 120, 60, 255},
+		)
 	}
 }
 

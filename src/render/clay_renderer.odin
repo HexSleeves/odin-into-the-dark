@@ -1,7 +1,7 @@
 package renderer
 
 import eng "../engine"
-import clay "../vendor/clay"
+import clay "libs:clay"
 @(private = "file")
 clay_renderer_import_anchor :: proc() {
 	_ = clay.RenderCommand{}

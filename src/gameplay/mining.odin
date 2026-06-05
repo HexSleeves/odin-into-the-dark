@@ -33,7 +33,12 @@ mine_wall :: proc(
 	}
 
 	if !game.equipped_weapon.occupied {
-		add_message(messages, game, "You need a pickaxe to mine!", eng.Engine_Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"You need a pickaxe to mine!",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 		return false
 	}
 	wpn := &game.equipped_weapon.item
@@ -93,7 +98,12 @@ mine_wall :: proc(
 			add_message(
 				messages,
 				game,
-				fmt.tprintf("%s wearing down... (%d/%d)", wpn.name, wpn.durability, wpn.max_durability),
+				fmt.tprintf(
+					"%s wearing down... (%d/%d)",
+					wpn.name,
+					wpn.durability,
+					wpn.max_durability,
+				),
 				eng.Engine_Color{255, 180, 50, 255},
 			)
 		}
@@ -126,7 +136,12 @@ try_craft :: proc(
 
 	if recipe.is_repair {
 		if !game.equipped_weapon.occupied || game.equipped_weapon.item.max_durability <= 0 {
-			add_message(messages, game, "No weapon to repair.", eng.Engine_Color{255, 100, 100, 255})
+			add_message(
+				messages,
+				game,
+				"No weapon to repair.",
+				eng.Engine_Color{255, 100, 100, 255},
+			)
 			return
 		}
 		game.equipped_weapon.item.durability = game.equipped_weapon.item.max_durability
@@ -142,7 +157,12 @@ try_craft :: proc(
 
 	slot_idx := inventory_first_empty_slot(game)
 	if slot_idx < 0 {
-		add_message(messages, game, "Inventory full! Cannot craft.", eng.Engine_Color{255, 100, 100, 255})
+		add_message(
+			messages,
+			game,
+			"Inventory full! Cannot craft.",
+			eng.Engine_Color{255, 100, 100, 255},
+		)
 		return
 	}
 

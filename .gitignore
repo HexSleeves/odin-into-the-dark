@@ -36,10 +36,9 @@ __pycache__/
 .venv/
 venv/
 target/
-vendor/
-!src/vendor/
-!src/vendor/clay/
-!src/vendor/clay/**
+!vendor/
+!vendor/clay/
+!vendor/clay/**
 *.log
 coverage/
 .cache/
