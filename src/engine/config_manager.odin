@@ -57,7 +57,7 @@ config_manager_load_env_text :: proc(config: ^Config_Manager, text: string) -> b
 	}
 
 	start := 0
-	for start <= len(text) {
+	for start < len(text) {
 		end := start
 		for end < len(text) && text[end] != '\n' && text[end] != '\r' {
 			end += 1

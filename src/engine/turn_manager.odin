@@ -47,15 +47,24 @@ Energy_Actor :: struct {
 
 // Grant one round's worth of AP to an actor.
 energy_actor_grant :: proc(actor: ^Energy_Actor) {
+	if actor == nil {
+		return
+	}
 	actor.energy += actor.quickness * 10
 }
 
 // Spend AP for an action. Energy may go negative (debt).
 energy_actor_spend :: proc(actor: ^Energy_Actor, cost: int) {
+	if actor == nil {
+		return
+	}
 	actor.energy -= cost
 }
 
 // Returns true when the actor has AP remaining to act.
 energy_actor_can_act :: proc(actor: ^Energy_Actor) -> bool {
+	if actor == nil {
+		return false
+	}
 	return actor.energy > 0
 }

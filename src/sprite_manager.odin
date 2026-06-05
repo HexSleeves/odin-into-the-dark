@@ -70,6 +70,8 @@ sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> S
 		key = "water"
 	case .Gas_Vent:
 		key = "gas_vent"
+	case .Fire_Vent:
+		key = "gas_vent"
 	case .Unstable:
 		key = "unstable"
 	case .Chasm:
@@ -78,6 +80,8 @@ sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: Tile_Type) -> S
 		key = "anvil"
 	case .Fountain:
 		key = "water"
+	case .Locked_Door:
+		key = "anvil"
 	case:
 		key = "floor"
 	}

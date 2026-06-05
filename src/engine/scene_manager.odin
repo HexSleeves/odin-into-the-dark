@@ -104,6 +104,9 @@ scene_manager_find_index :: proc(
 	index: int,
 	found: bool,
 ) {
+	if manager == nil {
+		return -1, false
+	}
 	for i in 0 ..< len(manager.scenes) {
 		if manager.scenes[i].id == id {
 			return i, true
