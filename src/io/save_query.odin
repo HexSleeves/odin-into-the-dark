@@ -1,6 +1,6 @@
-package main
+package gameio
 
-import eng "./engine"
+import eng "../engine"
 
 
 save_exists :: proc() -> bool {

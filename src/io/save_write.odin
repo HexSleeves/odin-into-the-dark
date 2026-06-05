@@ -1,8 +1,8 @@
-package main
+package gameio
 import "core:mem"
 
 
-import eng "./engine"
+import eng "../engine"
 
 
 save_game :: proc(turns: ^eng.Turn_Manager, game: ^Game) -> bool {

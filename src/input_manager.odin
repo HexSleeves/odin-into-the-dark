@@ -2,10 +2,6 @@ package main
 
 import eng "./engine"
 
-// ---------------------------------------------------------------------------
-// Game_Action enum
-// ---------------------------------------------------------------------------
-
 Game_Action :: enum {
 	Move_North,
 	Move_South,
@@ -50,16 +46,10 @@ Game_Action :: enum {
 	Craft_4,
 }
 
-// ---------------------------------------------------------------------------
-// Structs
-// ---------------------------------------------------------------------------
-
 Key_Binding :: eng.Engine_Key_Binding
 Repeat_State :: eng.Engine_Repeat_State
-
 KEY_REPEAT_DELAY :: f32(0.20)
 KEY_REPEAT_RATE :: f32(0.08)
-
 Input_Manager :: eng.Action_Input_Manager
 
 input_manager_make :: proc() -> Input_Manager {
@@ -68,18 +58,10 @@ input_manager_make :: proc() -> Input_Manager {
 	return input
 }
 
-// ---------------------------------------------------------------------------
-// Init
-// ---------------------------------------------------------------------------
-
 input_manager_init :: proc(im: ^Input_Manager) {
 	im^ = eng.action_input_manager_make(KEY_REPEAT_DELAY, KEY_REPEAT_RATE)
 	input_default_bindings(im)
 }
-
-// ---------------------------------------------------------------------------
-// Default bindings
-// ---------------------------------------------------------------------------
 
 input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Move_North, {primary = .W, alt = .Up})
@@ -125,40 +107,10 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Craft_4, {primary = .Four})
 }
 
-// ---------------------------------------------------------------------------
-// Private helpers
-// ---------------------------------------------------------------------------
-
-// ---------------------------------------------------------------------------
-// Public query procs
-// ---------------------------------------------------------------------------
-
-action_pressed :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return eng.action_input_pressed(im, input_action_id(action))
-}
-
-action_held :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return eng.action_input_held(im, input_action_id(action))
-}
-
-action_released :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return eng.action_input_released(im, input_action_id(action))
-}
-
-// ---------------------------------------------------------------------------
-// Key repeat
-// ---------------------------------------------------------------------------
-
-check_repeat :: proc(im: ^Input_Manager, action: Game_Action) -> bool {
-	return eng.action_input_repeat(im, input_action_id(action))
-}
-
-@(private = "file")
-input_set_binding :: proc(im: ^Input_Manager, action: Game_Action, binding: Key_Binding) {
-	eng.action_input_manager_set_binding(im, input_action_id(action), binding)
-}
-
-@(private = "file")
-input_action_id :: proc(action: Game_Action) -> int {
-	return int(action)
-}
+input_set_binding :: eng.action_input_manager_set_binding
+input_tick :: eng.action_input_manager_tick
+action_pressed :: eng.action_input_manager_pressed
+action_binding :: eng.action_input_manager_binding
+action_binding_ptr :: eng.action_input_manager_binding_ptr
+reset_repeats :: eng.action_input_manager_reset_repeats
+check_repeat :: eng.action_input_manager_check_repeat

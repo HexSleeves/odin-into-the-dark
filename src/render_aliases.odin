@@ -49,4 +49,3 @@ minimap_should_draw_enemy_dot :: renderer.minimap_should_draw_enemy_dot
 // ─── Render ───────────────────────────────────────────────────────────────────
 
 render_game :: renderer.render_game
-palette_for_depth :: renderer.palette_for_depth

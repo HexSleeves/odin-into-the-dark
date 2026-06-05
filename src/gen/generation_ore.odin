@@ -1,6 +1,5 @@
-package main
+package gen
 
-import eng "./engine"
 import "core:math/rand"
 
 
@@ -13,10 +12,10 @@ spawn_ore_veins :: proc(game: ^Game) {
 	depth := game.depth
 
 	// Define ore colors
-	iron_color := eng.Engine_Color{200, 120, 50, 255}
-	copper_color := eng.Engine_Color{80, 180, 80, 255}
-	crystal_color := eng.Engine_Color{100, 150, 255, 255}
-	gold_color := eng.Engine_Color{255, 215, 0, 255}
+	iron_color := Engine_Color{200, 120, 50, 255}
+	copper_color := Engine_Color{80, 180, 80, 255}
+	crystal_color := Engine_Color{100, 150, 255, 255}
+	gold_color := Engine_Color{255, 215, 0, 255}
 
 	// Scan all wall tiles, ~10% chance to become ore vein
 	for y in 1 ..< MAP_HEIGHT - 1 {
@@ -29,10 +28,8 @@ spawn_ore_veins :: proc(game: ^Game) {
 
 			// Check if wall is adjacent to at least one floor-like tile (accessible)
 			has_floor := false
-			ADJ_DX :: CARDINAL_DX
-			ADJ_DY :: CARDINAL_DY
-			adj_dx := ADJ_DX
-			adj_dy := ADJ_DY
+			adj_dx := CARDINAL_DX
+			adj_dy := CARDINAL_DY
 			for dir in 0 ..< 4 {
 				nx := x + adj_dx[dir]
 				ny := y + adj_dy[dir]
@@ -53,7 +50,7 @@ spawn_ore_veins :: proc(game: ^Game) {
 
 			// Weighted ore type selection by depth
 			ore_type: string
-			ore_color: eng.Engine_Color
+			ore_color: Engine_Color
 			roll := rand.int_max(100)
 
 			if depth >= 8 {

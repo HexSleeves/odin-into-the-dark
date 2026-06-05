@@ -25,6 +25,7 @@ Ore_Vein :: gcore.Ore_Vein
 UI_State :: gcore.UI_State
 Game_State :: gcore.Game_State
 Game :: gcore.Game
+palette_for_depth :: gcore.palette_for_depth
 Message :: gcore.Message
 MessageLog :: gcore.MessageLog
 DEATH_CAUSE_MAX_LEN :: gcore.DEATH_CAUSE_MAX_LEN
@@ -59,6 +60,39 @@ MAP_VIEW_HEIGHT :: gcore.MAP_VIEW_HEIGHT
 CARDINAL_DX :: gcore.CARDINAL_DX
 CARDINAL_DY :: gcore.CARDINAL_DY
 CARDINAL_DIRS :: gcore.CARDINAL_DIRS
+
+// ─── game_utils / world_state / data_factory ──────────────────────────────────
+game_world :: gcore.game_world
+game_grid :: gcore.game_grid
+pos_to_idx :: gcore.pos_to_idx
+idx_to_pos :: gcore.idx_to_pos
+tile_at :: gcore.tile_at
+tile_state_at :: gcore.tile_state_at
+tile_state_at_idx :: gcore.tile_state_at_idx
+tile_visible_at :: gcore.tile_visible_at
+tile_visible_idx :: gcore.tile_visible_idx
+tile_explored_at :: gcore.tile_explored_at
+tile_explored_idx :: gcore.tile_explored_idx
+tile_light_level_at :: gcore.tile_light_level_at
+tile_light_level_idx :: gcore.tile_light_level_idx
+tile_state_set :: gcore.tile_state_set
+tile_state_set_idx :: gcore.tile_state_set_idx
+tile_states_clear_visibility :: gcore.tile_states_clear_visibility
+tile_states_import_from_tiles :: gcore.tile_states_import_from_tiles
+tile_states_export_to_tiles :: gcore.tile_states_export_to_tiles
+is_walkable :: gcore.is_walkable
+web_tile_at :: gcore.web_tile_at
+web_tile_at_idx :: gcore.web_tile_at_idx
+web_tile_set :: gcore.web_tile_set
+web_tile_set_idx :: gcore.web_tile_set_idx
+web_tiles_clear :: gcore.web_tiles_clear
+enemy_at :: gcore.enemy_at
+game_init_world :: gcore.game_init_world
+game_camera_update :: gcore.game_camera_update
+item_display_name :: gcore.item_display_name
+enemy_display_name :: gcore.enemy_display_name
+enemy_make_from_def :: gcore.enemy_make_from_def
+item_make_from_def :: gcore.item_make_from_def
 
 // ─── ui_constants.odin ────────────────────────────────────────────────────────
 TITLE_OPTION_COUNT :: gcore.TITLE_OPTION_COUNT

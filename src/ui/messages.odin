@@ -1,6 +1,7 @@
-package main
+package ui
 
-import eng "./engine"
+import gcore "../core"
+import eng "../engine"
 
 Message_Manager :: eng.Message_Manager
 message_manager_make :: eng.message_manager_make
@@ -8,7 +9,7 @@ message_manager_bind_turns :: eng.message_manager_bind_turns
 
 add_message :: proc(
 	messages: ^Message_Manager,
-	game: ^Game,
+	game: ^gcore.Game,
 	text: string,
 	color: eng.Engine_Color,
 ) {

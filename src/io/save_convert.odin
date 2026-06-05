@@ -1,4 +1,4 @@
-package main
+package gameio
 
 
 string_to_save :: proc(s: string) -> Save_String {

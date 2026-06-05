@@ -1,8 +1,8 @@
-package main
+package ai
 
 import "core:fmt"
 
-import eng "./engine"
+import eng "../engine"
 
 
 process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
@@ -23,10 +23,8 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			// Web: place web on a floor tile adjacent to enemy if player is nearby
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist <= 3 {
-				DX :: CARDINAL_DX
-				DY :: CARDINAL_DY
-				dx := DX
-				dy := DY
+				dx := CARDINAL_DX
+				dy := CARDINAL_DY
 				for dir in 0 ..< 4 {
 					wx := enemy.pos.x + dx[dir]
 					wy := enemy.pos.y + dy[dir]
@@ -89,10 +87,8 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 3 && dist <= enemy.ability_range {
 				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
-					DX :: CARDINAL_DX
-					DY :: CARDINAL_DY
-					dx := DX
-					dy := DY
+					dx := CARDINAL_DX
+					dy := CARDINAL_DY
 					for dir in 0 ..< 4 {
 						tx := game.player.pos.x + dx[dir]
 						ty := game.player.pos.y + dy[dir]

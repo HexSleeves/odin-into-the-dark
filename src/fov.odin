@@ -2,56 +2,36 @@ package main
 
 import "core:log"
 
-// ─── FOV computation (recursive shadowcasting) ───────────────────────────────
-//
-// Uses octant-based recursive shadowcasting for symmetric, wall-aware FOV.
-// Reference: http://www.roguebasin.com/index.php/FOV_using_recursive_shadowcasting
-
-// Octant multipliers: each octant transforms (row, col) into (dx, dy)
 @(private = "file")
 OCTANT_MULTIPLIERS :: [8][4]int {
-	{1, 0, 0, 1}, // octant 0
-	{0, 1, 1, 0}, // octant 1
-	{0, -1, 1, 0}, // octant 2
-	{-1, 0, 0, 1}, // octant 3
-	{-1, 0, 0, -1}, // octant 4
-	{0, -1, -1, 0}, // octant 5
-	{0, 1, -1, 0}, // octant 6
-	{1, 0, 0, -1}, // octant 7
+	{1, 0, 0, 1},
+	{0, 1, 1, 0},
+	{0, -1, 1, 0},
+	{-1, 0, 0, 1},
+	{-1, 0, 0, -1},
+	{0, -1, -1, 0},
+	{0, 1, -1, 0},
+	{1, 0, 0, -1},
 }
 
-// ─── Public entry point ──────────────────────────────────────────────────────
-
 compute_fov :: proc(game: ^Game) {
-	// Clear visibility for all tiles
 	tile_states_clear_visibility(game)
-
-	// Player's tile is always visible
 	px := game.player.pos.x
 	py := game.player.pos.y
 	radius := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
-
 	_ = tile_state_set(game, px, py, true, true, 1.0)
-
-	// Cast light in all 8 octants
 	mults := OCTANT_MULTIPLIERS
 	for oct in 0 ..< 8 {
 		cast_light(game, px, py, radius, 1, 1.0, 0.0, mults[oct])
 	}
-
-	// Diagnostic: count visible tiles
 	if logger_should_log(logger_state(), log.Level.Debug, .Fov) {
 		visible_count := 0
 		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-			if tile_visible_idx(game, i) {
-				visible_count += 1
-			}
+			if tile_visible_idx(game, i) {visible_count += 1}
 		}
 		logger_debugf(.Fov, "recomputed: %v tiles visible (radius=%v)", visible_count, radius)
 	}
 }
-
-// ─── Recursive shadowcasting for one octant ──────────────────────────────────
 
 @(private = "file")
 cast_light :: proc(
@@ -64,44 +44,24 @@ cast_light :: proc(
 	mult: [4]int,
 ) {
 	start := start_slope
-
-	if start < end_slope {
-		return
-	}
-
+	if start < end_slope {return}
 	radius_sq := f64(radius * radius)
-
 	for j := row; j <= radius; j += 1 {
 		dx := -j - 1
 		dy := -j
-
 		blocked := false
 		next_start := start
-
 		for dx <= 0 {
 			dx += 1
-
-			// Map coordinates via octant transform
 			map_x := origin_x + dx * mult[0] + dy * mult[1]
 			map_y := origin_y + dx * mult[2] + dy * mult[3]
-
-			// Slopes for this cell
 			l_slope := (f64(dx) - 0.5) / (f64(dy) + 0.5)
 			r_slope := (f64(dx) + 0.5) / (f64(dy) - 0.5)
-
-			if start < r_slope {
-				continue
-			}
-			if end_slope > l_slope {
-				break
-			}
-
-			// Distance check (circular FOV)
+			if start < r_slope {continue}
+			if end_slope > l_slope {break}
 			dist_sq := f64(dx * dx + dy * dy)
 			if dist_sq <= radius_sq {
-				t := tile_at(game, map_x, map_y)
-				if t != nil {
-					// Light falls off with distance
+				if tile_at(game, map_x, map_y) != nil {
 					_ = tile_state_set(
 						game,
 						map_x,
@@ -112,9 +72,7 @@ cast_light :: proc(
 					)
 				}
 			}
-
 			if blocked {
-				// Previous cell was a wall
 				if is_opaque(game, map_x, map_y) {
 					next_start = r_slope
 					continue
@@ -122,29 +80,23 @@ cast_light :: proc(
 					blocked = false
 					start = next_start
 				}
-			} else {
-				if is_opaque(game, map_x, map_y) && j < radius {
-					// Start a new scan skipping this wall
-					blocked = true
-					cast_light(game, origin_x, origin_y, radius, j + 1, start, l_slope, mult)
-					next_start = r_slope
-				}
+			} else if is_opaque(game, map_x, map_y) && j < radius {
+				blocked = true
+				cast_light(game, origin_x, origin_y, radius, j + 1, start, l_slope, mult)
+				next_start = r_slope
 			}
 		}
-
-		if blocked {
-			break
-		}
+		if blocked {break}
 	}
 }
-
-// ─── Opacity check ───────────────────────────────────────────────────────────
 
 @(private = "file")
 is_opaque :: proc(game: ^Game, x, y: int) -> bool {
 	t := tile_at(game, x, y)
-	if t == nil {
-		return true // out-of-bounds blocks LOS
+	if t == nil {return true}
+	#partial switch t.type {
+	case .Wall, .Locked_Door:
+		return true
 	}
-	return t.type == .Wall || t.type == .Chasm || t.type == .Locked_Door
+	return false
 }

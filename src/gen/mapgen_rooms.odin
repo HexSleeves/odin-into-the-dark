@@ -1,4 +1,4 @@
-package main
+package gen
 
 import "core:math/rand"
 import "core:slice"

@@ -7,57 +7,9 @@ import gcore "../core"
 import eng "../engine"
 import "core:math"
 
-// ─── Depth palette definitions ────────────────────────────────────────────────
-
-PALETTE_MINE :: gcore.Floor_Palette {
-	wall    = eng.Engine_Color{40, 40, 45, 255},
-	floor   = eng.Engine_Color{139, 90, 43, 255},
-	rubble  = eng.Engine_Color{180, 160, 100, 255},
-	descent = eng.Engine_Color{0, 200, 200, 255},
-}
-
-PALETTE_STONE :: gcore.Floor_Palette {
-	wall    = eng.Engine_Color{50, 50, 55, 255},
-	floor   = eng.Engine_Color{100, 100, 110, 255},
-	rubble  = eng.Engine_Color{130, 130, 120, 255},
-	descent = eng.Engine_Color{0, 200, 200, 255},
-}
-
-PALETTE_CRYSTAL :: gcore.Floor_Palette {
-	wall    = eng.Engine_Color{30, 45, 60, 255},
-	floor   = eng.Engine_Color{50, 90, 100, 255},
-	rubble  = eng.Engine_Color{80, 140, 130, 255},
-	descent = eng.Engine_Color{0, 255, 200, 255},
-}
-
-PALETTE_FLOODED :: gcore.Floor_Palette {
-	wall    = eng.Engine_Color{25, 40, 55, 255},
-	floor   = eng.Engine_Color{35, 65, 80, 255},
-	rubble  = eng.Engine_Color{50, 90, 85, 255},
-	descent = eng.Engine_Color{0, 200, 255, 255},
-}
-
-PALETTE_DEEP :: gcore.Floor_Palette {
-	wall    = eng.Engine_Color{35, 20, 45, 255},
-	floor   = eng.Engine_Color{70, 40, 80, 255},
-	rubble  = eng.Engine_Color{110, 60, 120, 255},
-	descent = eng.Engine_Color{200, 100, 255, 255},
-}
-
 UNSEEN_COLOR :: eng.Engine_Color{0, 0, 0, 255}
-
-// Dimming multiplier for explored-but-not-visible tiles (used in S03 FOV)
 EXPLORED_DIM :: 0.55
 
-// ─── Palette selection ────────────────────────────────────────────────────────
-
-palette_for_depth :: proc(depth: int) -> gcore.Floor_Palette {
-	if depth <= 2 {return PALETTE_MINE}
-	if depth <= 4 {return PALETTE_STONE}
-	if depth == 5 {return PALETTE_CRYSTAL}
-	if depth <= 7 {return PALETTE_FLOODED}
-	return PALETTE_DEEP
-}
 
 // ─── gcore.Tile color helpers ───────────────────────────────────────────────────────
 
@@ -179,7 +131,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 	sprites := game_engine_sprite_manager(engine)
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
-	palette := palette_for_depth(game.depth)
+	palette := gcore.palette_for_depth(game.depth)
 
 	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
@@ -271,7 +223,7 @@ render_webs :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			// Cull off-screen
 			if sx + tile_size < 0 || sx >= i32(gcore.MAP_VIEW_WIDTH) {continue}
 			if sy + tile_size < 0 || sy >= i32(gcore.MAP_VIEW_HEIGHT) {continue}
-			spr := sprite_manager_named(sprites, "tile", gcore.ENEMY_ABILITY_WEB)
+			spr := sprite_manager_named(sprites, "tile", "web")
 			render_world_sprite_or_glyph(
 				engine,
 				sprites,

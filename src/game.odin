@@ -82,16 +82,6 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	give_starter_gear(content, game)
 }
 
-game_init_world :: proc(game: ^Game) {
-	if game == nil {
-		return
-	}
-	game.world = eng.world_manager_make(MAP_WIDTH, MAP_HEIGHT, TILE_SIZE)
-	game.web_tiles = eng.bool_grid_manager_make(eng.world_manager_grid(game.world))
-	game.tile_states = eng.tile_state_manager_make(eng.world_manager_grid(game.world))
-	game.map_width = eng.world_manager_width(game.world)
-	game.map_height = eng.world_manager_height(game.world)
-}
 
 // ─── Initialize player from data ─────────────────────────────────────────────
 
@@ -128,24 +118,6 @@ game_has_live_boss :: proc(game: ^Game) -> bool {
 	return false
 }
 
-
-game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool = false) {
-	if camera == nil || game == nil {
-		return
-	}
-	zoom := f32(1.12) if game_has_live_boss(game) else f32(1)
-	eng.camera_manager_set_zoom(camera, zoom)
-	eng.camera_manager_update(
-		camera,
-		game.player.pos.x * TILE_SIZE + TILE_SIZE / 2,
-		game.player.pos.y * TILE_SIZE + TILE_SIZE / 2,
-		MAP_VIEW_WIDTH,
-		MAP_VIEW_HEIGHT,
-		eng.world_manager_pixel_width(game.world),
-		eng.world_manager_pixel_height(game.world),
-		snap,
-	)
-}
 
 game_camera_x :: proc(camera: ^eng.Camera_Manager) -> int {
 	if camera == nil {

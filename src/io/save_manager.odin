@@ -1,7 +1,7 @@
-package main
+package gameio
 
-import gcore "./core"
-import eng "./engine"
+import gcore "../core"
+import eng "../engine"
 
 // ─── Save manager facade ─────────────────────────────────────────────────────
 

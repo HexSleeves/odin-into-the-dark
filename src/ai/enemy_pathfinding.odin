@@ -1,6 +1,6 @@
-package main
+package ai
 
-import eng "./engine"
+import eng "../engine"
 
 
 compute_dijkstra_map :: proc(game: ^Game) {
@@ -22,26 +22,18 @@ compute_dijkstra_map :: proc(game: ^Game) {
 	queue[tail] = {px, py}
 	tail += 1
 
-	// 4-directional offsets
-	DX :: CARDINAL_DX
-	DY :: CARDINAL_DY
-
+	dx := CARDINAL_DX
+	dy := CARDINAL_DY
 	for head != tail {
 		cur := queue[head]
 		head += 1
 		cur_dist := eng.engine_distance_map_get(&dmap, cur.x, cur.y)
-
-		dx := DX
-		dy := DY
 		for dir in 0 ..< 4 {
 			nx := cur.x + dx[dir]
 			ny := cur.y + dy[dir]
-
 			if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
 			if !is_walkable(game, nx, ny) {continue}
-
 			if eng.engine_distance_map_get(&dmap, nx, ny) <= cur_dist + 1 {continue}
-
 			eng.engine_distance_map_set(&dmap, nx, ny, cur_dist + 1)
 			queue[tail] = {nx, ny}
 			tail += 1

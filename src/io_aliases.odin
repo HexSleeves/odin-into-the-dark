@@ -22,3 +22,22 @@ logger_errorf :: gameio.logger_errorf
 logger_fatalf :: gameio.logger_fatalf
 logger_should_log :: gameio.logger_should_log
 logger_state :: gameio.logger_state
+
+// ─── Save / load API ──────────────────────────────────────────────────────────
+Save_Manager :: gameio.Save_Manager
+save_manager_make :: gameio.save_manager_make
+save_manager_save_exists :: gameio.save_manager_save_exists
+save_manager_save_game :: gameio.save_manager_save_game
+save_manager_load_game :: gameio.save_manager_load_game
+save_exists :: gameio.save_exists
+save_exists_at :: gameio.save_exists_at
+save_exists_in_storage :: gameio.save_exists_in_storage
+save_game :: gameio.save_game
+save_game_to_path :: gameio.save_game_to_path
+save_game_to_storage :: gameio.save_game_to_storage
+load_game :: gameio.load_game
+load_game_from_path :: gameio.load_game_from_path
+load_game_from_storage :: gameio.load_game_from_storage
+SAVE_FILE :: gameio.SAVE_FILE
+Save_Header :: gameio.Save_Header
+load_save_data :: gameio.load_save_data

@@ -1,8 +1,8 @@
-package main
+package ai
 
 import "core:fmt"
 
-import eng "./engine"
+import eng "../engine"
 
 
 remove_dead_enemies :: proc(

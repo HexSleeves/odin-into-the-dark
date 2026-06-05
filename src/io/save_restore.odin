@@ -1,8 +1,8 @@
-package main
+package gameio
 import "core:mem"
 
 
-import eng "./engine"
+import eng "../engine"
 
 load_game :: proc(
 	content: ^Content_Manager,

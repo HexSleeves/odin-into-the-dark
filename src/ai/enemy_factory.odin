@@ -1,6 +1,6 @@
-package main
+package ai
 
-import eng "./engine"
+import eng "../engine"
 
 // ─── Enemy factory (data-driven) ─────────────────────────────────────────────
 

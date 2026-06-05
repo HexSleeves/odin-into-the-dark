@@ -1,4 +1,4 @@
-package main
+package ai
 
 import "core:math/rand"
 
@@ -59,15 +59,5 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 }
 
-// ─── Find enemy at position ──────────────────────────────────────────────────
-
-enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
-	for &e in game.enemies {
-		if e.alive && e.pos.x == x && e.pos.y == y {
-			return &e
-		}
-	}
-	return nil
-}
 
 // ─── Dijkstra map (BFS flood-fill from player) ──────────────────────────────

@@ -1,8 +1,8 @@
-package main
+package ai
 
 import "core:math/rand"
 
-import eng "./engine"
+import eng "../engine"
 
 
 process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
@@ -67,10 +67,8 @@ chase_act_once :: proc(
 	enemy: ^Enemy,
 	move_cost: int,
 ) -> bool {
-	DX :: CARDINAL_DX
-	DY :: CARDINAL_DY
-	dx := DX
-	dy := DY
+	dx := CARDINAL_DX
+	dy := CARDINAL_DY
 
 	// Attack if adjacent
 	for dir in 0 ..< 4 {
@@ -129,10 +127,8 @@ wander_act_once :: proc(game: ^Game, enemy: ^Enemy, move_cost: int) -> bool {
 		return false
 	}
 
-	DX :: CARDINAL_DX
-	DY :: CARDINAL_DY
-	dx := DX
-	dy := DY
+	dx := CARDINAL_DX
+	dy := CARDINAL_DY
 
 	dir := rand.int_max(4)
 	nx := enemy.pos.x + dx[dir]
@@ -164,10 +160,8 @@ wander_act_once :: proc(game: ^Game, enemy: ^Enemy, move_cost: int) -> bool {
 
 @(private = "file")
 lurker_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -> bool {
-	DX :: CARDINAL_DX
-	DY :: CARDINAL_DY
-	dx := DX
-	dy := DY
+	dx := CARDINAL_DX
+	dy := CARDINAL_DY
 
 	// Attack if adjacent
 	for dir in 0 ..< 4 {

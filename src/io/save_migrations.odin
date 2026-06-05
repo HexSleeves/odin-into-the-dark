@@ -1,4 +1,4 @@
-package main
+package gameio
 
 import "core:mem"
 
