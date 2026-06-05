@@ -158,16 +158,6 @@ RECIPES :: [4]Recipe {
 	},
 }
 
-// Count how many of a material the player has in inventory
-count_material :: proc(game: ^Game, material_id: string) -> int {
-	return inventory_count_item_type(game, material_id)
-}
-
-// Consume N of a material from inventory
-consume_material :: proc(game: ^Game, material_id: string, amount: int) {
-	inventory_consume_item_type(game, material_id, amount)
-}
-
 try_craft :: proc(
 	content: ^Content_Manager,
 	messages: ^Message_Manager,
@@ -202,7 +192,7 @@ try_craft :: proc(
 			return
 		}
 		game.equipped_weapon.item.durability = game.equipped_weapon.item.max_durability
-		consume_material(game, recipe.material_id, recipe.material_qty)
+		inventory_consume_item_type(game, recipe.material_id, recipe.material_qty)
 		add_message(
 			messages,
 			game,
@@ -229,7 +219,7 @@ try_craft :: proc(
 		return
 	}
 
-	consume_material(game, recipe.material_id, recipe.material_qty)
+	inventory_consume_item_type(game, recipe.material_id, recipe.material_qty)
 	crafted := item_make_from_def(def, Vec2{0, 0})
 	crafted.picked_up = true
 	inventory_put_slot(game, slot_idx, crafted, 1)

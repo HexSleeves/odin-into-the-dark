@@ -56,16 +56,8 @@ game_engine_vfx_manager :: renderer.game_engine_vfx_manager
 logger_debugf :: gameio.logger_debugf
 Game_Log_Channel :: gameio.Game_Log_Channel
 
-effective_attack :: proc(game: ^Game) -> int {
-	bonus := 0
-	if game.equipped_weapon.occupied {bonus = game.equipped_weapon.item.stat_bonus}
-	return game.player.attack + bonus
-}
-
-effective_defense :: proc(game: ^Game) -> int {
-	if game.equipped_armor.occupied {return game.equipped_armor.item.stat_bonus}
-	return 0
-}
+effective_attack :: gcore.effective_attack
+effective_defense :: gcore.effective_defense
 
 enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 	return gcore.enemy_at(game, x, y)

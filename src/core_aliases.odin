@@ -106,6 +106,28 @@ item_display_name :: gcore.item_display_name
 enemy_display_name :: gcore.enemy_display_name
 enemy_make_from_def :: gcore.enemy_make_from_def
 item_make_from_def :: gcore.item_make_from_def
+item_at :: gcore.item_at
+count_material :: gcore.count_material
+effective_attack_cost :: gcore.effective_attack_cost
+effective_light_bonus :: gcore.effective_light_bonus
+
+// ─── inventory.odin ───────────────────────────────────────────────────────────
+inventory_slot_in_bounds :: gcore.inventory_slot_in_bounds
+inventory_first_empty_slot :: gcore.inventory_first_empty_slot
+inventory_put_slot :: gcore.inventory_put_slot
+inventory_decrement_slot :: gcore.inventory_decrement_slot
+inventory_count_item_type :: gcore.inventory_count_item_type
+inventory_consume_item_type :: gcore.inventory_consume_item_type
+remove_item_from_inventory :: gcore.remove_item_from_inventory
+
+// ─── item_helpers.odin ────────────────────────────────────────────────────────
+item_stack_limit :: gcore.item_stack_limit
+item_is_stackable :: gcore.item_is_stackable
+
+// ─── equipment.odin ──────────────────────────────────────────────────────────
+game_equipment_slot :: gcore.game_equipment_slot
+effective_attack :: gcore.effective_attack
+effective_defense :: gcore.effective_defense
 
 // ─── ui_constants.odin ────────────────────────────────────────────────────────
 TITLE_OPTION_COUNT :: gcore.TITLE_OPTION_COUNT

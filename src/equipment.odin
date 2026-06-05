@@ -34,15 +34,7 @@ give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 }
 
-// ─── Equipment: equip / unequip / stat queries ────────────────────────────────
-
-game_equipment_slot :: proc(game: ^Game, slot_name: string) -> ^Equipment {
-	if game == nil {return nil}
-	if slot_name == EQUIPMENT_SLOT_WEAPON {return &game.equipped_weapon}
-	if slot_name == EQUIPMENT_SLOT_ARMOR {return &game.equipped_armor}
-	if slot_name == EQUIPMENT_SLOT_HELMET {return &game.equipped_helmet}
-	return nil
-}
+// ─── Equipment: equip / unequip ───────────────────────────────────────────────
 
 equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {
 	if !inventory_slot_in_bounds(slot_index) {return false}
@@ -127,31 +119,4 @@ unequip_slot :: proc(messages: ^Message_Manager, game: ^Game, slot_name: string)
 	)
 	equip_slot^ = {}
 	return true
-}
-
-// ─── Effective stat queries (used by combat + fov) ────────────────────────────
-
-effective_attack :: proc(game: ^Game) -> int {
-	bonus := 0
-	if game.equipped_weapon.occupied {bonus = game.equipped_weapon.item.stat_bonus}
-	return game.player.attack + bonus
-}
-
-effective_defense :: proc(game: ^Game) -> int {
-	if game.equipped_armor.occupied {return game.equipped_armor.item.stat_bonus}
-	return 0
-}
-
-effective_light_bonus :: proc(game: ^Game) -> int {
-	if game.equipped_helmet.occupied {return game.equipped_helmet.item.stat_bonus}
-	return 0
-}
-
-// Returns the AP cost to attack with the currently equipped weapon.
-// Weapons with action_cost > 0 in data use that value; otherwise BASE_ACTION_COST.
-effective_attack_cost :: proc(game: ^Game) -> int {
-	if game.equipped_weapon.occupied && game.equipped_weapon.item.action_cost > 0 {
-		return game.equipped_weapon.item.action_cost
-	}
-	return BASE_ACTION_COST
 }

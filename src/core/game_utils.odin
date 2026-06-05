@@ -197,14 +197,7 @@ enemy_display_name :: proc(enemy: ^Enemy) -> string {
 }
 
 count_material :: proc(game: ^Game, material_id: string) -> int {
-	if game == nil {return 0}
-	total := 0
-	for i in 0 ..< MAX_INVENTORY {
-		if game.inventory[i].occupied && game.inventory[i].item.item_type == material_id {
-			total += game.inventory[i].item.quantity
-		}
-	}
-	return total
+	return inventory_count_item_type(game, material_id)
 }
 
 game_has_live_boss :: proc(game: ^Game) -> bool {
