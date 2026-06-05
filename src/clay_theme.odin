@@ -9,7 +9,6 @@ clay_theme_import_anchor :: proc() {
 	_ = clay.Color{}
 }
 
-when USE_CLAY {
 	CLAY_FONT_SMALL :: u16(12)
 	CLAY_FONT_BODY :: u16(13)
 	CLAY_FONT_TITLE :: u16(14)
@@ -31,4 +30,3 @@ when USE_CLAY {
 		},
 		) {}
 	}
-}

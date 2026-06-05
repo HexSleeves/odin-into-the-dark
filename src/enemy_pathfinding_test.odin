@@ -131,6 +131,56 @@ adjacent_visible_enemy_attacks_instead_of_moving :: proc(t: ^testing.T) {
 }
 
 @(test)
+enemy_turns_stop_after_player_death_and_preserve_first_death_cause :: proc(t: ^testing.T) {
+	game: Game
+	path_test_fill_tiles(&game)
+	game.player.pos = Vec2{1, 1}
+	game.player.hp = 1
+	game.player.max_hp = 1
+	game.state = .Playing
+	game.enemies = make([dynamic]Enemy)
+	defer delete(game.enemies)
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{2, 1},
+			name = "Cave Crawler",
+			hp = 5,
+			max_hp = 5,
+			attack = 1,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{1, 2},
+			name = "Rat",
+			hp = 5,
+			max_hp = 5,
+			attack = 1,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
+	_ = tile_state_set(&game, 2, 1, true, true, 1)
+	_ = tile_state_set(&game, 1, 2, true, true, 1)
+	messages := message_manager_make()
+
+	process_enemy_turns(&messages, &game)
+
+	testing.expect_value(t, game.state, Game_State.Game_Over)
+	testing.expect_value(t, game.player.hp, 0)
+	testing.expect(t, game.death_cause == "Killed by a Cave Crawler")
+	testing.expect_value(t, game.enemies[1].energy, 0)
+}
+
+@(test)
 visible_unreachable_enemy_stops_instead_of_random_wandering :: proc(t: ^testing.T) {
 	game: Game
 	path_test_fill_tiles(&game, .Wall)

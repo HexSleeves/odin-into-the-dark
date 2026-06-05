@@ -7,7 +7,8 @@ import "core:fmt"
 
 Input_Result :: enum {
 	None, // no action taken
-	Moved, // player moved — turn consumed
+	Moved, // player changed tiles — movement side effects apply
+	Acted, // non-movement action consumed AP/turn
 	Descended, // player descended to next floor
 	Waited, // player skipped a turn (period key)
 	Quit, // escape pressed — signal to close
@@ -75,7 +76,7 @@ handle_input :: proc(
 					eng.Engine_Color{255, 215, 0, 255},
 				)
 				game.player.energy -= BASE_ACTION_COST
-				return .Moved
+				return .Acted
 			} else {
 				add_message(
 					messages,
@@ -93,7 +94,7 @@ handle_input :: proc(
 		resolve_attack_player_on_enemy(messages, game, target_enemy)
 		// Deduct weapon-specific AP cost; trigger_enemy_rounds fires in handle_player_action
 		game.player.energy -= effective_attack_cost(game)
-		return .Moved
+		return .Acted
 	}
 
 	game.player.pos.x = target_x

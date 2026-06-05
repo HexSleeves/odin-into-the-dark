@@ -9,7 +9,6 @@ clay_renderer_import_anchor :: proc() {
 }
 
 
-when USE_CLAY {
 	clay_render_commands :: proc(
 		engine: ^eng.Engine,
 		commands: clay.ClayArray(clay.RenderCommand),
@@ -133,4 +132,3 @@ when USE_CLAY {
 		if left > 0 {render_draw_rectangle(engine, x, y, left, h, color)}
 		if right > 0 {render_draw_rectangle(engine, x + w - right, y, right, h, color)}
 	}
-}

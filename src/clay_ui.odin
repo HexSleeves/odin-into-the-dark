@@ -13,7 +13,6 @@ clay_ui_import_anchor :: proc() {
 }
 
 
-when USE_CLAY {
 	Clay_UI_State :: struct {
 		ctx:    ^clay.Context,
 		memory: []u8,
@@ -60,7 +59,7 @@ when USE_CLAY {
 
 	clay_ui_destroy :: proc() {
 		if g_clay_ui.ctx != nil {
-			clay.SetCurrentContext(g_clay_ui.ctx)
+			clay.SetCurrentContext(nil)
 		}
 		if g_clay_ui.memory != nil {
 			delete(g_clay_ui.memory)
@@ -144,4 +143,3 @@ when USE_CLAY {
 
 	@(private = "file")
 	clay_ui_handle_error :: proc "c" (error_data: clay.ErrorData) {}
-}

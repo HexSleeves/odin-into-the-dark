@@ -6,6 +6,16 @@ import eng "engine"
 
 // ─── Combat resolution ──────────────────────────────────────────────────────
 
+game_set_death_cause :: proc(game: ^Game, cause: string) {
+	if game == nil {return}
+
+	copy_len := min(len(cause), DEATH_CAUSE_MAX_LEN)
+	for i in 0 ..< copy_len {
+		game.death_cause_storage[i] = cause[i]
+	}
+	game.death_cause = string(game.death_cause_storage[:copy_len])
+}
+
 // Player attacks enemy (bump-to-attack from input)
 resolve_attack_player_on_enemy :: proc(
 	messages: ^Message_Manager,
@@ -59,7 +69,7 @@ resolve_attack_player_on_enemy :: proc(
 // Enemy attacks player
 resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
 	damage := max(enemy.attack - effective_defense(game), 1)
-	game.player.hp -= damage
+	game.player.hp = max(game.player.hp - damage, 0)
 	add_message(
 		messages,
 		game,
@@ -68,7 +78,7 @@ resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, 
 	)
 
 	if game.player.hp <= 0 {
-		game.death_cause = fmt.tprintf("Killed by a %s", enemy_display_name(enemy))
+		game_set_death_cause(game, fmt.tprintf("Killed by a %s", enemy_display_name(enemy)))
 		game.state = .Game_Over
 		add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
 	}

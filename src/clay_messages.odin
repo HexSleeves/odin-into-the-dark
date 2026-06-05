@@ -9,7 +9,6 @@ clay_messages_import_anchor :: proc() {
 	_ = eng.Message{}
 }
 
-when USE_CLAY {
 	clay_render_messages :: proc(messages: ^Message_Manager) {
 		if messages == nil {
 			return
@@ -41,4 +40,3 @@ when USE_CLAY {
 			}
 		}
 	}
-}

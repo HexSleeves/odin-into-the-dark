@@ -11,7 +11,6 @@ clay_tooltip_import_anchor :: proc() {
 	_ = eng.Engine{}
 }
 
-when USE_CLAY {
 	clay_render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
 		tooltip_text := tooltip_text_for_mouse(engine, game)
 		if len(tooltip_text) == 0 {
@@ -109,4 +108,3 @@ when USE_CLAY {
 		}
 		return fmt.tprintf("%s (%d/%d HP)", enemy_display_name(enemy), enemy.hp, enemy.max_hp)
 	}
-}

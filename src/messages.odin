@@ -42,52 +42,13 @@ clear_messages :: proc(messages: ^Message_Manager) {
 
 // ─── Render message panel ────────────────────────────────────────────────────
 
-when !USE_CLAY {
-	render_messages_for_engine :: proc(engine: ^eng.Engine) {
-		render_messages(engine, game_engine_message_manager(engine))
-	}
-
-	render_messages :: proc(engine: ^eng.Engine, messages: ^Message_Manager) {
-		if messages == nil {
-			return
-		}
-		log := &messages.log
-
-		eng.engine_render_draw_rectangle(
-			engine,
-			0,
-			MSG_PANEL_Y,
-			i32(SCREEN_WIDTH),
-			MSG_PANEL_HEIGHT,
-			eng.engine_color_make(15, 15, 20, 255),
-		)
-
-		visible_count := min(log.count, MSG_MAX_VISIBLE)
-		if visible_count == 0 {
-			return
-		}
-
-		for i in 0 ..< visible_count {
-			msg_offset := visible_count - 1 - i
-			msg_idx := (log.head - 1 - msg_offset + MAX_MESSAGES * 2) % MAX_MESSAGES
-			msg := &log.messages[msg_idx]
-
-			y := MSG_PANEL_Y + 4 + i32(i) * MSG_LINE_HEIGHT
-			text_cstr := cast(cstring)&msg.text[0]
-			eng.engine_render_draw_text(engine, text_cstr, 8, y, MSG_FONT_SIZE, msg.color)
-		}
-	}
+render_messages_for_engine :: proc(engine: ^eng.Engine) {
+	clay_render_messages(game_engine_message_manager(engine))
 }
 
-when USE_CLAY {
-	render_messages_for_engine :: proc(engine: ^eng.Engine) {
-		clay_render_messages(game_engine_message_manager(engine))
-	}
-
-	render_messages :: proc(engine: ^eng.Engine, messages: ^Message_Manager) {
-		_ = engine
-		clay_render_messages(messages)
-	}
+render_messages :: proc(engine: ^eng.Engine, messages: ^Message_Manager) {
+	_ = engine
+	clay_render_messages(messages)
 }
 
 // ─── Name helpers (data-driven) ──────────────────────────────────────────────

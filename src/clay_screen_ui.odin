@@ -9,7 +9,6 @@ clay_screen_ui_import_anchor :: proc() {
 	_ = clay.ElementDeclaration{}
 }
 
-when USE_CLAY {
 	clay_render_screen_ui :: proc(engine: ^eng.Engine, game: ^Game) {
 		if game == nil {
 			return
@@ -27,13 +26,27 @@ when USE_CLAY {
 		},
 		) {
 			#partial switch game.state {
+			case .Title_Screen:
+				clay_render_title_overlay(engine, game)
 			case .Playing:
 				clay_render_gameplay_ui(engine, game)
-			case .Viewing_Inventory, .Viewing_Crafting, .Viewing_Cheats:
+			case .Viewing_Inventory:
 				clay_render_gameplay_ui(engine, game)
-			case .Title_Screen, .Viewing_Help, .Viewing_Scores:
-				// Future Clay screens intentionally route through the dispatcher but remain
-				// legacy-rendered until their migration tasks are implemented.
+				clay_render_inventory_overlay(engine, game)
+			case .Viewing_Crafting:
+				clay_render_gameplay_ui(engine, game)
+				clay_render_crafting_overlay(engine, game)
+			case .Viewing_Cheats:
+				clay_render_gameplay_ui(engine, game)
+				clay_render_cheats_overlay(engine, game)
+			case .Viewing_Help:
+				clay_render_help_overlay(engine, game)
+			case .Viewing_Scores:
+				clay_render_scores_overlay(engine, game)
+			case .Game_Over:
+				clay_render_game_over_overlay(engine, game)
+			case .Victory:
+				clay_render_victory_overlay(engine, game)
 			}
 		}
 	}
@@ -52,4 +65,3 @@ when USE_CLAY {
 		clay_render_tooltip(engine, game)
 		clay_render_gameplay_hints(engine, game)
 	}
-}

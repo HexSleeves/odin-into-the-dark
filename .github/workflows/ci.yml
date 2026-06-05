@@ -36,8 +36,6 @@ jobs:
       - name: Run tests
         run: odin test src/ && odin test src/engine/
 
-      - name: Test Clay HUD
-        run: odin test src/ -define:USE_CLAY=true
 
       - name: Type check
         run: odin check src/ -vet -strict-style
@@ -45,5 +43,3 @@ jobs:
       - name: Build
         run: odin build src/ -out:into_the_depths -define:PUBLIC_BUILD=true
 
-      - name: Build Clay HUD
-        run: odin build src/ -out:into_the_depths_clay -define:USE_CLAY=true -define:PUBLIC_BUILD=true

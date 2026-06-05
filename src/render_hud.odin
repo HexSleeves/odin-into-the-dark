@@ -2,6 +2,11 @@ package main
 
 import eng "./engine"
 import "core:fmt"
+@(private = "file")
+render_hud_import_anchor :: proc() {
+	_ = fmt.tprintf
+}
+
 
 // ─── Sidebar palette ─────────────────────────────────────────────────────────
 
@@ -60,7 +65,6 @@ sb_text_right :: proc(engine: ^eng.Engine, text: cstring, y, size: i32, color: e
 // ─── Main sidebar ─────────────────────────────────────────────────────────────
 
 render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
-	when !USE_CLAY {
 		turns := game_engine_turn_manager(engine)
 
 		// Background
@@ -77,7 +81,7 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 		y += 6
 
 		// ── HP ──────────────────────────────────────────────────────────────────
-		hp_ratio := f32(max(game.player.hp, 0)) / f32(game.player.max_hp)
+		hp_ratio := f32(max(game.player.hp, 0)) / f32(max(game.player.max_hp, 1))
 		hp_fg := SB_HP_FG if hp_ratio > 0.3 else SB_HP_LOW
 		sb_text(engine, "HP", y, 12, SB_HEADER)
 		sb_text_right(
@@ -340,7 +344,6 @@ render_hud :: proc(engine: ^eng.Engine, game: ^Game) {
 			sb_text(engine, "[F1]Mute  [ ]/[ ] Vol", controls_y + 54, 12, SB_KEY)
 		}
 
-	}
 
 	// ── Contextual overlays (these draw ON the map, not in sidebar) ──────────
 

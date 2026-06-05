@@ -156,10 +156,13 @@ compute_dijkstra_map :: proc(game: ^Game) {
 // ─── Process enemy turns (energy-based) ──────────────────────────────────────
 
 process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
+	if game.state == .Game_Over {return}
+
 	// Recompute dijkstra map so enemies have fresh pathfinding
 	compute_dijkstra_map(game)
 
 	for &enemy in game.enemies {
+		if game.state == .Game_Over {return}
 		if !enemy.alive {continue}
 
 		// Grant this round's AP (accumulates on any debt from previous rounds)
@@ -167,8 +170,10 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 
 		// Let the enemy act until it runs out of AP
 		for enemy.energy > 0 {
+			if game.state == .Game_Over {return}
 			is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
 			if !enemy_act_once(messages, game, &enemy, is_visible) {break}
+			if game.state == .Game_Over {return}
 			if !enemy.alive {break}
 		}
 	}
@@ -334,7 +339,10 @@ lurker_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) 
 // ─── Process special abilities ───────────────────────────────────────────────
 
 process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
+	if game.state == .Game_Over {return}
+
 	for &enemy in game.enemies {
+		if game.state == .Game_Over {return}
 		if !enemy.alive {continue}
 		if enemy.ability_type == "" {continue}
 
@@ -450,7 +458,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						eng.Engine_Color{220, 180, 60, 255},
 					)
 					if game.player.hp <= 0 {
-						game.death_cause = "Crushed by the Mine Guardian"
+						game_set_death_cause(game, "Crushed by the Mine Guardian")
 						game.state = .Game_Over
 						add_message(
 							messages,
@@ -493,9 +501,9 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						eng.Engine_Color{200, 160, 80, 255},
 					)
 					if game.player.hp <= 0 {
-						game.death_cause = fmt.tprintf(
-							"Pelted to death by a %s",
-							enemy_display_name(&enemy),
+						game_set_death_cause(
+							game,
+							fmt.tprintf("Pelted to death by a %s", enemy_display_name(&enemy)),
 						)
 						game.state = .Game_Over
 						add_message(

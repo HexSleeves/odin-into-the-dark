@@ -321,17 +321,15 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	compute_fov(game)
 	game_camera_update(game_engine_camera_manager(engine), game, true)
 	game_app_enforce_build_flags(engine)
-	when USE_CLAY {
-		if !clay_ui_init(engine) {
-			logger_fatalf(.App, "Failed to initialize Clay UI. Exiting.")
-			game_destroy(state.game)
-			when !NO_SPRITES {
-				sprites_cleanup(engine)
-			}
-			free(state)
-			app.state = nil
-			return false
+	if !clay_ui_init(engine) {
+		logger_fatalf(.App, "Failed to initialize Clay UI. Exiting.")
+		game_destroy(state.game)
+		when !NO_SPRITES {
+			sprites_cleanup(engine)
 		}
+		free(state)
+		app.state = nil
+		return false
 	}
 	add_message(
 		game_engine_message_manager(engine),
@@ -386,9 +384,7 @@ game_app_shutdown :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 	if state.game != nil {
 		game_destroy(state.game)
 	}
-	when USE_CLAY {
-		clay_ui_destroy()
-	}
+	clay_ui_destroy()
 	when !NO_SPRITES {
 		sprites_cleanup(engine)
 	}

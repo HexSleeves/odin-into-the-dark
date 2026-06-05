@@ -1,7 +1,6 @@
 package main
 
 import eng "./engine"
-import "core:fmt"
 import "core:math"
 
 // ─── Depth palette definitions ────────────────────────────────────────────────
@@ -127,6 +126,31 @@ camera_world_y_to_screen :: proc(camera: ^eng.Camera_Manager, world_y: int) -> i
 	return i32(f32(world_y - game_camera_y(camera)) * camera_zoom(camera))
 }
 
+screen_shake_offset :: proc(vfx: ^eng.Vfx_Manager) -> (x, y: i32) {
+	shake := eng.vfx_manager_shake_offset(vfx)
+	x = i32(shake[0])
+	y = i32(shake[1])
+	return
+}
+
+camera_world_x_to_screen_shaken :: proc(
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	world_x: int,
+) -> i32 {
+	shake_x, _ := screen_shake_offset(vfx)
+	return camera_world_x_to_screen(camera, world_x) - shake_x
+}
+
+camera_world_y_to_screen_shaken :: proc(
+	camera: ^eng.Camera_Manager,
+	vfx: ^eng.Vfx_Manager,
+	world_y: int,
+) -> i32 {
+	_, shake_y := screen_shake_offset(vfx)
+	return camera_world_y_to_screen(camera, world_y) - shake_y
+}
+
 visible_tile_bounds :: proc(camera: ^eng.Camera_Manager) -> (x0, y0, x1, y1: int) {
 	camera_x := game_camera_x(camera)
 	camera_y := game_camera_y(camera)
@@ -151,16 +175,13 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	sprites := game_engine_sprite_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
-	shake := eng.vfx_manager_shake_offset(vfx)
-	shake_x := i32(shake[0])
-	shake_y := i32(shake[1])
 	palette := palette_for_depth(game.depth)
 
 	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
 		for x in x0 ..= x1 {
-			sx := camera_world_x_to_screen(camera, x * TILE_SIZE) - shake_x
-			sy := camera_world_y_to_screen(camera, y * TILE_SIZE) - shake_y
+			sx := camera_world_x_to_screen_shaken(camera, vfx, x * TILE_SIZE)
+			sy := camera_world_y_to_screen_shaken(camera, vfx, y * TILE_SIZE)
 
 			// Cull tiles entirely outside the map viewport
 			if sx + tile_size < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
@@ -229,6 +250,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^Game) {
 render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	tile_size := camera_tile_size(camera)
 	x0, y0, x1, y1 := visible_tile_bounds(camera)
@@ -239,8 +261,8 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 
 			if !tile_visible_idx(game, idx) {continue}
 
-			sx := camera_world_x_to_screen(camera, x * TILE_SIZE)
-			sy := camera_world_y_to_screen(camera, y * TILE_SIZE)
+			sx := camera_world_x_to_screen_shaken(camera, vfx, x * TILE_SIZE)
+			sy := camera_world_y_to_screen_shaken(camera, vfx, y * TILE_SIZE)
 
 			// Cull off-screen
 			if sx + tile_size < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
@@ -278,8 +300,8 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 	vfx := game_engine_vfx_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	tile_size := camera_tile_size(camera)
-	px := camera_world_x_to_screen(camera, game.player.pos.x * TILE_SIZE)
-	py := camera_world_y_to_screen(camera, game.player.pos.y * TILE_SIZE)
+	px := camera_world_x_to_screen_shaken(camera, vfx, game.player.pos.x * TILE_SIZE)
+	py := camera_world_y_to_screen_shaken(camera, vfx, game.player.pos.y * TILE_SIZE)
 
 	bob_phase := f32(eng.vfx_manager_frame(vfx)) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * f64(camera_zoom(camera)))
@@ -309,8 +331,8 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 
 		if !tile_visible_at(game, enemy.pos.x, enemy.pos.y) {continue}
 
-		ex := camera_world_x_to_screen(camera, enemy.pos.x * TILE_SIZE)
-		ey := camera_world_y_to_screen(camera, enemy.pos.y * TILE_SIZE)
+		ex := camera_world_x_to_screen_shaken(camera, vfx, enemy.pos.x * TILE_SIZE)
+		ey := camera_world_y_to_screen_shaken(camera, vfx, enemy.pos.y * TILE_SIZE)
 		bob_phase := f32(eng.vfx_manager_frame(vfx) + enemy.pos.x * 17 + enemy.pos.y * 31) * 0.05
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
@@ -337,67 +359,8 @@ TOOLTIP_PAD_Y :: i32(4)
 TOOLTIP_OFFSET_X :: i32(12)
 TOOLTIP_OFFSET_Y :: i32(-20)
 
-when !USE_CLAY {
-	render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
-		mouse := eng.engine_mouse_position(engine)
-		camera := game_engine_camera_manager(engine)
-
-		if int(mouse.x) >= MAP_VIEW_WIDTH || int(mouse.y) >= MAP_VIEW_HEIGHT {return}
-
-		zoom := camera_zoom(camera)
-		tile_x := (int(f32(mouse.x) / zoom) + game_camera_x(camera)) / TILE_SIZE
-		tile_y := (int(f32(mouse.y) / zoom) + game_camera_y(camera)) / TILE_SIZE
-
-		if tile_x < 0 || tile_x >= MAP_WIDTH || tile_y < 0 || tile_y >= MAP_HEIGHT {
-			return
-		}
-
-		tile := tile_at(game, tile_x, tile_y)
-		if tile == nil || !tile_visible_at(game, tile_x, tile_y) {
-			return
-		}
-
-		tooltip_text: cstring
-
-		if game.player.pos.x == tile_x && game.player.pos.y == tile_y {
-			tooltip_text = fmt.ctprintf("You (%d/%d HP)", game.player.hp, game.player.max_hp)
-		} else {
-			enemy := enemy_at(game, tile_x, tile_y)
-			if enemy == nil {
-				return
-			}
-			name := enemy_display_name(enemy)
-			tooltip_text = fmt.ctprintf("%s (%d/%d HP)", name, enemy.hp, enemy.max_hp)
-		}
-
-		text_w := render_measure_text(engine, tooltip_text, TOOLTIP_FONT_SIZE)
-		box_w := text_w + TOOLTIP_PAD_X * 2
-		box_h := TOOLTIP_FONT_SIZE + TOOLTIP_PAD_Y * 2
-
-		box_x := i32(mouse.x) + TOOLTIP_OFFSET_X
-		box_y := i32(mouse.y) + TOOLTIP_OFFSET_Y
-
-		if box_x + box_w > i32(MAP_VIEW_WIDTH) {box_x = i32(MAP_VIEW_WIDTH) - box_w}
-		if box_x < 0 {box_x = 0}
-		if box_y < 0 {box_y = 0}
-		if box_y + box_h > i32(SCREEN_HEIGHT) {box_y = i32(SCREEN_HEIGHT) - box_h}
-
-		render_draw_rectangle(engine, box_x, box_y, box_w, box_h, TOOLTIP_BG_COLOR)
-		render_draw_text(
-			engine,
-			tooltip_text,
-			box_x + TOOLTIP_PAD_X,
-			box_y + TOOLTIP_PAD_Y,
-			TOOLTIP_FONT_SIZE,
-			TOOLTIP_TEXT_COLOR,
-		)
-	}
-}
-
-when USE_CLAY {
-	render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
-		clay_render_tooltip(engine, game)
-	}
+render_tooltip :: proc(engine: ^eng.Engine, game: ^Game) {
+	clay_render_tooltip(engine, game)
 }
 
 // ─── Render texture stubs (texture approach reverted; kept for game_cleanup call) ──

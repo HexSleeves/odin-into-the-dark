@@ -15,7 +15,6 @@ clay_ui_test_import_anchor :: proc() {
 clay_ui_test_mutex: sync.Mutex
 
 
-when USE_CLAY {
 	@(test)
 	clay_ui_emits_and_renders_basic_rectangle_command :: proc(t: ^testing.T) {
 		sync.mutex_lock(&clay_ui_test_mutex)
@@ -184,4 +183,3 @@ when USE_CLAY {
 		rotation: f32,
 		tint: eng.Engine_Color,
 	) {}
-}

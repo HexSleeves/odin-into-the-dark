@@ -96,6 +96,65 @@ hud_rendering_uses_engine_render_backend_primitives :: proc(t: ^testing.T) {
 }
 
 @(test)
+hud_hp_bar_guards_zero_or_invalid_max_hp :: proc(t: ^testing.T) {
+	source, read_err := os.read_entire_file("src/render_hud.odin", context.allocator)
+	testing.expect(t, read_err == nil)
+	if read_err != nil {
+		return
+	}
+	defer delete(source, context.allocator)
+	text := string(source)
+
+	testing.expect(t, strings.contains(text, "max(game.player.max_hp, 1)"))
+}
+
+@(test)
+map_world_layers_use_shared_shaken_screen_coordinates :: proc(t: ^testing.T) {
+	map_source, map_read_err := os.read_entire_file("src/render_map.odin", context.allocator)
+	testing.expect(t, map_read_err == nil)
+	if map_read_err != nil {
+		return
+	}
+	defer delete(map_source, context.allocator)
+	items_source, items_read_err := os.read_entire_file("src/items.odin", context.allocator)
+	testing.expect(t, items_read_err == nil)
+	if items_read_err != nil {
+		return
+	}
+	defer delete(items_source, context.allocator)
+
+	map_text := string(map_source)
+	items_text := string(items_source)
+	testing.expect(t, strings.contains(map_text, "camera_world_x_to_screen_shaken"))
+	testing.expect(t, strings.contains(map_text, "camera_world_y_to_screen_shaken"))
+	testing.expect(
+		t,
+		!strings.contains(map_text, "sx := camera_world_x_to_screen(camera, x * TILE_SIZE)"),
+	)
+	testing.expect(
+		t,
+		!strings.contains(
+			map_text,
+			"px := camera_world_x_to_screen(camera, game.player.pos.x * TILE_SIZE)",
+		),
+	)
+	testing.expect(
+		t,
+		!strings.contains(
+			map_text,
+			"ex := camera_world_x_to_screen(camera, enemy.pos.x * TILE_SIZE)",
+		),
+	)
+	testing.expect(
+		t,
+		!strings.contains(
+			items_text,
+			"ix := camera_world_x_to_screen(camera, item.pos.x * TILE_SIZE)",
+		),
+	)
+}
+
+@(test)
 minimap_and_item_rendering_use_engine_render_backend_primitives :: proc(t: ^testing.T) {
 	minimap_source, minimap_read_err := os.read_entire_file(
 		"src/render_minimap.odin",

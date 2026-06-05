@@ -67,6 +67,9 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		// Energy was deducted in handle_input; fire enemy rounds until player has AP
 		trigger_enemy_rounds(engine, game)
 		announce_item_under_player(messages, game)
+	case .Acted:
+		// Energy was deducted in handle_input; fire enemy rounds until player has AP
+		trigger_enemy_rounds(engine, game)
 	case .Waited:
 		// Energy was deducted in handle_input
 		trigger_enemy_rounds(engine, game)

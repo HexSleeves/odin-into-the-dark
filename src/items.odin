@@ -176,6 +176,7 @@ use_item :: proc(
 		}
 	} else {
 		add_message(messages, game, "Nothing happens.", eng.Engine_Color{180, 180, 180, 255})
+		return false
 	}
 
 	// Decrement stack quantity; clear slot only when empty
@@ -189,6 +190,8 @@ use_item :: proc(
 // ─── Tick timed effects (call once per turn) ──────────────────────────────────
 
 tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
+	if game.state == .Game_Over {return}
+
 	if game.light_boost_turns > 0 {
 		game.light_boost_turns -= 1
 		if game.light_boost_turns <= 0 {
@@ -204,7 +207,7 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 
 	if game.poison_turns > 0 {
 		game.poison_turns -= 1
-		game.player.hp -= 1
+		game.player.hp = max(game.player.hp - 1, 0)
 		add_message(
 			messages,
 			game,
@@ -212,15 +215,16 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 			eng.Engine_Color{120, 200, 40, 255},
 		)
 		if game.player.hp <= 0 {
-			game.death_cause = "Died from poison"
+			game_set_death_cause(game, "Died from poison")
 			game.state = .Game_Over
 			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			return
 		}
 	}
 
 	if game.burning_turns > 0 {
 		game.burning_turns -= 1
-		game.player.hp -= 1
+		game.player.hp = max(game.player.hp - 1, 0)
 		add_message(
 			messages,
 			game,
@@ -228,9 +232,10 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 			eng.Engine_Color{255, 120, 20, 255},
 		)
 		if game.player.hp <= 0 {
-			game.death_cause = "Burned to death"
+			game_set_death_cause(game, "Burned to death")
 			game.state = .Game_Over
 			add_message(messages, game, "You have been slain...", eng.Engine_Color{255, 0, 0, 255})
+			return
 		}
 	}
 
@@ -314,6 +319,7 @@ drop_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> b
 render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 	sprites := game_engine_sprite_manager(engine)
 	camera := game_engine_camera_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	tile_size := camera_tile_size(camera)
 
@@ -323,8 +329,8 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 		// Only render items on visible tiles
 		if !tile_visible_at(game, item.pos.x, item.pos.y) {continue}
 
-		ix := camera_world_x_to_screen(camera, item.pos.x * TILE_SIZE)
-		iy := camera_world_y_to_screen(camera, item.pos.y * TILE_SIZE)
+		ix := camera_world_x_to_screen_shaken(camera, vfx, item.pos.x * TILE_SIZE)
+		iy := camera_world_y_to_screen_shaken(camera, vfx, item.pos.y * TILE_SIZE)
 
 		if ui.use_sprites {
 			spr := sprite_manager_item(sprites, item.item_type)

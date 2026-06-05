@@ -282,7 +282,9 @@ engine_shutdown :: proc(state: ^Engine_State) {
 		if state.app.autosave != nil {
 			state.app.autosave(&state.engine, state.app)
 		}
-		state.app.shutdown(&state.engine, state.app)
+		if state.app.shutdown != nil {
+			state.app.shutdown(&state.engine, state.app)
+		}
 	}
 	if state.runtime_started {
 		engine_services_shutdown_runtime_assets(&state.services)

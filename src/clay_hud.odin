@@ -11,7 +11,6 @@ clay_hud_import_anchor :: proc() {
 	_ = eng.Engine{}
 }
 
-when USE_CLAY {
 	CLAY_HUD_FONT :: CLAY_FONT_SMALL
 	CLAY_HUD_ROW_FONT :: CLAY_FONT_BODY
 
@@ -317,4 +316,3 @@ when USE_CLAY {
 		) {}
 	}
 
-}

@@ -158,6 +158,36 @@ engine_run_uses_configured_platform_backend :: proc(t: ^testing.T) {
 	testing.expect_value(t, render_state.last_color.a, u8(4))
 }
 
+@(test)
+engine_shutdown_allows_app_without_shutdown_callback :: proc(t: ^testing.T) {
+	platform_state := Test_Platform_State{}
+	app_state := Test_Run_App_State{}
+	config := engine_config_make(640, 360, "Nil Shutdown Test", 60)
+	config.platform = Engine_Platform_Backend {
+		ctx                 = &platform_state,
+		init                = test_platform_init,
+		shutdown            = test_platform_shutdown,
+		set_target_fps      = test_platform_set_target_fps,
+		disable_exit_key    = test_platform_disable_exit_key,
+		window_should_close = test_platform_window_should_close,
+	}
+	app := Game_App {
+		name     = "Nil Shutdown App",
+		state    = &app_state,
+		init     = test_run_app_init,
+		update   = test_run_app_update,
+		render   = nil,
+		shutdown = nil,
+		autosave = test_run_app_autosave,
+	}
+
+	engine_run(config, engine_services_default_config(), &app)
+
+	testing.expect_value(t, app_state.init_count, 1)
+	testing.expect_value(t, app_state.autosave_count, 1)
+	testing.expect_value(t, platform_state.shutdown_count, 1)
+}
+
 test_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {return true}
 test_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {return false}
 test_app_render :: proc(engine: ^Engine, app: ^Game_App) {}

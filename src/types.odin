@@ -161,6 +161,8 @@ UI_State :: struct {
 
 // ─── Game State ───────────────────────────────────────────────────────────────
 
+DEATH_CAUSE_MAX_LEN :: 128
+
 Game_State :: enum {
 	Title_Screen,
 	Playing,
@@ -210,12 +212,13 @@ Game :: struct {
 	ore_veins:              [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
 	// Death tracking
 	death_cause:            string,
+	death_cause_storage:    [DEATH_CAUSE_MAX_LEN]u8,
 	score_saved:            bool,
 	last_score_rank:        int,
 	render_map_dirty:       bool,
 	render_last_cam_x:      int,
 	render_last_cam_y:      int,
-	// Status effects (volatile — not saved; resets on load)
+	// Status effects
 	poison_turns:           int,
 	burning_turns:          int,
 	frozen_turns:           int,

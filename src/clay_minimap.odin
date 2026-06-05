@@ -9,7 +9,6 @@ clay_minimap_import_anchor :: proc() {
 	_ = eng.Engine_Color{}
 }
 
-when USE_CLAY {
 	clay_render_minimap :: proc(game: ^Game) {
 		if game == nil {
 			return
@@ -105,4 +104,3 @@ when USE_CLAY {
 		}
 		return eng.Engine_Color{}
 	}
-}
