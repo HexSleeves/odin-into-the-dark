@@ -1,6 +1,7 @@
 set dotenv-load
 
 src := "src/"
+test := "test/"
 engine_src := "src/engine"
 binary := "into_the_depths"
 cheat_define := if env_var_or_default("CHEATS", "false") == "true" { "-define:CHEATS=true" } else { "" }
@@ -76,11 +77,13 @@ odinfmt := "/Users/lecoqjacob/Developer/games/ols/odinfmt"
 # Format all Odin source files
 fmt:
     {{odinfmt}} {{src}} -w
+    {{odinfmt}} {{test}} -w
 
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
 # Run root package, engine package, and sub-package tests
 test:
+    odin test {{test}} {{build_defines}}
     odin test {{src}} {{build_defines}}
     odin test {{engine_src}}
     odin test src/audio
