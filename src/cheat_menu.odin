@@ -6,6 +6,7 @@ import "core:fmt"
 @(private = "file")
 cheat_menu_import_anchor :: proc() {
 	_ = fmt.tprintf
+	_ = gcore.CHEATS_ENABLED
 }
 
 

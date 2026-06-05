@@ -81,23 +81,18 @@ fmt:
 
 # ─── Quality ───────────────────────────────────────────────────────────────────
 
-# Run root package, engine package, and sub-package tests
+# Run all tests staged from test/ into temporary package mirrors.
 test:
-    odin test {{test}} {{build_defines}}
-    odin test {{src}} {{build_defines}}
-    odin test {{engine_src}}
-    odin test src/audio
-    odin test src/io
-    odin test src/ui
+    python3 scripts/run_odin_tests.py {{build_defines}}
 
 
 # Run compile-flag matrix tests that should stay green regardless of environment.
 test-flags:
-    odin test {{src}} -define:CHEATS=true
-    odin test {{src}} -define:NO_AUDIO=true
-    odin test {{src}} -define:SPRITES=true -define:NO_SPRITES=true
-    odin test {{src}} -define:SKIP_TITLE=true
-    odin test {{src}} -define:FIXED_SEED=12345
+    python3 scripts/run_odin_tests.py --root-only -define:CHEATS=true
+    python3 scripts/run_odin_tests.py --root-only -define:NO_AUDIO=true
+    python3 scripts/run_odin_tests.py --root-only -define:SPRITES=true -define:NO_SPRITES=true
+    python3 scripts/run_odin_tests.py --root-only -define:SKIP_TITLE=true
+    python3 scripts/run_odin_tests.py --root-only -define:FIXED_SEED=12345
     odin check {{src}} -vet -strict-style -define:CHEATS=true -define:NO_AUDIO=true -define:SPRITES=true -define:NO_SPRITES=true -define:SKIP_TITLE=true -define:FIXED_SEED=12345
 
 # Check and build (CI-style verification)

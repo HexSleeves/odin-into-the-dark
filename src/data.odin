@@ -2,7 +2,6 @@ package main
 
 import "core:encoding/json"
 import "core:fmt"
-import "core:math/rand"
 
 import gcore "./core"
 import eng "./engine"
@@ -92,22 +91,6 @@ load_json5_from_bytes :: proc($T: typeid, data: []u8) -> (result: T, ok: bool) {
 	return result, true
 }
 
-// ─── Data lookup helpers ──────────────────────────────────────────────────────
-
-find_enemy_def :: proc(id: string) -> ^gcore.Enemy_Def {
-	for &def in g_data.enemies.enemies {
-		if def.id == id {return &def}
-	}
-	return nil
-}
-
-find_item_def :: proc(id: string) -> ^gcore.Item_Def {
-	for &def in g_data.items.items {
-		if def.id == id {return &def}
-	}
-	return nil
-}
-
 // ─── Data-driven enemy factory ────────────────────────────────────────────────
 
 enemy_make_from_def :: proc(def: ^gcore.Enemy_Def, pos: gcore.Vec2) -> gcore.Enemy {
@@ -136,34 +119,6 @@ enemy_make_from_def :: proc(def: ^gcore.Enemy_Def, pos: gcore.Vec2) -> gcore.Ene
 	}
 }
 
-pick_enemy_def_for_depth :: proc(depth: int) -> ^gcore.Enemy_Def {
-	for &table in g_data.enemies.spawn_tables {
-		if depth >= table.depth_min && depth <= table.depth_max {
-			total_weight := 0
-			for &w in table.weights {
-				total_weight += w.weight
-			}
-			if total_weight <= 0 {break}
-
-			roll := rand.int_max(total_weight)
-			acc := 0
-			for &w in table.weights {
-				acc += w.weight
-				if roll < acc {
-					def := find_enemy_def(w.id)
-					if def != nil {return def}
-					break
-				}
-			}
-			break
-		}
-	}
-	if len(g_data.enemies.enemies) > 0 {
-		return &g_data.enemies.enemies[0]
-	}
-	return nil
-}
-
 // ─── Data-driven item factory ─────────────────────────────────────────────────
 
 item_make_from_def :: proc(def: ^gcore.Item_Def, pos: gcore.Vec2) -> gcore.Item {
@@ -185,57 +140,6 @@ item_make_from_def :: proc(def: ^gcore.Item_Def, pos: gcore.Vec2) -> gcore.Item 
 		max_durability = def.durability,
 		action_cost = def.action_cost,
 	}
-}
-
-pick_item_def :: proc() -> ^gcore.Item_Def {
-	total_weight := 0
-	for &w in g_data.items.spawn_weights {
-		total_weight += w.weight
-	}
-	if total_weight <= 0 && len(g_data.items.items) > 0 {
-		return &g_data.items.items[0]
-	}
-
-	roll := rand.int_max(total_weight)
-	acc := 0
-	for &w in g_data.items.spawn_weights {
-		acc += w.weight
-		if roll < acc {
-			def := find_item_def(w.id)
-			if def != nil {return def}
-			break
-		}
-	}
-
-	if len(g_data.items.items) > 0 {
-		return &g_data.items.items[0]
-	}
-	return nil
-}
-
-pick_item_def_for_depth :: proc(depth: int) -> ^gcore.Item_Def {
-	for &table in g_data.items.item_spawn_tables {
-		if depth >= table.depth_min && depth <= table.depth_max {
-			total_weight := 0
-			for &w in table.weights {
-				total_weight += w.weight
-			}
-			if total_weight <= 0 {break}
-
-			roll := rand.int_max(total_weight)
-			acc := 0
-			for &w in table.weights {
-				acc += w.weight
-				if roll < acc {
-					def := find_item_def(w.id)
-					if def != nil {return def}
-					break
-				}
-			}
-			break
-		}
-	}
-	return pick_item_def()
 }
 
 // ─── Data-driven item use ─────────────────────────────────────────────────────

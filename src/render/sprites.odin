@@ -204,36 +204,40 @@ fallback_sprite :: proc() -> Sprite {
 	return sprite_at(0, 0, g_sprites.tile_size if g_sprites.tile_size > 0 else gcore.SPRITE_SIZE)
 }
 
-get_tile_sprite :: proc(tile_type: gcore.Tile_Type) -> Sprite {
-	key: string
+// Canonical tile-type → sprite-key mapping shared by all lookup paths.
+tile_type_to_sprite_key :: proc(tile_type: gcore.Tile_Type) -> string {
 	#partial switch tile_type {
 	case .Wall:
-		key = "wall"
+		return "wall"
 	case .Floor:
-		key = "floor"
+		return "floor"
 	case .Rubble:
-		key = "rubble"
+		return "rubble"
 	case .Descent:
-		key = "descent"
+		return "descent"
 	case .Water:
-		key = "water"
+		return "water"
 	case .Gas_Vent:
-		key = "gas_vent"
+		return "gas_vent"
 	case .Fire_Vent:
-		key = "gas_vent"
+		return "gas_vent"
 	case .Unstable:
-		key = "unstable"
+		return "unstable"
 	case .Chasm:
-		key = "chasm"
+		return "chasm"
 	case .Anvil:
-		key = "anvil"
+		return "anvil"
 	case .Fountain:
-		key = "water"
+		return "water"
 	case .Locked_Door:
-		key = "anvil"
+		return "anvil"
 	case:
-		key = "floor"
+		return "floor"
 	}
+}
+
+get_tile_sprite :: proc(tile_type: gcore.Tile_Type) -> Sprite {
+	key := tile_type_to_sprite_key(tile_type)
 	spr, ok := g_sprites.tile_map[key]
 	if ok {return spr}
 	return fallback_sprite()

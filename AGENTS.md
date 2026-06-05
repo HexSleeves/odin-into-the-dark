@@ -44,7 +44,7 @@ main()  →  engine_run(config, services, &app)
 
 Defaults use OS/Raylib implementations. Tests inject fake backends by constructing the struct directly — no mocking framework.
 
-**Clay UI path** — Clay is the default immediate-mode UI layout path. Clay is vendored at `src/vendor/clay/`; `src/clay_ui.odin` owns context/input/text measurement, `src/clay_renderer.odin` translates Clay commands to `Engine_Render_Backend`, and `src/clay_hud.odin`/`src/clay_overlays.odin` declare game UI. Engine code never imports Clay.
+**Clay UI path** — Clay is the default immediate-mode UI layout path. Clay is vendored at `src/vendor/clay/`; `src/render/clay_ui.odin` owns context/input/text measurement, `src/render/clay_renderer.odin` translates Clay commands to `Engine_Render_Backend`, and `src/render/clay_hud.odin`/`src/render/clay_overlays.odin` declare game UI. Engine code never imports Clay.
 
 ---
 
@@ -52,7 +52,10 @@ Defaults use OS/Raylib implementations. Tests inject fake backends by constructi
 
 | Path | Purpose |
 |---|---|
-| `src/` | Game package (`package main`) — all game logic, scenes, rendering |
+| `src/` | Game package (`package main`) — app lifecycle and glue across domain subpackages |
+| `src/core/` | Game domain types, constants, content/save managers, UI text/theme tokens |
+| `src/render/` | Rendering package — Clay UI, world rendering, sprites, render tests |
+| `src/audio/` / `src/io/` / `src/ui/` | Audio, logging/platform I/O, and UI manager packages |
 | `src/engine/` | Engine package (`package engine`) — reusable, backend-agnostic managers |
 | `data/` | json5 data files — enemies, items, player, sprites |
 | `assets/` | PNG spritesheets (tiles, characters, items, GUI) |
@@ -147,21 +150,21 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 | File | Purpose |
 |---|---|
 | `src/main.odin` | Entry point — 12 lines, calls `engine_run` |
-| `src/game_app.odin` | App lifecycle adapter — wires engine callbacks to game |
-| `src/types.odin` | All game types: `Game`, `Player`, `Enemy`, `Item`, `Tile`, `Game_State` |
-| `src/constants.odin` | `MAP_WIDTH/HEIGHT` (80×50), `SCREEN_WIDTH/HEIGHT` (1280×900), `TILE_SIZE` (32) |
+| `src/game_app_lifecycle.odin` / `src/game_app_config.odin` / `src/game_services.odin` | App lifecycle, build/runtime config, and game service registration/accessors |
+| `src/core/types.odin` | Core game types: `Game`, `Player`, `Enemy`, `Item`, `Tile`, `Game_State` |
+| `src/core/screen_layout.odin` / `src/core/gameplay_tuning.odin` / `src/core/build_config.odin` | Screen geometry, gameplay tuning constants, build flags |
 | `src/game.odin` | `game_init`, `game_destroy`, `game_camera_update` |
 | `src/scene.odin` | `Game_Scene` enum, `scene_for_state`, scene update/render callbacks |
-| `src/generation.odin` | BSP room-tunnel procedural map generation |
-| `src/data.odin` | json5 parsing, `Data_Registry`, `Enemy_Def`, `Item_Def`, `Player_Def` |
-| `src/saveload.odin` | Binary save format: magic `0x44455054` ("DEPT"), version `u32(3)` |
+| `src/generation_dispatch.odin` / `src/mapgen_rooms.odin` / `src/generation_*.odin` | Procedural map generation by concern |
+| `src/data.odin` / `src/core/data_defs.odin` / `src/core/content_manager.odin` | json5 parsing, data schemas, content registry/accessors |
+| `src/save_format.odin` / `src/save_write.odin` / `src/save_restore.odin` / `src/save_migrations.odin` / `src/save_query.odin` | Binary save format and persistence flow |
 | `src/actions.odin` | Player action handlers: move, descend, advance_turn, restart |
 | `src/combat.odin` | Combat resolution |
 | `src/fov.odin` | Field-of-view computation |
-| `src/input.odin` / `src/input_manager.odin` | Input routing and manager |
-| `src/render.odin` | Top-level render dispatch |
-| `src/render_map.odin` / `src/render_title_fx.odin` | World/map rendering and title fire backdrop effects |
-| `src/clay_ui.odin` / `src/clay_renderer.odin` / `src/clay_hud.odin` / `src/clay_overlays.odin` / `src/clay_*` | Clay immediate-mode UI path |
+| `src/input.odin` / `src/input_*.odin` / `src/input_manager.odin` | Input routing, per-state handlers, and manager |
+| `src/render/render.odin` | Top-level render dispatch |
+| `src/render/render_map.odin` / `src/render/render_items.odin` / `src/render/render_world.odin` / `src/render/render_title_fx.odin` | World/map/item rendering and title fire backdrop effects |
+| `src/render/clay_ui.odin` / `src/render/clay_renderer.odin` / `src/render/clay_hud.odin` / `src/render/clay_overlays.odin` / `src/render/clay_*` | Clay immediate-mode UI path |
 | `src/vendor/clay/` | Vendored Clay Odin binding and prebuilt platform libraries |
 | `src/engine/engine.odin` | `Engine` struct, `engine_run` loop, all manager accessors |
 | `src/engine/engine_services.odin` | Service registry (up to 16 services, inline arena) |

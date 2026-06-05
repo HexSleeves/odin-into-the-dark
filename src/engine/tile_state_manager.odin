@@ -18,17 +18,11 @@ tile_state_manager_make :: proc(grid: Engine_Grid_2D) -> Tile_State_Manager {
 }
 
 tile_state_manager_is_valid :: proc(manager: Tile_State_Manager) -> bool {
-	return(
-		engine_grid_2d_is_valid(manager.grid) &&
-		engine_grid_2d_cell_count(manager.grid) <= ENGINE_TILE_STATE_MAX_CELLS \
-	)
+	return _grid_manager_is_valid(manager.grid, ENGINE_TILE_STATE_MAX_CELLS)
 }
 
 tile_state_manager_cell_count :: proc(manager: Tile_State_Manager) -> int {
-	if !tile_state_manager_is_valid(manager) {
-		return 0
-	}
-	return engine_grid_2d_cell_count(manager.grid)
+	return _grid_manager_cell_count(manager.grid, ENGINE_TILE_STATE_MAX_CELLS)
 }
 
 tile_state_at :: proc(manager: Tile_State_Manager, x, y: int) -> Tile_State {
@@ -158,21 +152,15 @@ tile_state_manager_import :: proc(manager: ^Tile_State_Manager, states: []Tile_S
 	if manager == nil || !tile_state_manager_is_valid(manager^) {
 		return
 	}
-	cell_count := min(tile_state_manager_cell_count(manager^), len(states))
-	for i in 0 ..< cell_count {
-		manager.states[i] = states[i]
-	}
-	for i in cell_count ..< tile_state_manager_cell_count(manager^) {
-		manager.states[i] = Tile_State{}
-	}
+	_grid_manager_import(manager.states[:], states, tile_state_manager_cell_count(manager^))
 }
 
 tile_state_manager_export :: proc(manager: Tile_State_Manager, states: []Tile_State) {
 	if !tile_state_manager_is_valid(manager) {
 		return
 	}
-	cell_count := min(tile_state_manager_cell_count(manager), len(states))
-	for i in 0 ..< cell_count {
+	n := min(tile_state_manager_cell_count(manager), len(states))
+	for i in 0 ..< n {
 		states[i] = manager.states[i]
 	}
 }

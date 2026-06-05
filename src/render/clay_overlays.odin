@@ -21,23 +21,13 @@ clay_render_title_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	if ui != nil {choice = ui.title_choice}
 	saves := game_engine_save_manager(engine)
 	has_save := gcore.save_manager_save_exists(saves)
-	options := [gcore.TITLE_OPTION_COUNT]string {
-		"New gcore.Game",
-		"Continue",
-		"High Scores",
-		"Help",
-		"Quit",
-	}
+	options := ui_pkg.UI_TITLE_OPTIONS
 
 	if clay.UI(clay.ID("title-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
 		clay_render_title_embers(engine)
-		clay_title_text("INTO THE DEPTHS", 48, eng.Engine_Color{255, 230, 120, 255})
+		clay_title_text(ui_pkg.UI_APP_TITLE, 48, eng.Engine_Color{255, 230, 120, 255})
 		clay_spacer_fixed("title-art-gap", 1, 32)
-		clay_overlay_text(
-			"A turn-based mining roguelike",
-			18,
-			eng.Engine_Color{180, 180, 180, 255},
-		)
+		clay_overlay_text(ui_pkg.UI_TITLE_SUBTITLE, 18, eng.Engine_Color{180, 180, 180, 255})
 		clay_spacer_fixed("title-gap", 1, 12)
 		for label, idx in options {
 			disabled := idx == gcore.TITLE_CONTINUE && !has_save
@@ -50,18 +40,14 @@ clay_render_title_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		}
 		if !has_save {
 			clay_overlay_text(
-				"No save file found — Continue is disabled",
+				ui_pkg.UI_TITLE_CONTINUE_DISABLED,
 				14,
 				eng.Engine_Color{120, 120, 120, 255},
 			)
 		}
 		clay_spacer_grow("title-footer-gap")
-		clay_overlay_text(
-			"Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit",
-			14,
-			eng.Engine_Color{150, 150, 150, 255},
-		)
-		clay_overlay_text("v0.1.0", 12, eng.Engine_Color{80, 80, 80, 255})
+		clay_overlay_text(ui_pkg.UI_TITLE_FOOTER, 14, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_APP_VERSION, 12, eng.Engine_Color{80, 80, 80, 255})
 	}
 }
 
@@ -103,16 +89,12 @@ clay_render_title_embers :: proc(engine: ^eng.Engine) {
 clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
 	if clay.UI(clay.ID("inventory-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 200})) {
-		clay_title_text("INVENTORY", 30, eng.Engine_Color{255, 255, 255, 255})
-		clay_overlay_text(
-			"1-9=Use | D=Drop | E=Equip | Up/Down=Inspect | I/ESC=Close",
-			14,
-			eng.Engine_Color{150, 150, 150, 255},
-		)
+		clay_title_text(ui_pkg.UI_INVENTORY_TITLE, 30, eng.Engine_Color{255, 255, 255, 255})
+		clay_overlay_text(ui_pkg.UI_INVENTORY_HELP, 14, eng.Engine_Color{150, 150, 150, 255})
 		if ui != nil &&
-		   ui.dropping {clay_overlay_text("[DROP MODE] Press 1-9 to drop", 16, eng.Engine_Color{255, 200, 80, 255})}
+		   ui.dropping {clay_overlay_text(ui_pkg.UI_INVENTORY_DROP_MODE, 16, eng.Engine_Color{255, 200, 80, 255})}
 		if ui != nil &&
-		   ui.equipping {clay_overlay_text("[EQUIP MODE] Press 1-9 to equip", 16, eng.Engine_Color{100, 200, 255, 255})}
+		   ui.equipping {clay_overlay_text(ui_pkg.UI_INVENTORY_EQUIP_MODE, 16, eng.Engine_Color{100, 200, 255, 255})}
 		clay_spacer_fixed("inventory-gap", 1, 18)
 		for idx in 0 ..< gcore.MAX_INVENTORY {
 			slot := game.inventory[idx]
@@ -145,12 +127,8 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 clay_render_crafting_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
 	if clay.UI(clay.ID("crafting-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 200})) {
-		clay_title_text("CRAFTING", 30, eng.Engine_Color{255, 255, 255, 255})
-		clay_overlay_text(
-			"Press 1-4 to craft | C or ESC to close",
-			14,
-			eng.Engine_Color{150, 150, 150, 255},
-		)
+		clay_title_text(ui_pkg.UI_CRAFTING_TITLE, 30, eng.Engine_Color{255, 255, 255, 255})
+		clay_overlay_text(ui_pkg.UI_CRAFTING_HELP, 14, eng.Engine_Color{150, 150, 150, 255})
 		clay_spacer_fixed("craft-gap", 1, 28)
 		recipes := gcore.RECIPES
 		for idx in 0 ..< len(recipes) {
@@ -181,27 +159,9 @@ clay_render_crafting_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = engine
 	_ = game
-	lines := [?]string {
-		"MOVEMENT",
-		"WASD / Arrows    Move",
-		".  (period)      Wait a turn",
-		"Walk into enemy  Attack",
-		"",
-		"ITEMS",
-		"G                Pick up item",
-		"I                Open inventory",
-		"1-9              Use item",
-		"D / E            Drop or equip from inventory",
-		"",
-		"TOOLS",
-		"X                Mine adjacent wall/hazard",
-		"C                Craft at anvils",
-		"M                Toggle minimap",
-		"F1               Mute audio",
-		"ESC/Q            Close menu / quit",
-	}
+	lines := ui_pkg.UI_HELP_LINES
 	if clay.UI(clay.ID("help-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text("CONTROLS & HELP", 28, eng.Engine_Color{255, 255, 255, 255})
+		clay_title_text(ui_pkg.UI_HELP_TITLE, 28, eng.Engine_Color{255, 255, 255, 255})
 		clay_spacer_fixed("help-gap", 1, 20)
 		for line, idx in lines {
 			if len(line) == 0 {
@@ -213,7 +173,7 @@ clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			}
 		}
 		clay_spacer_grow("help-footer-gap")
-		clay_overlay_text("Press ESC or ? to return", 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_HELP_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
 	}
 }
 
@@ -222,10 +182,10 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	table := score_manager_load(game_engine_score_manager(engine))
 	defer score_table_destroy(&table)
 	if clay.UI(clay.ID("scores-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
-		clay_title_text("HIGH SCORES", 34, eng.Engine_Color{255, 220, 50, 255})
+		clay_title_text(ui_pkg.UI_SCORES_TITLE, 34, eng.Engine_Color{255, 220, 50, 255})
 		clay_spacer_fixed("scores-gap", 1, 26)
 		if table.count == 0 {
-			clay_overlay_text("No scores yet.", 18, eng.Engine_Color{150, 150, 150, 255})
+			clay_overlay_text(ui_pkg.UI_SCORES_EMPTY, 18, eng.Engine_Color{150, 150, 150, 255})
 		} else {
 			for i in 0 ..< min(table.count, MAX_SCORES) {
 				s := table.scores[i]
@@ -244,14 +204,14 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			}
 		}
 		clay_spacer_grow("scores-footer-gap")
-		clay_overlay_text("Press ESC or H to return", 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_SCORES_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
 	}
 }
 
 clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
 	if clay.UI(clay.ID("game-over-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text("GAME OVER", 36, eng.Engine_Color{230, 41, 55, 255})
+		clay_title_text(ui_pkg.UI_GAME_OVER_TITLE, 36, eng.Engine_Color{230, 41, 55, 255})
 		cause := game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death"
 		clay_overlay_text(cause, 18, eng.Engine_Color{255, 255, 255, 255})
 		clay_overlay_text(
@@ -265,23 +225,15 @@ clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			eng.Engine_Color{180, 180, 180, 255},
 		)
 		clay_spacer_fixed("game-over-gap", 1, 28)
-		clay_overlay_text(
-			"Press R to restart or Q to quit",
-			16,
-			eng.Engine_Color{150, 150, 150, 255},
-		)
+		clay_overlay_text(ui_pkg.UI_GAME_OVER_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
 	}
 }
 
 clay_render_victory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
 	if clay.UI(clay.ID("victory-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text("VICTORY!", 48, eng.Engine_Color{255, 215, 0, 255})
-		clay_overlay_text(
-			"You have conquered the depths!",
-			20,
-			eng.Engine_Color{200, 200, 100, 255},
-		)
+		clay_title_text(ui_pkg.UI_VICTORY_TITLE, 48, eng.Engine_Color{255, 215, 0, 255})
+		clay_overlay_text(ui_pkg.UI_VICTORY_SUBTITLE, 20, eng.Engine_Color{200, 200, 100, 255})
 		clay_spacer_fixed("victory-gap", 1, 24)
 		clay_overlay_text(
 			fmt.tprintf("Depth Reached  %d", game.depth),
@@ -304,11 +256,7 @@ clay_render_victory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			eng.Engine_Color{255, 255, 200, 255},
 		)
 		clay_spacer_grow("victory-footer-gap")
-		clay_overlay_text(
-			"Press R to play again or Q to quit",
-			16,
-			eng.Engine_Color{150, 150, 150, 255},
-		)
+		clay_overlay_text(ui_pkg.UI_VICTORY_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
 	}
 }
 
@@ -317,12 +265,8 @@ clay_render_cheats_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	choice := 0
 	if ui != nil {choice = ui.cheat_choice}
 	if clay.UI(clay.ID("cheats-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text("CHEAT MENU", 32, eng.Engine_Color{255, 215, 0, 255})
-		clay_overlay_text(
-			"Built with -define:CHEATS=true. Press 1-8 or Enter; Esc/Shift+C closes.",
-			14,
-			eng.Engine_Color{180, 180, 180, 255},
-		)
+		clay_title_text(ui_pkg.UI_CHEATS_TITLE, 32, eng.Engine_Color{255, 215, 0, 255})
+		clay_overlay_text(ui_pkg.UI_CHEATS_HELP, 14, eng.Engine_Color{180, 180, 180, 255})
 		clay_spacer_fixed("cheats-gap", 1, 26)
 		when CHEATS_ENABLED {
 			for i in 0 ..< gcore.CHEAT_COMMAND_COUNT {

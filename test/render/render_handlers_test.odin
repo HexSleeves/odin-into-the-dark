@@ -29,7 +29,7 @@ render_handlers_accept_engine_context_for_runtime_surfaces :: proc(t: ^testing.T
 
 @(test)
 render_entry_uses_engine_render_backend_for_frame_operations :: proc(t: ^testing.T) {
-	source, read_err := os.read_entire_file("src/render.odin", context.allocator)
+	source, read_err := os.read_entire_file("src/render/render.odin", context.allocator)
 	testing.expect(t, read_err == nil)
 	if read_err != nil {return}
 	defer delete(source, context.allocator)
@@ -44,13 +44,16 @@ render_entry_uses_engine_render_backend_for_frame_operations :: proc(t: ^testing
 
 @(test)
 clay_renderer_and_particles_use_engine_render_backend :: proc(t: ^testing.T) {
-	clay_source, clay_read_err := os.read_entire_file("src/clay_renderer.odin", context.allocator)
+	clay_source, clay_read_err := os.read_entire_file(
+		"src/render/clay_renderer.odin",
+		context.allocator,
+	)
 	testing.expect(t, clay_read_err == nil)
 	if clay_read_err != nil {return}
 	defer delete(clay_source, context.allocator)
 
 	particle_source, particle_read_err := os.read_entire_file(
-		"src/particles.odin",
+		"src/render/particles.odin",
 		context.allocator,
 	)
 	testing.expect(t, particle_read_err == nil)
@@ -66,7 +69,10 @@ clay_renderer_and_particles_use_engine_render_backend :: proc(t: ^testing.T) {
 
 @(test)
 map_world_layers_use_shared_shaken_screen_coordinates :: proc(t: ^testing.T) {
-	map_source, map_read_err := os.read_entire_file("src/render_map.odin", context.allocator)
+	map_source, map_read_err := os.read_entire_file(
+		"src/render/render_map.odin",
+		context.allocator,
+	)
 	testing.expect(t, map_read_err == nil)
 	if map_read_err != nil {return}
 	defer delete(map_source, context.allocator)
@@ -108,7 +114,10 @@ map_world_layers_use_shared_shaken_screen_coordinates :: proc(t: ^testing.T) {
 
 @(test)
 world_and_item_rendering_use_engine_render_backend_primitives :: proc(t: ^testing.T) {
-	map_source, map_read_err := os.read_entire_file("src/render_map.odin", context.allocator)
+	map_source, map_read_err := os.read_entire_file(
+		"src/render/render_map.odin",
+		context.allocator,
+	)
 	testing.expect(t, map_read_err == nil)
 	if map_read_err != nil {return}
 	defer delete(map_source, context.allocator)
@@ -130,14 +139,17 @@ world_and_item_rendering_use_engine_render_backend_primitives :: proc(t: ^testin
 @(test)
 sprite_rendering_uses_engine_render_backend_for_texture_regions :: proc(t: ^testing.T) {
 	manager_source, manager_read_err := os.read_entire_file(
-		"src/sprite_manager.odin",
+		"src/render/sprite_manager.odin",
 		context.allocator,
 	)
 	testing.expect(t, manager_read_err == nil)
 	if manager_read_err != nil {return}
 	defer delete(manager_source, context.allocator)
 
-	sprites_source, sprites_read_err := os.read_entire_file("src/sprites.odin", context.allocator)
+	sprites_source, sprites_read_err := os.read_entire_file(
+		"src/render/sprites.odin",
+		context.allocator,
+	)
 	testing.expect(t, sprites_read_err == nil)
 	if sprites_read_err != nil {return}
 	defer delete(sprites_source, context.allocator)

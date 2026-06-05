@@ -58,35 +58,7 @@ sprite_manager_tile :: proc(sprites: ^Sprite_Manager, tile_type: gcore.Tile_Type
 	if sprites == nil || sprites.backend == nil || sprites.backend == &g_sprites {
 		return get_tile_sprite(tile_type)
 	}
-	key: string
-	#partial switch tile_type {
-	case .Wall:
-		key = "wall"
-	case .Floor:
-		key = "floor"
-	case .Rubble:
-		key = "rubble"
-	case .Descent:
-		key = "descent"
-	case .Water:
-		key = "water"
-	case .Gas_Vent:
-		key = "gas_vent"
-	case .Fire_Vent:
-		key = "gas_vent"
-	case .Unstable:
-		key = "unstable"
-	case .Chasm:
-		key = "chasm"
-	case .Anvil:
-		key = "anvil"
-	case .Fountain:
-		key = "water"
-	case .Locked_Door:
-		key = "anvil"
-	case:
-		key = "floor"
-	}
+	key := tile_type_to_sprite_key(tile_type)
 	spr, ok := sprites.backend.tile_map[key]
 	if ok {return spr}
 	return sprite_manager_fallback(sprites)
