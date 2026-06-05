@@ -1,9 +1,11 @@
-package main
+package gameplay
 
-import eng "./engine"
+import gcore "../core"
+import eng "../engine"
 import "core:fmt"
 
-// ─── Mining ───────────────────────────────────────────────────────────────────
+Recipe :: gcore.Recipe
+RECIPES :: gcore.RECIPES
 
 mineable_tile_type :: proc(tile_type: Tile_Type) -> bool {
 	#partial switch tile_type {
@@ -22,7 +24,6 @@ mine_wall :: proc(
 	tx := game.player.pos.x + dx
 	ty := game.player.pos.y + dy
 
-	// Check bounds
 	if tx < 0 || tx >= MAP_WIDTH || ty < 0 || ty >= MAP_HEIGHT {return false}
 
 	t := tile_at(game, tx, ty)
@@ -31,14 +32,8 @@ mine_wall :: proc(
 		return false
 	}
 
-	// Check pickaxe — need an equipped weapon with durability
 	if !game.equipped_weapon.occupied {
-		add_message(
-			messages,
-			game,
-			"You need a pickaxe to mine!",
-			eng.Engine_Color{255, 100, 100, 255},
-		)
+		add_message(messages, game, "You need a pickaxe to mine!", eng.Engine_Color{255, 100, 100, 255})
 		return false
 	}
 	wpn := &game.equipped_weapon.item
@@ -52,15 +47,11 @@ mine_wall :: proc(
 		return false
 	}
 
-	// Mine the wall
 	idx := pos_to_idx(tx, ty)
 	mined_tile_type := t.type
 	vein := game.ore_veins[idx]
-
-	// Convert wall to rubble
 	t.type = .Rubble
 
-	// If ore vein, spawn material item
 	if vein.ore_type != "" {
 		def := content_manager_item_def(content, vein.ore_type)
 		if def != nil {
@@ -75,7 +66,7 @@ mine_wall :: proc(
 				eng.Engine_Color{180, 160, 100, 255},
 			)
 		}
-		game.ore_veins[idx] = {} // clear the vein
+		game.ore_veins[idx] = {}
 	} else {
 		msg := "You mine through the wall."
 		#partial switch mined_tile_type {
@@ -89,7 +80,6 @@ mine_wall :: proc(
 		add_message(messages, game, msg, eng.Engine_Color{180, 160, 100, 255})
 	}
 
-	// Decrease equipped weapon durability
 	if wpn.max_durability > 0 {
 		wpn.durability -= 1
 		if wpn.durability <= 0 {
@@ -103,59 +93,13 @@ mine_wall :: proc(
 			add_message(
 				messages,
 				game,
-				fmt.tprintf(
-					"%s wearing down... (%d/%d)",
-					wpn.name,
-					wpn.durability,
-					wpn.max_durability,
-				),
+				fmt.tprintf("%s wearing down... (%d/%d)", wpn.name, wpn.durability, wpn.max_durability),
 				eng.Engine_Color{255, 180, 50, 255},
 			)
 		}
 	}
 
 	return true
-}
-
-// ─── Crafting recipes ─────────────────────────────────────────────────────────
-
-Recipe :: struct {
-	name:         string,
-	material_id:  string,
-	material_qty: int,
-	result_id:    string, // "" means special (like pickaxe repair)
-	is_repair:    bool,
-}
-
-RECIPES :: [4]Recipe {
-	{
-		name = "Repair Pickaxe",
-		material_id = "iron_ore",
-		material_qty = 3,
-		result_id = "",
-		is_repair = true,
-	},
-	{
-		name = "Copper Shield",
-		material_id = "copper_ore",
-		material_qty = 2,
-		result_id = "copper_shield",
-		is_repair = false,
-	},
-	{
-		name = "Crystal Torch",
-		material_id = "crystal_shard",
-		material_qty = 2,
-		result_id = "crystal_torch",
-		is_repair = false,
-	},
-	{
-		name = "Golden Amulet",
-		material_id = "gold_nugget",
-		material_qty = 1,
-		result_id = "golden_amulet",
-		is_repair = false,
-	},
 }
 
 try_craft :: proc(
@@ -181,14 +125,8 @@ try_craft :: proc(
 	}
 
 	if recipe.is_repair {
-		// Repair equipped weapon durability
 		if !game.equipped_weapon.occupied || game.equipped_weapon.item.max_durability <= 0 {
-			add_message(
-				messages,
-				game,
-				"No weapon to repair.",
-				eng.Engine_Color{255, 100, 100, 255},
-			)
+			add_message(messages, game, "No weapon to repair.", eng.Engine_Color{255, 100, 100, 255})
 			return
 		}
 		game.equipped_weapon.item.durability = game.equipped_weapon.item.max_durability
@@ -204,12 +142,7 @@ try_craft :: proc(
 
 	slot_idx := inventory_first_empty_slot(game)
 	if slot_idx < 0 {
-		add_message(
-			messages,
-			game,
-			"Inventory full! Cannot craft.",
-			eng.Engine_Color{255, 100, 100, 255},
-		)
+		add_message(messages, game, "Inventory full! Cannot craft.", eng.Engine_Color{255, 100, 100, 255})
 		return
 	}
 

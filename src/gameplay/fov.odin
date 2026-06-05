@@ -1,6 +1,27 @@
-package main
+package gameplay
 
+import gameio "../io"
+import gcore "../core"
 import "core:log"
+
+compute_fov :: proc(game: ^Game) {
+	gcore.tile_states_clear_visibility(game)
+	px := game.player.pos.x
+	py := game.player.pos.y
+	radius := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
+	_ = gcore.tile_state_set(game, px, py, true, true, 1.0)
+	mults := OCTANT_MULTIPLIERS
+	for oct in 0 ..< 8 {
+		cast_light(game, px, py, radius, 1, 1.0, 0.0, mults[oct])
+	}
+	if gameio.logger_should_log(gameio.logger_state(), log.Level.Debug, .Fov) {
+		visible_count := 0
+		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+			if gcore.tile_visible_idx(game, i) {visible_count += 1}
+		}
+		logger_debugf(.Fov, "recomputed: %v tiles visible (radius=%v)", visible_count, radius)
+	}
+}
 
 @(private = "file")
 OCTANT_MULTIPLIERS :: [8][4]int {
@@ -12,25 +33,6 @@ OCTANT_MULTIPLIERS :: [8][4]int {
 	{0, -1, -1, 0},
 	{0, 1, -1, 0},
 	{1, 0, 0, -1},
-}
-
-compute_fov :: proc(game: ^Game) {
-	tile_states_clear_visibility(game)
-	px := game.player.pos.x
-	py := game.player.pos.y
-	radius := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
-	_ = tile_state_set(game, px, py, true, true, 1.0)
-	mults := OCTANT_MULTIPLIERS
-	for oct in 0 ..< 8 {
-		cast_light(game, px, py, radius, 1, 1.0, 0.0, mults[oct])
-	}
-	if logger_should_log(logger_state(), log.Level.Debug, .Fov) {
-		visible_count := 0
-		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-			if tile_visible_idx(game, i) {visible_count += 1}
-		}
-		logger_debugf(.Fov, "recomputed: %v tiles visible (radius=%v)", visible_count, radius)
-	}
 }
 
 @(private = "file")
@@ -62,7 +64,7 @@ cast_light :: proc(
 			dist_sq := f64(dx * dx + dy * dy)
 			if dist_sq <= radius_sq {
 				if tile_at(game, map_x, map_y) != nil {
-					_ = tile_state_set(
+					_ = gcore.tile_state_set(
 						game,
 						map_x,
 						map_y,
