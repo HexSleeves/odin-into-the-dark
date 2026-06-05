@@ -169,7 +169,7 @@ game_scene_title_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_gameplay_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^Game)ctx
-	return update_playing(engine, game, game_engine_input_manager(engine))
+	return update_playing(engine, game, game_engine_input_manager(engine), &g_game_config)
 }
 
 game_scene_game_over_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {

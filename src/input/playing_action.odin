@@ -1,16 +1,15 @@
-package main
+package gameinput
 
-import eng "./engine"
-
-// ─── Input result ─────────────────────────────────────────────────────────────
+import aipkg "../ai"
+import eng "../engine"
 
 Input_Result :: enum {
-	None, // no action taken
-	Moved, // player changed tiles — movement side effects apply
-	Acted, // non-movement action consumed AP/turn
-	Descended, // player descended to next floor
-	Waited, // player skipped a turn (period key)
-	Quit, // escape pressed — signal to close
+	None,
+	Moved,
+	Acted,
+	Descended,
+	Waited,
+	Quit,
 }
 
 read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
@@ -21,8 +20,7 @@ read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
 	return
 }
 
-// ─── Input handling ───────────────────────────────────────────────────────────
-
+resolve_attack_player_on_enemy :: aipkg.resolve_attack_player_on_enemy
 handle_input :: proc(
 	content: ^Content_Manager,
 	turns: ^eng.Turn_Manager,
@@ -37,13 +35,11 @@ handle_input :: proc(
 	}
 
 	if action_pressed(im, .Wait) {
-		// Deduct AP; trigger_enemy_rounds fires in handle_player_action
 		game.player.energy -= BASE_ACTION_COST
 		add_message(messages, game, "You wait...", eng.Engine_Color{180, 180, 180, 255})
 		return .Waited
 	}
 
-	// Four independent repeat states — direction change fires immediately
 	fired_n := check_repeat(im, .Move_North)
 	fired_s := check_repeat(im, .Move_South)
 	fired_e := check_repeat(im, .Move_East)
@@ -63,7 +59,6 @@ handle_input :: proc(
 	target_y := game.player.pos.y + dy
 
 	if !is_walkable(game, target_x, target_y) {
-		// Check if bumping into a locked door with a key
 		t := tile_at(game, target_x, target_y)
 		if t != nil && t.type == .Locked_Door {
 			if remove_item_from_inventory(game, ITEM_ID_VAULT_KEY) {
@@ -91,14 +86,12 @@ handle_input :: proc(
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
 		resolve_attack_player_on_enemy(messages, game, target_enemy)
-		// Deduct weapon-specific AP cost; trigger_enemy_rounds fires in handle_player_action
 		game.player.energy -= effective_attack_cost(game)
 		return .Acted
 	}
 
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
-	// Deduct move AP (player move_speed is 100 in Phase 1 → cost = BASE_MOVE_COST)
 	move_cost := BASE_MOVE_COST
 	if game.frozen_turns > 0 {move_cost *= 2}
 	game.player.energy -= move_cost

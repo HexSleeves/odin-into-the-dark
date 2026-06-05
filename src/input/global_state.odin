@@ -1,6 +1,6 @@
-package main
+package gameinput
 
-import eng "./engine"
+import eng "../engine"
 
 handle_global_input :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Load) {

@@ -1,14 +1,39 @@
-package main
+package gameinput
 
-import eng "./engine"
+import eng "../engine"
 
-update_playing :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+// ─── Playing state ────────────────────────────────────────────────────────────
+
+update_playing :: proc(
+	engine: ^eng.Engine,
+	game: ^Game,
+	im: ^Input_Manager,
+	config: ^Game_Config,
+) -> (quit: bool) {
 	if cheat_open_if_requested(game_engine_ui_manager(engine), game, im) {return false}
 	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}
-	if handle_playing_hotkeys(engine, game, im) {return}
+	if handle_playing_hotkeys(engine, game, im, config) {return}
 	return handle_player_action(engine, game)
 }
+
+// handle_player_action stays at root — bridges input and gameplay.
+// This proc pointer is set by root at init time.
+Handle_Player_Action_Proc :: proc(engine: ^eng.Engine, game: ^Game) -> bool
+g_handle_player_action: Handle_Player_Action_Proc
+
+register_handle_player_action :: proc(p: Handle_Player_Action_Proc) {
+	g_handle_player_action = p
+}
+
+handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
+	if g_handle_player_action != nil {
+		return g_handle_player_action(engine, game)
+	}
+	return false
+}
+
+// ─── Game Over ────────────────────────────────────────────────────────────────
 
 update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !death_sound_played {
@@ -27,21 +52,25 @@ update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -
 	}
 	if action_pressed(im, .Restart) {
 		death_sound_played = false
-		restart_game(
-			game_engine_content_manager(engine),
-			game_engine_turn_manager(engine),
-			game_engine_camera_manager(engine),
-			game_engine_vfx_manager(engine),
-			game_engine_ui_manager(engine),
-			game_engine_message_manager(engine),
-			game,
-		)
+		if g_restart_game != nil {
+			g_restart_game(
+				game_engine_content_manager(engine),
+				game_engine_turn_manager(engine),
+				game_engine_camera_manager(engine),
+				game_engine_vfx_manager(engine),
+				game_engine_ui_manager(engine),
+				game_engine_message_manager(engine),
+				game,
+			)
+		}
 	}
 	if action_pressed(im, .Quit) {
 		return true
 	}
 	return
 }
+
+// ─── Victory ──────────────────────────────────────────────────────────────────
 
 update_victory :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
 	if !game.score_saved {
@@ -49,15 +78,17 @@ update_victory :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> 
 		save_run_score(game_engine_score_manager(engine), game_engine_turn_manager(engine), game)
 	}
 	if action_pressed(im, .Restart) {
-		restart_game(
-			game_engine_content_manager(engine),
-			game_engine_turn_manager(engine),
-			game_engine_camera_manager(engine),
-			game_engine_vfx_manager(engine),
-			game_engine_ui_manager(engine),
-			game_engine_message_manager(engine),
-			game,
-		)
+		if g_restart_game != nil {
+			g_restart_game(
+				game_engine_content_manager(engine),
+				game_engine_turn_manager(engine),
+				game_engine_camera_manager(engine),
+				game_engine_vfx_manager(engine),
+				game_engine_ui_manager(engine),
+				game_engine_message_manager(engine),
+				game,
+			)
+		}
 	}
 	if action_pressed(im, .Quit) {
 		return true
@@ -65,15 +96,17 @@ update_victory :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> 
 	return
 }
 
+// ─── Inventory ────────────────────────────────────────────────────────────────
+
 update_viewing_inventory :: proc(
 	content: ^Content_Manager,
-	ui_manager: ^UI_Manager,
+	ui_mgr: ^UI_Manager,
 	messages: ^Message_Manager,
 	game: ^Game,
 	im: ^Input_Manager,
 	engine: ^eng.Engine = nil,
 ) {
-	ui := ui_manager_state(ui_manager)
+	ui := ui_manager_state(ui_mgr)
 	if action_pressed(im, .Inventory) || action_pressed(im, .Menu_Back) {
 		game.state = .Playing
 		ui.dropping = false
@@ -120,6 +153,8 @@ update_viewing_inventory :: proc(
 	}
 }
 
+// ─── Crafting ─────────────────────────────────────────────────────────────────
+
 update_viewing_crafting :: proc(
 	content: ^Content_Manager,
 	messages: ^Message_Manager,
@@ -135,8 +170,10 @@ update_viewing_crafting :: proc(
 	if action_pressed(im, .Craft_4) {try_craft(content, messages, game, 3)}
 }
 
-update_viewing_help :: proc(ui_manager: ^UI_Manager, game: ^Game, im: ^Input_Manager) {
-	ui := ui_manager_state(ui_manager)
+// ─── Help ─────────────────────────────────────────────────────────────────────
+
+update_viewing_help :: proc(ui_mgr: ^UI_Manager, game: ^Game, im: ^Input_Manager) {
+	ui := ui_manager_state(ui_mgr)
 	if action_pressed(im, .Menu_Back) || action_pressed(im, .Help) {
 		if ui.return_to_title {
 			ui.return_to_title = false
@@ -146,6 +183,8 @@ update_viewing_help :: proc(ui_manager: ^UI_Manager, game: ^Game, im: ^Input_Man
 		}
 	}
 }
+
+// ─── Scores ───────────────────────────────────────────────────────────────────
 
 update_viewing_scores :: proc(game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Menu_Back) || action_pressed(im, .Menu_High_Scores) {

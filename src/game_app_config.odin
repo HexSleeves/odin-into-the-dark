@@ -4,10 +4,7 @@ import eng "./engine"
 import "core:strconv"
 
 
-Game_Config :: struct {
-	master_volume: f32,
-	music_volume:  f32,
-}
+Game_Config :: Input_Game_Config
 
 g_game_config: Game_Config
 g_config: eng.Config_Manager
