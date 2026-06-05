@@ -19,16 +19,8 @@ render_items :: proc(engine: ^eng.Engine, game: ^Game) {
 		ix := camera_world_x_to_screen_shaken(camera, vfx, item.pos.x * TILE_SIZE)
 		iy := camera_world_y_to_screen_shaken(camera, vfx, item.pos.y * TILE_SIZE)
 
-		if ui.use_sprites {
-			spr := sprite_manager_item(sprites, item.item_type)
-			sprite_manager_draw(engine, sprites, spr, ix, iy, item.color, tile_size)
-		} else {
-			glyph_buf: [2]u8
-			glyph_buf[0] = u8(item.glyph)
-			glyph_buf[1] = 0
-			glyph_cstr := cast(cstring)&glyph_buf[0]
-			render_draw_text(engine, glyph_cstr, ix, iy, tile_size, item.color)
-		}
+		spr := sprite_manager_item(sprites, item.item_type)
+		render_world_sprite_or_glyph(engine, sprites, ui.use_sprites, spr, item.glyph, nil, item.color, ix, iy, tile_size)
 	}
 }
 

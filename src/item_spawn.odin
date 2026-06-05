@@ -16,13 +16,8 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 			if spawned >= target {break}
 			x := rand.int_max(MAP_WIDTH - 2) + 1
 			y := rand.int_max(MAP_HEIGHT - 2) + 1
-			if !is_walkable(game, x, y) {continue}
 			pos := Vec2{x, y}
-			if pos == game.player.pos {continue}
-			t := tile_at(game, x, y)
-			if t != nil && t.type == .Descent {continue}
-			if enemy_at(game, x, y) != nil {continue}
-			if item_at(game, x, y) != nil {continue}
+			if !can_place_item(game, x, y) {continue}
 
 			def := content_manager_pick_item_def_for_depth(content, game.depth)
 			if def != nil {
@@ -55,14 +50,7 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 			iy := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
 			pos := Vec2{ix, iy}
 
-			if !is_walkable(game, ix, iy) {continue}
-			if pos == game.player.pos {continue}
-
-			t := tile_at(game, ix, iy)
-			if t != nil && t.type == .Descent {continue}
-
-			if enemy_at(game, ix, iy) != nil {continue}
-			if item_at(game, ix, iy) != nil {continue}
+			if !can_place_item(game, ix, iy) {continue}
 
 			def := content_manager_pick_item_def_for_depth(content, game.depth)
 			if def != nil {

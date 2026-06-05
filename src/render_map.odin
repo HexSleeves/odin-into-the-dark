@@ -267,27 +267,19 @@ render_webs :: proc(engine: ^eng.Engine, game: ^Game) {
 			// Cull off-screen
 			if sx + tile_size < 0 || sx >= i32(MAP_VIEW_WIDTH) {continue}
 			if sy + tile_size < 0 || sy >= i32(MAP_VIEW_HEIGHT) {continue}
-			if ui.use_sprites {
-				spr := sprite_manager_named(sprites, "tile", ENEMY_ABILITY_WEB)
-				sprite_manager_draw(
-					engine,
-					sprites,
-					spr,
-					sx,
-					sy,
-					eng.Engine_Color{180, 180, 180, 150},
-					tile_size,
-				)
-			} else {
-				render_draw_text(
-					engine,
-					"w",
-					sx + 4,
-					sy + 4,
-					tile_size - 8,
-					eng.Engine_Color{180, 180, 180, 150},
-				)
-			}
+			spr := sprite_manager_named(sprites, "tile", ENEMY_ABILITY_WEB)
+			render_world_sprite_or_glyph(
+				engine,
+				sprites,
+				ui.use_sprites,
+				spr,
+				'w',
+				"w",
+				eng.Engine_Color{180, 180, 180, 150},
+				sx + (0 if ui.use_sprites else 4),
+				sy + (0 if ui.use_sprites else 4),
+				tile_size if ui.use_sprites else tile_size - 8,
+			)
 		}
 	}
 }
@@ -306,15 +298,8 @@ render_player :: proc(engine: ^eng.Engine, game: ^Game) {
 	bob_phase := f32(eng.vfx_manager_frame(vfx)) * 0.06
 	bob_offset := i32(math.sin(f64(bob_phase)) * f64(camera_zoom(camera)))
 	py += bob_offset
-	if ui.use_sprites {
-		spr := sprite_manager_named(sprites, "character", "player")
-		sprite_manager_draw(engine, sprites, spr, px, py, game.player.color, tile_size)
-	} else {
-		glyph_buf: [2]u8
-		glyph_buf[0] = u8(game.player.glyph)
-		glyph_buf[1] = 0
-		render_draw_text(engine, cast(cstring)&glyph_buf[0], px, py, tile_size, game.player.color)
-	}
+	spr := sprite_manager_named(sprites, "character", "player")
+	render_world_sprite_or_glyph(engine, sprites, ui.use_sprites, spr, game.player.glyph, nil, game.player.color, px, py, tile_size)
 }
 
 // ─── Enemy rendering ──────────────────────────────────────────────────────────
@@ -337,14 +322,7 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^Game) {
 		bob_offset := i32(math.sin(f64(bob_phase)) * 1.5)
 		ey += bob_offset
 
-		if ui.use_sprites {
-			spr := sprite_manager_enemy(sprites, enemy.enemy_type)
-			sprite_manager_draw(engine, sprites, spr, ex, ey, enemy.color, tile_size)
-		} else {
-			glyph_buf: [2]u8
-			glyph_buf[0] = u8(enemy.glyph)
-			glyph_buf[1] = 0
-			render_draw_text(engine, cast(cstring)&glyph_buf[0], ex, ey, tile_size, enemy.color)
-		}
+		spr := sprite_manager_enemy(sprites, enemy.enemy_type)
+		render_world_sprite_or_glyph(engine, sprites, ui.use_sprites, spr, enemy.glyph, nil, enemy.color, ex, ey, tile_size)
 	}
 }

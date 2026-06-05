@@ -1,6 +1,8 @@
 package main
 
 import "core:math/rand"
+import "core:slice"
+
 
 
 MIN_ROOM_W :: 4

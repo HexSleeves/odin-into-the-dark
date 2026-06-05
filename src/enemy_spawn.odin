@@ -20,10 +20,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 					ey := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
 					pos := Vec2{ex, ey}
 
-					if !is_walkable(game, ex, ey) {continue}
-					if pos == game.player.pos {continue}
-					if enemy_at(game, ex, ey) != nil {continue}
-
+					if !can_place_enemy(game, ex, ey) {continue}
 					def := content_manager_enemy_def_for_depth(content, game.depth)
 					if def != nil {
 						append(&game.enemies, enemy_make_from_def(def, pos))
@@ -50,13 +47,8 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			if spawned >= target {break}
 			x := rand.int_max(MAP_WIDTH - 2) + 1
 			y := rand.int_max(MAP_HEIGHT - 2) + 1
-			if !is_walkable(game, x, y) {continue}
 			pos := Vec2{x, y}
-			if pos == game.player.pos {continue}
-			if enemy_at(game, x, y) != nil {continue}
-			// Don't spawn on descent
-			t := tile_at(game, x, y)
-			if t != nil && t.type == .Descent {continue}
+			if !can_place_enemy(game, x, y) {continue}
 
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {

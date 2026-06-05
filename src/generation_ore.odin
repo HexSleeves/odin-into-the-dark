@@ -1,6 +1,8 @@
 package main
 
 import "core:math/rand"
+import eng "./engine"
+
 
 
 spawn_ore_veins :: proc(game: ^Game) {
@@ -84,4 +86,3 @@ spawn_ore_veins :: proc(game: ^Game) {
 }
 
 // ─── Anvil spawning (one per floor) ───────────────────────────────────────────
-
