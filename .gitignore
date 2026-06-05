@@ -52,6 +52,7 @@ main
 game
 
 .firecrawl/
+src.bin
 
 # Game runtime files
 savegame.dat
