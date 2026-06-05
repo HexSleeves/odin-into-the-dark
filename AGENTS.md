@@ -39,6 +39,7 @@ main()  →  engine_run(config, services, &app)
 **Scene system** — `Game_State` enum maps 1:1 to `Game_Scene` enum. Each scene has `enter/update/render/exit` callbacks. `scene.odin` owns the mapping; `engine.Scene_Manager` owns the lifecycle.
 
 **Backend abstraction** — every I/O boundary is a struct of `ctx: rawptr` + function pointers:
+
 - `Engine_File_System` — read/write/exists/remove
 - `Engine_Input_Backend`, `Engine_Audio_Backend`, `Engine_Render_Backend`, `Engine_Texture_Backend`
 
@@ -52,10 +53,13 @@ Defaults use OS/Raylib implementations. Tests inject fake backends by constructi
 
 | Path | Purpose |
 |---|---|
-| `src/` | Game package (`package main`) — app lifecycle and glue across domain subpackages |
-| `src/core/` | Game domain types, constants, content/save managers, UI text/theme tokens |
-| `src/render/` | Rendering package — Clay UI, world rendering, sprites, render tests |
+| `src/` | Game package (`package main`) — app lifecycle, scene routing, and alias shims |
+| `src/core/` | Pure data layer — game types, constants, content/save managers, inventory/equipment helpers |
+| `src/gameplay/` | Gameplay orchestration — actions, items, mining, FOV, generation, status effects |
+| `src/input/` | Input package (`package gameinput`) — input manager, key bindings, all input state handlers |
+| `src/render/` | Rendering package — Clay UI, world rendering, sprites, particles |
 | `src/audio/` / `src/io/` / `src/ui/` | Audio, logging/platform I/O, and UI manager packages |
+| `src/ai/` / `src/gen/` | AI (enemy turns, combat, abilities) and map generation packages |
 | `src/engine/` | Engine package (`package engine`) — reusable, backend-agnostic managers |
 | `data/` | json5 data files — enemies, items, player, sprites |
 | `assets/` | PNG spritesheets (tiles, characters, items, GUI) |
@@ -79,6 +83,7 @@ just stats           # wc -l on all .odin and .json5 files
 `just verify` is the required pre-completion gate. Always run it before finishing any task.
 
 **Tooling:**
+
 - Odin: `2026-05` (Homebrew, `/opt/homebrew/Cellar/odin/2026-05/`)
 - OLS language server: `ols.json` — `-vet -strict-style` checker args, inlay hints enabled
 - `odinfmt` binary: `/Users/lecoqjacob/Developer/games/ols/odinfmt`
@@ -155,13 +160,23 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 | `src/core/screen_layout.odin` / `src/core/gameplay_tuning.odin` / `src/core/build_config.odin` | Screen geometry, gameplay tuning constants, build flags |
 | `src/game.odin` | `game_init`, `game_destroy`, `game_camera_update` |
 | `src/scene.odin` | `Game_Scene` enum, `scene_for_state`, scene update/render callbacks |
-| `src/generation_dispatch.odin` / `src/mapgen_rooms.odin` / `src/generation_*.odin` | Procedural map generation by concern |
+| `src/gameplay/generation.odin` | Map generation dispatch and item spawning |
+| `src/gameplay/actions.odin` | Turn/combat orchestration: descend, advance_turn, trigger_enemy_rounds, tile effects |
+| `src/gameplay/items.odin` | Item factory, pickup, use, drop, equip, apply_item_effect |
+| `src/gameplay/mining.odin` | Mining and crafting orchestration |
+| `src/gameplay/fov.odin` | Field-of-view computation |
+| `src/gameplay/status_effects.odin` | Timed effect ticking (poison, fire, light drain) |
+| `src/gameplay/restart.odin` | Score saving |
+| `src/gen/*.odin` | Procedural room/cave/mixed map generation |
 | `src/data.odin` / `src/core/data_defs.odin` / `src/core/content_manager.odin` | json5 parsing, data schemas, content registry/accessors |
-| `src/save_format.odin` / `src/save_write.odin` / `src/save_restore.odin` / `src/save_migrations.odin` / `src/save_query.odin` | Binary save format and persistence flow |
-| `src/actions.odin` | Player action handlers: move, descend, advance_turn, restart |
-| `src/combat.odin` | Combat resolution |
-| `src/fov.odin` | Field-of-view computation |
-| `src/input.odin` / `src/input_*.odin` / `src/input_manager.odin` | Input routing, per-state handlers, and manager |
+| `src/io/save_*.odin` | Binary save format and persistence flow |
+| `src/actions.odin` | Root bridge: handle_player_action, restart_game |
+| `src/ai/combat.odin` | Combat resolution |
+| `src/input/manager.odin` | Input manager, key bindings, Game_Action enum |
+| `src/input/playing_action.odin` | Movement/combat input dispatch (handle_input) |
+| `src/input/playing_state.odin` | Playing state hotkeys, mining input, forced turns |
+| `src/input/state_updates.odin` | Per-state update handlers (inventory, crafting, help, scores, game over, victory) |
+| `src/input/cheats.odin` | Cheat menu input handling |
 | `src/render/render.odin` | Top-level render dispatch |
 | `src/render/render_map.odin` / `src/render/render_items.odin` / `src/render/render_world.odin` / `src/render/render_title_fx.odin` | World/map/item rendering and title fire backdrop effects |
 | `src/render/clay_ui.odin` / `src/render/clay_renderer.odin` / `src/render/clay_hud.odin` / `src/render/clay_overlays.odin` / `src/render/clay_*` | Clay immediate-mode UI path |
@@ -233,7 +248,7 @@ odin test src/engine/   # engine package only
 
 ## GitHub Project Board
 
-**Board:** https://github.com/users/HexSleeves/projects/4
+**Board:** <https://github.com/users/HexSleeves/projects/4>
 
 ### Project IDs (for GraphQL mutations)
 
