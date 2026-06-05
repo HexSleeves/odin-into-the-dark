@@ -99,7 +99,7 @@ mine_wall :: proc(
 				fmt.tprintf("Your %s breaks!", wpn.name),
 				eng.Engine_Color{255, 80, 80, 255},
 			)
-		} else if wpn.durability <= 5 {
+		} else if wpn.durability <= DURABILITY_WARN_THRESHOLD {
 			add_message(
 				messages,
 				game,

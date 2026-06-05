@@ -69,7 +69,7 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 	}
 
 	// Passive light drain — darkness encroaches without a light source (depth 3+)
-	if game.depth >= 3 && game.light_boost_turns <= 0 {
+	if game.depth >= LIGHT_DRAIN_START_DEPTH && game.light_boost_turns <= 0 {
 		game.light_drain_timer += 1
 		if game.light_drain_timer >= LIGHT_DRAIN_INTERVAL {
 			game.light_drain_timer = 0

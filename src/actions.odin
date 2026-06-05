@@ -111,17 +111,15 @@ descend :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 ) {
-	// Victory condition: escaping from depth 12
-	if game.depth >= 12 {
+	if game.depth >= MAX_DEPTH {
 		game.state = .Victory
 		return
 	}
 
 	game.depth += 1
 
-	// Reduce light radius with depth (min 2 at depth 8+, min 3 otherwise)
-	min_light := 3
-	if game.depth >= 8 {min_light = 2}
+	min_light := MIN_LIGHT_RADIUS_DEFAULT
+	if game.depth >= MIN_LIGHT_DEPTH {min_light = MIN_LIGHT_RADIUS_DEEP}
 	player_def := content_manager_player_def(content)
 	game.player.light_radius = max(player_def.light_radius - game.depth + 1, min_light)
 	game.light_drain_timer = 0
@@ -308,8 +306,8 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
-		game.player.hp -= 3
-		game.poison_turns = max(game.poison_turns, 5)
+		game.player.hp -= GAS_VENT_DAMAGE
+		game.poison_turns = max(game.poison_turns, GAS_VENT_POISON_TURNS)
 		eng.vfx_manager_flash(
 			game_engine_vfx_manager(engine),
 			eng.Engine_Color{160, 180, 40, 255},
@@ -318,7 +316,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		add_message(
 			messages,
 			game,
-			"Toxic gas burns you! Poisoned! (-3 HP)",
+			fmt.tprintf("Toxic gas burns you! Poisoned! (-%d HP)", GAS_VENT_DAMAGE),
 			eng.Engine_Color{160, 180, 40, 255},
 		)
 		if game.player.hp <= 0 {
@@ -329,7 +327,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	if cur_tile.type == .Fountain {
 		messages := game_engine_message_manager(engine)
-		heal := min(5, game.player.max_hp - game.player.hp)
+		heal := min(FOUNTAIN_HEAL, game.player.max_hp - game.player.hp)
 		if heal > 0 {
 			game.player.hp += heal
 			// Consume the fountain — one use only
@@ -353,8 +351,8 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 
 	if cur_tile.type == .Fire_Vent {
 		messages := game_engine_message_manager(engine)
-		game.player.hp -= 2
-		game.burning_turns = max(game.burning_turns, 4)
+		game.player.hp -= FIRE_VENT_DAMAGE
+		game.burning_turns = max(game.burning_turns, FIRE_VENT_BURNING_TURNS)
 		eng.vfx_manager_flash(
 			game_engine_vfx_manager(engine),
 			eng.Engine_Color{255, 120, 20, 255},
@@ -363,7 +361,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 		add_message(
 			messages,
 			game,
-			"Flames scorch you! Burning! (-2 HP)",
+			fmt.tprintf("Flames scorch you! Burning! (-%d HP)", FIRE_VENT_DAMAGE),
 			eng.Engine_Color{255, 120, 20, 255},
 		)
 		if game.player.hp <= 0 {
