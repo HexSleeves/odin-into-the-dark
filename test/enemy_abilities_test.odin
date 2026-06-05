@@ -1,5 +1,6 @@
 package main
 
+import eng "./engine"
 import "core:testing"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────

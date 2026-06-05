@@ -42,6 +42,12 @@ make_test_content :: proc(id: string, stack_limit: int) -> gcore.Content_Manager
 	return c
 }
 
+destroy_test_content :: proc(content: ^gcore.Content_Manager) {
+	if content == nil {return}
+	delete(content.registry.items.items)
+	content.registry.items.items = nil
+}
+
 // ─── inventory_put_slot / pickup into empty slot ──────────────────────────────
 
 @(test)
@@ -52,6 +58,7 @@ pickup_item_adds_item_to_empty_slot :: proc(t: ^testing.T) {
 
 	msgs := message_manager_make()
 	content := make_test_content("health_potion", 1) // stack_limit=1 → non-stackable
+	defer destroy_test_content(&content)
 
 	ok := pickup_item(&content, &msgs, &g)
 
@@ -71,6 +78,7 @@ pickup_item_adds_item_to_empty_slot :: proc(t: ^testing.T) {
 pickup_item_stacks_stackable_item_up_to_stack_max :: proc(t: ^testing.T) {
 	g := make_test_game()
 	content := make_test_content("torch", 5) // stack_limit=5
+	defer destroy_test_content(&content)
 
 	// Pre-seed inventory with 1 torch already held.
 	existing := make_test_item("torch")
@@ -100,6 +108,7 @@ pickup_item_stacks_stackable_item_up_to_stack_max :: proc(t: ^testing.T) {
 pickup_item_opens_new_slot_when_existing_stack_is_full :: proc(t: ^testing.T) {
 	g := make_test_game()
 	content := make_test_content("torch", 5)
+	defer destroy_test_content(&content)
 
 	// Slot 0: torch already at max stack.
 	full_stack := make_test_item("torch")
@@ -132,6 +141,7 @@ pickup_item_opens_new_slot_when_existing_stack_is_full :: proc(t: ^testing.T) {
 pickup_item_fails_when_inventory_full_and_item_non_stackable :: proc(t: ^testing.T) {
 	g := make_test_game()
 	content := make_test_content("sword", 1) // non-stackable
+	defer destroy_test_content(&content)
 
 	// Fill every slot.
 	filler := make_test_item("filler")
