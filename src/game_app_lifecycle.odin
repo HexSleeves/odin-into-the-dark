@@ -3,9 +3,9 @@ package main
 import gameaudio "./audio"
 import gcore "./core"
 import eng "./engine"
+import gp "./gameplay"
 import gameinput "./input"
 import gameio "./io"
-import gp "./gameplay"
 import renderer "./render"
 import gameui "./ui"
 

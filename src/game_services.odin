@@ -126,7 +126,12 @@ game_engine_save_manager :: proc(engine: ^eng.Engine) -> ^gcore.Save_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^gcore.Save_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_SAVES)
+	return(
+		cast(^gcore.Save_Manager)eng.engine_services_get(
+			engine.services,
+			GAME_ENGINE_SERVICE_SAVES,
+		) \
+	)
 }
 
 game_engine_audio_manager :: proc(engine: ^eng.Engine) -> ^gameaudio.Audio_Manager {
@@ -153,14 +158,24 @@ game_engine_score_manager :: proc(engine: ^eng.Engine) -> ^renderer.Score_Manage
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^renderer.Score_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_SCORES)
+	return(
+		cast(^renderer.Score_Manager)eng.engine_services_get(
+			engine.services,
+			GAME_ENGINE_SERVICE_SCORES,
+		) \
+	)
 }
 
 game_engine_input_manager :: proc(engine: ^eng.Engine) -> ^gameinput.Input_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^gameinput.Input_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_INPUT)
+	return(
+		cast(^gameinput.Input_Manager)eng.engine_services_get(
+			engine.services,
+			GAME_ENGINE_SERVICE_INPUT,
+		) \
+	)
 }
 
 game_engine_message_manager :: proc(engine: ^eng.Engine) -> ^eng.Message_Manager {

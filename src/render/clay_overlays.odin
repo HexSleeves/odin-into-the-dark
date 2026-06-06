@@ -296,6 +296,7 @@ clay_overlay_decl :: proc(color: eng.Engine_Color) -> clay.ElementDeclaration {
 			childAlignment = {x = .Center, y = .Top},
 			layoutDirection = .TopToBottom,
 		},
+		floating = {attachTo = .Parent, attachment = {element = .LeftTop, parent = .LeftTop}},
 		backgroundColor = clay_color(color),
 	}
 }

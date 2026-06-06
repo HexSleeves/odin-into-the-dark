@@ -46,14 +46,20 @@ action_input_pressed :: proc(input: ^Action_Input_Manager, action: int) -> bool 
 	if input == nil || !action_input_valid_action(action) {
 		return false
 	}
-	return action_input_binding_pressed(action_input_backend(input), input.bindings[action])
+	backend := action_input_backend(input)
+	binding := input.bindings[action]
+	if action_input_unshifted_binding_suppressed(input, binding, backend) {return false}
+	return action_input_binding_pressed(backend, binding)
 }
 
 action_input_held :: proc(input: ^Action_Input_Manager, action: int) -> bool {
 	if input == nil || !action_input_valid_action(action) {
 		return false
 	}
-	return action_input_binding_held(action_input_backend(input), input.bindings[action])
+	backend := action_input_backend(input)
+	binding := input.bindings[action]
+	if action_input_unshifted_binding_suppressed(input, binding, backend) {return false}
+	return action_input_binding_held(backend, binding)
 }
 
 action_input_released :: proc(input: ^Action_Input_Manager, action: int) -> bool {
@@ -62,6 +68,7 @@ action_input_released :: proc(input: ^Action_Input_Manager, action: int) -> bool
 	}
 	binding := input.bindings[action]
 	backend := action_input_backend(input)
+	if action_input_unshifted_binding_suppressed(input, binding, backend) {return false}
 	if binding.primary == .None {return false}
 	if binding.needs_shift && !action_input_shift_is_held(backend) {return false}
 	return(
@@ -77,7 +84,11 @@ action_input_repeat :: proc(input: ^Action_Input_Manager, action: int) -> bool {
 	backend := action_input_backend(input)
 	dt := engine_input_frame_time(backend)
 	repeat := &input.repeat[action]
-	held := action_input_binding_held(backend, input.bindings[action])
+	binding := input.bindings[action]
+	held := false
+	if !action_input_unshifted_binding_suppressed(input, binding, backend) {
+		held = action_input_binding_held(backend, binding)
+	}
 
 	if !held {
 		repeat.hold_time = 0
@@ -121,6 +132,31 @@ action_input_backend :: proc(input: ^Action_Input_Manager) -> Engine_Input_Backe
 }
 
 @(private = "file")
+action_input_unshifted_binding_suppressed :: proc(
+	input: ^Action_Input_Manager,
+	binding: Engine_Key_Binding,
+	backend: Engine_Input_Backend,
+) -> bool {
+	if input == nil || binding.needs_shift || !action_input_shift_is_held(backend) {
+		return false
+	}
+	for shifted in input.bindings {
+		if shifted.needs_shift && action_input_bindings_share_key(binding, shifted) {
+			return true
+		}
+	}
+	return false
+}
+
+@(private = "file")
+action_input_bindings_share_key :: proc(a, b: Engine_Key_Binding) -> bool {
+	return(
+		a.primary != .None && (a.primary == b.primary || a.primary == b.alt) ||
+		a.alt != .None && (a.alt == b.primary || a.alt == b.alt) \
+	)
+}
+
+@(private = "file")
 action_input_binding_held :: proc(
 	backend: Engine_Input_Backend,
 	binding: Engine_Key_Binding,
@@ -139,10 +175,26 @@ action_input_binding_pressed :: proc(
 	binding: Engine_Key_Binding,
 ) -> bool {
 	if binding.primary == .None {return false}
-	if binding.needs_shift && !action_input_shift_is_held(backend) {return false}
+	if binding.needs_shift {
+		if !action_input_shift_is_held(backend) {return false}
+		if action_input_shift_pressed(backend) {
+			return(
+				engine_input_key_down(backend, binding.primary) ||
+				(binding.alt != .None && engine_input_key_down(backend, binding.alt)) \
+			)
+		}
+	}
 	return(
 		engine_input_key_pressed(backend, binding.primary) ||
 		(binding.alt != .None && engine_input_key_pressed(backend, binding.alt)) \
+	)
+}
+
+@(private = "file")
+action_input_shift_pressed :: proc(backend: Engine_Input_Backend) -> bool {
+	return(
+		engine_input_key_pressed(backend, .Left_Shift) ||
+		engine_input_key_pressed(backend, .Right_Shift) \
 	)
 }
 

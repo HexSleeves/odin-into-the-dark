@@ -25,6 +25,51 @@ action_input_manager_reads_configured_bindings_from_backend :: proc(t: ^testing.
 }
 
 @(test)
+action_input_manager_prefers_shifted_binding_over_unshifted_binding_for_same_key :: proc(
+	t: ^testing.T,
+) {
+	state := Test_Action_Input_Backend_State{}
+	state.pressed[Engine_Key.C] = true
+	state.down[Engine_Key.C] = true
+	state.released[Engine_Key.C] = true
+	state.down[Engine_Key.Left_Shift] = true
+	input := action_input_manager_make(0.20, 0.08)
+	input.backend = test_action_input_backend(&state)
+	action_input_manager_set_binding(&input, 0, Engine_Key_Binding{primary = .C})
+	action_input_manager_set_binding(
+		&input,
+		1,
+		Engine_Key_Binding{primary = .C, needs_shift = true},
+	)
+
+	testing.expect(t, !action_input_pressed(&input, 0))
+	testing.expect(t, !action_input_held(&input, 0))
+	testing.expect(t, !action_input_released(&input, 0))
+	testing.expect(t, action_input_pressed(&input, 1))
+	testing.expect(t, action_input_held(&input, 1))
+	testing.expect(t, action_input_released(&input, 1))
+}
+
+@(test)
+action_input_manager_fires_shifted_binding_when_shift_is_pressed_after_primary_key :: proc(
+	t: ^testing.T,
+) {
+	state := Test_Action_Input_Backend_State{}
+	state.down[Engine_Key.C] = true
+	state.pressed[Engine_Key.Left_Shift] = true
+	state.down[Engine_Key.Left_Shift] = true
+	input := action_input_manager_make(0.20, 0.08)
+	input.backend = test_action_input_backend(&state)
+	action_input_manager_set_binding(
+		&input,
+		0,
+		Engine_Key_Binding{primary = .C, needs_shift = true},
+	)
+
+	testing.expect(t, action_input_pressed(&input, 0))
+}
+
+@(test)
 action_input_manager_reads_released_and_held_alternate_keys :: proc(t: ^testing.T) {
 	state := Test_Action_Input_Backend_State{}
 	state.down[Engine_Key.Up] = true

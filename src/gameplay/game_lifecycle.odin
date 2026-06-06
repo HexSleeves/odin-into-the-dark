@@ -2,6 +2,7 @@ package gameplay
 
 import gcore "../core"
 import eng "../engine"
+import "base:runtime"
 import "core:math/rand"
 import "core:time"
 
@@ -62,6 +63,12 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 // ─── Reinitialize in place (for restart) ─────────────────────────────────────
 
 game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game: ^Game) {
+	// This proc runs inside the engine update callback, which sets
+	// context.allocator to a per-frame arena. Dynamic arrays allocated
+	// from the frame arena would be freed next frame. Force the heap
+	// allocator for all persistent allocations.
+	context.allocator = runtime.default_allocator()
+
 	seed := game_next_seed()
 	logger_debugf(.Init, "seed = %v", seed)
 	rand.reset(seed)

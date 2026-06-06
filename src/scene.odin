@@ -172,7 +172,12 @@ game_scene_title_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_gameplay_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^gcore.Game)ctx
-	return gameinput.update_playing(engine, game, game_engine_input_manager(engine), &g_game_config)
+	return gameinput.update_playing(
+		engine,
+		game,
+		game_engine_input_manager(engine),
+		&g_game_config,
+	)
 }
 
 game_scene_game_over_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
@@ -211,7 +216,11 @@ game_scene_crafting_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_help_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^gcore.Game)ctx
-	gameinput.update_viewing_help(game_engine_ui_manager(engine), game, game_engine_input_manager(engine))
+	gameinput.update_viewing_help(
+		game_engine_ui_manager(engine),
+		game,
+		game_engine_input_manager(engine),
+	)
 	return false
 }
 

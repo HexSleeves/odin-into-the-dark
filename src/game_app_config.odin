@@ -13,7 +13,12 @@ g_game_config: Game_Config
 g_config: eng.Config_Manager
 
 game_engine_config :: proc() -> eng.Engine_Config {
-	config := eng.engine_config_make(gcore.SCREEN_WIDTH, gcore.SCREEN_HEIGHT, "Into the Depths", 60)
+	config := eng.engine_config_make(
+		gcore.SCREEN_WIDTH,
+		gcore.SCREEN_HEIGHT,
+		"Into the Depths",
+		60,
+	)
 	when ODIN_OS == .JS {
 		config.platform = gameio.karl2d_platform_backend()
 		config.render = gameio.karl2d_render_backend()
