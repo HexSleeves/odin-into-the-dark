@@ -23,6 +23,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 					def := content_manager_enemy_def_for_depth(content, game.depth)
 					if def != nil {
 						append(&game.enemies, enemy_make_from_def(def, pos))
+						logger_debugf(.Enemy, "spawned '%s' at (%v,%v) room=%v", def.id, ex, ey, i)
 						total += 1
 					}
 					break
@@ -52,6 +53,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, pos))
+				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave", def.id, x, y)
 				spawned += 1
 			}
 		}

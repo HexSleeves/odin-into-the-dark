@@ -99,6 +99,7 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def == nil {break}
 			append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+			logger_debugf(.Enemy, "spawned '%s' at (%v,%v) den", def.id, x, y)
 			break
 		}
 	}
