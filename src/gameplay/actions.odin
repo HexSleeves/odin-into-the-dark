@@ -180,11 +180,11 @@ consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 	pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
 	if web_tile_at_idx(game, pidx) {
 		web_tile_set_idx(game, pidx, false)
-		game.skip_next_turn = true
+		game.web_stuck_turns = WEB_STUCK_TURNS
 		add_message(
 			messages,
 			game,
-			"You are stuck in a web!",
+			fmt.tprintf("You are caught in a web! Stuck for %d turns.", WEB_STUCK_TURNS),
 			eng.Engine_Color{180, 180, 180, 255},
 		)
 	}

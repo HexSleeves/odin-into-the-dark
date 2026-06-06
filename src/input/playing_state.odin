@@ -11,16 +11,20 @@ Game_Config :: struct {
 handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 	messages := game_engine_message_manager(engine)
 
-	if game.skip_next_turn {
-		game.skip_next_turn = false
+	if game.web_stuck_turns > 0 {
+		game.web_stuck_turns -= 1
 		game.player.energy -= game.player.quickness * 10
 		trigger_enemy_rounds(engine, game)
-		add_message(
-			messages,
-			game,
-			"You break free from the web.",
-			eng.Engine_Color{200, 200, 100, 255},
-		)
+		if game.web_stuck_turns > 0 {
+			add_message(
+				messages,
+				game,
+				fmt.tprintf("You struggle in the web... (%d turns left)", game.web_stuck_turns),
+				eng.Engine_Color{180, 180, 180, 255},
+			)
+		} else {
+			add_message(messages, game, "You break free from the web!", eng.Engine_Color{200, 200, 100, 255})
+		}
 		return true
 	}
 

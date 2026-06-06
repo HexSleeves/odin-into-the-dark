@@ -36,7 +36,7 @@ save_game_to_storage :: proc(
 	data.seed = game.seed
 	data.light_boost_bonus = game.light_boost_bonus
 	data.light_boost_turns = game.light_boost_turns
-	data.skip_next_turn = game.skip_next_turn
+	data.web_stuck_turns = game.web_stuck_turns
 	data.water_slow_active = game.water_slow_active
 	data.items_found = game.items_found
 	data.poison_turns = game.poison_turns

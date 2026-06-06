@@ -80,7 +80,7 @@ load_game_from_storage :: proc(
 	game.seed = data.seed
 	game.light_boost_bonus = data.light_boost_bonus
 	game.light_boost_turns = data.light_boost_turns
-	game.skip_next_turn = data.skip_next_turn
+	game.web_stuck_turns = data.web_stuck_turns
 	game.water_slow_active = data.water_slow_active
 	game.items_found = data.items_found
 	game.poison_turns = data.poison_turns

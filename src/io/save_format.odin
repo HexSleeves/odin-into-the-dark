@@ -6,7 +6,7 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-SAVE_VERSION :: u32(5)
+SAVE_VERSION :: u32(6)
 SAVE_VERSION_V4 :: u32(4)
 SAVE_VERSION_V3 :: u32(3)
 SAVE_VERSION_V2 :: u32(2)
@@ -106,7 +106,7 @@ Save_Data :: struct {
 	seed:              u64,
 	light_boost_bonus: int,
 	light_boost_turns: int,
-	skip_next_turn:    bool,
+	web_stuck_turns:   int,
 	water_slow_active: bool,
 	// v4 additions
 	items_found:       int,

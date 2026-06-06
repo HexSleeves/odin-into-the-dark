@@ -75,7 +75,7 @@ when CHEATS_ENABLED {
 		game.light_drain_timer = 0
 		game.water_slow_active = false
 		game.minimap_reveal_enemies = false
-		game.skip_next_turn = false
+		game.web_stuck_turns = 0
 		generate_map(content, game)
 		compute_fov(game)
 		game_camera_update(camera, game, true)
@@ -124,7 +124,7 @@ when CHEATS_ENABLED {
 			game.poison_turns = 0
 			game.burning_turns = 0
 			game.frozen_turns = 0
-			game.skip_next_turn = false
+			game.web_stuck_turns = 0
 			add_message(
 				messages,
 				game,

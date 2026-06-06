@@ -85,7 +85,7 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 	web_tiles_clear(game)
 	clear(&game.rooms)
-	game.skip_next_turn = false
+	game.web_stuck_turns = 0
 
 	if game.depth <= 2 {
 		generate_rooms(game)

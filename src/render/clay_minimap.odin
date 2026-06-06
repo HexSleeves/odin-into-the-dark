@@ -94,6 +94,9 @@ clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Colo
 	}
 	enemy := gcore.enemy_at(game, x, y)
 	if enemy != nil && minimap_should_draw_enemy_dot(game, enemy) {
+		if enemy.is_boss {
+			return eng.Engine_Color{255, 215, 0, 255} // gold
+		}
 		return eng.Engine_Color{255, 60, 60, 255}
 	}
 

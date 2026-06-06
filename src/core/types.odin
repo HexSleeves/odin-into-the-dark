@@ -198,7 +198,7 @@ Game :: struct {
 	// Web tiles (Cave Crawler ability)
 	web_tiles:              eng.Bool_Grid_Manager,
 	tile_states:            eng.Tile_State_Manager,
-	skip_next_turn:         bool, // player stuck in web
+	web_stuck_turns:        int, // turns remaining stuck in web (0 = free)
 	// Equipment slots
 	equipped_weapon:        Equipment,
 	equipped_armor:         Equipment,

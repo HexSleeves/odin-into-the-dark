@@ -66,6 +66,7 @@ FIRE_VENT_BURNING_TURNS :: gcore.FIRE_VENT_BURNING_TURNS
 MIN_LIGHT_RADIUS_DEFAULT :: gcore.MIN_LIGHT_RADIUS_DEFAULT
 MIN_LIGHT_DEPTH :: gcore.MIN_LIGHT_DEPTH
 MIN_LIGHT_RADIUS_DEEP :: gcore.MIN_LIGHT_RADIUS_DEEP
+WEB_STUCK_TURNS :: gcore.WEB_STUCK_TURNS
 
 // ─── Core helpers ─────────────────────────────────────────────────────────────
 pos_to_idx :: gcore.pos_to_idx
