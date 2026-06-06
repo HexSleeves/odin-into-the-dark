@@ -53,8 +53,7 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 
 		placed := false
 		for _ in 0 ..< 20 {
-			ix := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-			iy := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+			ix, iy := rand_room_interior(room)
 			pos := Vec2{ix, iy}
 
 			if !can_place_item(game, ix, iy) {continue}

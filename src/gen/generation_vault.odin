@@ -74,8 +74,7 @@ spawn_treasure_vault :: proc(content: ^Content_Manager, game: ^Game) {
 	seal_room_perimeter_for_vault(game, room, door)
 
 	for _ in 0 ..< 50 {
-		x := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-		y := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+		x, y := rand_room_interior(room)
 		if item_at(game, x, y) != nil {continue}
 		append(&game.items, item_make_from_def(loot_def, Vec2{x, y}))
 		break

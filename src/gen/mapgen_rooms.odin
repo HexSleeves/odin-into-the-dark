@@ -124,8 +124,7 @@ generate_rooms :: proc(game: ^Game) {
 		rubble_count := rand.int_max(2) + 1
 		for _ in 0 ..< rubble_count {
 			for _ in 0 ..< 10 {
-				rx := rand.int_max(room.x2 - room.x1) + room.x1
-				ry := rand.int_max(room.y2 - room.y1) + room.y1
+				rx, ry := rand_room_any(room)
 				idx := pos_to_idx(rx, ry)
 				if game.tiles[idx].type == .Floor &&
 				   !(rx == game.player.pos.x && ry == game.player.pos.y) &&

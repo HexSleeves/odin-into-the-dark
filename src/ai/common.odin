@@ -58,6 +58,7 @@ Game_Log_Channel :: gameio.Game_Log_Channel
 
 effective_attack :: gcore.effective_attack
 effective_defense :: gcore.effective_defense
+rand_room_interior :: gcore.rand_room_interior
 
 enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 	return gcore.enemy_at(game, x, y)

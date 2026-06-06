@@ -1,6 +1,7 @@
 package core
 
 import eng "../engine"
+import "core:math/rand"
 
 pos_to_idx :: proc(x, y: int) -> int {
 	return y * MAP_WIDTH + x
@@ -222,4 +223,26 @@ game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool 
 		eng.world_manager_pixel_height(game.world),
 		snap,
 	)
+}
+
+// rand_room_interior picks a random interior point in a room (1 tile inset).
+// Returns (room center x, room center y) if the room is too small for an interior.
+rand_room_interior :: proc(room: Room) -> (x, y: int) {
+	w := room.x2 - room.x1 - 2
+	h := room.y2 - room.y1 - 2
+	if w <= 0 || h <= 0 {
+		return (room.x1 + room.x2) / 2, (room.y1 + room.y2) / 2
+	}
+	return rand.int_max(w) + room.x1 + 1, rand.int_max(h) + room.y1 + 1
+}
+
+// rand_room_any picks a random point anywhere within a room's bounds.
+// Returns (room center x, room center y) if the room has zero area.
+rand_room_any :: proc(room: Room) -> (x, y: int) {
+	w := room.x2 - room.x1
+	h := room.y2 - room.y1
+	if w <= 0 || h <= 0 {
+		return (room.x1 + room.x2) / 2, (room.y1 + room.y2) / 2
+	}
+	return rand.int_max(w) + room.x1, rand.int_max(h) + room.y1
 }

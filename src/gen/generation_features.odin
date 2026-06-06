@@ -66,8 +66,7 @@ spawn_fountain :: proc(game: ^Game) {
 	for _ in 0 ..< 50 {
 		room_idx := rand.int_max(len(game.rooms) - 1) + 1
 		room := game.rooms[room_idx]
-		x := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-		y := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+		x, y := rand_room_interior(room)
 		idx := pos_to_idx(x, y)
 		if game.tiles[idx].type != .Floor {continue}
 		pos := Vec2{x, y}
@@ -91,8 +90,7 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 	extra := rand.int_max(3) + 3
 	for _ in 0 ..< extra {
 		for _ in 0 ..< 20 {
-			x := rand.int_max(room.x2 - room.x1) + room.x1
-			y := rand.int_max(room.y2 - room.y1) + room.y1
+			x, y := rand_room_any(room)
 			if !is_walkable(game, x, y) {continue}
 			if enemy_at(game, x, y) != nil {continue}
 			if x == game.player.pos.x && y == game.player.pos.y {continue}
@@ -106,8 +104,7 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 
 	// Place 1 guaranteed item in the den
 	for _ in 0 ..< 50 {
-		x := rand.int_max(room.x2 - room.x1) + room.x1
-		y := rand.int_max(room.y2 - room.y1) + room.y1
+		x, y := rand_room_any(room)
 		if !is_walkable(game, x, y) {continue}
 		if item_at(game, x, y) != nil {continue}
 		def := content_manager_pick_item_def_for_depth(content, game.depth)

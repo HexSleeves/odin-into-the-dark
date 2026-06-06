@@ -15,8 +15,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 
 			for _ in 0 ..< count {
 				for _ in 0 ..< 20 {
-					ex := rand.int_max(room.x2 - room.x1 - 2) + room.x1 + 1
-					ey := rand.int_max(room.y2 - room.y1 - 2) + room.y1 + 1
+					ex, ey := rand_room_interior(room)
 					pos := Vec2{ex, ey}
 
 					if !can_place_enemy(game, ex, ey) {continue}

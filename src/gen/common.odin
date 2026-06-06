@@ -40,3 +40,5 @@ palette_for_depth :: gcore.palette_for_depth
 
 logger_debugf :: gameio.logger_debugf
 Game_Log_Channel :: gameio.Game_Log_Channel
+rand_room_interior :: gcore.rand_room_interior
+rand_room_any :: gcore.rand_room_any
