@@ -201,6 +201,13 @@ enemy_make :: aipkg.enemy_make
 compute_dijkstra_map :: aipkg.compute_dijkstra_map
 game_grid :: aipkg.game_grid
 
+Merchant_Offer :: gcore.Merchant_Offer
+check_event_tile :: gp.check_event_tile
+apply_shrine_buff :: gp.apply_shrine_buff
+merchant_buy :: gp.merchant_buy
+merchant_leave :: gp.merchant_leave
+update_viewing_shrine :: gameinput.update_viewing_shrine
+update_viewing_merchant :: gameinput.update_viewing_merchant
 content_manager_pick_item_def :: gcore.content_manager_pick_item_def
 // ─── Render procs ─────────────────────────────────────────────────────────────
 clay_ui_init :: renderer.clay_ui_init

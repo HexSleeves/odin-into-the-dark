@@ -51,6 +51,14 @@ clay_render_screen_ui :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			clay_render_game_over_overlay(engine, game)
 		case .Victory:
 			clay_render_victory_overlay(engine, game)
+		case .Viewing_Shrine:
+			clay_render_gameplay_ui(engine, game)
+			clay_render_shrine_overlay(engine, game)
+		case .Viewing_Chest:
+			clay_render_gameplay_ui(engine, game)
+		case .Viewing_Merchant:
+			clay_render_gameplay_ui(engine, game)
+			clay_render_merchant_overlay(engine, game)
 		}
 	}
 }

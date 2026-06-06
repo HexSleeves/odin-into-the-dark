@@ -174,12 +174,18 @@ game_scene_title_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 
 game_scene_gameplay_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^gcore.Game)ctx
-	return gameinput.update_playing(
-		engine,
-		game,
-		game_engine_input_manager(engine),
-		&g_game_config,
-	)
+	im := game_engine_input_manager(engine)
+	// Event overlays share the Gameplay scene
+	#partial switch game.state {
+	case .Viewing_Shrine:
+		gameinput.update_viewing_shrine(engine, game, im)
+		return false
+	case .Viewing_Merchant:
+		gameinput.update_viewing_merchant(engine, game, im)
+		return false
+	case:
+		return gameinput.update_playing(engine, game, im, &g_game_config)
+	}
 }
 
 game_scene_game_over_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {

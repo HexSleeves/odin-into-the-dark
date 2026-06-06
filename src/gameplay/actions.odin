@@ -37,6 +37,7 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	consume_web_if_present(messages, game)
 	apply_current_tile_effects(engine, game)
 	collapse_unstable_previous_tile(messages, game)
+	check_event_tile(engine, game)
 }
 
 handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {

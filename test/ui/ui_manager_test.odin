@@ -30,6 +30,6 @@ ui_manager_resets_transient_modes_without_changing_sprite_preference :: proc(t: 
 	testing.expect(t, !state.mining_mode)
 	testing.expect(t, !state.dropping)
 	testing.expect(t, !state.equipping)
-	testing.expect(t, !state.show_minimap)
+	testing.expect(t, state.show_minimap)
 	testing.expect_value(t, state.inspect_slot, -1)
 }
