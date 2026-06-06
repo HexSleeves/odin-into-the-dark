@@ -39,18 +39,22 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			game.depth,
 		)
 	} else {
-		// Cave/mixed layouts: route-biased scatter on reachable floor tiles.
-		target := 3 + game.depth + game.depth / 2 // slower scaling
+		// Cave/mixed layouts: split between route-biased and free scatter.
+		target := 3 + game.depth + game.depth / 2
 		if target > 15 {target = 15}
+
+		// Route-biased: ~60% of enemies near the path to descent.
+		route_target := target * 3 / 5
+		free_target := target - route_target
 
 		route: [MAP_WIDTH * MAP_HEIGHT]bool
 		route_ok := enemy_spawn_mark_route_to_descent(game, &route)
-		path_radius := 4
+		path_radius := 4 + game.depth / 3  // widen at deeper depths
 		min_player_distance := max(game.player.light_radius + 2, 6)
 
 		spawned := 0
-		for _ in 0 ..< target * 30 {
-			if spawned >= target {break}
+		for _ in 0 ..< route_target * 30 {
+			if spawned >= route_target {break}
 			x := rand.int_max(MAP_WIDTH - 2) + 1
 			y := rand.int_max(MAP_HEIGHT - 2) + 1
 			if !can_place_enemy(game, x, y) {continue}
@@ -63,6 +67,24 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
 				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave route", def.id, x, y)
+				spawned += 1
+			}
+		}
+
+		// Free scatter: remaining enemies anywhere on walkable floor.
+		for _ in 0 ..< free_target * 30 {
+			if spawned >= target {break}
+			x := rand.int_max(MAP_WIDTH - 2) + 1
+			y := rand.int_max(MAP_HEIGHT - 2) + 1
+			if !can_place_enemy(game, x, y) {continue}
+
+			dist := abs(x - game.player.pos.x) + abs(y - game.player.pos.y)
+			if dist < min_player_distance {continue}
+
+			def := content_manager_enemy_def_for_depth(content, game.depth)
+			if def != nil {
+				append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave free", def.id, x, y)
 				spawned += 1
 			}
 		}
