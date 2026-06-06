@@ -114,7 +114,8 @@ is_walkable :: proc(game: ^Game, x, y: int) -> bool {
 	t := tile_at(game, x, y)
 	if t == nil {return false}
 	#partial switch t.type {
-	case .Floor, .Rubble, .Descent, .Water, .Gas_Vent, .Unstable, .Anvil, .Fountain, .Fire_Vent:
+	case .Floor, .Rubble, .Descent, .Water, .Gas_Vent, .Unstable, .Anvil, .Fountain, .Fire_Vent,
+	     .Shrine, .Chest, .Merchant:
 		return true
 	}
 	return false

@@ -156,6 +156,7 @@ spawn_boss :: genpkg.spawn_boss
 spawn_fountain :: genpkg.spawn_fountain
 spawn_monster_den :: genpkg.spawn_monster_den
 spawn_treasure_vault :: genpkg.spawn_treasure_vault
+spawn_floor_event :: genpkg.spawn_floor_event
 
 // ─── AI package ───────────────────────────────────────────────────────────────
 player_die :: aipkg.player_die

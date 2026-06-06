@@ -26,3 +26,16 @@ MIN_LIGHT_RADIUS_DEEP :: 2
 MIN_LIGHT_DEPTH :: 8
 
 DURABILITY_WARN_THRESHOLD :: 5
+
+// ─── Floor events ─────────────────────────────────────────────────────────────
+EVENT_SPAWN_CHANCE :: 40 // percent chance per floor (depth >= 2)
+EVENT_MIN_DEPTH :: 2 // no events on depth 1
+
+SHRINE_HP_COST_PERCENT :: 30 // % of current HP sacrificed
+SHRINE_BUFF_MAX_HP :: 5
+SHRINE_BUFF_ATTACK :: 2
+SHRINE_BUFF_LIGHT :: 2
+
+CHEST_TRAP_CHANCE :: 40 // percent chance of trap
+CHEST_TRAP_DAMAGE :: 5
+CHEST_TRAP_POISON_TURNS :: 3

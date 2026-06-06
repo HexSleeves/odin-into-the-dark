@@ -41,6 +41,8 @@ scene_for_state :: proc(state: gcore.Game_State) -> Game_Scene {
 		return .Scores
 	case .Viewing_Cheats:
 		return .Cheats
+	case .Viewing_Shrine, .Viewing_Chest, .Viewing_Merchant:
+		return .Gameplay
 	}
 
 	return .Gameplay

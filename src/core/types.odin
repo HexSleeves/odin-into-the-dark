@@ -34,7 +34,10 @@ Tile_Type :: enum {
 	Anvil,
 	Fountain,
 	Fire_Vent,
-	Locked_Door, // treasure vault door — blocks entry until player has a key
+	Locked_Door,
+	Shrine,
+	Chest,
+	Merchant,
 }
 
 Tile :: struct {
@@ -166,6 +169,13 @@ UI_State :: struct {
 
 // ─── Game State ───────────────────────────────────────────────────────────────
 
+Merchant_Offer :: struct {
+	item_id:      string, // content ID of item being sold
+	cost_id:      string, // material required
+	cost_qty:     int,    // amount of material needed
+	sold:         bool,   // already purchased
+}
+
 DEATH_CAUSE_MAX_LEN :: 128
 
 Game_State :: enum {
@@ -178,6 +188,9 @@ Game_State :: enum {
 	Viewing_Help,
 	Viewing_Scores,
 	Viewing_Cheats,
+	Viewing_Shrine,
+	Viewing_Chest,
+	Viewing_Merchant,
 }
 
 Game :: struct {
@@ -231,4 +244,8 @@ Game :: struct {
 	// Run statistics
 	items_found:            int,
 	minimap_reveal_enemies: bool, // cheat/debug: show enemy dots on explored tiles
+	// Floor events
+	event_used:             bool, // true if this floor's event has been consumed
+	merchant_stock:         [3]Merchant_Offer, // current merchant offers (3 slots)
+	shrine_choice:          int, // selected shrine buff index (UI state)
 }

@@ -48,6 +48,12 @@ base_tile_color :: proc(type: gcore.Tile_Type, palette: gcore.Floor_Palette) -> 
 		return eng.Engine_Color{200, 80, 20, 255}
 	case .Locked_Door:
 		return eng.Engine_Color{180, 140, 50, 255}
+	case .Shrine:
+		return eng.Engine_Color{100, 200, 255, 255} // cyan glow
+	case .Chest:
+		return eng.Engine_Color{220, 180, 50, 255} // golden
+	case .Merchant:
+		return eng.Engine_Color{80, 220, 120, 255} // green
 	}
 	return UNSEEN_COLOR
 }

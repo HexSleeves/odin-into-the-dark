@@ -104,8 +104,10 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	spawn_fountain(game)
 	spawn_monster_den(content, game)
 	spawn_treasure_vault(content, game)
+	spawn_floor_event(game)
 
 	game.minimap_reveal_enemies = false
 	game.water_slow_active = false
+	game.event_used = false
 	game.palette = palette_for_depth(game.depth)
 }

@@ -35,7 +35,7 @@ ui_manager_reset_transient :: proc(ui: ^UI_Manager) {
 	ui.state.mining_mode = false
 	ui.state.dropping = false
 	ui.state.equipping = false
-	ui.state.show_minimap = false
+	ui.state.show_minimap = true
 	ui.state.inspect_slot = -1
 	ui.state.use_sprites = use_sprites
 }
