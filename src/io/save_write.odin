@@ -70,6 +70,8 @@ save_game_to_storage :: proc(
 			ability_max_cd   = e.ability_max_cd,
 			ability_range    = e.ability_range,
 			is_boss          = e.is_boss,
+			detection_radius = e.detection_radius,
+			aware            = e.aware,
 		}
 	}
 

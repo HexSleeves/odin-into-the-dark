@@ -78,7 +78,10 @@ Enemy :: struct {
 	ability_max_cd:   int, // max cooldown for reset
 	ability_range:    int, // range of the ability
 	is_boss:          bool,
-	behavior:         string, // "lurker" or "" for standard (berserker removed — use high quickness)
+	behavior:         string, // "lurker" or "" for standard
+	// Detection / awareness
+	detection_radius: int, // how far this enemy can "see" the player
+	aware:            bool, // true once the enemy has noticed the player
 	// Energy system (Qud-style AP scheduling)
 	energy:           int, // current action points (may be negative = debt)
 	quickness:        int, // AP generated per round = quickness * 10. Default 100.

@@ -25,10 +25,11 @@ Enemy_Def :: struct {
 	color:      Color_Array,
 	hp:         int,
 	attack:     int,
-	quickness:  int,
-	move_speed: int,
-	ability:    Ability_Def,
-	behavior:   string,
+	quickness:        int,
+	move_speed:       int,
+	detection_radius: int, // 0 = use default (DEFAULT_ENEMY_DETECTION_RADIUS)
+	ability:          Ability_Def,
+	behavior:         string,
 }
 
 Spawn_Weight :: struct {

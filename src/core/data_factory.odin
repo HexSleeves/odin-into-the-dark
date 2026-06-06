@@ -6,6 +6,8 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 	if len(def.glyph) > 0 {
 		g = rune(def.glyph[0])
 	}
+	det := DEFAULT_ENEMY_DETECTION_RADIUS
+	if def.detection_radius > 0 {det = def.detection_radius}
 	return Enemy {
 		pos = pos,
 		hp = def.hp,
@@ -21,6 +23,7 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		ability_max_cd = def.ability.cooldown,
 		ability_range = def.ability.range,
 		behavior = def.behavior,
+		detection_radius = det,
 		quickness = 100 if def.quickness == 0 else def.quickness,
 		move_speed = 100 if def.move_speed == 0 else def.move_speed,
 		energy = 0,

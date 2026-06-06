@@ -132,6 +132,8 @@ load_game_from_storage :: proc(
 				ability_max_cd   = se.ability_max_cd,
 				ability_range    = se.ability_range,
 				is_boss          = se.is_boss,
+				detection_radius = max(se.detection_radius, DEFAULT_ENEMY_DETECTION_RADIUS),
+				aware            = se.aware,
 				behavior         = beh,
 				quickness        = qn,
 				move_speed       = ms,

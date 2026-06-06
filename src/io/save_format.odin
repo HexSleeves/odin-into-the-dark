@@ -41,6 +41,8 @@ Save_Enemy :: struct {
 	ability_max_cd:   int,
 	ability_range:    int,
 	is_boss:          bool,
+	detection_radius: int,
+	aware:            bool,
 }
 
 Save_Item :: struct {

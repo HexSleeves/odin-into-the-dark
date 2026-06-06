@@ -21,8 +21,8 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 		// Let the enemy act until it runs out of AP
 		for enemy.energy > 0 {
 			if game.state == .Game_Over {return}
-			is_visible := tile_visible_at(game, enemy.pos.x, enemy.pos.y)
-			if !enemy_act_once(messages, game, &enemy, is_visible) {break}
+			enemy_update_awareness(game, &enemy)
+			if !enemy_act_once(messages, game, &enemy) {break}
 			if game.state == .Game_Over {return}
 			if !enemy.alive {break}
 		}
@@ -38,23 +38,39 @@ enemy_act_once :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 	enemy: ^Enemy,
-	is_visible: bool,
 ) -> bool {
 	move_cost := max(1, BASE_MOVE_COST * enemy.move_speed / 100)
 
 	switch enemy.behavior {
 	case ENEMY_BEHAVIOR_LURKER:
-		if is_visible {
+		if enemy.aware {
 			return lurker_act_once(messages, game, enemy)
 		}
-		// Lurker stays completely still when the player can't see it
 		enemy.energy = 0
 		return false
 	case:
-		if is_visible {
+		if enemy.aware {
 			return chase_act_once(messages, game, enemy, move_cost)
 		}
 		return wander_act_once(game, enemy, move_cost)
+	}
+}
+
+// enemy_update_awareness checks if the enemy can detect the player
+// based on Manhattan distance to its detection_radius.
+// Once aware, an enemy stays aware (it heard/saw you).
+@(private = "file")
+enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
+	if enemy.aware {return}
+	// detection_radius 0 means "always detect" (legacy / hand-built enemies)
+	if enemy.detection_radius <= 0 {
+		enemy.aware = true
+		return
+	}
+	dx := abs(enemy.pos.x - game.player.pos.x)
+	dy := abs(enemy.pos.y - game.player.pos.y)
+	if dx + dy <= enemy.detection_radius {
+		enemy.aware = true
 	}
 }
 

@@ -178,7 +178,7 @@ adjacent_attack_consumes_action_without_consuming_web_under_player :: proc(t: ^t
 	testing.expect_value(t, game.player.energy, BASE_AP_PER_ROUND)
 	testing.expect_value(t, eng.turn_manager_current(&engine.turn_manager), 1)
 	testing.expect(t, web_tile_at(&game, 1, 1))
-	testing.expect(t, !game.skip_next_turn)
+	testing.expect(t, game.web_stuck_turns == 0)
 }
 
 @(test)
@@ -208,7 +208,7 @@ locked_door_unlock_consumes_action_without_consuming_web_under_player :: proc(t:
 	testing.expect_value(t, game.tiles[pos_to_idx(2, 1)].type, Tile_Type.Floor)
 	testing.expect(t, !game.inventory[0].occupied)
 	testing.expect(t, web_tile_at(&game, 1, 1))
-	testing.expect(t, !game.skip_next_turn)
+	testing.expect(t, game.web_stuck_turns == 0)
 }
 
 @(test)
