@@ -27,6 +27,8 @@ spawn_boss :: proc(content: ^Content_Manager, game: ^Game) {
 		boss_id = "mine_guardian"
 	} else if game.depth == 10 {
 		boss_id = "abyssal_lord"
+	} else if game.depth == MAX_DEPTH {
+		boss_id = "depth_king"
 	} else {
 		return
 	}
