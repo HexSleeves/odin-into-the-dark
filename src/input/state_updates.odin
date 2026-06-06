@@ -9,7 +9,9 @@ update_playing :: proc(
 	game: ^Game,
 	im: ^Input_Manager,
 	config: ^Game_Config,
-) -> (quit: bool) {
+) -> (
+	quit: bool,
+) {
 	if cheat_open_if_requested(game_engine_ui_manager(engine), game, im) {return false}
 	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}

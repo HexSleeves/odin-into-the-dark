@@ -5,8 +5,8 @@ import ui_pkg "../ui"
 import gcore "../core"
 
 import eng "../engine"
-import "core:fmt"
 import clay "../vendor/clay"
+import "core:fmt"
 
 @(private = "file")
 clay_overlays_import_anchor :: proc() {
