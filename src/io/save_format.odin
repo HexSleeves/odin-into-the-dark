@@ -43,6 +43,8 @@ Save_Enemy :: struct {
 	is_boss:          bool,
 	detection_radius: int,
 	aware:            bool,
+	memory_turns:     int,
+	aware_turns_left: int,
 }
 
 Save_Item :: struct {

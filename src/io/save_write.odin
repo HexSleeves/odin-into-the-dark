@@ -72,6 +72,8 @@ save_game_to_storage :: proc(
 			is_boss          = e.is_boss,
 			detection_radius = e.detection_radius,
 			aware            = e.aware,
+			memory_turns     = e.memory_turns,
+			aware_turns_left = e.aware_turns_left,
 		}
 	}
 

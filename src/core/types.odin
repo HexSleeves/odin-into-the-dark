@@ -81,7 +81,9 @@ Enemy :: struct {
 	behavior:         string, // "lurker" or "" for standard
 	// Detection / awareness
 	detection_radius: int, // how far this enemy can "see" the player
-	aware:            bool, // true once the enemy has noticed the player
+	aware:            bool, // currently chasing the player
+	memory_turns:     int, // max turns to remember player after losing detection
+	aware_turns_left: int, // countdown — 0 = forget and wander
 	// Energy system (Qud-style AP scheduling)
 	energy:           int, // current action points (may be negative = debt)
 	quickness:        int, // AP generated per round = quickness * 10. Default 100.

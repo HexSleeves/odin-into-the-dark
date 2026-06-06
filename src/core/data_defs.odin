@@ -27,7 +27,8 @@ Enemy_Def :: struct {
 	attack:     int,
 	quickness:        int,
 	move_speed:       int,
-	detection_radius: int, // 0 = use default (DEFAULT_ENEMY_DETECTION_RADIUS)
+	detection_radius: int, // 0 = use default
+	memory_turns:     int, // 0 = use default; how long enemy remembers player
 	ability:          Ability_Def,
 	behavior:         string,
 }

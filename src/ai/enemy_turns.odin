@@ -56,21 +56,34 @@ enemy_act_once :: proc(
 	}
 }
 
-// enemy_update_awareness checks if the enemy can detect the player
-// based on Manhattan distance to its detection_radius.
-// Once aware, an enemy stays aware (it heard/saw you).
+// enemy_update_awareness manages detection and memory decay.
+// - If within detection range → become aware, reset memory timer
+// - If already aware but out of range → decay memory timer
+// - If memory timer hits 0 → forget and return to wandering
 @(private = "file")
 enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
-	if enemy.aware {return}
-	// detection_radius 0 means "always detect" (legacy / hand-built enemies)
+	// detection_radius 0 = always aware (legacy / hand-built enemies)
 	if enemy.detection_radius <= 0 {
 		enemy.aware = true
 		return
 	}
-	dx := abs(enemy.pos.x - game.player.pos.x)
-	dy := abs(enemy.pos.y - game.player.pos.y)
-	if dx + dy <= enemy.detection_radius {
+
+	dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+	in_range := dist <= enemy.detection_radius
+
+	if in_range {
 		enemy.aware = true
+		enemy.aware_turns_left = enemy.memory_turns
+		return
+	}
+
+	if !enemy.aware {return}
+
+	// Out of detection range — decay memory
+	enemy.aware_turns_left -= 1
+	if enemy.aware_turns_left <= 0 {
+		enemy.aware = false
+		enemy.aware_turns_left = 0
 	}
 }
 

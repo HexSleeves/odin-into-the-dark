@@ -1,5 +1,10 @@
 // Enemy definitions for Into the Depths
 // Stats, visuals, and depth-based spawn weights
+//
+// detection_radius: how far the enemy can spot the player (default 10)
+// memory_turns:     how many turns the enemy chases after losing sight (default 8)
+//   - Low = forgetful (rats, bats)
+//   - High = relentless (bosses, stalkers)
 {
   enemies: [
     {
@@ -8,40 +13,48 @@
       glyph: "r",
       color: [150, 120, 80, 255],
       hp: 3,
-      attack: 2,  // was 1 — now a minor threat, not ignorable
+      attack: 2,
       quickness: 110,
       move_speed: 80,
+      detection_radius: 6,
+      memory_turns: 3,       // dumb — forgets quickly
     },
     {
       id: "miner_husk",
       name: "Miner Husk",
       glyph: "H",
       color: [180, 180, 160, 255],
-      hp: 8,     // was 6 — tougher mid-tier
+      hp: 8,
       attack: 3,
       quickness: 90,
       move_speed: 110,
+      detection_radius: 8,
+      memory_turns: 6,       // moderate — shambling but persistent
     },
     {
       id: "cave_crawler",
       name: "Cave Crawler",
       glyph: "C",
       color: [100, 200, 100, 255],
-      hp: 12,    // was 10 — beefier with ability
+      hp: 12,
       attack: 4,
       quickness: 100,
       move_speed: 100,
-      ability: { type: "web", cooldown: 5, range: 1 },  // cd was 4 — slightly slower
+      detection_radius: 10,
+      memory_turns: 10,      // smart hunter — sets webs and pursues
+      ability: { type: "web", cooldown: 5, range: 1 },
     },
     {
       id: "deep_watcher",
       name: "Deep Watcher",
       glyph: "W",
       color: [180, 50, 220, 255],
-      hp: 18,    // was 15 — proper boss-tier
+      hp: 18,
       attack: 6,
       quickness: 80,
       move_speed: 100,
+      detection_radius: 14,
+      memory_turns: 15,      // intelligent — long memory
       ability: { type: "freeze", cooldown: 4, range: 3 },
     },
     {
@@ -53,6 +66,8 @@
       attack: 2,
       quickness: 80,
       move_speed: 120,
+      detection_radius: 5,
+      memory_turns: 2,       // mindless — reacts only to proximity
       ability: { type: "poison_cloud", cooldown: 0, range: 0 },
     },
     {
@@ -64,6 +79,8 @@
       attack: 5,
       quickness: 130,
       move_speed: 70,
+      detection_radius: 16,
+      memory_turns: 20,      // relentless predator — never gives up easily
       ability: { type: "teleport", cooldown: 3, range: 5 },
     },
     {
@@ -75,6 +92,8 @@
       attack: 3,
       quickness: 150,
       move_speed: 60,
+      detection_radius: 8,
+      memory_turns: 4,       // skittish — loses interest fast
     },
     {
       id: "stone_thrower",
@@ -85,6 +104,8 @@
       attack: 4,
       quickness: 100,
       move_speed: 120,
+      detection_radius: 12,
+      memory_turns: 8,       // territorial — guards its area
       ability: { type: "ranged_shoot", cooldown: 2, range: 5 },
     },
     {
@@ -96,9 +117,11 @@
       attack: 8,
       quickness: 80,
       move_speed: 100,
+      detection_radius: 6,
+      memory_turns: 25,      // patient ambusher — once triggered, never stops
       behavior: "lurker",
     },
-    // Bosses
+    // Bosses — high detection, long memory (effectively permanent)
     {
       id: "mine_guardian",
       name: "Mine Guardian",
@@ -108,6 +131,8 @@
       attack: 8,
       quickness: 80,
       move_speed: 100,
+      detection_radius: 20,
+      memory_turns: 99,
       ability: { type: "slam", cooldown: 3, range: 1 },
     },
     {
@@ -119,6 +144,8 @@
       attack: 10,
       quickness: 90,
       move_speed: 90,
+      detection_radius: 25,
+      memory_turns: 99,
       ability: { type: "darkness", cooldown: 4, range: 6 },
     },
     {
@@ -130,6 +157,8 @@
       attack: 14,
       quickness: 100,
       move_speed: 100,
+      detection_radius: 30,
+      memory_turns: 99,
       ability: { type: "slam", cooldown: 3, range: 2, damage: 8 },
     },
   ],
@@ -146,50 +175,63 @@
       ],
     },
     {
-      // Depth 2: husks start appearing
+      // Depth 2: introduce husks and bats
       depth_min: 2, depth_max: 2,
       weights: [
-        { id: "rat", weight: 30 },
-        { id: "miner_husk", weight: 40 },
-        { id: "cave_bat", weight: 20 },
+        { id: "rat", weight: 40 },
+        { id: "miner_husk", weight: 30 },
+        { id: "cave_bat", weight: 25 },
+        { id: "cave_crawler", weight: 5 },
+      ],
+    },
+    {
+      // Depth 3-4: cave crawlers and spores appear
+      depth_min: 3, depth_max: 4,
+      weights: [
+        { id: "rat", weight: 15 },
+        { id: "miner_husk", weight: 25 },
+        { id: "cave_bat", weight: 15 },
+        { id: "cave_crawler", weight: 25 },
+        { id: "toxic_spore", weight: 10 },
         { id: "stone_thrower", weight: 10 },
       ],
     },
     {
-      // Depth 3-4: crawlers enter, toxic spores appear
-      depth_min: 3, depth_max: 4,
+      // Depth 5-6: tougher mid-game
+      depth_min: 5, depth_max: 6,
       weights: [
-        { id: "rat", weight: 5 },
-        { id: "miner_husk", weight: 25 },
+        { id: "miner_husk", weight: 15 },
         { id: "cave_crawler", weight: 25 },
-        { id: "toxic_spore", weight: 10 },
+        { id: "toxic_spore", weight: 15 },
         { id: "stone_thrower", weight: 20 },
-        { id: "mine_lurker", weight: 15 },
-      ],
-    },
-    {
-      // Depth 5-7: deep watchers enter, shadow stalkers appear
-      depth_min: 5, depth_max: 7,
-      weights: [
-        { id: "miner_husk", weight: 5 },
-        { id: "cave_crawler", weight: 20 },
-        { id: "deep_watcher", weight: 25 },
-        { id: "toxic_spore", weight: 10 },
         { id: "shadow_stalker", weight: 10 },
-        { id: "stone_thrower", weight: 15 },
-        { id: "mine_lurker", weight: 15 },
+        { id: "deep_watcher", weight: 10 },
+        { id: "mine_lurker", weight: 5 },
       ],
     },
     {
-      // Depth 8+: endgame gauntlet with shadow stalkers
-      depth_min: 8, depth_max: 99,
+      // Depth 7-9: deep danger
+      depth_min: 7, depth_max: 9,
       weights: [
         { id: "cave_crawler", weight: 15 },
-        { id: "deep_watcher", weight: 30 },
-        { id: "shadow_stalker", weight: 25 },
         { id: "toxic_spore", weight: 10 },
+        { id: "stone_thrower", weight: 15 },
+        { id: "shadow_stalker", weight: 20 },
+        { id: "deep_watcher", weight: 20 },
         { id: "mine_lurker", weight: 15 },
-        { id: "miner_husk", weight: 5 },
+        { id: "cave_bat", weight: 5 },
+      ],
+    },
+    {
+      // Depth 10-12: endgame gauntlet
+      depth_min: 10, depth_max: 12,
+      weights: [
+        { id: "shadow_stalker", weight: 25 },
+        { id: "deep_watcher", weight: 25 },
+        { id: "mine_lurker", weight: 20 },
+        { id: "stone_thrower", weight: 15 },
+        { id: "toxic_spore", weight: 10 },
+        { id: "cave_bat", weight: 5 },
       ],
     },
   ],

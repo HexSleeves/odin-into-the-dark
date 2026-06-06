@@ -8,6 +8,8 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 	}
 	det := DEFAULT_ENEMY_DETECTION_RADIUS
 	if def.detection_radius > 0 {det = def.detection_radius}
+	mem := DEFAULT_ENEMY_MEMORY_TURNS
+	if def.memory_turns > 0 {mem = def.memory_turns}
 	return Enemy {
 		pos = pos,
 		hp = def.hp,
@@ -24,6 +26,7 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 		ability_range = def.ability.range,
 		behavior = def.behavior,
 		detection_radius = det,
+		memory_turns = mem,
 		quickness = 100 if def.quickness == 0 else def.quickness,
 		move_speed = 100 if def.move_speed == 0 else def.move_speed,
 		energy = 0,
