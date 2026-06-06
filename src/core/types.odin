@@ -176,6 +176,30 @@ Merchant_Offer :: struct {
 	sold:         bool,   // already purchased
 }
 
+MAX_NPCS :: 8
+
+NPC_Role :: enum {
+	Old_Miner, // quest-giver
+	Shopkeeper,
+	Guard,
+	Elder,
+}
+
+NPC :: struct {
+	pos:   Vec2,
+	name:  string, // static literal
+	glyph: rune,
+	color: eng.Engine_Color,
+	role:  NPC_Role,
+}
+
+Quest_State :: enum {
+	Not_Started,
+	Active, // miner has given the quest; go fetch the treasure
+	Treasure_Found, // player has the treasure
+	Complete, // returned/rewarded
+}
+
 DEATH_CAUSE_MAX_LEN :: 128
 
 Game_State :: enum {
@@ -191,6 +215,7 @@ Game_State :: enum {
 	Viewing_Shrine,
 	Viewing_Chest,
 	Viewing_Merchant,
+	Viewing_Dialogue,
 }
 
 Game :: struct {
@@ -248,4 +273,10 @@ Game :: struct {
 	event_used:             bool, // true if this floor's event has been consumed
 	merchant_stock:         [3]Merchant_Offer, // current merchant offers (3 slots)
 	shrine_choice:          int, // selected shrine buff index (UI state)
+	// Surface town + story
+	npcs:                   [MAX_NPCS]NPC,
+	npc_count:              int,
+	quest:                  Quest_State,
+	active_npc:             int, // index into npcs during dialogue (-1 = none)
+	dialogue_line:          int, // current line of active NPC's dialogue
 }

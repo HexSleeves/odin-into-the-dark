@@ -38,6 +38,8 @@ MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_INVENTORY :: gcore.MAX_INVENTORY
 MAX_DEPTH :: gcore.MAX_DEPTH
+SURFACE_DEPTH :: gcore.SURFACE_DEPTH
+SURFACE_LIGHT_RADIUS :: gcore.SURFACE_LIGHT_RADIUS
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
 BASE_AP_PER_ROUND :: gcore.BASE_AP_PER_ROUND
@@ -49,6 +51,7 @@ ITEM_ID_RUSTY_PICKAXE :: gcore.ITEM_ID_RUSTY_PICKAXE
 ITEM_ID_TORCH :: gcore.ITEM_ID_TORCH
 ITEM_ID_BANDAGE :: gcore.ITEM_ID_BANDAGE
 ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
+ITEM_ID_ANCIENT_TREASURE :: gcore.ITEM_ID_ANCIENT_TREASURE
 ITEM_EFFECT_HEAL :: gcore.ITEM_EFFECT_HEAL
 ITEM_EFFECT_LIGHT_BOOST :: gcore.ITEM_EFFECT_LIGHT_BOOST
 ITEM_EFFECT_TIMED_LIGHT_BOOST :: gcore.ITEM_EFFECT_TIMED_LIGHT_BOOST
@@ -157,6 +160,9 @@ spawn_fountain :: genpkg.spawn_fountain
 spawn_monster_den :: genpkg.spawn_monster_den
 spawn_treasure_vault :: genpkg.spawn_treasure_vault
 spawn_floor_event :: genpkg.spawn_floor_event
+generate_town :: genpkg.generate_town
+place_town_npcs :: gcore.place_town_npcs
+find_farthest_floor :: genpkg.find_farthest_floor
 
 // ─── AI package ───────────────────────────────────────────────────────────────
 player_die :: aipkg.player_die

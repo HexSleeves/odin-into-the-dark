@@ -116,9 +116,13 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			}
 
 			clay_theme_divider("hud-stats-divider")
+			depth_label := fmt.tprintf("DEPTH  %d", i32(game.depth))
+			if game.depth == gcore.SURFACE_DEPTH {
+				depth_label = "SURFACE"
+			}
 			clay_row(
 				"hud-depth-row",
-				fmt.tprintf("DEPTH  %d", i32(game.depth)),
+				depth_label,
 				fmt.tprintf("TURN %d", i32(eng.turn_manager_current(turns))),
 				CLAY_HUD_ROW_FONT,
 				ui_pkg.SB_TEXT,
@@ -132,6 +136,17 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				ui_pkg.SB_DIM,
 				ui_pkg.SB_DIM,
 			)
+			if game.quest != .Complete {
+				clay_row(
+					"hud-quest-row",
+					"QUEST",
+					"",
+					CLAY_HUD_ROW_FONT,
+					ui_pkg.SB_DIM,
+					ui_pkg.SB_DIM,
+				)
+				clay_text(gcore.quest_objective_text(game), CLAY_HUD_ROW_FONT, eng.Engine_Color{255, 215, 0, 255})
+			}
 
 			alive_count: i32 = 0
 			for &e in game.enemies {

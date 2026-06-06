@@ -173,6 +173,15 @@ item_at :: proc(game: ^Game, x, y: int) -> ^Item {
 	return nil
 }
 
+npc_at :: proc(game: ^Game, x, y: int) -> int {
+	for i in 0 ..< game.npc_count {
+		if game.npcs[i].pos.x == x && game.npcs[i].pos.y == y {
+			return i
+		}
+	}
+	return -1
+}
+
 effective_attack_cost :: proc(game: ^Game) -> int {
 	if game.equipped_weapon.occupied && game.equipped_weapon.item.action_cost > 0 {
 		return game.equipped_weapon.item.action_cost

@@ -40,7 +40,7 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game := new(Game)
 	game.seed = seed
 	gcore.game_init_world(game)
-	game.depth = 1
+	game.depth = SURFACE_DEPTH
 	game.state = game_initial_state()
 
 	init_player_from_content(content, game)
@@ -75,7 +75,7 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 
 	game.seed = seed
 	gcore.game_init_world(game)
-	game.depth = 1
+	game.depth = SURFACE_DEPTH
 	game.state = .Playing
 
 	init_player_from_content(content, game)

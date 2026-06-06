@@ -25,6 +25,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	render_webs(engine, game)
 	render_items(engine, game)
 	render_enemies(engine, game)
+	render_npcs(engine, game)
 	render_player(engine, game)
 	render_particles(engine, particles)
 	eng.engine_render_end_scissor(engine)

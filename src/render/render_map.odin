@@ -310,3 +310,34 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		)
 	}
 }
+
+// ─── NPC rendering (surface town) ─────────────────────────────────────────────
+
+render_npcs :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
+	camera := game_engine_camera_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
+	tile_size := camera_tile_size(camera)
+
+	for i in 0 ..< game.npc_count {
+		npc := &game.npcs[i]
+		if !gcore.tile_visible_at(game, npc.pos.x, npc.pos.y) {continue}
+
+		nx := camera_world_x_to_screen_shaken(camera, vfx, npc.pos.x * gcore.TILE_SIZE)
+		ny := camera_world_y_to_screen_shaken(camera, vfx, npc.pos.y * gcore.TILE_SIZE)
+		bob_phase := f32(eng.vfx_manager_frame(vfx) + npc.pos.x * 13) * 0.04
+		ny += i32(math.sin(f64(bob_phase)) * 1.5)
+
+		render_world_sprite_or_glyph(
+			engine,
+			nil,
+			false, // NPCs are ASCII-only (no sprite mapping)
+			Sprite{},
+			npc.glyph,
+			nil,
+			npc.color,
+			nx,
+			ny,
+			tile_size,
+		)
+	}
+}

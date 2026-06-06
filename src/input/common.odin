@@ -60,6 +60,7 @@ tile_state_set_idx :: gcore.tile_state_set_idx
 is_walkable :: gcore.is_walkable
 enemy_at :: gcore.enemy_at
 item_at :: gcore.item_at
+npc_at :: gcore.npc_at
 item_display_name :: gcore.item_display_name
 effective_attack_cost :: gcore.effective_attack_cost
 remove_item_from_inventory :: gcore.remove_item_from_inventory

@@ -87,12 +87,21 @@ descend :: proc(
 	compute_fov(game)
 	game_camera_update(camera, game, true)
 
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("You descend to depth %d...", game.depth),
-		eng.Engine_Color{0, 200, 200, 255},
-	)
+	if game.depth == SURFACE_DEPTH + 1 {
+		add_message(
+			messages,
+			game,
+			"You descend into the mine. The darkness swallows the daylight...",
+			eng.Engine_Color{0, 200, 200, 255},
+		)
+	} else {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("You descend to depth %d...", game.depth),
+			eng.Engine_Color{0, 200, 200, 255},
+		)
+	}
 }
 
 start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {

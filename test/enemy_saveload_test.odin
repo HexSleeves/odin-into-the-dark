@@ -17,6 +17,7 @@ save_load_round_trip_preserves_spawned_enemies :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 	game.state = .Playing
+	game.depth = 1
 	generate_map(&content, game)
 	testing.expect(t, len(game.enemies) > 0)
 	original_enemy_count := len(game.enemies)

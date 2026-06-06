@@ -99,6 +99,9 @@ clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Colo
 		}
 		return eng.Engine_Color{255, 60, 60, 255}
 	}
+	if gcore.npc_at(game, x, y) >= 0 && gcore.tile_explored_at(game, x, y) {
+		return eng.Engine_Color{120, 220, 160, 255} // NPC — soft green
+	}
 
 	idx := gcore.pos_to_idx(x, y)
 	tile := game.tiles[idx]

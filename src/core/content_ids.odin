@@ -5,6 +5,7 @@ ITEM_ID_TORCH :: "torch"
 ITEM_ID_BANDAGE :: "bandage"
 ITEM_ID_VAULT_KEY :: "vault_key"
 ITEM_ID_WEB_TILE :: "web"
+ITEM_ID_ANCIENT_TREASURE :: "ancient_treasure"
 
 ITEM_EFFECT_HEAL :: "heal"
 ITEM_EFFECT_LIGHT_BOOST :: "light_boost"

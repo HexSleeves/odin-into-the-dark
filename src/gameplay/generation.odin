@@ -86,6 +86,16 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	web_tiles_clear(game)
 	clear(&game.rooms)
 	game.web_stuck_turns = 0
+	game.npc_count = 0
+
+	// Depth 0 is the surface town — a safe hub, no combat or hazards.
+	if game.depth == SURFACE_DEPTH {
+		generate_town(game)
+		game.minimap_reveal_enemies = false
+		game.water_slow_active = false
+		game.event_used = true // no floor events on the surface
+		return
+	}
 
 	if game.depth <= 2 {
 		generate_rooms(game)
@@ -106,8 +116,28 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	spawn_treasure_vault(content, game)
 	spawn_floor_event(game)
 
+	// Final floor: the Ancient Treasure replaces the descent as the goal.
+	if game.depth >= MAX_DEPTH {
+		place_ancient_treasure(content, game)
+	}
+
 	game.minimap_reveal_enemies = false
 	game.water_slow_active = false
 	game.event_used = false
 	game.palette = palette_for_depth(game.depth)
+}
+
+// place_ancient_treasure removes the descent exit and drops the quest treasure
+// at the farthest reachable floor — the climax of the dive.
+place_ancient_treasure :: proc(content: ^Content_Manager, game: ^Game) {
+	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+		if game.tiles[i].type == .Descent {
+			game.tiles[i].type = .Floor
+		}
+	}
+	pos := find_farthest_floor(game, game.player.pos.x, game.player.pos.y)
+	def := content_manager_item_def(content, ITEM_ID_ANCIENT_TREASURE)
+	if def != nil {
+		append(&game.items, item_make_from_def(def, pos))
+	}
 }

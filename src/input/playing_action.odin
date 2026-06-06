@@ -83,6 +83,14 @@ handle_input :: proc(
 		return .None
 	}
 
+	// Walking into an NPC starts dialogue (surface town).
+	if npc_idx := npc_at(game, target_x, target_y); npc_idx >= 0 {
+		game.active_npc = npc_idx
+		game.dialogue_line = 0
+		game.state = .Viewing_Dialogue
+		return .None
+	}
+
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
 		resolve_attack_player_on_enemy(messages, game, target_enemy)

@@ -42,6 +42,7 @@ save_game_to_storage :: proc(
 	data.poison_turns = game.poison_turns
 	data.burning_turns = game.burning_turns
 	data.frozen_turns = game.frozen_turns
+	data.quest = game.quest
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {

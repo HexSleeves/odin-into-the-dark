@@ -59,6 +59,9 @@ clay_render_screen_ui :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		case .Viewing_Merchant:
 			clay_render_gameplay_ui(engine, game)
 			clay_render_merchant_overlay(engine, game)
+		case .Viewing_Dialogue:
+			clay_render_gameplay_ui(engine, game)
+			clay_render_dialogue_overlay(engine, game)
 		}
 	}
 }

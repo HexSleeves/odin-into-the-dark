@@ -39,3 +39,7 @@ SHRINE_BUFF_LIGHT :: 2
 CHEST_TRAP_CHANCE :: 40 // percent chance of trap
 CHEST_TRAP_DAMAGE :: 5
 CHEST_TRAP_POISON_TURNS :: 3
+
+// ─── Surface town ─────────────────────────────────────────────────────────────
+SURFACE_DEPTH :: 0
+SURFACE_LIGHT_RADIUS :: 14 // town is daylit; see the whole hub

@@ -9,6 +9,7 @@ Vec2 :: gcore.Vec2
 Room :: gcore.Room
 Tile :: gcore.Tile
 Enemy :: gcore.Enemy
+Quest_State :: gcore.Quest_State
 Enemy_Def :: gcore.Enemy_Def
 Item :: gcore.Item
 Item_Def :: gcore.Item_Def

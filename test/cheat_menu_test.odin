@@ -97,8 +97,12 @@ when CHEATS_ENABLED {
 		cheat_set_depth(&content, &turns, &camera, &messages, &game, 99)
 
 		testing.expect_value(t, game.depth, MAX_DEPTH)
-		_, descent_ok := cheat_find_descent(&game)
-		testing.expect(t, descent_ok)
+		// At MAX_DEPTH the descent is replaced by the Ancient Treasure.
+		has_treasure := false
+		for &it in game.items {
+			if it.item_type == ITEM_ID_ANCIENT_TREASURE {has_treasure = true}
+		}
+		testing.expect(t, has_treasure)
 		testing.expect(t, game.player.pos.x > 0 || game.player.pos.y > 0)
 		testing.expect(t, len(game.enemies) > 0)
 	}

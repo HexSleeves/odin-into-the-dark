@@ -13,9 +13,10 @@ game_init_with_loaded_content_spawns_enemies :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 
-	// game_init defers map gen when state is Title_Screen.
-	// Simulate "New Game": force Playing and generate the map.
+	// game_init now starts on the surface (depth 0). Simulate descending into
+	// the mine: set a mine depth and generate.
 	game.state = .Playing
+	game.depth = 1
 	generate_map(&content, game)
 
 	testing.expect(t, len(game.enemies) > 0)

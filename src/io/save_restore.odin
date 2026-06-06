@@ -2,6 +2,7 @@ package gameio
 import "core:mem"
 
 
+import gcore "../core"
 import eng "../engine"
 
 load_game :: proc(
@@ -86,7 +87,16 @@ load_game_from_storage :: proc(
 	game.poison_turns = data.poison_turns
 	game.burning_turns = data.burning_turns
 	game.frozen_turns = data.frozen_turns
+	game.quest = data.quest
+	game.active_npc = -1
+	game.dialogue_line = 0
 	game.state = .Playing
+
+	// NPCs are deterministic — repopulate them when loading onto the surface.
+	game.npc_count = 0
+	if game.depth == gcore.SURFACE_DEPTH {
+		gcore.place_town_npcs(game)
+	}
 
 	// ── Restore ore veins ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {

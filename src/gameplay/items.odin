@@ -36,6 +36,20 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 		return false
 	}
 
+	// The Ancient Treasure completes the quest goal on pickup.
+	if it.item_type == ITEM_ID_ANCIENT_TREASURE {
+		it.picked_up = true
+		game.items_found += 1
+		game.quest = .Treasure_Found
+		add_message(
+			messages,
+			game,
+			"You claim the Ancient Treasure! Return to the surface for your reward.",
+			eng.Engine_Color{255, 215, 0, 255},
+		)
+		return true
+	}
+
 	itype := it.item_type
 	stack_limit := item_stack_limit(content, itype)
 	if item_is_stackable(content, itype) {

@@ -118,6 +118,8 @@ Save_Data :: struct {
 	poison_turns:      int,
 	burning_turns:     int,
 	frozen_turns:      int,
+	// v6 additions
+	quest:             Quest_State,
 }
 
 // v4 save format — byte-for-byte identical to Save_Data minus status timers.

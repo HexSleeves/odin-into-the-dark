@@ -209,6 +209,14 @@
       stack_limit: 1,
       effect: { type: "none", value: 0 },
     },
+    {
+      id: "ancient_treasure",
+      name: "Ancient Treasure",
+      glyph: "*",
+      color: [255, 215, 0, 255],
+      stack_limit: 1,
+      effect: { type: "none", value: 0 },
+    },
   ],
 
   // Spawn weights — tier 1 equipment common, tier 2 rare

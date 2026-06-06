@@ -53,6 +53,8 @@ MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_INVENTORY :: gcore.MAX_INVENTORY
 MAX_DEPTH :: gcore.MAX_DEPTH
+SURFACE_DEPTH :: gcore.SURFACE_DEPTH
+ITEM_ID_ANCIENT_TREASURE :: gcore.ITEM_ID_ANCIENT_TREASURE
 TILE_SIZE :: gcore.TILE_SIZE
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
@@ -208,6 +210,21 @@ merchant_buy :: gp.merchant_buy
 merchant_leave :: gp.merchant_leave
 update_viewing_shrine :: gameinput.update_viewing_shrine
 update_viewing_merchant :: gameinput.update_viewing_merchant
+
+// ─── Town / dialogue / quest ──────────────────────────────────────────────────
+NPC :: gcore.NPC
+NPC_Role :: gcore.NPC_Role
+Quest_State :: gcore.Quest_State
+npc_at :: gcore.npc_at
+npc_dialogue :: gcore.npc_dialogue
+dialogue_current_line :: gcore.dialogue_current_line
+quest_objective_text :: gcore.quest_objective_text
+place_town_npcs :: gcore.place_town_npcs
+generate_town :: gp.generate_town
+advance_dialogue :: gp.advance_dialogue
+close_dialogue :: gp.close_dialogue
+update_viewing_dialogue :: gameinput.update_viewing_dialogue
+find_farthest_floor :: gp.find_farthest_floor
 content_manager_pick_item_def :: gcore.content_manager_pick_item_def
 // ─── Render procs ─────────────────────────────────────────────────────────────
 clay_ui_init :: renderer.clay_ui_init
