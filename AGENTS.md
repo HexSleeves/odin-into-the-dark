@@ -327,3 +327,8 @@ gh api graphql -f query='mutation {
 ### Labels
 
 `content` · `engine` · `gameplay` · `ui/ux` · `performance` · `good first issue` · `roadmap` · `backlog`
+
+## Rules
+
+- Always run `just verify` before claiming a task is done.
+- Always run `just fmt` before committing code.
