@@ -49,8 +49,12 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]gcore.Light_Source)
 
-	generate_map(content, game)
-	give_starter_gear(content, game)
+	// Only generate the world when skipping the title screen.
+	// Otherwise New Game / Continue triggers restart_game or save_manager_load_game.
+	if game.state == .Playing {
+		generate_map(content, game)
+		give_starter_gear(content, game)
+	}
 
 	return game
 }

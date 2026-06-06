@@ -83,10 +83,11 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	game := state.game
-	gameio.logger_debugf(.Init, "seed = %v", game.seed)
-
-	gp.compute_fov(game)
-	gcore.game_camera_update(game_engine_camera_manager(engine), game, true)
+	if game.state == .Playing {
+		gameio.logger_debugf(.Init, "seed = %v", game.seed)
+		gp.compute_fov(game)
+		gcore.game_camera_update(game_engine_camera_manager(engine), game, true)
+	}
 	game_app_enforce_build_flags(engine)
 	if !renderer.clay_ui_init(engine) {
 		gameio.logger_fatalf(.App, "Failed to initialize Clay UI. Exiting.")
@@ -98,12 +99,14 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 		app.state = nil
 		return false
 	}
-	gameui.add_message(
-		game_engine_message_manager(engine),
-		game,
-		"Welcome to the depths. Tread carefully...",
-		eng.Engine_Color{200, 200, 100, 255},
-	)
+	if game.state == .Playing {
+		gameui.add_message(
+			game_engine_message_manager(engine),
+			game,
+			"Welcome to the depths. Tread carefully...",
+			eng.Engine_Color{200, 200, 100, 255},
+		)
+	}
 
 	return true
 }
