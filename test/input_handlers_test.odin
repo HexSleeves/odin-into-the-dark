@@ -11,7 +11,12 @@ input_handlers_accept_engine_context_for_services :: proc(t: ^testing.T) {
 	choice_handler: proc(engine: ^eng.Engine, game: ^Game) -> bool = activate_title_choice
 	global_handler: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) =
 		handle_global_input
-	playing_handler: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> bool =
+	playing_handler: proc(
+			engine: ^eng.Engine,
+			game: ^Game,
+			im: ^Input_Manager,
+			config: ^Input_Game_Config,
+		) -> bool =
 		update_playing
 
 	testing.expect(t, title_handler != nil)

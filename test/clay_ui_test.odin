@@ -2,9 +2,9 @@ package main
 
 
 import eng "./engine"
-import clay "libs:clay"
 import "core:sync"
 import "core:testing"
+import clay "libs:clay"
 @(private = "file")
 clay_ui_test_import_anchor :: proc() {
 	_ = eng.Engine{}

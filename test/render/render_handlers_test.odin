@@ -76,7 +76,10 @@ map_world_layers_use_shared_shaken_screen_coordinates :: proc(t: ^testing.T) {
 	testing.expect(t, map_read_err == nil)
 	if map_read_err != nil {return}
 	defer delete(map_source, context.allocator)
-	items_source, items_read_err := os.read_entire_file("src/items.odin", context.allocator)
+	items_source, items_read_err := os.read_entire_file(
+		"src/gameplay/items.odin",
+		context.allocator,
+	)
 	testing.expect(t, items_read_err == nil)
 	if items_read_err != nil {return}
 	defer delete(items_source, context.allocator)
@@ -122,7 +125,10 @@ world_and_item_rendering_use_engine_render_backend_primitives :: proc(t: ^testin
 	if map_read_err != nil {return}
 	defer delete(map_source, context.allocator)
 
-	items_source, items_read_err := os.read_entire_file("src/items.odin", context.allocator)
+	items_source, items_read_err := os.read_entire_file(
+		"src/gameplay/items.odin",
+		context.allocator,
+	)
 	testing.expect(t, items_read_err == nil)
 	if items_read_err != nil {return}
 	defer delete(items_source, context.allocator)

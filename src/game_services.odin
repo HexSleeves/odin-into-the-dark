@@ -75,7 +75,32 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 			&ui,
 			size_of(UI_Manager),
 		) !=
-			nil \
+			nil &&
+		eng.engine_services_register(
+			engine.services,
+			GAME_ENGINE_SERVICE_TURNS,
+			&engine.turn_manager,
+		) &&
+		eng.engine_services_register(
+			engine.services,
+			GAME_ENGINE_SERVICE_CAMERA,
+			&engine.camera_manager,
+		) &&
+		eng.engine_services_register(
+			engine.services,
+			GAME_ENGINE_SERVICE_VFX,
+			&engine.vfx_manager,
+		) &&
+		eng.engine_services_register(
+			engine.services,
+			GAME_ENGINE_SERVICE_MESSAGES,
+			&engine.message_manager,
+		) &&
+		eng.engine_services_register(
+			engine.services,
+			GAME_ENGINE_SERVICE_PARTICLES,
+			&engine.particle_manager,
+		) \
 	)
 }
 

@@ -41,9 +41,18 @@ handle_forced_turn :: gameinput.handle_forced_turn
 handle_mining_input :: gameinput.handle_mining_input
 handle_playing_hotkeys :: gameinput.handle_playing_hotkeys
 
+// ─── Title screen ─────────────────────────────────────────────────────────────
+activate_title_choice :: gameinput.activate_title_choice
+
 // ─── Cheats ───────────────────────────────────────────────────────────────────
 cheat_open_if_requested :: gameinput.cheat_open_if_requested
 update_viewing_cheats :: gameinput.update_viewing_cheats
+
+when CHEATS_ENABLED {
+	cheat_apply :: gameinput.cheat_apply
+	cheat_set_depth :: gameinput.cheat_set_depth
+	cheat_find_descent :: gameinput.cheat_find_descent
+}
 
 // ─── Callbacks ────────────────────────────────────────────────────────────────
 register_restart_game :: gameinput.register_restart_game
