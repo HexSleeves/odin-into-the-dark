@@ -9,9 +9,7 @@ update_playing :: proc(
 	game: ^Game,
 	im: ^Input_Manager,
 	config: ^Game_Config,
-) -> (
-	quit: bool,
-) {
+) -> (quit: bool) {
 	if cheat_open_if_requested(game_engine_ui_manager(engine), game, im) {return false}
 	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}
@@ -19,19 +17,36 @@ update_playing :: proc(
 	return handle_player_action(engine, game)
 }
 
-// handle_player_action stays at root — bridges input and gameplay.
-// This proc pointer is set by root at init time.
-Handle_Player_Action_Proc :: proc(engine: ^eng.Engine, game: ^Game) -> bool
-g_handle_player_action: Handle_Player_Action_Proc
+handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
+	messages := game_engine_message_manager(engine)
+	game.prev_player_pos = game.player.pos
+	kills_before := game.kills
+	result := handle_input(
+		game_engine_content_manager(engine),
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		messages,
+		game,
+		game_engine_input_manager(engine),
+		engine,
+	)
 
-register_handle_player_action :: proc(p: Handle_Player_Action_Proc) {
-	g_handle_player_action = p
-}
-
-handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
-	if g_handle_player_action != nil {
-		return g_handle_player_action(engine, game)
+	switch result {
+	case .Quit:
+		return true
+	case .Moved:
+		handle_player_moved(engine, game, kills_before)
+		trigger_enemy_rounds(engine, game)
+		announce_item_under_player(messages, game)
+	case .Acted:
+		trigger_enemy_rounds(engine, game)
+	case .Waited:
+		trigger_enemy_rounds(engine, game)
+	case .Descended:
+		handle_player_descended(engine, game)
+	case .None:
 	}
+
 	return false
 }
 
@@ -54,17 +69,15 @@ update_game_over :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -
 	}
 	if action_pressed(im, .Restart) {
 		death_sound_played = false
-		if g_restart_game != nil {
-			g_restart_game(
-				game_engine_content_manager(engine),
-				game_engine_turn_manager(engine),
-				game_engine_camera_manager(engine),
-				game_engine_vfx_manager(engine),
-				game_engine_ui_manager(engine),
-				game_engine_message_manager(engine),
-				game,
-			)
-		}
+		restart_game(
+			game_engine_content_manager(engine),
+			game_engine_turn_manager(engine),
+			game_engine_camera_manager(engine),
+			game_engine_vfx_manager(engine),
+			game_engine_ui_manager(engine),
+			game_engine_message_manager(engine),
+			game,
+		)
 	}
 	if action_pressed(im, .Quit) {
 		return true
@@ -80,17 +93,15 @@ update_victory :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> 
 		save_run_score(game_engine_score_manager(engine), game_engine_turn_manager(engine), game)
 	}
 	if action_pressed(im, .Restart) {
-		if g_restart_game != nil {
-			g_restart_game(
-				game_engine_content_manager(engine),
-				game_engine_turn_manager(engine),
-				game_engine_camera_manager(engine),
-				game_engine_vfx_manager(engine),
-				game_engine_ui_manager(engine),
-				game_engine_message_manager(engine),
-				game,
-			)
-		}
+		restart_game(
+			game_engine_content_manager(engine),
+			game_engine_turn_manager(engine),
+			game_engine_camera_manager(engine),
+			game_engine_vfx_manager(engine),
+			game_engine_ui_manager(engine),
+			game_engine_message_manager(engine),
+			game,
+		)
 	}
 	if action_pressed(im, .Quit) {
 		return true

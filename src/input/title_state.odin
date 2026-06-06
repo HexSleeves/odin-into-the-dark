@@ -37,41 +37,20 @@ update_title_screen :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager
 	return false
 }
 
-// activate_title_choice needs restart_game which stays at root.
-// It receives restart via a proc pointer stored as a package-level callback.
-
-Restart_Game_Proc :: proc(
-	content: ^Content_Manager,
-	turns: ^eng.Turn_Manager,
-	camera: ^eng.Camera_Manager,
-	vfx: ^eng.Vfx_Manager,
-	ui: ^UI_Manager,
-	messages: ^Message_Manager,
-	game: ^Game,
-)
-
-g_restart_game: Restart_Game_Proc
-
-register_restart_game :: proc(p: Restart_Game_Proc) {
-	g_restart_game = p
-}
-
 activate_title_choice :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 	ui := ui_manager_state(game_engine_ui_manager(engine))
 	switch ui.title_choice {
 	case TITLE_NEW_GAME:
 		death_sound_played = false
-		if g_restart_game != nil {
-			g_restart_game(
-				game_engine_content_manager(engine),
-				game_engine_turn_manager(engine),
-				game_engine_camera_manager(engine),
-				game_engine_vfx_manager(engine),
-				game_engine_ui_manager(engine),
-				game_engine_message_manager(engine),
-				game,
-			)
-		}
+		restart_game(
+			game_engine_content_manager(engine),
+			game_engine_turn_manager(engine),
+			game_engine_camera_manager(engine),
+			game_engine_vfx_manager(engine),
+			game_engine_ui_manager(engine),
+			game_engine_message_manager(engine),
+			game,
+		)
 	case TITLE_CONTINUE:
 		saves := game_engine_save_manager(engine)
 		if save_manager_save_exists(saves) {

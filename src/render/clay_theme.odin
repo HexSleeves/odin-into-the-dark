@@ -3,7 +3,7 @@ package renderer
 import ui_pkg "../ui"
 
 import eng "../engine"
-import clay "libs:clay"
+import clay "../vendor/clay"
 
 @(private = "file")
 clay_theme_import_anchor :: proc() {

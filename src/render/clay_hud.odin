@@ -6,7 +6,7 @@ import gcore "../core"
 
 import eng "../engine"
 import "core:fmt"
-import clay "libs:clay"
+import clay "../vendor/clay"
 
 @(private = "file")
 clay_hud_import_anchor :: proc() {

@@ -2,6 +2,15 @@ package main
 
 import gp "./gameplay"
 
+// ─── Game lifecycle ───────────────────────────────────────────────────────────
+game_init :: gp.game_init
+game_reinit :: gp.game_reinit
+game_cleanup :: gp.game_cleanup
+game_destroy :: gp.game_destroy
+game_has_live_boss :: gp.game_has_live_boss
+init_player_from_content :: gp.init_player_from_content
+restart_game :: gp.restart_game
+
 // ─── Generation ───────────────────────────────────────────────────────────────
 generate_map :: gp.generate_map
 compute_fov :: gp.compute_fov

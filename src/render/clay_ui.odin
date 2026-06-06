@@ -5,7 +5,7 @@ import gcore "../core"
 import eng "../engine"
 import "base:runtime"
 import "core:mem"
-import clay "libs:clay"
+import clay "../vendor/clay"
 @(private = "file")
 clay_ui_import_anchor :: proc() {
 	_ = eng.Engine{}

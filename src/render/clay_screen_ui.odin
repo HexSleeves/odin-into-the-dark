@@ -5,7 +5,7 @@ import ui_pkg "../ui"
 import gcore "../core"
 
 import eng "../engine"
-import clay "libs:clay"
+import clay "../vendor/clay"
 
 @(private = "file")
 clay_screen_ui_import_anchor :: proc() {

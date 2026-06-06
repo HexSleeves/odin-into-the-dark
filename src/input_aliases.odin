@@ -23,6 +23,7 @@ check_repeat :: gameinput.check_repeat
 // ─── Input handlers ──────────────────────────────────────────────────────────
 Input_Result :: gameinput.Input_Result
 handle_input :: gameinput.handle_input
+handle_player_action :: gameinput.handle_player_action
 read_cardinal_press :: gameinput.read_cardinal_press
 
 // ─── State update handlers ────────────────────────────────────────────────────
@@ -35,28 +36,16 @@ update_viewing_crafting :: gameinput.update_viewing_crafting
 update_viewing_help :: gameinput.update_viewing_help
 update_viewing_scores :: gameinput.update_viewing_scores
 handle_global_input :: gameinput.handle_global_input
+activate_title_choice :: gameinput.activate_title_choice
 
 // ─── Playing sub-handlers ─────────────────────────────────────────────────────
 handle_forced_turn :: gameinput.handle_forced_turn
 handle_mining_input :: gameinput.handle_mining_input
 handle_playing_hotkeys :: gameinput.handle_playing_hotkeys
 
-// ─── Title screen ─────────────────────────────────────────────────────────────
-activate_title_choice :: gameinput.activate_title_choice
-
 // ─── Cheats ───────────────────────────────────────────────────────────────────
 cheat_open_if_requested :: gameinput.cheat_open_if_requested
 update_viewing_cheats :: gameinput.update_viewing_cheats
-
-when CHEATS_ENABLED {
-	cheat_apply :: gameinput.cheat_apply
-	cheat_set_depth :: gameinput.cheat_set_depth
-	cheat_find_descent :: gameinput.cheat_find_descent
-}
-
-// ─── Callbacks ────────────────────────────────────────────────────────────────
-register_restart_game :: gameinput.register_restart_game
-register_handle_player_action :: gameinput.register_handle_player_action
 
 // ─── Config type ──────────────────────────────────────────────────────────────
 Input_Game_Config :: gameinput.Game_Config

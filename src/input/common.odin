@@ -89,6 +89,14 @@ game_engine_audio_manager :: proc(engine: ^Engine) -> ^Audio_Manager {
 game_engine_save_manager :: renderer.game_engine_save_manager
 game_engine_score_manager :: renderer.game_engine_score_manager
 
+@(private = "file")
+GAME_ENGINE_SERVICE_INPUT :: eng.Engine_Service_Id(7)
+
+game_engine_input_manager :: proc(engine: ^Engine) -> ^Input_Manager {
+	if engine == nil || engine.services == nil {return nil}
+	return cast(^Input_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_INPUT)
+}
+
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 add_message :: gameui.add_message
 clear_messages :: gameui.clear_messages
@@ -130,3 +138,4 @@ compute_fov :: gp.compute_fov
 item_make :: gp.item_make
 apply_item_effect :: gp.apply_item_effect
 generate_map :: gp.generate_map
+restart_game :: gp.restart_game

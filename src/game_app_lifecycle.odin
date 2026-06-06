@@ -98,8 +98,6 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 		eng.Engine_Color{200, 200, 100, 255},
 	)
 
-	register_restart_game(restart_game)
-	register_handle_player_action(handle_player_action)
 	return true
 }
 
