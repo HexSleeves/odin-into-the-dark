@@ -124,6 +124,14 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				ui_pkg.SB_TEXT,
 				ui_pkg.SB_DIM,
 			)
+			clay_row(
+				"hud-pos-row",
+				fmt.tprintf("POS  %d,%d", i32(game.player.pos.x), i32(game.player.pos.y)),
+				"",
+				CLAY_HUD_ROW_FONT,
+				ui_pkg.SB_DIM,
+				ui_pkg.SB_DIM,
+			)
 
 			alive_count: i32 = 0
 			for &e in game.enemies {
