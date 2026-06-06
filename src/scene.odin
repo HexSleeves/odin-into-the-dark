@@ -1,6 +1,9 @@
 package main
 
+import gcore "./core"
 import eng "./engine"
+import gameinput "./input"
+import renderer "./render"
 
 // ─── Game scene boundary ─────────────────────────────────────────────────────
 
@@ -18,7 +21,7 @@ Game_Scene :: enum {
 	Cheats,
 }
 
-scene_for_state :: proc(state: Game_State) -> Game_Scene {
+scene_for_state :: proc(state: gcore.Game_State) -> Game_Scene {
 	switch state {
 	case .Title_Screen:
 		return .Title
@@ -50,7 +53,7 @@ game_scene_id :: proc(scene: Game_Scene) -> eng.Engine_Scene_Id {
 game_scene_manager_init :: proc(
 	scenes: []eng.Engine_Scene,
 	engine: ^eng.Engine,
-	game: ^Game,
+	game: ^gcore.Game,
 ) -> bool {
 	manager := eng.engine_scene_manager(engine)
 	if manager == nil || game == nil || len(scenes) < GAME_SCENE_COUNT {
@@ -117,7 +120,7 @@ game_scene_manager_init :: proc(
 	return game_scene_manager_sync(engine, game)
 }
 
-game_scene_manager_sync :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
+game_scene_manager_sync :: proc(engine: ^eng.Engine, game: ^gcore.Game) -> bool {
 	manager := eng.engine_scene_manager(engine)
 	if engine == nil || game == nil {
 		return false
@@ -129,7 +132,7 @@ game_scene_manager_sync :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 	)
 }
 
-game_scene_manager_update :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
+game_scene_manager_update :: proc(engine: ^eng.Engine, game: ^gcore.Game) -> bool {
 	if !game_scene_manager_sync(engine, game) {
 		return true
 	}
@@ -137,7 +140,7 @@ game_scene_manager_update :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 	return eng.scene_manager_update(manager, engine)
 }
 
-game_scene_manager_render :: proc(engine: ^eng.Engine, game: ^Game) {
+game_scene_manager_render :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	if !game_scene_manager_sync(engine, game) {
 		return
 	}
@@ -145,7 +148,7 @@ game_scene_manager_render :: proc(engine: ^eng.Engine, game: ^Game) {
 	eng.scene_manager_render(manager, engine)
 }
 
-scene_update :: proc(game: ^Game) -> bool {
+scene_update :: proc(game: ^gcore.Game) -> bool {
 	if game == nil {
 		return true
 	}
@@ -163,28 +166,28 @@ scene_update :: proc(game: ^Game) -> bool {
 }
 
 game_scene_title_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	return update_title_screen(engine, game, game_engine_input_manager(engine))
+	game := cast(^gcore.Game)ctx
+	return gameinput.update_title_screen(engine, game, game_engine_input_manager(engine))
 }
 
 game_scene_gameplay_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	return update_playing(engine, game, game_engine_input_manager(engine), &g_game_config)
+	game := cast(^gcore.Game)ctx
+	return gameinput.update_playing(engine, game, game_engine_input_manager(engine), &g_game_config)
 }
 
 game_scene_game_over_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	return update_game_over(engine, game, game_engine_input_manager(engine))
+	game := cast(^gcore.Game)ctx
+	return gameinput.update_game_over(engine, game, game_engine_input_manager(engine))
 }
 
 game_scene_victory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	return update_victory(engine, game, game_engine_input_manager(engine))
+	game := cast(^gcore.Game)ctx
+	return gameinput.update_victory(engine, game, game_engine_input_manager(engine))
 }
 
 game_scene_inventory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	update_viewing_inventory(
+	game := cast(^gcore.Game)ctx
+	gameinput.update_viewing_inventory(
 		game_engine_content_manager(engine),
 		game_engine_ui_manager(engine),
 		game_engine_message_manager(engine),
@@ -196,8 +199,8 @@ game_scene_inventory_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 }
 
 game_scene_crafting_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	update_viewing_crafting(
+	game := cast(^gcore.Game)ctx
+	gameinput.update_viewing_crafting(
 		game_engine_content_manager(engine),
 		game_engine_message_manager(engine),
 		game,
@@ -207,20 +210,20 @@ game_scene_crafting_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 }
 
 game_scene_help_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	update_viewing_help(game_engine_ui_manager(engine), game, game_engine_input_manager(engine))
+	game := cast(^gcore.Game)ctx
+	gameinput.update_viewing_help(game_engine_ui_manager(engine), game, game_engine_input_manager(engine))
 	return false
 }
 
 game_scene_scores_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	update_viewing_scores(game, game_engine_input_manager(engine))
+	game := cast(^gcore.Game)ctx
+	gameinput.update_viewing_scores(game, game_engine_input_manager(engine))
 	return false
 }
 
 game_scene_cheats_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
-	game := cast(^Game)ctx
-	update_viewing_cheats(
+	game := cast(^gcore.Game)ctx
+	gameinput.update_viewing_cheats(
 		game_engine_content_manager(engine),
 		game_engine_turn_manager(engine),
 		game_engine_camera_manager(engine),
@@ -233,6 +236,6 @@ game_scene_cheats_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 }
 
 game_scene_render :: proc(engine: ^eng.Engine, ctx: rawptr) {
-	game := cast(^Game)ctx
-	render_game(engine, game)
+	game := cast(^gcore.Game)ctx
+	renderer.render_game(engine, game)
 }

@@ -1,10 +1,17 @@
 package main
 
+import gameaudio "./audio"
+import gcore "./core"
 import eng "./engine"
+import gameinput "./input"
+import gameio "./io"
+import gp "./gameplay"
+import renderer "./render"
+import gameui "./ui"
 
 game_app_enforce_build_flags :: proc(engine: ^eng.Engine) {
 	when NO_SPRITES {
-		ui := ui_manager_state(game_engine_ui_manager(engine))
+		ui := gameui.ui_manager_state(game_engine_ui_manager(engine))
 		if ui != nil {
 			ui.use_sprites = false
 		}
@@ -34,13 +41,13 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	app.state = state
 
 	when !NO_SPRITES {
-		sprites_init(engine)
+		renderer.sprites_init(engine)
 	}
 
 	if !game_engine_register_app_services(engine) {
-		logger_fatalf(.App, "Failed to register app services. Exiting.")
+		gameio.logger_fatalf(.App, "Failed to register app services. Exiting.")
 		when !NO_SPRITES {
-			sprites_cleanup(engine)
+			renderer.sprites_cleanup(engine)
 		}
 		free(state)
 		app.state = nil
@@ -49,26 +56,26 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 
 	content := game_engine_content_manager(engine)
 	if content == nil || !content_manager_load_all(content) {
-		logger_fatalf(.App, "Failed to load data files. Exiting.")
+		gameio.logger_fatalf(.App, "Failed to load data files. Exiting.")
 		when !NO_SPRITES {
-			sprites_cleanup(engine)
+			renderer.sprites_cleanup(engine)
 		}
 		free(state)
 		app.state = nil
 		return false
 	}
 
-	message_manager_bind_turns(
+	eng.message_manager_bind_turns(
 		game_engine_message_manager(engine),
 		game_engine_turn_manager(engine),
 	)
 
-	state.game = game_init(content)
+	state.game = gp.game_init(content)
 	if !game_scene_manager_init(state.scene_descriptors[:], engine, state.game) {
-		logger_fatalf(.App, "Failed to initialize scene manager. Exiting.")
-		game_destroy(state.game)
+		gameio.logger_fatalf(.App, "Failed to initialize scene manager. Exiting.")
+		gp.game_destroy(state.game)
 		when !NO_SPRITES {
-			sprites_cleanup(engine)
+			renderer.sprites_cleanup(engine)
 		}
 		free(state)
 		app.state = nil
@@ -76,22 +83,22 @@ game_app_init :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	game := state.game
-	logger_debugf(.Init, "seed = %v", game.seed)
+	gameio.logger_debugf(.Init, "seed = %v", game.seed)
 
-	compute_fov(game)
-	game_camera_update(game_engine_camera_manager(engine), game, true)
+	gp.compute_fov(game)
+	gcore.game_camera_update(game_engine_camera_manager(engine), game, true)
 	game_app_enforce_build_flags(engine)
-	if !clay_ui_init(engine) {
-		logger_fatalf(.App, "Failed to initialize Clay UI. Exiting.")
-		game_destroy(state.game)
+	if !renderer.clay_ui_init(engine) {
+		gameio.logger_fatalf(.App, "Failed to initialize Clay UI. Exiting.")
+		gp.game_destroy(state.game)
 		when !NO_SPRITES {
-			sprites_cleanup(engine)
+			renderer.sprites_cleanup(engine)
 		}
 		free(state)
 		app.state = nil
 		return false
 	}
-	add_message(
+	gameui.add_message(
 		game_engine_message_manager(engine),
 		game,
 		"Welcome to the depths. Tread carefully...",
@@ -109,10 +116,10 @@ game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 
 	game := state.game
 	when !NO_AUDIO {
-		music_update(game)
+		gameaudio.music_update(game)
 	}
 	game_app_enforce_build_flags(engine)
-	handle_global_input(engine, game, game_engine_input_manager(engine))
+	gameinput.handle_global_input(engine, game, game_engine_input_manager(engine))
 	return game_scene_manager_update(engine, game)
 }
 
@@ -132,7 +139,7 @@ game_app_autosave :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 
 	saves := game_engine_save_manager(engine)
 	if state.game.state == .Playing && saves != nil {
-		save_manager_save_game(saves, game_engine_turn_manager(engine), state.game)
+		gameio.save_manager_save_game(saves, game_engine_turn_manager(engine), state.game)
 	}
 }
 
@@ -142,11 +149,11 @@ game_app_shutdown :: proc(engine: ^eng.Engine, app: ^eng.Game_App) {
 		return
 	}
 	if state.game != nil {
-		game_destroy(state.game)
+		gp.game_destroy(state.game)
 	}
-	clay_ui_destroy()
+	renderer.clay_ui_destroy()
 	when !NO_SPRITES {
-		sprites_cleanup(engine)
+		renderer.sprites_cleanup(engine)
 	}
 	free(state)
 	app.state = nil

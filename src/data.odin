@@ -3,27 +3,7 @@ package main
 import "core:encoding/json"
 
 import gcore "./core"
-
-// ─── Type aliases (types now live in gcore/data_defs.odin) ───────────────────
-
-Color_Array :: gcore.Color_Array
-Ability_Def :: gcore.Ability_Def
-Enemy_Def :: gcore.Enemy_Def
-Spawn_Weight :: gcore.Spawn_Weight
-Spawn_Table :: gcore.Spawn_Table
-Enemy_Data :: gcore.Enemy_Data
-Item_Effect :: gcore.Item_Effect
-Item_Spawn_Table :: gcore.Item_Spawn_Table
-Item_Def :: gcore.Item_Def
-Item_Spawn_Weight :: gcore.Item_Spawn_Weight
-Item_Data :: gcore.Item_Data
-Player_Def :: gcore.Player_Def
-Data_Registry :: gcore.Data_Registry
-
-json5_color_to_engine :: gcore.json5_color_to_engine
-data_registry_destroy :: gcore.data_registry_destroy
-
-// ─── Global data registry ─────────────────────────────────────────────────────
+import gameio "./io"
 
 g_data: gcore.Data_Registry
 
@@ -69,7 +49,7 @@ data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 	gcore.data_registry_destroy(registry)
 	registry^ = next
 
-	logger_debugf(
+	gameio.logger_debugf(
 		.Data,
 		"loaded %v enemies, %v spawn tables, %v items",
 		len(registry.enemies.enemies),
@@ -83,7 +63,7 @@ data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 load_json5_from_bytes :: proc($T: typeid, data: []u8) -> (result: T, ok: bool) {
 	parse_err := json.unmarshal(data, &result, spec = .JSON5)
 	if parse_err != nil {
-		logger_errorf(.Data, "parse failed: %v", parse_err)
+		gameio.logger_errorf(.Data, "parse failed: %v", parse_err)
 		return {}, false
 	}
 	return result, true
