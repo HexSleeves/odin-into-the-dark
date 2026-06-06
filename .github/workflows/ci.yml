@@ -34,12 +34,12 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Run tests
-        run: odin test src/ && odin test src/engine/
-
+        run: |
+          odin test src/ -collection:libs=vendor/
+          odin test src/engine/ -collection:libs=vendor/
 
       - name: Type check
-        run: odin check src/ -vet -strict-style
+        run: odin check src/ -vet -strict-style -collection:libs=vendor/
 
       - name: Build
-        run: odin build src/ -out:into_the_depths -define:PUBLIC_BUILD=true
-
+        run: odin build src/ -out:into_the_depths -collection:libs=vendor/ -define:PUBLIC_BUILD=true
