@@ -425,4 +425,8 @@ generate_mixed :: proc(game: ^Game) {
 			descent_pos.y,
 		)
 	}
+
+	// (f) Room bounds are no longer accurate after erosion — clear so
+	//     spawn_enemies uses scatter placement instead of room-based.
+	clear(&game.rooms)
 }
