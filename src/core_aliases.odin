@@ -139,3 +139,41 @@ TITLE_QUIT :: gcore.TITLE_QUIT
 
 // build_config.odin (build flags) stays in `package main`: top-level `when`
 // conditions can't resolve cross-package constant aliases.
+
+// ─── content_manager.odin ──────────────────────────────────────────────────────
+Content_Manager :: gcore.Content_Manager
+content_manager_make :: gcore.content_manager_make
+content_manager_is_loaded :: gcore.content_manager_is_loaded
+content_manager_enemy_def :: gcore.content_manager_enemy_def
+content_manager_item_def :: gcore.content_manager_item_def
+content_manager_player_def :: gcore.content_manager_player_def
+content_manager_enemy_def_for_depth :: gcore.content_manager_enemy_def_for_depth
+content_manager_pick_item_def :: gcore.content_manager_pick_item_def
+content_manager_pick_item_def_for_depth :: gcore.content_manager_pick_item_def_for_depth
+content_manager_room_item_chance :: gcore.content_manager_room_item_chance
+content_manager_destroy :: gcore.content_manager_destroy
+
+// ─── content_ids.odin ─────────────────────────────────────────────────────────
+ITEM_ID_RUSTY_PICKAXE :: gcore.ITEM_ID_RUSTY_PICKAXE
+ITEM_ID_TORCH :: gcore.ITEM_ID_TORCH
+ITEM_ID_BANDAGE :: gcore.ITEM_ID_BANDAGE
+ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
+ITEM_ID_WEB_TILE :: gcore.ITEM_ID_WEB_TILE
+ITEM_EFFECT_HEAL :: gcore.ITEM_EFFECT_HEAL
+ITEM_EFFECT_LIGHT_BOOST :: gcore.ITEM_EFFECT_LIGHT_BOOST
+ITEM_EFFECT_TIMED_LIGHT_BOOST :: gcore.ITEM_EFFECT_TIMED_LIGHT_BOOST
+ITEM_EFFECT_EQUIP :: gcore.ITEM_EFFECT_EQUIP
+ITEM_EFFECT_MATERIAL :: gcore.ITEM_EFFECT_MATERIAL
+ITEM_EFFECT_CURE_POISON :: gcore.ITEM_EFFECT_CURE_POISON
+EQUIPMENT_SLOT_WEAPON :: gcore.EQUIPMENT_SLOT_WEAPON
+EQUIPMENT_SLOT_ARMOR :: gcore.EQUIPMENT_SLOT_ARMOR
+EQUIPMENT_SLOT_HELMET :: gcore.EQUIPMENT_SLOT_HELMET
+ENEMY_BEHAVIOR_LURKER :: gcore.ENEMY_BEHAVIOR_LURKER
+ENEMY_ABILITY_WEB :: gcore.ENEMY_ABILITY_WEB
+ENEMY_ABILITY_PULL :: gcore.ENEMY_ABILITY_PULL
+ENEMY_ABILITY_POISON_CLOUD :: gcore.ENEMY_ABILITY_POISON_CLOUD
+ENEMY_ABILITY_TELEPORT :: gcore.ENEMY_ABILITY_TELEPORT
+ENEMY_ABILITY_SLAM :: gcore.ENEMY_ABILITY_SLAM
+ENEMY_ABILITY_DARKNESS :: gcore.ENEMY_ABILITY_DARKNESS
+ENEMY_ABILITY_RANGED_SHOOT :: gcore.ENEMY_ABILITY_RANGED_SHOOT
+ENEMY_ABILITY_FREEZE :: gcore.ENEMY_ABILITY_FREEZE

@@ -67,3 +67,11 @@ SB_W :: ui.SB_W
 SB_H :: ui.SB_H
 SB_PX :: ui.SB_PX
 SB_IW :: ui.SB_IW
+
+
+// ─── messages.odin ─────────────────────────────────────────────────────────────
+Message_Manager :: ui.Message_Manager
+message_manager_make :: ui.message_manager_make
+message_manager_bind_turns :: ui.message_manager_bind_turns
+add_message :: ui.add_message
+clear_messages :: ui.clear_messages
