@@ -112,12 +112,9 @@ generate_rooms :: proc(game: ^Game) {
 		game.player.pos = room_center(game.rooms[0])
 	}
 
-	// (f) Place Descent tile at center of last room
-	descent_pos := Vec2{0, 0}
-	if len(game.rooms) > 0 {
-		descent_pos = room_center(game.rooms[len(game.rooms) - 1])
-		game.tiles[pos_to_idx(descent_pos.x, descent_pos.y)].type = .Descent
-	}
+	// (f) Place Descent tile at the farthest reachable floor from player
+	descent_pos := find_farthest_floor(game, game.player.pos.x, game.player.pos.y)
+	game.tiles[pos_to_idx(descent_pos.x, descent_pos.y)].type = .Descent
 
 	// (g) Scatter 1-2 Rubble tiles in each room
 	for &room in game.rooms {

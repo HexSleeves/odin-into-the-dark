@@ -402,29 +402,26 @@ generate_mixed :: proc(game: ^Game) {
 		game.player.pos = find_nearest_floor(game, game.player.pos.x, game.player.pos.y)
 	}
 
-	// (e) Re-place descent — center of last room may have eroded, find nearest floor
-	if len(game.rooms) > 0 {
-		last_center := room_center(game.rooms[len(game.rooms) - 1])
-		descent_pos := find_nearest_floor(game, last_center.x, last_center.y)
-		// Clear any old descent tile
-		for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-			if game.tiles[i].type == .Descent {
-				game.tiles[i].type = .Floor
-			}
+	// (e) Re-place descent at farthest reachable floor from player
+	// Clear any old descent tile first
+	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+		if game.tiles[i].type == .Descent {
+			game.tiles[i].type = .Floor
 		}
-		game.tiles[pos_to_idx(descent_pos.x, descent_pos.y)].type = .Descent
-
-		logger_debugf(
-			.Gen,
-			"mixed: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
-			game.seed,
-			len(game.rooms),
-			game.player.pos.x,
-			game.player.pos.y,
-			descent_pos.x,
-			descent_pos.y,
-		)
 	}
+	descent_pos := find_farthest_floor(game, game.player.pos.x, game.player.pos.y)
+	game.tiles[pos_to_idx(descent_pos.x, descent_pos.y)].type = .Descent
+
+	logger_debugf(
+		.Gen,
+		"mixed: seed=%v rooms=%v player=(%v,%v) descent=(%v,%v)",
+		game.seed,
+		len(game.rooms),
+		game.player.pos.x,
+		game.player.pos.y,
+		descent_pos.x,
+		descent_pos.y,
+	)
 
 	// (f) Room bounds are no longer accurate after erosion — clear so
 	//     spawn_enemies uses scatter placement instead of room-based.
