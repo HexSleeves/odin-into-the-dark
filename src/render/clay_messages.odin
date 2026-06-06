@@ -3,7 +3,7 @@ package renderer
 import gcore "../core"
 
 import eng "../engine"
-import clay "../vendor/clay"
+import clay "libs:clay"
 
 @(private = "file")
 clay_messages_import_anchor :: proc() {

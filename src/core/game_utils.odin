@@ -246,3 +246,10 @@ rand_room_any :: proc(room: Room) -> (x, y: int) {
 	}
 	return rand.int_max(w) + room.x1, rand.int_max(h) + room.y1
 }
+
+victory_boss_status_text :: proc(game: ^Game) -> cstring {
+	if game != nil && game.boss_killed_this_turn {
+		return "Defeated"
+	}
+	return "Not defeated"
+}

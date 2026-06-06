@@ -9,6 +9,11 @@ import gameio "./io"
 import renderer "./render"
 import gameui "./ui"
 
+@(private = "file")
+_lifecycle_import_anchor :: proc() {
+	_ = gameaudio.Audio_Manager{}
+}
+
 game_app_enforce_build_flags :: proc(engine: ^eng.Engine) {
 	when NO_SPRITES {
 		ui := gameui.ui_manager_state(game_engine_ui_manager(engine))

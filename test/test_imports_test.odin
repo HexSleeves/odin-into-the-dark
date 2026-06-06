@@ -1,0 +1,236 @@
+package main
+
+// Test-only aliases — re-exports subpackage symbols so test files
+// can use unqualified names. Only overlaid during `just test`/`just verify`.
+
+import aipkg "./ai"
+import gameaudio "./audio"
+import gcore "./core"
+import eng "./engine"
+import gp "./gameplay"
+import genpkg "./gen"
+import gameinput "./input"
+import gameio "./io"
+import renderer "./render"
+import gameui "./ui"
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+Game :: gcore.Game
+Player :: gcore.Player
+Enemy :: gcore.Enemy
+Item :: gcore.Item
+Equipment :: gcore.Equipment
+Vec2 :: gcore.Vec2
+Tile :: gcore.Tile
+Tile_Type :: gcore.Tile_Type
+Room :: gcore.Room
+Inventory_Slot :: gcore.Inventory_Slot
+Light_Source :: gcore.Light_Source
+Content_Manager :: gcore.Content_Manager
+Save_Manager :: gcore.Save_Manager
+Item_Def :: gcore.Item_Def
+Enemy_Def :: gcore.Enemy_Def
+Player_Def :: gcore.Player_Def
+Item_Spawn_Weight :: gcore.Item_Spawn_Weight
+Spawn_Table :: gcore.Spawn_Table
+Game_State :: gcore.Game_State
+Message_Manager :: eng.Message_Manager
+UI_Manager :: gameui.UI_Manager
+Input_Manager :: gameinput.Input_Manager
+Input_Game_Config :: gameinput.Game_Config
+Game_Action :: gameinput.Game_Action
+Input_Result :: gameinput.Input_Result
+Score_Manager :: renderer.Score_Manager
+Score_Table :: renderer.Score_Table
+Audio_Manager :: gameaudio.Audio_Manager
+
+// ─── Constants ────────────────────────────────────────────────────────────────
+Sound_Type :: gameaudio.Sound_Type
+Particle_Manager :: eng.Particle_Manager
+Save_Header :: gameio.Save_Header
+Spawn_Weight :: gcore.Spawn_Weight
+MAP_WIDTH :: gcore.MAP_WIDTH
+MAP_HEIGHT :: gcore.MAP_HEIGHT
+MAX_INVENTORY :: gcore.MAX_INVENTORY
+MAX_DEPTH :: gcore.MAX_DEPTH
+TILE_SIZE :: gcore.TILE_SIZE
+BASE_ACTION_COST :: gcore.BASE_ACTION_COST
+BASE_MOVE_COST :: gcore.BASE_MOVE_COST
+BASE_AP_PER_ROUND :: gcore.BASE_AP_PER_ROUND
+ITEM_ID_RUSTY_PICKAXE :: gcore.ITEM_ID_RUSTY_PICKAXE
+ITEM_ID_TORCH :: gcore.ITEM_ID_TORCH
+ITEM_ID_BANDAGE :: gcore.ITEM_ID_BANDAGE
+ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
+ITEM_EFFECT_HEAL :: gcore.ITEM_EFFECT_HEAL
+ITEM_EFFECT_EQUIP :: gcore.ITEM_EFFECT_EQUIP
+ITEM_EFFECT_MATERIAL :: gcore.ITEM_EFFECT_MATERIAL
+EQUIPMENT_SLOT_WEAPON :: gcore.EQUIPMENT_SLOT_WEAPON
+EQUIPMENT_SLOT_ARMOR :: gcore.EQUIPMENT_SLOT_ARMOR
+EQUIPMENT_SLOT_HELMET :: gcore.EQUIPMENT_SLOT_HELMET
+ENEMY_ABILITY_RANGED_SHOOT :: gcore.ENEMY_ABILITY_RANGED_SHOOT
+ENEMY_ABILITY_WEB :: gcore.ENEMY_ABILITY_WEB
+ENEMY_BEHAVIOR_LURKER :: gcore.ENEMY_BEHAVIOR_LURKER
+DMAP_UNREACHABLE :: aipkg.DMAP_UNREACHABLE
+KEY_REPEAT_DELAY :: gameinput.KEY_REPEAT_DELAY
+KEY_REPEAT_RATE :: gameinput.KEY_REPEAT_RATE
+
+// ─── Core procs ───────────────────────────────────────────────────────────────
+game_init_world :: gcore.game_init_world
+pos_to_idx :: gcore.pos_to_idx
+tile_at :: gcore.tile_at
+tile_state_at_idx :: gcore.tile_state_at_idx
+tile_state_set :: gcore.tile_state_set
+tile_visible_at :: gcore.tile_visible_at
+tile_visible_idx :: gcore.tile_visible_idx
+tile_explored_at :: gcore.tile_explored_at
+SAVE_FILE :: gameio.SAVE_FILE
+SCORES_FILE :: renderer.SCORES_FILE
+tile_explored_idx :: gcore.tile_explored_idx
+tile_states_clear_visibility :: gcore.tile_states_clear_visibility
+is_walkable :: gcore.is_walkable
+enemy_at :: gcore.enemy_at
+item_at :: gcore.item_at
+item_display_name :: gcore.item_display_name
+enemy_display_name :: gcore.enemy_display_name
+item_make_from_def :: gcore.item_make_from_def
+enemy_make_from_def :: gcore.enemy_make_from_def
+game_camera_update :: gcore.game_camera_update
+game_equipment_slot :: gcore.game_equipment_slot
+effective_attack :: gcore.effective_attack
+effective_defense :: gcore.effective_defense
+effective_attack_cost :: gcore.effective_attack_cost
+effective_light_bonus :: gcore.effective_light_bonus
+inventory_first_empty_slot :: gcore.inventory_first_empty_slot
+inventory_put_slot :: gcore.inventory_put_slot
+inventory_decrement_slot :: gcore.inventory_decrement_slot
+inventory_count_item_type :: gcore.inventory_count_item_type
+inventory_consume_item_type :: gcore.inventory_consume_item_type
+remove_item_from_inventory :: gcore.remove_item_from_inventory
+item_stack_limit :: gcore.item_stack_limit
+item_is_stackable :: gcore.item_is_stackable
+web_tile_at :: gcore.web_tile_at
+web_tile_at_idx :: gcore.web_tile_at_idx
+web_tiles_clear :: gcore.web_tiles_clear
+json5_color_to_engine :: gcore.json5_color_to_engine
+content_manager_make :: gcore.content_manager_make
+content_manager_destroy :: gcore.content_manager_destroy
+content_manager_is_loaded :: gcore.content_manager_is_loaded
+content_manager_item_def :: gcore.content_manager_item_def
+content_manager_enemy_def :: gcore.content_manager_enemy_def
+content_manager_player_def :: gcore.content_manager_player_def
+content_manager_enemy_def_for_depth :: gcore.content_manager_enemy_def_for_depth
+content_manager_pick_item_def_for_depth :: gcore.content_manager_pick_item_def_for_depth
+content_manager_room_item_chance :: gcore.content_manager_room_item_chance
+web_tile_set :: gcore.web_tile_set
+data_registry_destroy :: gcore.data_registry_destroy
+
+// ─── Engine procs ─────────────────────────────────────────────────────────────
+message_manager_make :: eng.message_manager_make
+message_manager_bind_turns :: eng.message_manager_bind_turns
+
+// ─── Sub-package procs ────────────────────────────────────────────────────────
+add_message :: gameui.add_message
+clear_messages :: gameui.clear_messages
+ui_manager_make :: gameui.ui_manager_make
+ui_manager_state :: gameui.ui_manager_state
+save_manager_make :: gameio.save_manager_make
+save_game_to_path :: gameio.save_game_to_path
+load_game_from_path :: gameio.load_game_from_path
+check_repeat :: gameinput.check_repeat
+score_manager_make :: renderer.score_manager_make
+score_manager_load :: renderer.score_manager_load
+score_manager_save :: renderer.score_manager_save
+score_table_destroy :: renderer.score_table_destroy
+input_manager_make :: gameinput.input_manager_make
+action_pressed :: gameinput.action_pressed
+audio_manager_make :: gameaudio.audio_manager_make
+
+// ─── Input handler procs ──────────────────────────────────────────────────────
+handle_player_action :: gameinput.handle_player_action
+handle_input :: gameinput.handle_input
+particle_manager_make :: eng.particle_manager_make
+particle_manager_spawn :: renderer.particle_manager_spawn
+particle_manager_active_count :: eng.particle_manager_active_count
+update_title_screen :: gameinput.update_title_screen
+activate_title_choice :: gameinput.activate_title_choice
+handle_global_input :: gameinput.handle_global_input
+update_playing :: gameinput.update_playing
+
+// ─── Gameplay procs ───────────────────────────────────────────────────────────
+game_init :: gp.game_init
+game_reinit :: gp.game_reinit
+game_cleanup :: gp.game_cleanup
+minimap_should_draw_enemy_dot :: renderer.minimap_should_draw_enemy_dot
+raylib_audio_state_ptr :: gameaudio.raylib_audio_state_ptr
+game_destroy :: gp.game_destroy
+game_initial_state :: gp.game_initial_state
+game_next_seed :: gp.game_next_seed
+init_player_from_content :: gp.init_player_from_content
+compute_fov :: gp.compute_fov
+generate_map :: gp.generate_map
+spawn_items :: gp.spawn_items
+pickup_item :: gp.pickup_item
+use_item :: gp.use_item
+equip_item :: gp.equip_item
+unequip_slot :: gp.unequip_slot
+mine_wall :: gp.mine_wall
+update_victory :: gameinput.update_victory
+try_craft :: gp.try_craft
+apply_item_effect :: gp.apply_item_effect
+item_make :: gp.item_make
+tick_timed_effects :: gp.tick_timed_effects
+give_starter_gear :: gp.give_starter_gear
+restart_game :: gp.restart_game
+descend :: gp.descend
+advance_turn :: gp.advance_turn
+
+// ─── AI procs ─────────────────────────────────────────────────────────────────
+resolve_attack_player_on_enemy :: aipkg.resolve_attack_player_on_enemy
+resolve_attack_enemy_on_player :: aipkg.resolve_attack_enemy_on_player
+process_enemy_turns :: aipkg.process_enemy_turns
+process_enemy_abilities :: aipkg.process_enemy_abilities
+save_run_score :: gp.save_run_score
+apply_current_tile_effects :: gp.apply_current_tile_effects
+footstep_sound_for_tile :: gp.footstep_sound_for_tile
+remove_dead_enemies :: aipkg.remove_dead_enemies
+player_die :: aipkg.player_die
+spawn_enemies :: aipkg.spawn_enemies
+can_place_enemy :: aipkg.can_place_enemy
+enemy_make :: aipkg.enemy_make
+compute_dijkstra_map :: aipkg.compute_dijkstra_map
+game_grid :: aipkg.game_grid
+
+content_manager_pick_item_def :: gcore.content_manager_pick_item_def
+// ─── Render procs ─────────────────────────────────────────────────────────────
+clay_ui_init :: renderer.clay_ui_init
+clay_ui_destroy :: renderer.clay_ui_destroy
+clay_ui_begin_frame :: renderer.clay_ui_begin_frame
+clay_ui_end_frame :: renderer.clay_ui_end_frame
+clay_render_screen_ui :: renderer.clay_render_screen_ui
+clay_render_commands :: renderer.clay_render_commands
+save_manager_save_game :: gameio.save_manager_save_game
+save_manager_load_game :: gameio.save_manager_load_game
+clay_render_messages :: renderer.clay_render_messages
+clay_render_minimap :: renderer.clay_render_minimap
+update_particles :: renderer.update_particles
+render_particles :: renderer.render_particles
+spawn_hit_particles :: renderer.spawn_hit_particles
+spawn_mine_particles :: renderer.spawn_mine_particles
+spawn_pickup_particles :: renderer.spawn_pickup_particles
+spawn_death_particles :: renderer.spawn_death_particles
+save_manager_save_exists :: gameio.save_manager_save_exists
+load_save_data :: gameio.load_save_data
+idx_to_pos :: gcore.idx_to_pos
+tile_light_level_at :: gcore.tile_light_level_at
+carve_rect :: genpkg.carve_rect
+victory_boss_status_text :: gcore.victory_boss_status_text
+
+seal_room_perimeter_for_vault :: genpkg.seal_room_perimeter_for_vault
+// ─── Cheat procs (guarded) ───────────────────────────────────────────────────
+cheat_open_if_requested :: gameinput.cheat_open_if_requested
+update_viewing_cheats :: gameinput.update_viewing_cheats
+when CHEATS_ENABLED {
+	cheat_apply :: gameinput.cheat_apply
+	cheat_set_depth :: gameinput.cheat_set_depth
+	cheat_find_descent :: gameinput.cheat_find_descent
+}

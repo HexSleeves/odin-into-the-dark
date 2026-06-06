@@ -5,8 +5,8 @@ import ui_pkg "../ui"
 import gcore "../core"
 
 import eng "../engine"
-import clay "../vendor/clay"
 import "core:fmt"
+import clay "libs:clay"
 
 @(private = "file")
 clay_tooltip_import_anchor :: proc() {

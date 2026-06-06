@@ -13,5 +13,10 @@ game_init_with_loaded_content_spawns_enemies :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 
+	// game_init defers map gen when state is Title_Screen.
+	// Simulate "New Game": force Playing and generate the map.
+	game.state = .Playing
+	generate_map(&content, game)
+
 	testing.expect(t, len(game.enemies) > 0)
 }
