@@ -10,4 +10,5 @@ NO_SPRITES :: #config(NO_SPRITES, false)
 SPRITES_REQUESTED :: #config(SPRITES, false)
 SKIP_TITLE :: #config(SKIP_TITLE, false)
 FIXED_SEED :: #config(FIXED_SEED, 0)
-DEFAULT_USE_SPRITES :: SPRITES_REQUESTED && !NO_SPRITES
+// Sprites disabled until sprite mapping is redone. SPRITES=true has no effect.
+DEFAULT_USE_SPRITES :: false

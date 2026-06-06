@@ -9,8 +9,8 @@ import "core:time"
 // ─── Build flags ──────────────────────────────────────────────────────────────
 FIXED_SEED :: #config(FIXED_SEED, 0)
 SKIP_TITLE :: #config(SKIP_TITLE, false)
-DEFAULT_USE_SPRITES :: SPRITES_REQUESTED && !NO_SPRITES
-SPRITES_REQUESTED :: #config(SPRITES, false)
+// Sprites disabled until sprite mapping is redone.
+DEFAULT_USE_SPRITES :: false
 NO_SPRITES :: #config(NO_SPRITES, false)
 
 // ─── Seed ─────────────────────────────────────────────────────────────────────

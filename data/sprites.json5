@@ -1,56 +1,12 @@
-// Sprite mappings for the Kenney 1-bit tileset
-// Each entry maps a sprite ID to a column and row in the 48x22 grid (16x16 tiles)
-// Tileset: assets/kenney_1bit.png (768x352, monochrome transparent)
+// Sprite mappings — DISABLED, pending full remap.
+// Sprites are force-disabled in build_config.odin (DEFAULT_USE_SPRITES :: false).
+// Re-enable by setting DEFAULT_USE_SPRITES :: SPRITES_REQUESTED && !NO_SPRITES
+// and filling in the mappings below.
 {
   tileset: "assets/kenney_1bit.png",
   sprite_size: 16,
 
-  // ── Tile sprites ──
-  tiles: {
-    wall:     { col: 1,  row: 10 },
-    floor:    { col: 0,  row: 12 },
-    rubble:   { col: 16, row: 5  },
-    descent:  { col: 29, row: 10 },
-    water:    { col: 2,  row: 8  },
-    gas_vent: { col: 35, row: 0  },
-    unstable: { col: 25, row: 10 },
-    chasm:    { col: 30, row: 10 },
-    anvil:    { col: 9,  row: 8  },
-    web:      { col: 6,  row: 4  },
-    ore_vein: { col: 17, row: 5  },
-  },
-
-  // ── Character sprites ──
-  characters: {
-    player:          { col: 25, row: 2 },
-    rat:             { col: 23, row: 3 },
-    miner_husk:      { col: 26, row: 2 },
-    cave_crawler:    { col: 23, row: 4 },
-    deep_watcher:    { col: 25, row: 4 },
-    toxic_spore:     { col: 3,  row: 0 },
-    shadow_stalker:  { col: 27, row: 2 },
-    mine_guardian:   { col: 28, row: 2 },
-    abyssal_lord:    { col: 29, row: 2 },
-  },
-
-  // ── Item sprites ──
-  items: {
-    health_potion:   { col: 36, row: 7 },
-    bandage:         { col: 37, row: 7 },
-    torch:           { col: 33, row: 7 },
-    lantern_oil:     { col: 34, row: 7 },
-    rusty_pickaxe:   { col: 36, row: 4 },
-    steel_pickaxe:   { col: 37, row: 4 },
-    leather_vest:    { col: 40, row: 7 },
-    chainmail:       { col: 41, row: 7 },
-    miners_helmet:   { col: 38, row: 7 },
-    crystal_lamp:    { col: 35, row: 7 },
-    copper_shield:   { col: 39, row: 7 },
-    crystal_torch:   { col: 33, row: 7 },
-    golden_amulet:   { col: 42, row: 7 },
-    iron_ore:        { col: 17, row: 5 },
-    copper_ore:      { col: 18, row: 5 },
-    crystal_shard:   { col: 19, row: 5 },
-    gold_nugget:     { col: 20, row: 5 },
-  },
+  tiles: {},
+  characters: {},
+  items: {},
 }
