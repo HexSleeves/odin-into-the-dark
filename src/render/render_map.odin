@@ -22,6 +22,37 @@ dim_color :: proc(c: eng.Engine_Color, factor: f32) -> eng.Engine_Color {
 	}
 }
 
+LIGHT_GLOW_FULL :: 40 // fuel turns at which glow reaches full lamp warmth
+
+// Multiply two colors channel-wise (b acts as a 0..255 tint per channel). Alpha from a.
+mul_color :: proc(a, b: eng.Engine_Color) -> eng.Engine_Color {
+	return eng.Engine_Color {
+		u8(int(a.r) * int(b.r) / 255),
+		u8(int(a.g) * int(b.g) / 255),
+		u8(int(a.b) * int(b.b) / 255),
+		a.a,
+	}
+}
+
+// Warm tint applied to visible tiles. No oil → faint ambient warmth. Burning oil →
+// lerp ember(low fuel) → lamp(full fuel) so the glow itself reads remaining fuel.
+light_glow_tint :: proc(boost_turns: int) -> eng.Engine_Color {
+	AMBIENT :: eng.Engine_Color{255, 248, 236, 255}
+	EMBER :: eng.Engine_Color{255, 170, 110, 255}
+	LAMP :: eng.Engine_Color{255, 225, 190, 255}
+	if boost_turns <= 0 {
+		return AMBIENT
+	}
+	r := clamp(f32(boost_turns) / f32(LIGHT_GLOW_FULL), 0, 1)
+	lerp_u8 :: proc(a, b: u8, t: f32) -> u8 {return u8(f32(a) + (f32(b) - f32(a)) * t)}
+	return eng.Engine_Color {
+		lerp_u8(EMBER.r, LAMP.r, r),
+		lerp_u8(EMBER.g, LAMP.g, r),
+		lerp_u8(EMBER.b, LAMP.b, r),
+		255,
+	}
+}
+
 base_tile_color :: proc(type: gcore.Tile_Type, palette: gcore.Floor_Palette) -> eng.Engine_Color {
 	#partial switch type {
 	case .Wall:
@@ -64,9 +95,13 @@ get_tile_color :: proc(
 	tile: gcore.Tile,
 	state: eng.Tile_State,
 	palette: gcore.Floor_Palette,
+	glow: eng.Engine_Color = {255, 255, 255, 255},
 ) -> eng.Engine_Color {
 	if state.visible {
-		return dim_color(base_tile_color(tile.type, palette), max(state.light_level, 0.5))
+		return dim_color(
+			mul_color(base_tile_color(tile.type, palette), glow),
+			max(state.light_level, 0.5),
+		)
 	}
 	if state.explored {
 		return dim_color(base_tile_color(tile.type, palette), EXPLORED_DIM)
@@ -141,6 +176,8 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
 	palette := gcore.palette_for_depth(game.depth)
 
+	glow := light_glow_tint(int(game.light_boost_turns))
+
 	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
 		for x in x0 ..= x1 {
@@ -161,11 +198,12 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				base := base_tile_color(tile.type, palette)
 				tint: eng.Engine_Color
 				if state.visible {
+					lit := mul_color(base, glow)
 					brightness := max(state.light_level, 0.5)
 					tint = eng.Engine_Color {
-						u8(f32(base.r) * brightness),
-						u8(f32(base.g) * brightness),
-						u8(f32(base.b) * brightness),
+						u8(f32(lit.r) * brightness),
+						u8(f32(lit.g) * brightness),
+						u8(f32(lit.b) * brightness),
 						255,
 					}
 				} else {
