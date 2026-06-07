@@ -15,8 +15,8 @@ clay_tooltip_import_anchor :: proc() {
 	_ = eng.Engine{}
 }
 
-TOOLTIP_BG_COLOR :: eng.Engine_Color{20, 20, 25, 230}
-TOOLTIP_TEXT_COLOR :: eng.Engine_Color{255, 255, 255, 255}
+TOOLTIP_BG_COLOR :: ui_pkg.SB_PANEL
+TOOLTIP_TEXT_COLOR :: ui_pkg.SB_TEXT
 TOOLTIP_FONT_SIZE :: i32(14)
 TOOLTIP_PAD_X :: i32(6)
 TOOLTIP_PAD_Y :: i32(4)
@@ -52,6 +52,8 @@ clay_render_tooltip :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			},
 		},
 		backgroundColor = clay_color(TOOLTIP_BG_COLOR),
+		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {1, 1, 1, 1, 0}},
+		cornerRadius = {3, 3, 3, 3},
 		floating = {
 			offset = {f32(box_x), f32(box_y)},
 			attachTo = .Parent,
@@ -78,7 +80,7 @@ clay_render_gameplay_hints :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			"mining-hint",
 			"[MINING] Direction (WASD/arrows) | ESC cancel",
 			4,
-			eng.Engine_Color{255, 200, 80, 255},
+			ui_pkg.SB_OIL,
 		)
 	}
 	cur := gcore.tile_at(game, game.player.pos.x, game.player.pos.y)
@@ -87,7 +89,7 @@ clay_render_gameplay_hints :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			"anvil-hint",
 			"[C = Craft]",
 			i32(gcore.MAP_VIEW_HEIGHT) - 22,
-			eng.Engine_Color{160, 160, 170, 255},
+			ui_pkg.SB_OIL,
 		)
 	}
 	if cur != nil && cur.type == .Fountain {
@@ -95,7 +97,7 @@ clay_render_gameplay_hints :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			"fountain-hint",
 			"[Fountain — restores HP]",
 			i32(gcore.MAP_VIEW_HEIGHT) - 22,
-			eng.Engine_Color{80, 180, 220, 255},
+			ui_pkg.SB_OIL,
 		)
 	}
 }

@@ -3,6 +3,7 @@ package renderer
 import gcore "../core"
 
 import eng "../engine"
+import ui_pkg "../ui"
 import clay "libs:clay"
 
 @(private = "file")
@@ -39,7 +40,9 @@ clay_render_minimap :: proc(game: ^gcore.Game) {
 			layoutDirection = .TopToBottom,
 			childGap = 0,
 		},
-		backgroundColor = clay_color(eng.Engine_Color{0, 0, 0, 180}),
+		backgroundColor = clay_color(
+			eng.Engine_Color{ui_pkg.SB_BG.r, ui_pkg.SB_BG.g, ui_pkg.SB_BG.b, 180},
+		),
 		floating = {
 			offset = {
 				f32(
@@ -90,17 +93,14 @@ clay_render_minimap :: proc(game: ^gcore.Game) {
 @(private = "file")
 clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Color {
 	if game.player.pos.x == x && game.player.pos.y == y {
-		return eng.Engine_Color{255, 255, 0, 255}
+		return ui_pkg.SB_TITLE // player — gold
 	}
 	enemy := gcore.enemy_at(game, x, y)
 	if enemy != nil && minimap_should_draw_enemy_dot(game, enemy) {
-		if enemy.is_boss {
-			return eng.Engine_Color{255, 215, 0, 255} // gold
-		}
-		return eng.Engine_Color{255, 60, 60, 255}
+		return ui_pkg.SB_BOSS // enemy / boss
 	}
 	if gcore.npc_at(game, x, y) >= 0 && gcore.tile_explored_at(game, x, y) {
-		return eng.Engine_Color{120, 220, 160, 255} // NPC — soft green
+		return ui_pkg.SB_POISON // NPC — soft green
 	}
 
 	idx := gcore.pos_to_idx(x, y)
@@ -109,40 +109,36 @@ clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Colo
 	if state.visible {
 		#partial switch tile.type {
 		case .Wall:
-			return eng.Engine_Color{80, 80, 90, 255}
+			return ui_pkg.SB_DIVIDER
 		case .Floor:
-			return eng.Engine_Color{160, 120, 60, 255}
+			return ui_pkg.SB_OIL
 		case .Rubble:
-			return eng.Engine_Color{140, 130, 90, 255}
+			return ui_pkg.SB_HLM
 		case .Descent:
-			return eng.Engine_Color{0, 255, 255, 255}
+			return ui_pkg.SB_ARM
 		case .Ascent:
 			return eng.Engine_Color{180, 120, 255, 255}
 		case .Shrine:
 			return eng.Engine_Color{100, 200, 255, 255}
 		case .Chest:
-			return eng.Engine_Color{220, 180, 50, 255}
+			return ui_pkg.SB_TITLE
 		case .Merchant:
-			return eng.Engine_Color{80, 220, 120, 255}
+			return ui_pkg.SB_POISON
 		case:
-			return eng.Engine_Color{120, 100, 80, 255}
+			return ui_pkg.SB_LAMP_LOW
 		}
 	}
 	if state.explored {
 		#partial switch tile.type {
 		case .Wall:
-			return eng.Engine_Color{30, 30, 35, 255}
-		case .Floor:
-			return eng.Engine_Color{60, 45, 25, 255}
-		case .Rubble:
-			return eng.Engine_Color{55, 50, 35, 255}
+			return ui_pkg.SB_PANEL
 		case .Descent:
 			return eng.Engine_Color{0, 80, 80, 255}
 		case .Ascent:
 			return eng.Engine_Color{80, 40, 120, 255}
 		case:
-			return eng.Engine_Color{50, 40, 30, 255}
+			return ui_pkg.SB_DIM
 		}
 	}
-	return eng.Engine_Color{}
+	return ui_pkg.SB_BG
 }
