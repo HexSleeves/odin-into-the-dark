@@ -1,4 +1,5 @@
 package gameio
+import "base:runtime"
 
 
 import gcore "../core"
@@ -88,7 +89,7 @@ clear_visited_floors :: proc(game: ^Game) {
 	for i in 0 ..< len(game.visited_floors) {
 		if game.visited_floors[i] == nil {continue}
 		saved_floor_destroy(game.visited_floors[i])
-		free(game.visited_floors[i])
+		free(game.visited_floors[i], runtime.default_allocator())
 		game.visited_floors[i] = nil
 	}
 }

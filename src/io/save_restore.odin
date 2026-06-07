@@ -1,4 +1,5 @@
 package gameio
+import "base:runtime"
 import "core:mem"
 
 
@@ -100,7 +101,7 @@ load_game_from_storage :: proc(
 	}
 	for depth in 0 ..< len(data.visited_floor_present) {
 		if !data.visited_floor_present[depth] {continue}
-		game.visited_floors[depth] = new(Saved_Floor)
+		game.visited_floors[depth] = new(Saved_Floor, runtime.default_allocator())
 		if game.visited_floors[depth] != nil {
 			save_to_floor(content, &data.visited_floors[depth], game.visited_floors[depth])
 		}

@@ -2,6 +2,7 @@ package gameplay
 
 import gcore "../core"
 import eng "../engine"
+import "base:runtime"
 import "core:math/rand"
 
 // ─── Map generation dispatch ──────────────────────────────────────────────────
@@ -94,7 +95,7 @@ clear_visited_floors :: proc(game: ^Game) {
 	for i in 0 ..< len(game.visited_floors) {
 		if game.visited_floors[i] == nil {continue}
 		saved_floor_destroy(game.visited_floors[i])
-		free(game.visited_floors[i])
+		free(game.visited_floors[i], runtime.default_allocator())
 		game.visited_floors[i] = nil
 	}
 }
@@ -102,12 +103,18 @@ clear_visited_floors :: proc(game: ^Game) {
 ensure_floor_snapshot :: proc(game: ^Game, depth: int) -> ^Saved_Floor {
 	if game == nil || depth < SURFACE_DEPTH || depth > MAX_DEPTH {return nil}
 	if game.visited_floors[depth] == nil {
-		game.visited_floors[depth] = new(Saved_Floor)
+		game.visited_floors[depth] = new(Saved_Floor, runtime.default_allocator())
 	}
 	return game.visited_floors[depth]
 }
 
 save_current_floor :: proc(game: ^Game) -> bool {
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
+
 	floor := ensure_floor_snapshot(game, game.depth)
 	if floor == nil {return false}
 	saved_floor_destroy(floor)
@@ -141,6 +148,11 @@ restore_dynamic_array :: proc($T: typeid, dst: ^[dynamic]T, src: [dynamic]T) {
 }
 
 restore_saved_floor :: proc(game: ^Game, depth: int) -> bool {
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
 	if game == nil || depth < SURFACE_DEPTH || depth > MAX_DEPTH {return false}
 	floor := game.visited_floors[depth]
 	if floor == nil {return false}
@@ -162,7 +174,7 @@ restore_saved_floor :: proc(game: ^Game, depth: int) -> bool {
 	restore_dynamic_array(Item, &game.items, floor.items)
 	restore_dynamic_array(Light_Source, &game.light_sources, floor.light_sources)
 	saved_floor_destroy(floor)
-	free(floor)
+	free(floor, runtime.default_allocator())
 	game.visited_floors[depth] = nil
 	return true
 }

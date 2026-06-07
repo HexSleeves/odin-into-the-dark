@@ -1,6 +1,7 @@
 package gameplay
 
 import eng "../engine"
+import "base:runtime"
 import "core:fmt"
 
 footstep_sound_for_tile :: proc(tile_type: Tile_Type) -> Sound_Type {
@@ -104,6 +105,12 @@ descend :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 ) {
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
+
 	if game.depth >= MAX_DEPTH {
 		game.state = .Victory
 		return
@@ -145,6 +152,12 @@ ascend :: proc(
 	messages: ^Message_Manager,
 	game: ^Game,
 ) -> bool {
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
+
 	if game.depth <= SURFACE_DEPTH {return false}
 
 	_ = save_current_floor(game)

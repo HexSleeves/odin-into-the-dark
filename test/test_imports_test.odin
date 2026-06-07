@@ -192,6 +192,7 @@ tick_timed_effects :: gp.tick_timed_effects
 give_starter_gear :: gp.give_starter_gear
 restart_game :: gp.restart_game
 descend :: gp.descend
+save_current_floor :: gp.save_current_floor
 advance_turn :: gp.advance_turn
 
 // ─── AI procs ─────────────────────────────────────────────────────────────────
