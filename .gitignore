@@ -56,3 +56,6 @@ src.bin
 # Game runtime files
 savegame.dat
 scores.json
+
+# Brainstorming visual companion
+.superpowers/
