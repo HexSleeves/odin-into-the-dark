@@ -3,18 +3,14 @@ package renderer
 import gcore "../core"
 import eng "../engine"
 import ui_pkg "../ui"
-import clay "libs:clay"
 import "core:fmt"
+import clay "libs:clay"
 
 // ─── Shrine overlay ──────────────────────────────────────────────────────────
 
-SHRINE_BUFF_LABELS :: [3]string{
-	"Max HP",
-	"Attack",
-	"Light Radius",
-}
+SHRINE_BUFF_LABELS :: [3]string{"Max HP", "Attack", "Light Radius"}
 
-SHRINE_BUFF_VALUES :: [3]int{
+SHRINE_BUFF_VALUES :: [3]int {
 	gcore.SHRINE_BUFF_MAX_HP,
 	gcore.SHRINE_BUFF_ATTACK,
 	gcore.SHRINE_BUFF_LIGHT,
@@ -39,9 +35,15 @@ clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				color = ui_pkg.SB_TITLE
 			}
 			clay_text(
-				fmt.tprintf("[%d] +%d %s%s", i + 1, values[i], labels[i],
-					i == game.shrine_choice ? " <" : ""),
-				CLAY_HUD_ROW_FONT, color,
+				fmt.tprintf(
+					"[%d] +%d %s%s",
+					i + 1,
+					values[i],
+					labels[i],
+					i == game.shrine_choice ? " <" : "",
+				),
+				CLAY_HUD_ROW_FONT,
+				color,
 			)
 		}
 

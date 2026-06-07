@@ -1,7 +1,7 @@
 package gameinput
 
-import gp "../gameplay"
 import eng "../engine"
+import gp "../gameplay"
 
 // update_viewing_dialogue advances NPC dialogue. Confirm/continue steps to the
 // next line; ESC ends the conversation (applying any quest effect on the way out).

@@ -1,9 +1,16 @@
 package gameplay
 
 import eng "../engine"
+import "base:runtime"
 import "core:strings"
 
 save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^Game) {
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
+
 	game.score_saved = true
 	table := score_manager_load(scores)
 	defer score_table_destroy(&table)

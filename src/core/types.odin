@@ -171,10 +171,10 @@ UI_State :: struct {
 // ─── Game State ───────────────────────────────────────────────────────────────
 
 Merchant_Offer :: struct {
-	item_id:      string, // content ID of item being sold
-	cost_id:      string, // material required
-	cost_qty:     int,    // amount of material needed
-	sold:         bool,   // already purchased
+	item_id:  string, // content ID of item being sold
+	cost_id:  string, // material required
+	cost_qty: int, // amount of material needed
+	sold:     bool, // already purchased
 }
 
 MAX_NPCS :: 8
@@ -295,6 +295,6 @@ Game :: struct {
 	quest:                  Quest_State,
 	active_npc:             int, // index into npcs during dialogue (-1 = none)
 	dialogue_line:          int, // current line of active NPC's dialogue
-	visited_floors:        [MAX_DEPTH + 1]^Saved_Floor,
-	floor_entry_pos:       Vec2,
+	visited_floors:         [MAX_DEPTH + 1]^Saved_Floor,
+	floor_entry_pos:        Vec2,
 }

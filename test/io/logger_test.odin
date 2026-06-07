@@ -3,6 +3,8 @@ package gameio
 
 import eng "../engine"
 import "core:log"
+import "core:mem"
+import "core:os"
 import "core:testing"
 
 @(test)
@@ -79,4 +81,25 @@ logger_config_reads_engine_config_manager_values :: proc(t: ^testing.T) {
 	testing.expect(t, .Data in logger_config.channels)
 	testing.expect(t, .Save in logger_config.channels)
 	testing.expect(t, !(.Audio in logger_config.channels))
+}
+
+@(test)
+logger_destroy_releases_env_owned_file_path :: proc(t: ^testing.T) {
+	os.set_env("ITD_LOG_LEVEL", "off")
+	os.set_env("ITD_LOG_FILE_PATH", "logs/env-owned.log")
+	defer os.unset_env("ITD_LOG_LEVEL")
+	defer os.unset_env("ITD_LOG_FILE_PATH")
+
+	track: mem.Tracking_Allocator
+	previous_allocator := context.allocator
+	mem.tracking_allocator_init(&track, previous_allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	logger: Game_Logger
+	context.allocator = mem.tracking_allocator(&track)
+	logger_init_from_env(&logger)
+	logger_destroy(&logger)
+	context.allocator = previous_allocator
+
+	testing.expect_value(t, len(track.allocation_map), 0)
 }

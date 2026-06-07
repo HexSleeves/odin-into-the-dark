@@ -43,9 +43,10 @@ load_game_from_storage :: proc(
 	storage: ^eng.Storage_Manager,
 	path: string,
 ) -> bool {
-	buf, read_ok := eng.storage_manager_read(storage, path, context.allocator)
+	read_allocator := context.allocator
+	buf, read_ok := eng.storage_manager_read(storage, path, read_allocator)
 	if !read_ok {return false}
-	defer delete(buf, context.allocator)
+	defer delete(buf, read_allocator)
 
 	if len(buf) < size_of(Save_Header) {return false}
 
@@ -57,6 +58,11 @@ load_game_from_storage :: proc(
 	data, data_ok := load_save_data(header, buf)
 	if !data_ok {return false}
 	defer free(data)
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
 
 	// ── Clean up existing dynamic arrays ──
 	game_cleanup(game)

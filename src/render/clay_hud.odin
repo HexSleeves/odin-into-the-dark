@@ -84,7 +84,14 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 					spd_label = "Very Slow"
 					spd_color = ui_pkg.SB_HP_LOW
 				}
-				clay_row("hud-atk-row", "ATK", spd_label, CLAY_HUD_FONT, ui_pkg.SB_HEADER, spd_color)
+				clay_row(
+					"hud-atk-row",
+					"ATK",
+					spd_label,
+					CLAY_HUD_FONT,
+					ui_pkg.SB_HEADER,
+					spd_color,
+				)
 
 				if game.equipped_weapon.occupied {
 					wpn := game.equipped_weapon.item
@@ -106,13 +113,24 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 							clay_row(
 								"hud-pick-row",
 								"PICK",
-								fmt.tprintf("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
+								fmt.tprintf(
+									"%d / %d",
+									i32(wpn.durability),
+									i32(wpn.max_durability),
+								),
 								CLAY_HUD_FONT,
 								ui_pkg.SB_HEADER,
 								ui_pkg.SB_TEXT,
 							)
 						}
-						clay_bar_segmented("hud-pick-bar", pick_ratio, 10, 8, ui_pkg.SB_PICK_BG, pick_fg)
+						clay_bar_segmented(
+							"hud-pick-bar",
+							pick_ratio,
+							10,
+							8,
+							ui_pkg.SB_PICK_BG,
+							pick_fg,
+						)
 					}
 				}
 			}

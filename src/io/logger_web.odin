@@ -19,6 +19,6 @@ logger_config_value :: proc(config: ^eng.Config_Manager, key: string) -> string 
 	return ""
 }
 
-logger_config_file_path :: proc(config: ^eng.Config_Manager) -> string {
-	return ""
+logger_config_file_path :: proc(config: ^eng.Config_Manager) -> (string, bool) {
+	return "", false
 }

@@ -1,6 +1,6 @@
 package gameio
 
-
+import "base:runtime"
 string_to_save :: proc(s: string) -> Save_String {
 	result: Save_String
 	copy_len := min(len(s), MAX_NAME_LEN)
@@ -13,23 +13,23 @@ string_to_save :: proc(s: string) -> Save_String {
 
 enemy_to_save :: proc(e: ^Enemy) -> Save_Enemy {
 	return Save_Enemy {
-		pos              = e.pos,
-		hp               = e.hp,
-		max_hp           = e.max_hp,
-		attack           = e.attack,
-		enemy_type       = string_to_save(e.enemy_type),
-		name             = string_to_save(e.name),
-		glyph            = e.glyph,
-		color            = e.color,
-		alive            = e.alive,
-		ability_type     = string_to_save(e.ability_type),
+		pos = e.pos,
+		hp = e.hp,
+		max_hp = e.max_hp,
+		attack = e.attack,
+		enemy_type = string_to_save(e.enemy_type),
+		name = string_to_save(e.name),
+		glyph = e.glyph,
+		color = e.color,
+		alive = e.alive,
+		ability_type = string_to_save(e.ability_type),
 		ability_cooldown = e.ability_cooldown,
-		ability_max_cd   = e.ability_max_cd,
-		ability_range    = e.ability_range,
-		is_boss          = e.is_boss,
+		ability_max_cd = e.ability_max_cd,
+		ability_range = e.ability_range,
+		is_boss = e.is_boss,
 		detection_radius = e.detection_radius,
-		aware            = e.aware,
-		memory_turns     = e.memory_turns,
+		aware = e.aware,
+		memory_turns = e.memory_turns,
 		aware_turns_left = e.aware_turns_left,
 	}
 }
@@ -46,28 +46,28 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 		beh = def.behavior
 	}
 	return Enemy {
-		pos              = se.pos,
-		hp               = se.hp,
-		max_hp           = se.max_hp,
-		attack           = se.attack,
-		enemy_type       = etype,
-		name             = save_to_string(content, &se.name),
-		glyph            = se.glyph,
-		color            = se.color,
-		alive            = se.alive,
-		ability_type     = save_to_string(content, &se.ability_type),
+		pos = se.pos,
+		hp = se.hp,
+		max_hp = se.max_hp,
+		attack = se.attack,
+		enemy_type = etype,
+		name = save_to_string(content, &se.name),
+		glyph = se.glyph,
+		color = se.color,
+		alive = se.alive,
+		ability_type = save_to_string(content, &se.ability_type),
 		ability_cooldown = se.ability_cooldown,
-		ability_max_cd   = se.ability_max_cd,
-		ability_range    = se.ability_range,
-		is_boss          = se.is_boss,
+		ability_max_cd = se.ability_max_cd,
+		ability_range = se.ability_range,
+		is_boss = se.is_boss,
 		detection_radius = max(se.detection_radius, DEFAULT_ENEMY_DETECTION_RADIUS),
-		memory_turns     = max(se.memory_turns, DEFAULT_ENEMY_MEMORY_TURNS),
-		aware            = se.aware,
+		memory_turns = max(se.memory_turns, DEFAULT_ENEMY_MEMORY_TURNS),
+		aware = se.aware,
 		aware_turns_left = se.aware_turns_left,
-		behavior         = beh,
-		quickness        = qn,
-		move_speed       = ms,
-		energy           = 0,
+		behavior = beh,
+		quickness = qn,
+		move_speed = ms,
+		energy = 0,
 	}
 }
 
@@ -191,6 +191,12 @@ floor_to_save :: proc(floor: ^Saved_Floor, result: ^Save_Floor) {
 
 save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Saved_Floor) {
 	if saved == nil || floor == nil {return}
+	old_context := context
+	context.allocator = runtime.default_allocator()
+	defer {
+		context = old_context
+	}
+
 	floor.tiles = saved.tiles
 	floor.web_tiles = saved.web_tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {

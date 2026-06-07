@@ -49,8 +49,9 @@ clay_screen_dispatcher_playing_state_emits_hud_text_commands :: proc(t: ^testing
 	defer sync.mutex_unlock(&clay_ui_test_mutex)
 	render_state := Clay_Test_Render_State{}
 	engine := eng.Engine {
-		input  = eng.engine_input_backend_nil(),
-		render = clay_test_render_backend(&render_state),
+		input         = eng.engine_input_backend_nil(),
+		render        = clay_test_render_backend(&render_state),
+		frame_manager = eng.frame_manager_make(),
 	}
 	content := content_manager_make()
 	game := game_init(&content)
@@ -80,8 +81,9 @@ clay_gameplay_surfaces_emit_message_and_minimap_commands :: proc(t: ^testing.T) 
 	defer sync.mutex_unlock(&clay_ui_test_mutex)
 	render_state := Clay_Test_Render_State{}
 	engine := eng.Engine {
-		input  = eng.engine_input_backend_nil(),
-		render = clay_test_render_backend(&render_state),
+		input         = eng.engine_input_backend_nil(),
+		render        = clay_test_render_backend(&render_state),
+		frame_manager = eng.frame_manager_make(),
 	}
 	content := content_manager_make()
 	game := game_init(&content)

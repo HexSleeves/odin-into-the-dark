@@ -49,7 +49,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 
 		route: [MAP_WIDTH * MAP_HEIGHT]bool
 		route_ok := enemy_spawn_mark_route_to_descent(game, &route)
-		path_radius := 4 + game.depth / 3  // widen at deeper depths
+		path_radius := 4 + game.depth / 3 // widen at deeper depths
 		min_player_distance := max(game.player.light_radius + 2, 6)
 
 		spawned := 0

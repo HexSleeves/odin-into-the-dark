@@ -1,15 +1,19 @@
 package gameinput
 
-import gp "../gameplay"
 import eng "../engine"
+import gp "../gameplay"
 
 // ─── Shrine input ────────────────────────────────────────────────────────────
 
 update_viewing_shrine :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Menu_Back) {
 		game.state = .Playing
-		add_message(game_engine_message_manager(engine), game,
-			"You leave the shrine untouched.", eng.Engine_Color{120, 120, 120, 255})
+		add_message(
+			game_engine_message_manager(engine),
+			game,
+			"You leave the shrine untouched.",
+			eng.Engine_Color{120, 120, 120, 255},
+		)
 		return
 	}
 

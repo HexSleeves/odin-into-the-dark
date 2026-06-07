@@ -2,6 +2,7 @@
 package audio
 
 import eng "../engine"
+import "core:mem"
 import "core:sync"
 import "core:testing"
 
@@ -184,6 +185,101 @@ audio_manager_play_looped_skipped_when_disabled :: proc(t: ^testing.T) {
 	audio_manager_play_sfx_looped(&audio, .Footstep)
 	testing.expect_value(t, state.play_looped_count, 0)
 }
+
+@(test)
+music_init_unloads_previously_loaded_tracks_when_a_later_tier_fails :: proc(t: ^testing.T) {
+	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
+	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
+
+	saved_audio := g_audio
+	saved_music := g_music
+	defer {
+		g_audio = saved_audio
+		g_music = saved_music
+	}
+
+	state := Test_Music_Backend_State {
+		fail_load_number = 2,
+	}
+	g_audio.enabled = true
+	g_audio.backend = test_music_backend_make(&state)
+	g_music = {}
+
+	track: mem.Tracking_Allocator
+	previous_allocator := context.allocator
+	mem.tracking_allocator_init(&track, previous_allocator)
+	defer mem.tracking_allocator_destroy(&track)
+
+	context.allocator = mem.tracking_allocator(&track)
+	music_init()
+	context.allocator = previous_allocator
+
+	testing.expect(t, !g_music.initialized)
+	testing.expect(t, !g_music.enabled)
+	testing.expect_value(t, state.load_music_count, 2)
+	testing.expect_value(t, state.unload_music_count, 1)
+	testing.expect_value(t, len(g_music.wav_data[.Shallow]), 0)
+	testing.expect_value(t, len(g_music.wav_data[.Mid]), 0)
+	testing.expect_value(t, len(g_music.wav_data[.Deep]), 0)
+	testing.expect_value(t, len(track.allocation_map), 0)
+}
+
+Test_Music_Backend_State :: struct {
+	load_music_count:   int,
+	unload_music_count: int,
+	fail_load_number:   int,
+}
+
+test_music_backend_make :: proc(state: ^Test_Music_Backend_State) -> eng.Engine_Audio_Backend {
+	backend := eng.engine_audio_backend_nil()
+	backend.ctx = state
+	backend.load_music = test_music_load
+	backend.unload_music = test_music_unload
+	backend.is_music_valid = test_music_is_valid
+	backend.set_music_looping = test_music_set_looping
+	backend.set_music_volume = test_music_set_volume
+	backend.play_music = test_music_play
+	backend.stop_music = test_music_stop
+	backend.pause_music = test_music_pause
+	backend.resume_music = test_music_resume
+	backend.update_music = test_music_update
+	backend.get_frame_time = test_music_frame_time
+	return backend
+}
+
+test_music_load :: proc(
+	ctx: rawptr,
+	format: string,
+	data: rawptr,
+	data_len: i32,
+) -> eng.Engine_Music_Handle {
+	state := cast(^Test_Music_Backend_State)ctx
+	state.load_music_count += 1
+	if state.load_music_count == state.fail_load_number {
+		return nil
+	}
+	return rawptr(uintptr(state.load_music_count))
+}
+
+test_music_unload :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
+	state := cast(^Test_Music_Backend_State)ctx
+	if handle != nil {
+		state.unload_music_count += 1
+	}
+}
+
+test_music_is_valid :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) -> bool {return(
+		handle !=
+		nil \
+	)}
+test_music_set_looping :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle, looping: bool) {}
+test_music_set_volume :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle, volume: f32) {}
+test_music_play :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
+test_music_stop :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
+test_music_pause :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
+test_music_resume :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
+test_music_update :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
+test_music_frame_time :: proc(ctx: rawptr) -> f32 {return 1.0 / 60.0}
 
 // ─── Test backend ────────────────────────────────────────────────────────────
 

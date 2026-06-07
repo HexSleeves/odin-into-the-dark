@@ -1,9 +1,9 @@
 package gameio
 
 import eng "../engine"
+import "base:runtime"
 import "core:fmt"
 import "core:log"
-
 // ─── Game diagnostics logger ─────────────────────────────────────────────────
 
 Game_Log_Channel :: enum {
@@ -30,6 +30,7 @@ Game_Logger_Config :: struct {
 	console_level:   log.Level,
 	file_level:      log.Level,
 	file_path:       string,
+	file_path_owned: bool,
 	channels:        Game_Log_Channels,
 	include_source:  bool,
 	flush_file:      bool,
@@ -81,6 +82,11 @@ logger_init_from_config :: proc(logger: ^Game_Logger, config: ^eng.Config_Manage
 
 logger_destroy :: proc(logger: ^Game_Logger) {
 	logger_destroy_file(logger)
+	if logger.config.file_path_owned && len(logger.config.file_path) > 0 {
+		delete(logger.config.file_path, runtime.default_allocator())
+		logger.config.file_path = ""
+		logger.config.file_path_owned = false
+	}
 	if logger.console_ready {
 		log.destroy_console_logger(logger.console)
 		logger.console_ready = false
@@ -106,10 +112,10 @@ logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Co
 		logger_config_value(config, "ITD_LOG_FILE_LEVEL"),
 		base_level,
 	)
-
-	file_path := logger_config_file_path(config)
+	file_path, file_path_owned := logger_config_file_path(config)
 	if file_path == "" {
 		file_path = LOGGER_DEFAULT_FILE_PATH
+		file_path_owned = false
 	}
 
 	return Game_Logger_Config {
@@ -123,6 +129,7 @@ logger_config_from_config :: proc(config: ^eng.Config_Manager) -> Game_Logger_Co
 		console_level = console_level,
 		file_level = file_level,
 		file_path = file_path,
+		file_path_owned = file_path_owned,
 		channels = logger_parse_channels(logger_config_value(config, "ITD_LOG_CHANNELS")),
 		include_source = logger_parse_bool(logger_config_value(config, "ITD_LOG_SOURCE"), true),
 		flush_file = logger_parse_bool(logger_config_value(config, "ITD_LOG_FLUSH"), true),

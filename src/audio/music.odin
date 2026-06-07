@@ -109,7 +109,15 @@ music_init :: proc() {
 			i32(len(d)),
 		)
 		if !eng.engine_audio_backend_is_music_valid(backend, g_music.tracks[tier]) {
-			g_music.enabled = false
+			for rollback in Music_Tier {
+				if rollback <= tier {
+					if g_music.tracks[rollback] != nil {
+						eng.engine_audio_backend_unload_music(backend, g_music.tracks[rollback])
+					}
+				}
+				delete(g_music.wav_data[rollback])
+			}
+			g_music = {}
 			return
 		}
 		eng.engine_audio_backend_set_music_looping(backend, g_music.tracks[tier], true)
@@ -127,7 +135,7 @@ music_init :: proc() {
 }
 
 music_cleanup :: proc() {
-	if !g_music.initialized {return}
+	if !g_music.initialized && !g_music.enabled {return}
 	backend := g_audio.backend
 	for tier in Music_Tier {
 		eng.engine_audio_backend_unload_music(backend, g_music.tracks[tier])

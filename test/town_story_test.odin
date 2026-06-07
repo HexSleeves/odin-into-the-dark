@@ -204,7 +204,10 @@ buying_from_shopkeeper_consumes_material_and_marks_offer_sold :: proc(t: ^testin
 	engine.services = &services
 	engine.message_manager = message_manager_make()
 	testing.expect(t, engine_services_register(&services, GAME_ENGINE_SERVICE_CONTENT, &content))
-	testing.expect(t, engine_services_register(&services, GAME_ENGINE_SERVICE_MESSAGES, &engine.message_manager))
+	testing.expect(
+		t,
+		engine_services_register(&services, GAME_ENGINE_SERVICE_MESSAGES, &engine.message_manager),
+	)
 
 	testing.expect(t, merchant_buy(&engine, game, 0))
 
@@ -300,7 +303,16 @@ save_load_preserves_floor_stack_for_return_trip :: proc(t: ^testing.T) {
 	loaded_messages := message_manager_make()
 	testing.expect(
 		t,
-		load_game_from_path(&content, &loaded_turns, &loaded_camera, &vfx, &ui, &loaded_messages, &loaded, path),
+		load_game_from_path(
+			&content,
+			&loaded_turns,
+			&loaded_camera,
+			&vfx,
+			&ui,
+			&loaded_messages,
+			&loaded,
+			path,
+		),
 	)
 	defer game_cleanup(&loaded)
 

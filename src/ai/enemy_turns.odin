@@ -34,11 +34,7 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 // enemy_act_once performs exactly one action and deducts its AP cost.
 // Returns true if an action was taken, false if the enemy should stop acting.
 @(private = "file")
-enemy_act_once :: proc(
-	messages: ^Message_Manager,
-	game: ^Game,
-	enemy: ^Enemy,
-) -> bool {
+enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -> bool {
 	move_cost := max(1, BASE_MOVE_COST * enemy.move_speed / 100)
 
 	switch enemy.behavior {

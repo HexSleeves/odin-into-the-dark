@@ -97,3 +97,41 @@ score_test_file_system_exists :: proc(ctx: rawptr, path: string) -> bool {
 score_test_file_system_remove :: proc(ctx: rawptr, path: string) -> bool {
 	return false
 }
+
+@(test)
+save_run_score_works_with_frame_like_context_and_persists_scores :: proc(t: ^testing.T) {
+	state := Score_Test_File_System_State{}
+	fs := eng.Engine_File_System {
+		ctx               = &state,
+		read_entire_file  = score_test_file_system_read_entire_file,
+		write_entire_file = score_test_file_system_write_entire_file,
+		exists            = score_test_file_system_exists,
+		remove            = score_test_file_system_remove,
+	}
+	scores := score_manager_make()
+	scores.file_path = "virtual-scores.json"
+	scores.storage = eng.storage_manager_make(fs)
+	turns := eng.turn_manager_make()
+	eng.turn_manager_set(&turns, 12)
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+	game := game_init(&content)
+	defer game_destroy(game)
+	game.depth = 2
+	game.kills = 3
+	game.items_found = 4
+	game.death_cause = "allocator test"
+
+	arena: runtime.Arena
+	_ = runtime.arena_init(&arena, 1 << 12, runtime.default_allocator())
+	defer runtime.arena_destroy(&arena)
+	old_context := context
+	context.allocator = runtime.arena_allocator(&arena)
+	save_run_score(&scores, &turns, game)
+	context = old_context
+
+	testing.expect(t, game.score_saved)
+	testing.expect_value(t, state.write_count, 1)
+	testing.expect(t, state.last_write_len > 0)
+}

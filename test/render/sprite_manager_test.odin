@@ -184,13 +184,15 @@ sprite_lookup_covers_special_tiles_and_town_npcs :: proc(t: ^testing.T) {
 @(test)
 sprite_manager_named_returns_npc_category_sprites :: proc(t: ^testing.T) {
 	atlas := Sprite_Atlas {
-		loaded = true,
+		loaded    = true,
 		tile_size = 16,
-		npc_map = make(map[string]Sprite),
+		npc_map   = make(map[string]Sprite),
 	}
 	defer delete(atlas.npc_map)
 	(&atlas.npc_map)["shopkeeper"] = sprite_at(3, 4, 16)
-	sprites := Sprite_Manager{backend = &atlas}
+	sprites := Sprite_Manager {
+		backend = &atlas,
+	}
 
 	spr := sprite_manager_named(&sprites, "npc", "shopkeeper")
 

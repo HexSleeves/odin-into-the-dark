@@ -93,34 +93,46 @@ quest_objective_text :: proc(game: ^Game) -> string {
 
 place_town_npcs :: proc(game: ^Game) {
 	game.npc_count = 0
-	town_add_npc(game, NPC {
-		pos = Vec2{17, 18},
-		name = "Bram the Shopkeeper",
-		glyph = 'S',
-		color = {80, 220, 120, 255},
-		role = .Shopkeeper,
-	})
-	town_add_npc(game, NPC {
-		pos = Vec2{MAP_WIDTH / 2, MAP_HEIGHT - 8},
-		name = "Sergeant Hild",
-		glyph = 'G',
-		color = {120, 160, 230, 255},
-		role = .Guard,
-	})
-	town_add_npc(game, NPC {
-		pos = Vec2{MAP_WIDTH - 19, 18},
-		name = "Elder Marisa",
-		glyph = 'E',
-		color = {220, 200, 120, 255},
-		role = .Elder,
-	})
-	town_add_npc(game, NPC {
-		pos = Vec2{MAP_WIDTH / 2 + 3, 9},
-		name = "Old Miner Tobias",
-		glyph = 'M',
-		color = {230, 180, 90, 255},
-		role = .Old_Miner,
-	})
+	town_add_npc(
+		game,
+		NPC {
+			pos = Vec2{17, 18},
+			name = "Bram the Shopkeeper",
+			glyph = 'S',
+			color = {80, 220, 120, 255},
+			role = .Shopkeeper,
+		},
+	)
+	town_add_npc(
+		game,
+		NPC {
+			pos = Vec2{MAP_WIDTH / 2, MAP_HEIGHT - 8},
+			name = "Sergeant Hild",
+			glyph = 'G',
+			color = {120, 160, 230, 255},
+			role = .Guard,
+		},
+	)
+	town_add_npc(
+		game,
+		NPC {
+			pos = Vec2{MAP_WIDTH - 19, 18},
+			name = "Elder Marisa",
+			glyph = 'E',
+			color = {220, 200, 120, 255},
+			role = .Elder,
+		},
+	)
+	town_add_npc(
+		game,
+		NPC {
+			pos = Vec2{MAP_WIDTH / 2 + 3, 9},
+			name = "Old Miner Tobias",
+			glyph = 'M',
+			color = {230, 180, 90, 255},
+			role = .Old_Miner,
+		},
+	)
 }
 
 @(private = "file")

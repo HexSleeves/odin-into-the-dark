@@ -70,7 +70,9 @@ clay_render_title_embers :: proc(engine: ^eng.Engine) {
 					height = clay.SizingFixed(f32(size)),
 				},
 			},
-			backgroundColor = clay_color(eng.Engine_Color{ui_pkg.SB_OIL.r, ui_pkg.SB_OIL.g, ui_pkg.SB_OIL.b, alpha}),
+			backgroundColor = clay_color(
+				eng.Engine_Color{ui_pkg.SB_OIL.r, ui_pkg.SB_OIL.g, ui_pkg.SB_OIL.b, alpha},
+			),
 			floating = {
 				offset = {f32(x), f32(y)},
 				attachTo = .Parent,

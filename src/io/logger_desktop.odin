@@ -2,6 +2,7 @@
 package gameio
 
 import eng "../engine"
+import "base:runtime"
 import "core:fmt"
 import "core:log"
 import "core:os"
@@ -55,10 +56,11 @@ logger_config_value :: proc(config: ^eng.Config_Manager, key: string) -> string 
 	return os.get_env(key, context.temp_allocator)
 }
 
-logger_config_file_path :: proc(config: ^eng.Config_Manager) -> string {
+logger_config_file_path :: proc(config: ^eng.Config_Manager) -> (string, bool) {
 	file_path, file_path_ok := eng.config_manager_get(config, "ITD_LOG_FILE_PATH")
-	if !file_path_ok {
-		file_path = os.get_env("ITD_LOG_FILE_PATH", context.allocator)
+	if file_path_ok {
+		return file_path, false
 	}
-	return file_path
+	file_path = os.get_env("ITD_LOG_FILE_PATH", runtime.default_allocator())
+	return file_path, file_path != ""
 }

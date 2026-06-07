@@ -188,6 +188,47 @@ engine_shutdown_allows_app_without_shutdown_callback :: proc(t: ^testing.T) {
 	testing.expect_value(t, platform_state.shutdown_count, 1)
 }
 
+@(test)
+engine_shutdown_unloads_textures_before_platform_shutdown :: proc(t: ^testing.T) {
+	order := 0
+	platform_state := Test_Platform_State {
+		order = &order,
+	}
+	texture_state := Test_Texture_Backend_State {
+		order = &order,
+	}
+
+	state: Engine_State
+	state.platform_started = true
+	state.platform = Engine_Platform_Backend {
+		ctx                 = &platform_state,
+		init                = test_platform_init,
+		shutdown            = test_platform_shutdown,
+		set_target_fps      = test_platform_set_target_fps,
+		disable_exit_key    = test_platform_disable_exit_key,
+		window_should_close = test_platform_window_should_close,
+	}
+	state.engine.texture_manager = texture_manager_make(
+		Engine_Texture_Backend {
+			ctx = &texture_state,
+			load = test_texture_load,
+			unload = test_texture_unload,
+		},
+	)
+	state.engine.texture_manager.loaded[0] = true
+	state.engine.texture_manager.textures[0] = Engine_Texture {
+		handle = rawptr(uintptr(123)),
+		width  = 16,
+		height = 16,
+	}
+
+	engine_shutdown(&state)
+
+	testing.expect_value(t, texture_state.unload_count, 1)
+	testing.expect_value(t, platform_state.shutdown_count, 1)
+	testing.expect(t, texture_state.unload_order < platform_state.shutdown_order)
+}
+
 test_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {return true}
 test_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {return false}
 test_app_render :: proc(engine: ^Engine, app: ^Game_App) {}
@@ -200,6 +241,8 @@ Test_Platform_State :: struct {
 	target_fps:             i32,
 	disable_exit_key_count: int,
 	should_close_calls:     int,
+	order:                  ^int,
+	shutdown_order:         int,
 }
 
 test_platform_init :: proc(ctx: rawptr, config: Engine_Config) -> bool {
@@ -211,11 +254,22 @@ test_platform_init :: proc(ctx: rawptr, config: Engine_Config) -> bool {
 test_platform_shutdown :: proc(ctx: rawptr) {
 	state := cast(^Test_Platform_State)ctx
 	state.shutdown_count += 1
+	if state.order != nil {
+		state.shutdown_order = state.order^
+		state.order^ += 1
+	}
 }
 
 test_platform_set_target_fps :: proc(ctx: rawptr, target_fps: i32) {
 	state := cast(^Test_Platform_State)ctx
 	state.target_fps = target_fps
+}
+
+test_run_app_init_with_manager_texture :: proc(engine: ^Engine, app: ^Game_App) -> bool {
+	state := cast(^Test_Run_App_State)app.state
+	state.init_count += 1
+	_ = engine_texture_manager_load(engine, "assets/test.png")
+	return true
 }
 
 test_platform_disable_exit_key :: proc(ctx: rawptr) {
@@ -454,6 +508,8 @@ Test_Texture_Backend_State :: struct {
 	unload_count:         int,
 	last_loaded_path:     string,
 	last_unloaded_handle: rawptr,
+	order:                ^int,
+	unload_order:         int,
 }
 
 test_texture_load :: proc(ctx: rawptr, path: string) -> Engine_Texture {
@@ -467,5 +523,9 @@ test_texture_unload :: proc(ctx: rawptr, texture: ^Engine_Texture) {
 	state := cast(^Test_Texture_Backend_State)ctx
 	state.unload_count += 1
 	state.last_unloaded_handle = texture.handle
+	if state.order != nil {
+		state.unload_order = state.order^
+		state.order^ += 1
+	}
 	texture^ = {}
 }

@@ -23,7 +23,12 @@ handle_forced_turn :: proc(engine: ^eng.Engine, game: ^Game) -> bool {
 				eng.Engine_Color{180, 180, 180, 255},
 			)
 		} else {
-			add_message(messages, game, "You break free from the web!", eng.Engine_Color{200, 200, 100, 255})
+			add_message(
+				messages,
+				game,
+				"You break free from the web!",
+				eng.Engine_Color{200, 200, 100, 255},
+			)
 		}
 		return true
 	}
