@@ -167,6 +167,37 @@ sprites_init_replaces_existing_atlas_without_leaking_previous_metadata :: proc(t
 	testing.expect_value(t, len(track.allocation_map), 0)
 }
 
+@(test)
+sprite_lookup_covers_special_tiles_and_town_npcs :: proc(t: ^testing.T) {
+	testing.expect_value(t, tile_type_to_sprite_key(.Shrine), "shrine")
+	testing.expect_value(t, tile_type_to_sprite_key(.Chest), "chest")
+	testing.expect_value(t, tile_type_to_sprite_key(.Merchant), "merchant")
+	testing.expect_value(t, tile_type_to_sprite_key(.Ascent), "ascent")
+	testing.expect_value(t, tile_type_to_sprite_key(.Locked_Door), "locked_door")
+
+	testing.expect_value(t, npc_role_to_sprite_key(.Shopkeeper), "shopkeeper")
+	testing.expect_value(t, npc_role_to_sprite_key(.Guard), "guard")
+	testing.expect_value(t, npc_role_to_sprite_key(.Elder), "elder")
+	testing.expect_value(t, npc_role_to_sprite_key(.Old_Miner), "old_miner")
+}
+
+@(test)
+sprite_manager_named_returns_npc_category_sprites :: proc(t: ^testing.T) {
+	atlas := Sprite_Atlas {
+		loaded = true,
+		tile_size = 16,
+		npc_map = make(map[string]Sprite),
+	}
+	defer delete(atlas.npc_map)
+	(&atlas.npc_map)["shopkeeper"] = sprite_at(3, 4, 16)
+	sprites := Sprite_Manager{backend = &atlas}
+
+	spr := sprite_manager_named(&sprites, "npc", "shopkeeper")
+
+	testing.expect_value(t, spr.src.x, f32(48))
+	testing.expect_value(t, spr.src.y, f32(64))
+}
+
 Test_Sprite_Render_Backend_State :: struct {
 	texture_draw_count: int,
 	last_dest:          eng.Engine_Rect,

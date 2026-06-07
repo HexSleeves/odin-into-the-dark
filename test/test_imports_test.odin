@@ -43,6 +43,8 @@ Input_Result :: gameinput.Input_Result
 Score_Manager :: renderer.Score_Manager
 Score_Table :: renderer.Score_Table
 Audio_Manager :: gameaudio.Audio_Manager
+Engine :: eng.Engine
+Engine_Services :: eng.Engine_Services
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 Sound_Type :: gameaudio.Sound_Type
@@ -130,6 +132,10 @@ data_registry_destroy :: gcore.data_registry_destroy
 // ─── Engine procs ─────────────────────────────────────────────────────────────
 message_manager_make :: eng.message_manager_make
 message_manager_bind_turns :: eng.message_manager_bind_turns
+engine_services_default_config :: eng.engine_services_default_config
+engine_services_make :: eng.engine_services_make
+engine_services_destroy :: eng.engine_services_destroy
+engine_services_register :: eng.engine_services_register
 
 // ─── Sub-package procs ────────────────────────────────────────────────────────
 add_message :: gameui.add_message
@@ -179,6 +185,7 @@ unequip_slot :: gp.unequip_slot
 mine_wall :: gp.mine_wall
 update_victory :: gameinput.update_victory
 try_craft :: gp.try_craft
+ascend :: gp.ascend
 apply_item_effect :: gp.apply_item_effect
 item_make :: gp.item_make
 tick_timed_effects :: gp.tick_timed_effects
@@ -208,6 +215,8 @@ check_event_tile :: gp.check_event_tile
 apply_shrine_buff :: gp.apply_shrine_buff
 merchant_buy :: gp.merchant_buy
 merchant_leave :: gp.merchant_leave
+generate_shopkeeper_stock :: gp.generate_shopkeeper_stock
+merchant_leave_shop :: gp.merchant_leave_shop
 update_viewing_shrine :: gameinput.update_viewing_shrine
 update_viewing_merchant :: gameinput.update_viewing_merchant
 

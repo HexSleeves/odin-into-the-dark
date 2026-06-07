@@ -32,6 +32,8 @@ base_tile_color :: proc(type: gcore.Tile_Type, palette: gcore.Floor_Palette) -> 
 		return palette.rubble
 	case .Descent:
 		return palette.descent
+	case .Ascent:
+		return eng.Engine_Color{180, 120, 255, 255}
 	case .Water:
 		return eng.Engine_Color{40, 80, 180, 255}
 	case .Fountain:
@@ -315,6 +317,8 @@ render_enemies :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 render_npcs :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	camera := game_engine_camera_manager(engine)
+	sprites := game_engine_sprite_manager(engine)
+	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
 	vfx := game_engine_vfx_manager(engine)
 	tile_size := camera_tile_size(camera)
 
@@ -327,11 +331,12 @@ render_npcs :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		bob_phase := f32(eng.vfx_manager_frame(vfx) + npc.pos.x * 13) * 0.04
 		ny += i32(math.sin(f64(bob_phase)) * 1.5)
 
+		spr := sprite_manager_named(sprites, "npc", npc_role_to_sprite_key(npc.role))
 		render_world_sprite_or_glyph(
 			engine,
-			nil,
-			false, // NPCs are ASCII-only (no sprite mapping)
-			Sprite{},
+			sprites,
+			ui.use_sprites,
+			spr,
 			npc.glyph,
 			nil,
 			npc.color,

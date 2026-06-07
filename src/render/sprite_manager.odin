@@ -95,6 +95,9 @@ sprite_manager_named :: proc(sprites: ^Sprite_Manager, category: string, name: s
 	} else if category == "item" {
 		spr, ok := sprites.backend.item_map[name]
 		if ok {return spr}
+	} else if category == "npc" {
+		spr, ok := sprites.backend.npc_map[name]
+		if ok {return spr}
 	}
 	return sprite_manager_fallback(sprites)
 }

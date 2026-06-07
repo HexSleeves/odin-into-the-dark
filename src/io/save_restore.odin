@@ -88,6 +88,7 @@ load_game_from_storage :: proc(
 	game.burning_turns = data.burning_turns
 	game.frozen_turns = data.frozen_turns
 	game.quest = data.quest
+	game.floor_entry_pos = data.floor_entry_pos
 	game.active_npc = -1
 	game.dialogue_line = 0
 	game.state = .Playing
@@ -96,6 +97,13 @@ load_game_from_storage :: proc(
 	game.npc_count = 0
 	if game.depth == gcore.SURFACE_DEPTH {
 		gcore.place_town_npcs(game)
+	}
+	for depth in 0 ..< len(data.visited_floor_present) {
+		if !data.visited_floor_present[depth] {continue}
+		game.visited_floors[depth] = new(Saved_Floor)
+		if game.visited_floors[depth] != nil {
+			save_to_floor(content, &data.visited_floors[depth], game.visited_floors[depth])
+		}
 	}
 
 	// ── Restore ore veins ──
@@ -114,44 +122,7 @@ load_game_from_storage :: proc(
 
 	game.enemies = make([dynamic]Enemy)
 	for i in 0 ..< data.enemy_count {
-		se := &data.enemies[i]
-		etype := save_to_string(content, &se.enemy_type)
-		def := content_manager_enemy_def(content, etype)
-		qn := 100
-		ms := 100
-		beh := ""
-		if def != nil {
-			qn = 100 if def.quickness == 0 else def.quickness
-			ms = 100 if def.move_speed == 0 else def.move_speed
-			beh = def.behavior
-		}
-		append(
-			&game.enemies,
-			Enemy {
-				pos              = se.pos,
-				hp               = se.hp,
-				max_hp           = se.max_hp,
-				attack           = se.attack,
-				enemy_type       = etype,
-				name             = save_to_string(content, &se.name),
-				glyph            = se.glyph,
-				color            = se.color,
-				alive            = se.alive,
-				ability_type     = save_to_string(content, &se.ability_type),
-				ability_cooldown = se.ability_cooldown,
-				ability_max_cd   = se.ability_max_cd,
-				ability_range    = se.ability_range,
-				is_boss          = se.is_boss,
-				detection_radius = max(se.detection_radius, DEFAULT_ENEMY_DETECTION_RADIUS),
-				memory_turns     = max(se.memory_turns, DEFAULT_ENEMY_MEMORY_TURNS),
-				aware            = se.aware,
-				aware_turns_left = se.aware_turns_left,
-				behavior         = beh,
-				quickness        = qn,
-				move_speed       = ms,
-				energy           = 0, // granted at start of next enemy round
-			},
-		)
+		append(&game.enemies, save_to_enemy(content, &data.enemies[i]))
 	}
 
 	game.items = make([dynamic]Item)

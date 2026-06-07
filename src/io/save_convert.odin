@@ -11,6 +11,66 @@ string_to_save :: proc(s: string) -> Save_String {
 	return result
 }
 
+enemy_to_save :: proc(e: ^Enemy) -> Save_Enemy {
+	return Save_Enemy {
+		pos              = e.pos,
+		hp               = e.hp,
+		max_hp           = e.max_hp,
+		attack           = e.attack,
+		enemy_type       = string_to_save(e.enemy_type),
+		name             = string_to_save(e.name),
+		glyph            = e.glyph,
+		color            = e.color,
+		alive            = e.alive,
+		ability_type     = string_to_save(e.ability_type),
+		ability_cooldown = e.ability_cooldown,
+		ability_max_cd   = e.ability_max_cd,
+		ability_range    = e.ability_range,
+		is_boss          = e.is_boss,
+		detection_radius = e.detection_radius,
+		aware            = e.aware,
+		memory_turns     = e.memory_turns,
+		aware_turns_left = e.aware_turns_left,
+	}
+}
+
+save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
+	etype := save_to_string(content, &se.enemy_type)
+	def := content_manager_enemy_def(content, etype)
+	qn := 100
+	ms := 100
+	beh := ""
+	if def != nil {
+		qn = 100 if def.quickness == 0 else def.quickness
+		ms = 100 if def.move_speed == 0 else def.move_speed
+		beh = def.behavior
+	}
+	return Enemy {
+		pos              = se.pos,
+		hp               = se.hp,
+		max_hp           = se.max_hp,
+		attack           = se.attack,
+		enemy_type       = etype,
+		name             = save_to_string(content, &se.name),
+		glyph            = se.glyph,
+		color            = se.color,
+		alive            = se.alive,
+		ability_type     = save_to_string(content, &se.ability_type),
+		ability_cooldown = se.ability_cooldown,
+		ability_max_cd   = se.ability_max_cd,
+		ability_range    = se.ability_range,
+		is_boss          = se.is_boss,
+		detection_radius = max(se.detection_radius, DEFAULT_ENEMY_DETECTION_RADIUS),
+		memory_turns     = max(se.memory_turns, DEFAULT_ENEMY_MEMORY_TURNS),
+		aware            = se.aware,
+		aware_turns_left = se.aware_turns_left,
+		behavior         = beh,
+		quickness        = qn,
+		move_speed       = ms,
+		energy           = 0,
+	}
+}
+
 // Resolve a Save_String back to a stable string pointer from loaded content.
 // All game strings originate from data definitions (lifetime = program),
 // so we look them up instead of allocating.
@@ -94,6 +154,72 @@ save_to_item :: proc(content: ^Content_Manager, si: ^Save_Item) -> Item {
 		durability = si.durability,
 		max_durability = si.max_durability,
 	}
+}
+
+floor_to_save :: proc(floor: ^Saved_Floor, result: ^Save_Floor) {
+	if floor == nil || result == nil {return}
+	result.tiles = floor.tiles
+	result.web_tiles = floor.web_tiles
+	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+		result.ore_veins[i] = Save_Ore_Vein {
+			ore_type = string_to_save(floor.ore_veins[i].ore_type),
+			color    = floor.ore_veins[i].color,
+		}
+	}
+	result.player_pos = floor.player_pos
+	result.enemy_count = min(len(floor.enemies), MAX_SAVE_ENEMIES)
+	for i in 0 ..< result.enemy_count {
+		result.enemies[i] = enemy_to_save(&floor.enemies[i])
+	}
+	result.item_count = min(len(floor.items), MAX_SAVE_ITEMS)
+	for i in 0 ..< result.item_count {
+		result.items[i] = item_to_save(&floor.items[i])
+	}
+	result.room_count = min(len(floor.rooms), MAX_SAVE_ROOMS)
+	for i in 0 ..< result.room_count {
+		result.rooms[i] = floor.rooms[i]
+	}
+	result.light_source_count = min(len(floor.light_sources), MAX_SAVE_LIGHTS)
+	for i in 0 ..< result.light_source_count {
+		result.light_sources[i] = floor.light_sources[i]
+	}
+	result.palette = floor.palette
+	result.event_used = floor.event_used
+	result.npcs = floor.npcs
+	result.npc_count = floor.npc_count
+}
+
+save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Saved_Floor) {
+	if saved == nil || floor == nil {return}
+	floor.tiles = saved.tiles
+	floor.web_tiles = saved.web_tiles
+	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
+		floor.ore_veins[i] = Ore_Vein {
+			ore_type = save_to_string(content, &saved.ore_veins[i].ore_type),
+			color    = saved.ore_veins[i].color,
+		}
+	}
+	floor.player_pos = saved.player_pos
+	floor.rooms = make([dynamic]Room)
+	for i in 0 ..< saved.room_count {
+		append(&floor.rooms, saved.rooms[i])
+	}
+	floor.enemies = make([dynamic]Enemy)
+	for i in 0 ..< saved.enemy_count {
+		append(&floor.enemies, save_to_enemy(content, &saved.enemies[i]))
+	}
+	floor.items = make([dynamic]Item)
+	for i in 0 ..< saved.item_count {
+		append(&floor.items, save_to_item(content, &saved.items[i]))
+	}
+	floor.light_sources = make([dynamic]Light_Source)
+	for i in 0 ..< saved.light_source_count {
+		append(&floor.light_sources, saved.light_sources[i])
+	}
+	floor.palette = saved.palette
+	floor.event_used = saved.event_used
+	floor.npcs = saved.npcs
+	floor.npc_count = saved.npc_count
 }
 
 // ─── Save ─────────────────────────────────────────────────────────────────────

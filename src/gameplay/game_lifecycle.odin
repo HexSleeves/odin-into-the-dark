@@ -125,6 +125,7 @@ game_has_live_boss :: proc(game: ^Game) -> bool {
 // ─── Cleanup ──────────────────────────────────────────────────────────────────
 
 game_cleanup :: proc(game: ^Game) {
+	clear_visited_floors(game)
 	delete(game.rooms)
 	delete(game.enemies)
 	delete(game.items)

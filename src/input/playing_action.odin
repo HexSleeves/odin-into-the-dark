@@ -8,6 +8,7 @@ Input_Result :: enum {
 	Moved,
 	Acted,
 	Descended,
+	Ascended,
 	Waited,
 	Quit,
 }
@@ -105,9 +106,16 @@ handle_input :: proc(
 	game.player.energy -= move_cost
 
 	t := tile_at(game, target_x, target_y)
-	if t != nil && t.type == .Descent {
-		descend(content, camera, messages, game)
-		return .Descended
+	if t != nil {
+		if t.type == .Descent {
+			descend(content, camera, messages, game)
+			return .Descended
+		}
+		if t.type == .Ascent {
+			if ascend(content, camera, messages, game) {
+				return .Ascended
+			}
+		}
 	}
 
 	return .Moved

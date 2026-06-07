@@ -1,6 +1,7 @@
 package gameplay
 
 import gcore "../core"
+import eng "../engine"
 import "core:math/rand"
 
 // ─── Map generation dispatch ──────────────────────────────────────────────────
@@ -77,6 +78,93 @@ spawn_items :: proc(content: ^Content_Manager, game: ^Game) {
 		len(game.rooms) - 1,
 		game.depth,
 	)
+}
+
+saved_floor_destroy :: proc(floor: ^Saved_Floor) {
+	if floor == nil {return}
+	if floor.rooms != nil {delete(floor.rooms)}
+	if floor.enemies != nil {delete(floor.enemies)}
+	if floor.items != nil {delete(floor.items)}
+	if floor.light_sources != nil {delete(floor.light_sources)}
+	floor^ = {}
+}
+
+clear_visited_floors :: proc(game: ^Game) {
+	if game == nil {return}
+	for i in 0 ..< len(game.visited_floors) {
+		if game.visited_floors[i] == nil {continue}
+		saved_floor_destroy(game.visited_floors[i])
+		free(game.visited_floors[i])
+		game.visited_floors[i] = nil
+	}
+}
+
+ensure_floor_snapshot :: proc(game: ^Game, depth: int) -> ^Saved_Floor {
+	if game == nil || depth < SURFACE_DEPTH || depth > MAX_DEPTH {return nil}
+	if game.visited_floors[depth] == nil {
+		game.visited_floors[depth] = new(Saved_Floor)
+	}
+	return game.visited_floors[depth]
+}
+
+save_current_floor :: proc(game: ^Game) -> bool {
+	floor := ensure_floor_snapshot(game, game.depth)
+	if floor == nil {return false}
+	saved_floor_destroy(floor)
+	floor.tiles = game.tiles
+	tile_states_export_to_tiles(game, floor.tiles[:])
+	eng.bool_grid_manager_export(game.web_tiles, floor.web_tiles[:])
+	floor.ore_veins = game.ore_veins
+	floor.player_pos = game.player.pos
+	floor.palette = game.palette
+	floor.event_used = game.event_used
+	floor.npcs = game.npcs
+	floor.npc_count = game.npc_count
+	floor.rooms = make([dynamic]Room)
+	for room in game.rooms {append(&floor.rooms, room)}
+	floor.enemies = make([dynamic]Enemy)
+	for enemy in game.enemies {append(&floor.enemies, enemy)}
+	floor.items = make([dynamic]Item)
+	for item in game.items {append(&floor.items, item)}
+	floor.light_sources = make([dynamic]Light_Source)
+	for light in game.light_sources {append(&floor.light_sources, light)}
+	return true
+}
+
+restore_dynamic_array :: proc($T: typeid, dst: ^[dynamic]T, src: [dynamic]T) {
+	if dst^ == nil {
+		dst^ = make([dynamic]T)
+	} else {
+		clear(dst)
+	}
+	for item in src {append(dst, item)}
+}
+
+restore_saved_floor :: proc(game: ^Game, depth: int) -> bool {
+	if game == nil || depth < SURFACE_DEPTH || depth > MAX_DEPTH {return false}
+	floor := game.visited_floors[depth]
+	if floor == nil {return false}
+	game.tiles = floor.tiles
+	tile_states_import_from_tiles(game, floor.tiles[:])
+	eng.bool_grid_manager_import(&game.web_tiles, floor.web_tiles[:])
+	game.ore_veins = floor.ore_veins
+	game.player.pos = floor.player_pos
+	game.palette = floor.palette
+	game.event_used = floor.event_used
+	if depth == SURFACE_DEPTH {
+		place_town_npcs(game)
+	} else {
+		game.npcs = floor.npcs
+		game.npc_count = floor.npc_count
+	}
+	restore_dynamic_array(Room, &game.rooms, floor.rooms)
+	restore_dynamic_array(Enemy, &game.enemies, floor.enemies)
+	restore_dynamic_array(Item, &game.items, floor.items)
+	restore_dynamic_array(Light_Source, &game.light_sources, floor.light_sources)
+	saved_floor_destroy(floor)
+	free(floor)
+	game.visited_floors[depth] = nil
+	return true
 }
 
 generate_map :: proc(content: ^Content_Manager, game: ^Game) {

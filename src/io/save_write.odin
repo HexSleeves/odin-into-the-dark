@@ -43,6 +43,7 @@ save_game_to_storage :: proc(
 	data.burning_turns = game.burning_turns
 	data.frozen_turns = game.frozen_turns
 	data.quest = game.quest
+	data.floor_entry_pos = game.floor_entry_pos
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
@@ -56,26 +57,7 @@ save_game_to_storage :: proc(
 	data.enemy_count = min(len(game.enemies), MAX_SAVE_ENEMIES)
 	for i in 0 ..< data.enemy_count {
 		e := &game.enemies[i]
-		data.enemies[i] = Save_Enemy {
-			pos              = e.pos,
-			hp               = e.hp,
-			max_hp           = e.max_hp,
-			attack           = e.attack,
-			enemy_type       = string_to_save(e.enemy_type),
-			name             = string_to_save(e.name),
-			glyph            = e.glyph,
-			color            = e.color,
-			alive            = e.alive,
-			ability_type     = string_to_save(e.ability_type),
-			ability_cooldown = e.ability_cooldown,
-			ability_max_cd   = e.ability_max_cd,
-			ability_range    = e.ability_range,
-			is_boss          = e.is_boss,
-			detection_radius = e.detection_radius,
-			aware            = e.aware,
-			memory_turns     = e.memory_turns,
-			aware_turns_left = e.aware_turns_left,
-		}
+		data.enemies[i] = enemy_to_save(e)
 	}
 
 	// ── Convert items ──
@@ -110,6 +92,13 @@ save_game_to_storage :: proc(
 	data.equipped_helmet = Save_Equipment {
 		occupied = game.equipped_helmet.occupied,
 		item     = item_to_save(&game.equipped_helmet.item),
+	}
+
+	// ── Convert visited floor stack ──
+	for depth in 0 ..< len(game.visited_floors) {
+		if game.visited_floors[depth] == nil {continue}
+		data.visited_floor_present[depth] = true
+		floor_to_save(game.visited_floors[depth], &data.visited_floors[depth])
 	}
 
 	// ── Serialize header + data as raw bytes ──

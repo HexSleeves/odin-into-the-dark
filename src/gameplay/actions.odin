@@ -9,7 +9,7 @@ footstep_sound_for_tile :: proc(tile_type: Tile_Type) -> Sound_Type {
 		return .Water
 	case .Rubble:
 		return .Step_Rubble
-	case .Descent, .Anvil:
+	case .Descent, .Ascent, .Anvil:
 		return .Step_Stone
 	}
 	return .Footstep
@@ -62,7 +62,41 @@ handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {
 	)
 }
 
+handle_player_ascended :: proc(engine: ^eng.Engine, game: ^Game) {
+	messages := game_engine_message_manager(engine)
+	vfx := game_engine_vfx_manager(engine)
+	audio_manager_play_sfx(game_engine_audio_manager(engine), .Step_Stone)
+	music_set_tier_by_depth(game.depth)
+	audio_manager_set_master_volume(
+		game_engine_audio_manager(engine),
+		0.6 + min(f32(game.depth) * 0.02, 0.4),
+	)
+	eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 255, 255, 255}, 0.5)
+	hp_before := game.player.hp
+	advance_turn(
+		game_engine_turn_manager(engine),
+		game_engine_camera_manager(engine),
+		game_engine_vfx_manager(engine),
+		messages,
+		game,
+		hp_before,
+		game_engine_particle_manager(engine),
+	)
+}
+
 // ─── Descent to next floor ───────────────────────────────────────────────────
+
+update_light_for_depth :: proc(content: ^Content_Manager, game: ^Game) {
+	if game.depth == SURFACE_DEPTH {
+		game.player.light_radius = SURFACE_LIGHT_RADIUS
+	} else {
+		min_light := MIN_LIGHT_RADIUS_DEFAULT
+		if game.depth >= MIN_LIGHT_DEPTH {min_light = MIN_LIGHT_RADIUS_DEEP}
+		player_def := content_manager_player_def(content)
+		game.player.light_radius = max(player_def.light_radius - game.depth + 1, min_light)
+	}
+	game.light_drain_timer = 0
+}
 
 descend :: proc(
 	content: ^Content_Manager,
@@ -75,15 +109,16 @@ descend :: proc(
 		return
 	}
 
+	_ = save_current_floor(game)
 	game.depth += 1
+	update_light_for_depth(content, game)
 
-	min_light := MIN_LIGHT_RADIUS_DEFAULT
-	if game.depth >= MIN_LIGHT_DEPTH {min_light = MIN_LIGHT_RADIUS_DEEP}
-	player_def := content_manager_player_def(content)
-	game.player.light_radius = max(player_def.light_radius - game.depth + 1, min_light)
-	game.light_drain_timer = 0
-
-	generate_map(content, game)
+	if !restore_saved_floor(game, game.depth) {
+		generate_map(content, game)
+		game.floor_entry_pos = game.player.pos
+		t := tile_at(game, game.floor_entry_pos.x, game.floor_entry_pos.y)
+		if t != nil {t.type = .Ascent}
+	}
 	compute_fov(game)
 	game_camera_update(camera, game, true)
 
@@ -102,6 +137,42 @@ descend :: proc(
 			eng.Engine_Color{0, 200, 200, 255},
 		)
 	}
+}
+
+ascend :: proc(
+	content: ^Content_Manager,
+	camera: ^eng.Camera_Manager,
+	messages: ^Message_Manager,
+	game: ^Game,
+) -> bool {
+	if game.depth <= SURFACE_DEPTH {return false}
+
+	_ = save_current_floor(game)
+	game.depth -= 1
+	update_light_for_depth(content, game)
+
+	if !restore_saved_floor(game, game.depth) {
+		generate_map(content, game)
+	}
+	compute_fov(game)
+	game_camera_update(camera, game, true)
+
+	if game.depth == SURFACE_DEPTH {
+		add_message(
+			messages,
+			game,
+			"You climb back to the surface.",
+			eng.Engine_Color{0, 200, 200, 255},
+		)
+	} else {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("You ascend to depth %d...", game.depth),
+			eng.Engine_Color{0, 200, 200, 255},
+		)
+	}
+	return true
 }
 
 start_mining_mode :: proc(ui: ^UI_Manager, messages: ^Message_Manager, game: ^Game) {

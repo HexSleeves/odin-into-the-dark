@@ -1,12 +1,73 @@
-// Sprite mappings — DISABLED, pending full remap.
-// Sprites are force-disabled in build_config.odin (DEFAULT_USE_SPRITES :: false).
-// Re-enable by setting DEFAULT_USE_SPRITES :: SPRITES_REQUESTED && !NO_SPRITES
-// and filling in the mappings below.
+// Kenney 1-bit atlas mappings (48x22 tiles, 16px cells).
+// Sprites stay opt-in at build/runtime; this file keeps the atlas ready.
 {
   tileset: "assets/kenney_1bit.png",
   sprite_size: 16,
 
-  tiles: {},
-  characters: {},
-  items: {},
+  tiles: {
+    wall:        { col: 1,  row: 1 },
+    floor:       { col: 0,  row: 1 },
+    rubble:      { col: 2,  row: 1 },
+    descent:     { col: 7,  row: 3 },
+    ascent:      { col: 6,  row: 3 },
+    water:       { col: 3,  row: 1 },
+    gas_vent:    { col: 4,  row: 1 },
+    unstable:    { col: 5,  row: 1 },
+    chasm:       { col: 6,  row: 1 },
+    anvil:       { col: 10, row: 4 },
+    locked_door: { col: 11, row: 4 },
+    shrine:      { col: 12, row: 4 },
+    chest:       { col: 13, row: 4 },
+    merchant:    { col: 14, row: 4 },
+    ore_vein:    { col: 9,  row: 4 },
+    web:         { col: 8,  row: 4 },
+  },
+
+  characters: {
+    player:          { col: 0,  row: 8 },
+    rat:             { col: 1,  row: 8 },
+    cave_bat:        { col: 2,  row: 8 },
+    miner_husk:      { col: 3,  row: 8 },
+    cave_crawler:    { col: 4,  row: 8 },
+    toxic_spore:     { col: 5,  row: 8 },
+    stone_thrower:   { col: 6,  row: 8 },
+    mine_lurker:     { col: 7,  row: 8 },
+    shadow_stalker:  { col: 8,  row: 8 },
+    deep_watcher:    { col: 9,  row: 8 },
+    mine_guardian:   { col: 10, row: 8 },
+    abyssal_lord:    { col: 11, row: 8 },
+    depth_king:      { col: 12, row: 8 },
+  },
+
+  items: {
+    health_potion:    { col: 0,  row: 12 },
+    antidote:         { col: 1,  row: 12 },
+    torch:            { col: 2,  row: 12 },
+    lantern_oil:      { col: 3,  row: 12 },
+    bandage:          { col: 4,  row: 12 },
+    rusty_pickaxe:    { col: 5,  row: 12 },
+    mine_dagger:      { col: 6,  row: 12 },
+    steel_pickaxe:    { col: 7,  row: 12 },
+    greatsword:       { col: 8,  row: 12 },
+    leather_vest:     { col: 9,  row: 12 },
+    chainmail:        { col: 10, row: 12 },
+    copper_shield:    { col: 11, row: 12 },
+    miners_helmet:    { col: 12, row: 12 },
+    crystal_lamp:     { col: 13, row: 12 },
+    golden_amulet:    { col: 14, row: 12 },
+    vault_key:        { col: 15, row: 12 },
+    ancient_treasure: { col: 16, row: 12 },
+    iron_ore:         { col: 17, row: 12 },
+    copper_ore:       { col: 18, row: 12 },
+    crystal_shard:    { col: 19, row: 12 },
+    gold_nugget:      { col: 20, row: 12 },
+    crystal_torch:    { col: 21, row: 12 },
+  },
+
+  npcs: {
+    shopkeeper: { col: 0, row: 10 },
+    guard:      { col: 1, row: 10 },
+    elder:      { col: 2, row: 10 },
+    old_miner:  { col: 3, row: 10 },
+  },
 }

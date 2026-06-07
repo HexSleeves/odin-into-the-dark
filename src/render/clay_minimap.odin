@@ -116,6 +116,8 @@ clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Colo
 			return eng.Engine_Color{140, 130, 90, 255}
 		case .Descent:
 			return eng.Engine_Color{0, 255, 255, 255}
+		case .Ascent:
+			return eng.Engine_Color{180, 120, 255, 255}
 		case .Shrine:
 			return eng.Engine_Color{100, 200, 255, 255}
 		case .Chest:
@@ -136,6 +138,8 @@ clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Colo
 			return eng.Engine_Color{55, 50, 35, 255}
 		case .Descent:
 			return eng.Engine_Color{0, 80, 80, 255}
+		case .Ascent:
+			return eng.Engine_Color{80, 40, 120, 255}
 		case:
 			return eng.Engine_Color{50, 40, 30, 255}
 		}

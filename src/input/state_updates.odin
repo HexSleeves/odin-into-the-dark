@@ -46,6 +46,8 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 		trigger_enemy_rounds(engine, game)
 	case .Descended:
 		handle_player_descended(engine, game)
+	case .Ascended:
+		handle_player_ascended(engine, game)
 	case .None:
 	}
 

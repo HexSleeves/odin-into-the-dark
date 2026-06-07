@@ -26,6 +26,7 @@ Sprite_Data :: struct {
 	tiles:       map[string]Sprite_Pos,
 	characters:  map[string]Sprite_Pos,
 	items:       map[string]Sprite_Pos,
+	npcs:        map[string]Sprite_Pos,
 }
 
 sprite_data_destroy :: proc(data: ^Sprite_Data, delete_strings := true) {
@@ -35,10 +36,12 @@ sprite_data_destroy :: proc(data: ^Sprite_Data, delete_strings := true) {
 		for id in data.tiles {delete(id)}
 		for id in data.characters {delete(id)}
 		for id in data.items {delete(id)}
+		for id in data.npcs {delete(id)}
 	}
 	delete(data.tiles)
 	delete(data.characters)
 	delete(data.items)
+	delete(data.npcs)
 	data^ = {}
 }
 
@@ -51,6 +54,7 @@ Sprite_Atlas :: struct {
 	tile_map:       map[string]Sprite, // "wall", "floor", etc.
 	char_map:       map[string]Sprite, // "player", "rat", etc.
 	item_map:       map[string]Sprite, // "health_potion", etc.
+	npc_map:        map[string]Sprite, // "shopkeeper", "guard", etc.
 	owned_strings:  [dynamic]string,
 	loaded:         bool,
 }
@@ -108,6 +112,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	g_sprites.tile_map = make(map[string]Sprite)
 	g_sprites.char_map = make(map[string]Sprite)
 	g_sprites.item_map = make(map[string]Sprite)
+	g_sprites.npc_map = make(map[string]Sprite)
 	g_sprites.owned_strings = make([dynamic]string)
 	if sprite_data.tileset != "" {
 		append(&g_sprites.owned_strings, sprite_data.tileset)
@@ -131,21 +136,29 @@ sprites_init :: proc(engine: ^eng.Engine) {
 		(&g_sprites.item_map)[id] = sprite_at(pos.col, pos.row, size)
 	}
 
+	// Build NPC sprite map
+	for id, pos in sprite_data.npcs {
+		append(&g_sprites.owned_strings, id)
+		(&g_sprites.npc_map)[id] = sprite_at(pos.col, pos.row, size)
+	}
+
 	g_sprites.loaded = true
 
 	tile_count := len(sprite_data.tiles)
 	char_count := len(sprite_data.characters)
 	item_count := len(sprite_data.items)
+	npc_count := len(sprite_data.npcs)
 	sprite_data_destroy(&sprite_data, delete_strings = false)
 	gameio.logger_debugf(
 		.Sprites,
-		"loaded '%s' (%dx%d) - %d tiles, %d chars, %d items",
+		"loaded '%s' (%dx%d) - %d tiles, %d chars, %d items, %d npcs",
 		tileset_path,
 		g_sprites.texture.width,
 		g_sprites.texture.height,
 		tile_count,
 		char_count,
 		item_count,
+		npc_count,
 	)
 }
 
@@ -159,6 +172,7 @@ sprites_cleanup :: proc(engine: ^eng.Engine) {
 	delete(g_sprites.tile_map)
 	delete(g_sprites.char_map)
 	delete(g_sprites.item_map)
+	delete(g_sprites.npc_map)
 	for owned in g_sprites.owned_strings {
 		delete(owned)
 	}
@@ -215,6 +229,8 @@ tile_type_to_sprite_key :: proc(tile_type: gcore.Tile_Type) -> string {
 		return "rubble"
 	case .Descent:
 		return "descent"
+	case .Ascent:
+		return "ascent"
 	case .Water:
 		return "water"
 	case .Gas_Vent:
@@ -230,7 +246,13 @@ tile_type_to_sprite_key :: proc(tile_type: gcore.Tile_Type) -> string {
 	case .Fountain:
 		return "water"
 	case .Locked_Door:
-		return "anvil"
+		return "locked_door"
+	case .Shrine:
+		return "shrine"
+	case .Chest:
+		return "chest"
+	case .Merchant:
+		return "merchant"
 	case:
 		return "floor"
 	}
@@ -255,6 +277,20 @@ get_item_sprite :: proc(item_type: string) -> Sprite {
 	return fallback_sprite()
 }
 
+npc_role_to_sprite_key :: proc(role: gcore.NPC_Role) -> string {
+	#partial switch role {
+	case .Shopkeeper:
+		return "shopkeeper"
+	case .Guard:
+		return "guard"
+	case .Elder:
+		return "elder"
+	case .Old_Miner:
+		return "old_miner"
+	}
+	return "old_miner"
+}
+
 // Special named sprites accessed directly
 get_named_sprite :: proc(category: string, name: string) -> Sprite {
 	if category == "tile" {
@@ -265,6 +301,9 @@ get_named_sprite :: proc(category: string, name: string) -> Sprite {
 		if ok {return spr}
 	} else if category == "item" {
 		spr, ok := g_sprites.item_map[name]
+		if ok {return spr}
+	} else if category == "npc" {
+		spr, ok := g_sprites.npc_map[name]
 		if ok {return spr}
 	}
 	return fallback_sprite()

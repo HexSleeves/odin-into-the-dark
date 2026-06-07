@@ -29,29 +29,42 @@ advance_dialogue :: proc(messages: ^Message_Manager, game: ^Game) {
 close_dialogue :: proc(game: ^Game) {
 	game.active_npc = -1
 	game.dialogue_line = 0
-	game.state = .Playing
+	if game.state != .Viewing_Merchant && game.state != .Victory {
+		game.state = .Playing
+	}
 }
 
 @(private = "file")
 on_dialogue_complete :: proc(messages: ^Message_Manager, game: ^Game, npc: ^NPC) {
-	if npc.role != .Old_Miner {return}
-	#partial switch game.quest {
-	case .Not_Started:
-		game.quest = .Active
+	#partial switch npc.role {
+	case .Old_Miner:
+		#partial switch game.quest {
+		case .Not_Started:
+			game.quest = .Active
+			add_message(
+				messages,
+				game,
+				"Quest accepted: retrieve the Ancient Treasure from the mine.",
+				eng.Engine_Color{255, 215, 0, 255},
+			)
+		case .Treasure_Found:
+			game.quest = .Complete
+			add_message(
+				messages,
+				game,
+				"You hand over the Ancient Treasure. The Old Miner rewards you!",
+				eng.Engine_Color{255, 215, 0, 255},
+			)
+			game.state = .Victory
+		}
+	case .Shopkeeper:
+		generate_shopkeeper_stock(game)
+		game.state = .Viewing_Merchant
 		add_message(
 			messages,
 			game,
-			"Quest accepted: retrieve the Ancient Treasure from the mine.",
-			eng.Engine_Color{255, 215, 0, 255},
+			"Bram lays out a few town supplies.",
+			eng.Engine_Color{80, 220, 120, 255},
 		)
-	case .Treasure_Found:
-		game.quest = .Complete
-		add_message(
-			messages,
-			game,
-			"You hand over the Ancient Treasure. The Old Miner rewards you!",
-			eng.Engine_Color{255, 215, 0, 255},
-		)
-		game.state = .Victory
 	}
 }

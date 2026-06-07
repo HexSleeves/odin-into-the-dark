@@ -6,7 +6,8 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-SAVE_VERSION :: u32(6)
+SAVE_VERSION :: u32(7)
+SAVE_VERSION_V6 :: u32(6)
 SAVE_VERSION_V4 :: u32(4)
 SAVE_VERSION_V3 :: u32(3)
 SAVE_VERSION_V2 :: u32(2)
@@ -15,6 +16,7 @@ SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 MAX_SAVE_ENEMIES :: 64
 MAX_SAVE_ITEMS :: 64
 MAX_SAVE_ROOMS :: 16
+MAX_SAVE_LIGHTS :: 16
 MAX_NAME_LEN :: 32
 
 // ─── Save-safe string (fixed buffer, no heap pointer) ─────────────────────────
@@ -76,6 +78,25 @@ Save_Equipment :: struct {
 	item:     Save_Item,
 }
 
+
+Save_Floor :: struct {
+	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	player_pos:         Vec2,
+	enemy_count:        int,
+	enemies:            [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:         int,
+	items:              [MAX_SAVE_ITEMS]Save_Item,
+	room_count:         int,
+	rooms:              [MAX_SAVE_ROOMS]Room,
+	light_source_count: int,
+	light_sources:      [MAX_SAVE_LIGHTS]Light_Source,
+	palette:            gcore.Floor_Palette,
+	event_used:         bool,
+	npcs:               [gcore.MAX_NPCS]gcore.NPC,
+	npc_count:          int,
+}
 // ─── File layout ──────────────────────────────────────────────────────────────
 
 Save_Header :: struct {
@@ -83,7 +104,7 @@ Save_Header :: struct {
 	version: u32,
 }
 
-// Current save format (v5) — v4 is a strict prefix of this struct.
+// Current save format (v7) — v6 is a strict prefix of this struct.
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
 	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
@@ -119,6 +140,41 @@ Save_Data :: struct {
 	burning_turns:     int,
 	frozen_turns:      int,
 	// v6 additions
+	quest:                 Quest_State,
+	// v7 additions
+	floor_entry_pos:       Vec2,
+	visited_floor_present: [gcore.MAX_DEPTH + 1]bool,
+	visited_floors:        [gcore.MAX_DEPTH + 1]Save_Floor,
+}
+
+// v6 save format — byte-for-byte identical to Save_Data minus floor stack.
+Save_Data_V6 :: struct {
+	tiles:             [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:         [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:         [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	player:            Player,
+	enemy_count:       int,
+	enemies:           [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:        int,
+	items:             [MAX_SAVE_ITEMS]Save_Item,
+	room_count:        int,
+	rooms:             [MAX_SAVE_ROOMS]Room,
+	inventory:         [MAX_INVENTORY]Save_Inventory_Slot,
+	equipped_weapon:   Save_Equipment,
+	equipped_armor:    Save_Equipment,
+	equipped_helmet:   Save_Equipment,
+	depth:             int,
+	turn_count:        int,
+	kills:             int,
+	seed:              u64,
+	light_boost_bonus: int,
+	light_boost_turns: int,
+	web_stuck_turns:   int,
+	water_slow_active: bool,
+	items_found:       int,
+	poison_turns:      int,
+	burning_turns:     int,
+	frozen_turns:      int,
 	quest:             Quest_State,
 }
 

@@ -27,6 +27,7 @@ Tile_Type :: enum {
 	Floor,
 	Rubble,
 	Descent,
+	Ascent,
 	Water,
 	Gas_Vent,
 	Unstable,
@@ -202,6 +203,21 @@ Quest_State :: enum {
 
 DEATH_CAUSE_MAX_LEN :: 128
 
+Saved_Floor :: struct {
+	tiles:         [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:     [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:     [MAP_WIDTH * MAP_HEIGHT]Ore_Vein,
+	player_pos:    Vec2,
+	rooms:         [dynamic]Room,
+	enemies:       [dynamic]Enemy,
+	items:         [dynamic]Item,
+	light_sources: [dynamic]Light_Source,
+	palette:       Floor_Palette,
+	event_used:    bool,
+	npcs:          [MAX_NPCS]NPC,
+	npc_count:     int,
+}
+
 Game_State :: enum {
 	Title_Screen,
 	Playing,
@@ -279,4 +295,6 @@ Game :: struct {
 	quest:                  Quest_State,
 	active_npc:             int, // index into npcs during dialogue (-1 = none)
 	dialogue_line:          int, // current line of active NPC's dialogue
+	visited_floors:        [MAX_DEPTH + 1]^Saved_Floor,
+	floor_entry_pos:       Vec2,
 }

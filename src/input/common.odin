@@ -38,6 +38,7 @@ MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_INVENTORY :: gcore.MAX_INVENTORY
 MAX_DEPTH :: gcore.MAX_DEPTH
+SURFACE_DEPTH :: gcore.SURFACE_DEPTH
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
 TILE_SIZE :: gcore.TILE_SIZE
@@ -86,6 +87,7 @@ game_camera_y :: renderer.game_camera_y
 game_engine_audio_manager :: proc(engine: ^Engine) -> ^Audio_Manager {
 	return eng.engine_audio_manager(engine)
 }
+ascend :: gp.ascend
 
 game_engine_save_manager :: renderer.game_engine_save_manager
 game_engine_score_manager :: renderer.game_engine_score_manager
@@ -126,6 +128,7 @@ descend :: gp.descend
 trigger_enemy_rounds :: gp.trigger_enemy_rounds
 handle_player_moved :: gp.handle_player_moved
 handle_player_descended :: gp.handle_player_descended
+handle_player_ascended :: gp.handle_player_ascended
 announce_item_under_player :: gp.announce_item_under_player
 start_mining_mode :: gp.start_mining_mode
 mine_wall :: gp.mine_wall

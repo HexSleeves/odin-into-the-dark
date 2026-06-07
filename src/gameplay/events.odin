@@ -151,6 +151,14 @@ generate_merchant_stock :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 }
 
+generate_shopkeeper_stock :: proc(game: ^Game) {
+	game.merchant_stock = [3]gcore.Merchant_Offer {
+		{item_id = ITEM_ID_BANDAGE, cost_id = "iron_ore", cost_qty = 1},
+		{item_id = ITEM_ID_TORCH, cost_id = "copper_ore", cost_qty = 1},
+		{item_id = "health_potion", cost_id = "iron_ore", cost_qty = 2},
+	}
+}
+
 merchant_buy :: proc(engine: ^eng.Engine, game: ^Game, offer_index: int) -> bool {
 	if offer_index < 0 || offer_index >= MERCHANT_OFFER_COUNT {return false}
 	offer := &game.merchant_stock[offer_index]
@@ -195,5 +203,11 @@ merchant_leave :: proc(engine: ^eng.Engine, game: ^Game) {
 	t := tile_at(game, game.player.pos.x, game.player.pos.y)
 	if t != nil {t.type = .Floor}
 	game.event_used = true
+	game.state = .Playing
+}
+
+merchant_leave_shop :: proc(engine: ^eng.Engine, game: ^Game) {
+	messages := game_engine_message_manager(engine)
+	add_message(messages, game, "Bram closes the shop ledger.", eng.Engine_Color{120, 120, 120, 255})
 	game.state = .Playing
 }

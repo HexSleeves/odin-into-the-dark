@@ -19,7 +19,9 @@ Vec2 :: gcore.Vec2
 Tile :: gcore.Tile
 Tile_Type :: gcore.Tile_Type
 Room :: gcore.Room
+Light_Source :: gcore.Light_Source
 Ore_Vein :: gcore.Ore_Vein
+Saved_Floor :: gcore.Saved_Floor
 Content_Manager :: gcore.Content_Manager
 Message_Manager :: eng.Message_Manager
 Engine :: eng.Engine
@@ -76,6 +78,8 @@ pos_to_idx :: gcore.pos_to_idx
 tile_at :: gcore.tile_at
 tile_state_at_idx :: gcore.tile_state_at_idx
 tile_state_set_idx :: gcore.tile_state_set_idx
+tile_states_import_from_tiles :: gcore.tile_states_import_from_tiles
+tile_states_export_to_tiles :: gcore.tile_states_export_to_tiles
 tile_visible_at :: gcore.tile_visible_at
 is_walkable :: gcore.is_walkable
 web_tile_at_idx :: gcore.web_tile_at_idx

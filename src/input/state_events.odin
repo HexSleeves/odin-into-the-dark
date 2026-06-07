@@ -46,7 +46,11 @@ update_viewing_shrine :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manag
 
 update_viewing_merchant :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
 	if action_pressed(im, .Menu_Back) {
-		gp.merchant_leave(engine, game)
+		if game.depth == SURFACE_DEPTH {
+			gp.merchant_leave_shop(engine, game)
+		} else {
+			gp.merchant_leave(engine, game)
+		}
 		return
 	}
 

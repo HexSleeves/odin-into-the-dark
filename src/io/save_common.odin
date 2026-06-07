@@ -18,6 +18,7 @@ Equipment :: gcore.Equipment
 Light_Source :: gcore.Light_Source
 Ore_Vein :: gcore.Ore_Vein
 Player :: gcore.Player
+Saved_Floor :: gcore.Saved_Floor
 Game :: gcore.Game
 Content_Manager :: gcore.Content_Manager
 UI_Manager :: gameui.UI_Manager
@@ -26,6 +27,7 @@ Message_Manager :: eng.Message_Manager
 MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_INVENTORY :: gcore.MAX_INVENTORY
+MAX_DEPTH :: gcore.MAX_DEPTH
 DEATH_CAUSE_MAX_LEN :: gcore.DEATH_CAUSE_MAX_LEN
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 DEFAULT_ENEMY_DETECTION_RADIUS :: gcore.DEFAULT_ENEMY_DETECTION_RADIUS
@@ -72,8 +74,28 @@ clear_messages :: proc(messages: ^Message_Manager) {
 	eng.message_manager_clear(messages)
 }
 
+saved_floor_destroy :: proc(floor: ^Saved_Floor) {
+	if floor == nil {return}
+	if floor.rooms != nil {delete(floor.rooms)}
+	if floor.enemies != nil {delete(floor.enemies)}
+	if floor.items != nil {delete(floor.items)}
+	if floor.light_sources != nil {delete(floor.light_sources)}
+	floor^ = {}
+}
+
+clear_visited_floors :: proc(game: ^Game) {
+	if game == nil {return}
+	for i in 0 ..< len(game.visited_floors) {
+		if game.visited_floors[i] == nil {continue}
+		saved_floor_destroy(game.visited_floors[i])
+		free(game.visited_floors[i])
+		game.visited_floors[i] = nil
+	}
+}
+
 game_cleanup :: proc(game: ^Game) {
 	if game == nil {return}
+	clear_visited_floors(game)
 	if game.rooms != nil {delete(game.rooms)}
 	if game.enemies != nil {delete(game.enemies)}
 	if game.items != nil {delete(game.items)}
