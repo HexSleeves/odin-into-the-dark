@@ -25,29 +25,25 @@ clay_render_title_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 	if clay.UI(clay.ID("title-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
 		clay_render_title_embers(engine)
-		clay_title_text(ui_pkg.UI_APP_TITLE, 48, eng.Engine_Color{255, 230, 120, 255})
+		clay_title_text(ui_pkg.UI_APP_TITLE, 48, ui_pkg.SB_TITLE)
 		clay_spacer_fixed("title-art-gap", 1, 32)
-		clay_overlay_text(ui_pkg.UI_TITLE_SUBTITLE, 18, eng.Engine_Color{180, 180, 180, 255})
+		clay_overlay_text(ui_pkg.UI_TITLE_SUBTITLE, 18, ui_pkg.SB_HEADER)
 		clay_spacer_fixed("title-gap", 1, 12)
 		for label, idx in options {
 			disabled := idx == gcore.TITLE_CONTINUE && !has_save
 			selected := idx == choice
-			color := eng.Engine_Color{220, 220, 220, 255}
-			if disabled {color = eng.Engine_Color{90, 90, 90, 255}}
-			if selected && !disabled {color = eng.Engine_Color{255, 220, 100, 255}}
+			color := ui_pkg.SB_TEXT
+			if disabled {color = ui_pkg.SB_DIM}
+			if selected && !disabled {color = ui_pkg.SB_TITLE}
 			prefix := ">" if selected else " "
 			clay_overlay_text(fmt.tprintf("%s %s", prefix, label), 24, color)
 		}
 		if !has_save {
-			clay_overlay_text(
-				ui_pkg.UI_TITLE_CONTINUE_DISABLED,
-				14,
-				eng.Engine_Color{120, 120, 120, 255},
-			)
+			clay_overlay_text(ui_pkg.UI_TITLE_CONTINUE_DISABLED, 14, ui_pkg.SB_DIM)
 		}
 		clay_spacer_grow("title-footer-gap")
-		clay_overlay_text(ui_pkg.UI_TITLE_FOOTER, 14, eng.Engine_Color{150, 150, 150, 255})
-		clay_overlay_text(ui_pkg.UI_APP_VERSION, 12, eng.Engine_Color{80, 80, 80, 255})
+		clay_overlay_text(ui_pkg.UI_TITLE_FOOTER, 14, ui_pkg.SB_DIM)
+		clay_overlay_text(ui_pkg.UI_APP_VERSION, 12, ui_pkg.SB_DIM)
 	}
 }
 
@@ -74,7 +70,7 @@ clay_render_title_embers :: proc(engine: ^eng.Engine) {
 					height = clay.SizingFixed(f32(size)),
 				},
 			},
-			backgroundColor = clay_color(eng.Engine_Color{255, 180, 70, alpha}),
+			backgroundColor = clay_color(eng.Engine_Color{ui_pkg.SB_OIL.r, ui_pkg.SB_OIL.g, ui_pkg.SB_OIL.b, alpha}),
 			floating = {
 				offset = {f32(x), f32(y)},
 				attachTo = .Parent,
@@ -89,18 +85,17 @@ clay_render_title_embers :: proc(engine: ^eng.Engine) {
 clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
 	if clay.UI(clay.ID("inventory-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 200})) {
-		clay_title_text(ui_pkg.UI_INVENTORY_TITLE, 30, eng.Engine_Color{255, 255, 255, 255})
-		clay_overlay_text(ui_pkg.UI_INVENTORY_HELP, 14, eng.Engine_Color{150, 150, 150, 255})
+		clay_title_text(ui_pkg.UI_INVENTORY_TITLE, 30, ui_pkg.SB_TITLE)
+		clay_overlay_text(ui_pkg.UI_INVENTORY_HELP, 14, ui_pkg.SB_DIM)
 		if ui != nil &&
-		   ui.dropping {clay_overlay_text(ui_pkg.UI_INVENTORY_DROP_MODE, 16, eng.Engine_Color{255, 200, 80, 255})}
+		   ui.dropping {clay_overlay_text(ui_pkg.UI_INVENTORY_DROP_MODE, 16, ui_pkg.SB_TITLE)}
 		if ui != nil &&
-		   ui.equipping {clay_overlay_text(ui_pkg.UI_INVENTORY_EQUIP_MODE, 16, eng.Engine_Color{100, 200, 255, 255})}
+		   ui.equipping {clay_overlay_text(ui_pkg.UI_INVENTORY_EQUIP_MODE, 16, ui_pkg.SB_ARM)}
 		clay_spacer_fixed("inventory-gap", 1, 18)
 		for idx in 0 ..< gcore.MAX_INVENTORY {
 			slot := game.inventory[idx]
 			selected := ui != nil && ui.inspect_slot == idx
-			color :=
-				eng.Engine_Color{255, 220, 100, 255} if selected else eng.Engine_Color{220, 220, 220, 255}
+			color := ui_pkg.SB_TITLE if selected else ui_pkg.SB_TEXT
 			if slot.occupied {
 				qty := fmt.tprintf(" x%d", slot.item.quantity) if slot.item.quantity > 1 else ""
 				clay_overlay_text(
@@ -109,15 +104,11 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 					color,
 				)
 			} else {
-				clay_overlay_text(
-					fmt.tprintf("%d. [empty]", idx + 1),
-					16,
-					eng.Engine_Color{90, 90, 90, 255},
-				)
+				clay_overlay_text(fmt.tprintf("%d. [empty]", idx + 1), 16, ui_pkg.SB_DIM)
 			}
 		}
 		clay_spacer_fixed("equipment-gap", 1, 12)
-		clay_overlay_text("EQUIPMENT", 18, eng.Engine_Color{200, 200, 100, 255})
+		clay_overlay_text("EQUIPMENT", 18, ui_pkg.SB_HEADER)
 		clay_equipment_line("WPN", &game.equipped_weapon)
 		clay_equipment_line("ARM", &game.equipped_armor)
 		clay_equipment_line("HLM", &game.equipped_helmet)
@@ -127,16 +118,15 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 clay_render_crafting_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
 	if clay.UI(clay.ID("crafting-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 200})) {
-		clay_title_text(ui_pkg.UI_CRAFTING_TITLE, 30, eng.Engine_Color{255, 255, 255, 255})
-		clay_overlay_text(ui_pkg.UI_CRAFTING_HELP, 14, eng.Engine_Color{150, 150, 150, 255})
+		clay_title_text(ui_pkg.UI_CRAFTING_TITLE, 30, ui_pkg.SB_TITLE)
+		clay_overlay_text(ui_pkg.UI_CRAFTING_HELP, 14, ui_pkg.SB_DIM)
 		clay_spacer_fixed("craft-gap", 1, 28)
 		recipes := gcore.RECIPES
 		for idx in 0 ..< len(recipes) {
 			recipe := recipes[idx]
 			have := gcore.count_material(game, recipe.material_id)
 			can_craft := have >= recipe.material_qty
-			color :=
-				eng.Engine_Color{100, 255, 100, 255} if can_craft else eng.Engine_Color{150, 80, 80, 255}
+			color := ui_pkg.SB_HP_FG if can_craft else ui_pkg.SB_HP_LOW
 			mat_name := recipe.material_id
 			if mat_def := gcore.content_manager_item_def(content, recipe.material_id);
 			   mat_def != nil {mat_name = mat_def.name}
@@ -161,19 +151,19 @@ clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = game
 	lines := ui_pkg.UI_HELP_LINES
 	if clay.UI(clay.ID("help-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text(ui_pkg.UI_HELP_TITLE, 28, eng.Engine_Color{255, 255, 255, 255})
+		clay_title_text(ui_pkg.UI_HELP_TITLE, 28, ui_pkg.SB_TITLE)
 		clay_spacer_fixed("help-gap", 1, 20)
 		for line, idx in lines {
 			if len(line) == 0 {
 				clay_spacer_fixed(fmt.tprintf("help-spacer-%d", idx), 1, 10)
 			} else {
 				color :=
-					eng.Engine_Color{255, 220, 100, 255} if line == "MOVEMENT" || line == "ITEMS" || line == "TOOLS" else eng.Engine_Color{200, 200, 200, 255}
+					ui_pkg.SB_TITLE if line == "MOVEMENT" || line == "ITEMS" || line == "TOOLS" else ui_pkg.SB_TEXT
 				clay_overlay_text(line, 15, color)
 			}
 		}
 		clay_spacer_grow("help-footer-gap")
-		clay_overlay_text(ui_pkg.UI_HELP_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_HELP_FOOTER, 16, ui_pkg.SB_DIM)
 	}
 }
 
@@ -182,10 +172,10 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	table := score_manager_load(game_engine_score_manager(engine))
 	defer score_table_destroy(&table)
 	if clay.UI(clay.ID("scores-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 230})) {
-		clay_title_text(ui_pkg.UI_SCORES_TITLE, 34, eng.Engine_Color{255, 220, 50, 255})
+		clay_title_text(ui_pkg.UI_SCORES_TITLE, 34, ui_pkg.SB_TITLE)
 		clay_spacer_fixed("scores-gap", 1, 26)
 		if table.count == 0 {
-			clay_overlay_text(ui_pkg.UI_SCORES_EMPTY, 18, eng.Engine_Color{150, 150, 150, 255})
+			clay_overlay_text(ui_pkg.UI_SCORES_EMPTY, 18, ui_pkg.SB_DIM)
 		} else {
 			for i in 0 ..< min(table.count, MAX_SCORES) {
 				s := table.scores[i]
@@ -199,21 +189,21 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 						s.turns,
 					),
 					16,
-					eng.Engine_Color{210, 210, 210, 255},
+					ui_pkg.SB_TEXT,
 				)
 			}
 		}
 		clay_spacer_grow("scores-footer-gap")
-		clay_overlay_text(ui_pkg.UI_SCORES_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_SCORES_FOOTER, 16, ui_pkg.SB_DIM)
 	}
 }
 
 clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
 	if clay.UI(clay.ID("game-over-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text(ui_pkg.UI_GAME_OVER_TITLE, 36, eng.Engine_Color{230, 41, 55, 255})
+		clay_title_text(ui_pkg.UI_GAME_OVER_TITLE, 36, ui_pkg.SB_HP_LOW)
 		cause := game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death"
-		clay_overlay_text(cause, 18, eng.Engine_Color{255, 255, 255, 255})
+		clay_overlay_text(cause, 18, ui_pkg.SB_TEXT)
 		clay_overlay_text(
 			fmt.tprintf(
 				"Depth: %d  |  Kills: %d  |  Turns: %d",
@@ -222,41 +212,29 @@ clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				eng.turn_manager_current(turns),
 			),
 			16,
-			eng.Engine_Color{180, 180, 180, 255},
+			ui_pkg.SB_DIM,
 		)
 		clay_spacer_fixed("game-over-gap", 1, 28)
-		clay_overlay_text(ui_pkg.UI_GAME_OVER_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_GAME_OVER_FOOTER, 16, ui_pkg.SB_DIM)
 	}
 }
 
 clay_render_victory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
 	if clay.UI(clay.ID("victory-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text(ui_pkg.UI_VICTORY_TITLE, 48, eng.Engine_Color{255, 215, 0, 255})
-		clay_overlay_text(ui_pkg.UI_VICTORY_SUBTITLE, 20, eng.Engine_Color{200, 200, 100, 255})
+		clay_title_text(ui_pkg.UI_VICTORY_TITLE, 48, ui_pkg.SB_TITLE)
+		clay_overlay_text(ui_pkg.UI_VICTORY_SUBTITLE, 20, ui_pkg.SB_HEADER)
 		clay_spacer_fixed("victory-gap", 1, 24)
-		clay_overlay_text(
-			fmt.tprintf("Depth Reached  %d", game.depth),
-			18,
-			eng.Engine_Color{255, 255, 200, 255},
-		)
-		clay_overlay_text(
-			fmt.tprintf("Enemies Slain  %d", game.kills),
-			18,
-			eng.Engine_Color{255, 255, 200, 255},
-		)
-		clay_overlay_text(
-			fmt.tprintf("Items Found    %d", game.items_found),
-			18,
-			eng.Engine_Color{255, 255, 200, 255},
-		)
+		clay_overlay_text(fmt.tprintf("Depth Reached  %d", game.depth), 18, ui_pkg.SB_TEXT)
+		clay_overlay_text(fmt.tprintf("Enemies Slain  %d", game.kills), 18, ui_pkg.SB_TEXT)
+		clay_overlay_text(fmt.tprintf("Items Found    %d", game.items_found), 18, ui_pkg.SB_TEXT)
 		clay_overlay_text(
 			fmt.tprintf("Turns Survived %d", eng.turn_manager_current(turns)),
 			18,
-			eng.Engine_Color{255, 255, 200, 255},
+			ui_pkg.SB_TEXT,
 		)
 		clay_spacer_grow("victory-footer-gap")
-		clay_overlay_text(ui_pkg.UI_VICTORY_FOOTER, 16, eng.Engine_Color{150, 150, 150, 255})
+		clay_overlay_text(ui_pkg.UI_VICTORY_FOOTER, 16, ui_pkg.SB_DIM)
 	}
 }
 
@@ -265,15 +243,14 @@ clay_render_cheats_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	choice := 0
 	if ui != nil {choice = ui.cheat_choice}
 	if clay.UI(clay.ID("cheats-overlay"))(clay_overlay_decl(eng.Engine_Color{0, 0, 0, 220})) {
-		clay_title_text(ui_pkg.UI_CHEATS_TITLE, 32, eng.Engine_Color{255, 215, 0, 255})
-		clay_overlay_text(ui_pkg.UI_CHEATS_HELP, 14, eng.Engine_Color{180, 180, 180, 255})
+		clay_title_text(ui_pkg.UI_CHEATS_TITLE, 32, ui_pkg.SB_TITLE)
+		clay_overlay_text(ui_pkg.UI_CHEATS_HELP, 14, ui_pkg.SB_DIM)
 		clay_spacer_fixed("cheats-gap", 1, 26)
 		when CHEATS_ENABLED {
 			for i in 0 ..< gcore.CHEAT_COMMAND_COUNT {
 				command := gcore.cheat_command_for_index(i)
 				prefix := ">" if i == choice else " "
-				color :=
-					eng.Engine_Color{255, 220, 100, 255} if i == choice else eng.Engine_Color{220, 220, 220, 255}
+				color := ui_pkg.SB_TITLE if i == choice else ui_pkg.SB_TEXT
 				clay_overlay_text(
 					fmt.tprintf("%s %d. %s", prefix, i + 1, gcore.cheat_command_label(command)),
 					18,
@@ -298,6 +275,8 @@ clay_overlay_decl :: proc(color: eng.Engine_Color) -> clay.ElementDeclaration {
 		},
 		floating = {attachTo = .Parent, attachment = {element = .LeftTop, parent = .LeftTop}},
 		backgroundColor = clay_color(color),
+		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {1, 1, 1, 1, 0}},
+		cornerRadius = {3, 3, 3, 3},
 	}
 }
 
@@ -325,9 +304,9 @@ clay_equipment_line :: proc(label: string, equipment: ^gcore.Equipment) {
 				equipment.item.stat_bonus,
 			),
 			15,
-			eng.Engine_Color{200, 200, 200, 255},
+			ui_pkg.SB_TEXT,
 		)
 	} else {
-		clay_overlay_text(fmt.tprintf("%s ---", label), 15, eng.Engine_Color{100, 100, 100, 255})
+		clay_overlay_text(fmt.tprintf("%s ---", label), 15, ui_pkg.SB_DIM)
 	}
 }
