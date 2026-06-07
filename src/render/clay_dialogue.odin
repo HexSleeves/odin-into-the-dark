@@ -10,8 +10,8 @@ clay_render_dialogue_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	if !ok {return}
 
 	if clay.UI(clay.ID("dialogue-overlay"))(clay_dialogue_decl()) {
-		clay_text(name, CLAY_FONT_TITLE, eng.Engine_Color{230, 200, 120, 255})
-		clay_text(line, CLAY_HUD_ROW_FONT, eng.Engine_Color{230, 230, 230, 255})
+		clay_text(name, CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
+		clay_text(line, CLAY_HUD_ROW_FONT, ui_pkg.SB_TEXT)
 		clay_text("[SPACE] continue   [ESC] end", CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
 	}
 }
@@ -34,7 +34,8 @@ clay_dialogue_decl :: proc() -> clay.ElementDeclaration {
 			offset = {40, f32(gcore.MAP_VIEW_HEIGHT) - 160},
 			attachment = {element = .LeftTop, parent = .LeftTop},
 		},
-		backgroundColor = clay_color(eng.Engine_Color{20, 18, 12, 240}),
-		cornerRadius = clay.CornerRadiusAll(6),
+		backgroundColor = clay_color(ui_pkg.SB_PANEL),
+		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {1, 1, 1, 1, 0}},
+		cornerRadius = {3, 3, 3, 3},
 	}
 }

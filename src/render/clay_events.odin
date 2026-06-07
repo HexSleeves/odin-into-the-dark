@@ -24,18 +24,19 @@ clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	hp_cost := max(1, game.player.hp * gcore.SHRINE_HP_COST_PERCENT / 100)
 
 	if clay.UI(clay.ID("shrine-overlay"))(clay_overlay_decl(eng.Engine_Color{10, 20, 40, 220})) {
-		clay_text("=== SHRINE ===", CLAY_FONT_TITLE, eng.Engine_Color{100, 200, 255, 255})
+		clay_text("=== SHRINE ===", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
 		clay_text(
 			fmt.tprintf("Sacrifice %d HP to receive a blessing:", hp_cost),
-			CLAY_HUD_ROW_FONT, eng.Engine_Color{200, 200, 200, 255},
+			CLAY_HUD_ROW_FONT,
+			ui_pkg.SB_TEXT,
 		)
 
 		labels := SHRINE_BUFF_LABELS
 		values := SHRINE_BUFF_VALUES
 		for i in 0 ..< 3 {
-			color := eng.Engine_Color{180, 180, 180, 255}
+			color := ui_pkg.SB_TEXT
 			if i == game.shrine_choice {
-				color = eng.Engine_Color{100, 200, 255, 255}
+				color = ui_pkg.SB_TITLE
 			}
 			clay_text(
 				fmt.tprintf("[%d] +%d %s%s", i + 1, values[i], labels[i],
@@ -54,8 +55,8 @@ clay_render_merchant_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
 
 	if clay.UI(clay.ID("merchant-overlay"))(clay_overlay_decl(eng.Engine_Color{10, 30, 20, 220})) {
-		clay_text("=== MERCHANT ===", CLAY_FONT_TITLE, eng.Engine_Color{80, 220, 120, 255})
-		clay_text("Trade materials for goods:", CLAY_HUD_ROW_FONT, eng.Engine_Color{200, 200, 200, 255})
+		clay_text("=== MERCHANT ===", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
+		clay_text("Trade materials for goods:", CLAY_HUD_ROW_FONT, ui_pkg.SB_TEXT)
 
 		for i in 0 ..< 3 {
 			offer := game.merchant_stock[i]
@@ -66,18 +67,22 @@ clay_render_merchant_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			if def != nil {item_name = def.name}
 
 			if offer.sold {
-				clay_text(
-					fmt.tprintf("[%d] SOLD", i + 1),
-					CLAY_HUD_ROW_FONT, eng.Engine_Color{80, 80, 80, 255},
-				)
+				clay_text(fmt.tprintf("[%d] SOLD", i + 1), CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
 			} else {
 				have := gcore.inventory_count_item_type(game, offer.cost_id)
-				color := eng.Engine_Color{180, 180, 180, 255}
-				if have < offer.cost_qty {color = eng.Engine_Color{255, 100, 100, 255}}
+				color := ui_pkg.SB_TITLE // cost shown inline — gold = currency
+				if have < offer.cost_qty {color = ui_pkg.SB_HP_LOW}
 				clay_text(
-					fmt.tprintf("[%d] %s — %d %s (have %d)",
-						i + 1, item_name, offer.cost_qty, offer.cost_id, have),
-					CLAY_HUD_ROW_FONT, color,
+					fmt.tprintf(
+						"[%d] %s — %d %s (have %d)",
+						i + 1,
+						item_name,
+						offer.cost_qty,
+						offer.cost_id,
+						have,
+					),
+					CLAY_HUD_ROW_FONT,
+					color,
 				)
 			}
 		}
