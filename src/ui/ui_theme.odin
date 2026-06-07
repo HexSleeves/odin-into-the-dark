@@ -3,27 +3,29 @@ package ui
 import gcore "../core"
 import eng "../engine"
 
-// Sidebar palette shared by Clay HUD and UI theme helpers.
-SB_BG :: eng.Engine_Color{12, 12, 20, 255}
-SB_DIVIDER :: eng.Engine_Color{35, 35, 52, 255}
-SB_TITLE :: eng.Engine_Color{200, 175, 90, 255}
-SB_HEADER :: eng.Engine_Color{130, 130, 155, 255}
-SB_TEXT :: eng.Engine_Color{195, 195, 210, 255}
-SB_DIM :: eng.Engine_Color{75, 75, 90, 255}
-SB_HP_BG :: eng.Engine_Color{70, 15, 15, 255}
-SB_HP_FG :: eng.Engine_Color{45, 185, 55, 255}
-SB_HP_LOW :: eng.Engine_Color{200, 55, 40, 255}
-SB_PICK_BG :: eng.Engine_Color{35, 25, 15, 255}
-SB_PICK_OK :: eng.Engine_Color{75, 170, 75, 255}
-SB_PICK_WARN :: eng.Engine_Color{195, 175, 45, 255}
-SB_PICK_CRIT :: eng.Engine_Color{200, 55, 40, 255}
-SB_WPN :: eng.Engine_Color{195, 145, 70, 255}
-SB_ARM :: eng.Engine_Color{90, 155, 205, 255}
-SB_HLM :: eng.Engine_Color{195, 195, 50, 255}
-SB_OIL :: eng.Engine_Color{250, 195, 70, 255}
-SB_POISON :: eng.Engine_Color{115, 200, 40, 255}
-SB_BOSS :: eng.Engine_Color{210, 45, 45, 255}
-SB_KEY :: eng.Engine_Color{120, 180, 255, 255}
+// Sidebar palette — "Lamplit Mine". Gold (SB_TITLE) is reserved for treasure/title only.
+SB_BG :: eng.Engine_Color{11, 10, 15, 255} // #0B0A0F screen void / sidebar base
+SB_PANEL :: eng.Engine_Color{21, 19, 28, 255} // #15131C readout panel background
+SB_DIVIDER :: eng.Engine_Color{58, 53, 80, 255} // #3A3550 panel border / divider
+SB_TITLE :: eng.Engine_Color{245, 182, 56, 255} // #F5B638 gold accent (treasure/title)
+SB_HEADER :: eng.Engine_Color{138, 130, 112, 255} // #8A8270 panel header labels
+SB_TEXT :: eng.Engine_Color{232, 223, 200, 255} // #E8DFC8 primary text
+SB_DIM :: eng.Engine_Color{90, 86, 72, 255} // #5A5648 passive/secondary
+SB_HP_BG :: eng.Engine_Color{30, 20, 20, 255} // HP bar empty cell
+SB_HP_FG :: eng.Engine_Color{111, 191, 115, 255} // #6FBF73 HP healthy
+SB_HP_LOW :: eng.Engine_Color{216, 69, 62, 255} // #D8453E HP danger
+SB_PICK_BG :: eng.Engine_Color{36, 31, 16, 255} // PICK bar empty cell
+SB_PICK_OK :: eng.Engine_Color{232, 163, 61, 255} // #E8A33D pick healthy (amber)
+SB_PICK_WARN :: eng.Engine_Color{245, 182, 56, 255} // pick warn
+SB_PICK_CRIT :: eng.Engine_Color{216, 69, 62, 255} // pick crit
+SB_WPN :: eng.Engine_Color{255, 158, 61, 255} // warm — weapon
+SB_ARM :: eng.Engine_Color{138, 158, 168, 255} // cool steel — armor
+SB_HLM :: eng.Engine_Color{200, 180, 120, 255} // brass — helmet
+SB_OIL :: eng.Engine_Color{255, 158, 61, 255} // #FF9E3D lamp / oil / fuel
+SB_LAMP_LOW :: eng.Engine_Color{122, 74, 28, 255} // #7A4A1C ember (low fuel)
+SB_POISON :: eng.Engine_Color{115, 200, 40, 255} // poison
+SB_BOSS :: eng.Engine_Color{216, 69, 62, 255} // #D8453E boss
+SB_KEY :: eng.Engine_Color{138, 130, 112, 255} // control keys (de-emphasized)
 
 // Sidebar geometry shared by Clay HUD layout.
 SB_X :: i32(gcore.MAP_VIEW_WIDTH)
