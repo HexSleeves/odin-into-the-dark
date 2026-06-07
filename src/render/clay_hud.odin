@@ -53,212 +53,219 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		},
 		) {
 			clay_text_centered("INTO THE DEPTHS", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
-			clay_theme_divider("hud-title-divider")
 
-			hp_ratio := f32(max(game.player.hp, 0)) / f32(max(game.player.max_hp, 1))
-			hp_fg := ui_pkg.SB_HP_FG if hp_ratio > 0.3 else ui_pkg.SB_HP_LOW
-			clay_row(
-				"hud-hp-row",
-				"HP",
-				fmt.tprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
-				CLAY_HUD_FONT,
-				ui_pkg.SB_HEADER,
-				ui_pkg.SB_TEXT,
-			)
-			clay_bar("hud-hp-bar", hp_ratio, 10, ui_pkg.SB_HP_BG, hp_fg)
+			// VITALS panel
+			if clay_panel_begin("hud-vitals", "VITALS") {
+				hp_ratio := f32(max(game.player.hp, 0)) / f32(max(game.player.max_hp, 1))
+				hp_fg := ui_pkg.SB_HP_FG if hp_ratio > 0.3 else ui_pkg.SB_HP_LOW
+				clay_row(
+					"hud-hp-row",
+					"HP",
+					fmt.tprintf("%d / %d", i32(game.player.hp), i32(game.player.max_hp)),
+					CLAY_HUD_FONT,
+					ui_pkg.SB_HEADER,
+					ui_pkg.SB_TEXT,
+				)
+				clay_bar_segmented("hud-hp-bar", hp_ratio, 10, 8, ui_pkg.SB_HP_BG, hp_fg)
 
-			cost := gcore.effective_attack_cost(game)
-			spd_label: string
-			spd_color: eng.Engine_Color
-			if cost <= 700 {
-				spd_label = "Fast"
-				spd_color = eng.Engine_Color{80, 220, 100, 255}
-			} else if cost <= 1100 {
-				spd_label = "Normal"
-				spd_color = ui_pkg.SB_TEXT
-			} else if cost <= 1600 {
-				spd_label = "Slow"
-				spd_color = eng.Engine_Color{220, 170, 60, 255}
-			} else {
-				spd_label = "Very Slow"
-				spd_color = eng.Engine_Color{220, 80, 60, 255}
-			}
-			clay_row("hud-atk-row", "ATK", spd_label, CLAY_HUD_FONT, ui_pkg.SB_HEADER, spd_color)
+				cost := gcore.effective_attack_cost(game)
+				spd_label: string
+				spd_color: eng.Engine_Color
+				if cost <= 700 {
+					spd_label = "Fast"
+					spd_color = ui_pkg.SB_HP_FG
+				} else if cost <= 1100 {
+					spd_label = "Normal"
+					spd_color = ui_pkg.SB_TEXT
+				} else if cost <= 1600 {
+					spd_label = "Slow"
+					spd_color = ui_pkg.SB_PICK_WARN
+				} else {
+					spd_label = "Very Slow"
+					spd_color = ui_pkg.SB_HP_LOW
+				}
+				clay_row("hud-atk-row", "ATK", spd_label, CLAY_HUD_FONT, ui_pkg.SB_HEADER, spd_color)
 
-			if game.equipped_weapon.occupied {
-				wpn := game.equipped_weapon.item
-				if wpn.max_durability > 0 {
-					pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
-					pick_fg: eng.Engine_Color
-					if wpn.durability <= 0 {
-						pick_fg = ui_pkg.SB_PICK_CRIT
-					} else if pick_ratio > 0.5 {
-						pick_fg = ui_pkg.SB_PICK_OK
-					} else if pick_ratio > 0.25 {
-						pick_fg = ui_pkg.SB_PICK_WARN
-					} else {
-						pick_fg = ui_pkg.SB_PICK_CRIT
+				if game.equipped_weapon.occupied {
+					wpn := game.equipped_weapon.item
+					if wpn.max_durability > 0 {
+						pick_ratio := f32(wpn.durability) / f32(max(wpn.max_durability, 1))
+						pick_fg: eng.Engine_Color
+						if wpn.durability <= 0 {
+							pick_fg = ui_pkg.SB_PICK_CRIT
+						} else if pick_ratio > 0.5 {
+							pick_fg = ui_pkg.SB_PICK_OK
+						} else if pick_ratio > 0.25 {
+							pick_fg = ui_pkg.SB_PICK_WARN
+						} else {
+							pick_fg = ui_pkg.SB_PICK_CRIT
+						}
+						if wpn.durability <= 0 {
+							clay_text("PICK  BROKEN", CLAY_HUD_FONT, ui_pkg.SB_PICK_CRIT)
+						} else {
+							clay_row(
+								"hud-pick-row",
+								"PICK",
+								fmt.tprintf("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
+								CLAY_HUD_FONT,
+								ui_pkg.SB_HEADER,
+								ui_pkg.SB_TEXT,
+							)
+						}
+						clay_bar_segmented("hud-pick-bar", pick_ratio, 10, 8, ui_pkg.SB_PICK_BG, pick_fg)
 					}
-					if wpn.durability <= 0 {
-						clay_text("PICK  BROKEN", CLAY_HUD_FONT, ui_pkg.SB_PICK_CRIT)
-					} else {
-						clay_row(
-							"hud-pick-row",
-							"PICK",
-							fmt.tprintf("%d / %d", i32(wpn.durability), i32(wpn.max_durability)),
-							CLAY_HUD_FONT,
-							ui_pkg.SB_HEADER,
-							ui_pkg.SB_TEXT,
-						)
-					}
-					clay_bar("hud-pick-bar", pick_ratio, 6, ui_pkg.SB_PICK_BG, pick_fg)
 				}
 			}
 
-			clay_theme_divider("hud-stats-divider")
-			depth_label := fmt.tprintf("DEPTH  %d", i32(game.depth))
-			if game.depth == gcore.SURFACE_DEPTH {
-				depth_label = "SURFACE"
-			}
-			clay_row(
-				"hud-depth-row",
-				depth_label,
-				fmt.tprintf("TURN %d", i32(eng.turn_manager_current(turns))),
-				CLAY_HUD_ROW_FONT,
-				ui_pkg.SB_TEXT,
-				ui_pkg.SB_DIM,
-			)
-			clay_row(
-				"hud-pos-row",
-				fmt.tprintf("POS  %d,%d", i32(game.player.pos.x), i32(game.player.pos.y)),
-				"",
-				CLAY_HUD_ROW_FONT,
-				ui_pkg.SB_DIM,
-				ui_pkg.SB_DIM,
-			)
-			if game.quest != .Complete {
+			// EXPEDITION panel
+			if clay_panel_begin("hud-expedition", "EXPEDITION") {
+				depth_label := fmt.tprintf("DEPTH  %d", i32(game.depth))
+				if game.depth == gcore.SURFACE_DEPTH {
+					depth_label = "SURFACE"
+				}
 				clay_row(
-					"hud-quest-row",
-					"QUEST",
+					"hud-depth-row",
+					depth_label,
+					fmt.tprintf("TURN %d", i32(eng.turn_manager_current(turns))),
+					CLAY_HUD_ROW_FONT,
+					ui_pkg.SB_TEXT,
+					ui_pkg.SB_DIM,
+				)
+				clay_row(
+					"hud-pos-row",
+					fmt.tprintf("POS  %d,%d", i32(game.player.pos.x), i32(game.player.pos.y)),
 					"",
 					CLAY_HUD_ROW_FONT,
 					ui_pkg.SB_DIM,
 					ui_pkg.SB_DIM,
 				)
-				clay_text(gcore.quest_objective_text(game), CLAY_HUD_ROW_FONT, eng.Engine_Color{255, 215, 0, 255})
-			}
 
-			alive_count: i32 = 0
-			for &e in game.enemies {
-				if e.alive {alive_count += 1}
-			}
-			clay_row(
-				"hud-kills-row",
-				fmt.tprintf("KILLS  %d", i32(game.kills)),
-				fmt.tprintf("NEAR %d", alive_count),
-				CLAY_HUD_ROW_FONT,
-				ui_pkg.SB_TEXT,
-				ui_pkg.SB_DIM,
-			)
-			if game.light_boost_turns > 0 {
+				alive_count: i32 = 0
+				for &e in game.enemies {
+					if e.alive {alive_count += 1}
+				}
 				clay_row(
-					"hud-light-row",
-					fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
-					fmt.tprintf("%dt fuel", i32(game.light_boost_turns)),
-					CLAY_HUD_ROW_FONT,
-					ui_pkg.SB_OIL,
-					ui_pkg.SB_OIL,
-				)
-			} else {
-				clay_row(
-					"hud-light-row",
-					fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
-					fmt.tprintf("ITEMS %d", i32(game.items_found)),
+					"hud-kills-row",
+					fmt.tprintf("KILLS  %d", i32(game.kills)),
+					fmt.tprintf("NEAR %d", alive_count),
 					CLAY_HUD_ROW_FONT,
 					ui_pkg.SB_TEXT,
 					ui_pkg.SB_DIM,
 				)
+				if game.light_boost_turns > 0 {
+					clay_row(
+						"hud-light-row",
+						fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
+						fmt.tprintf("%dt fuel", i32(game.light_boost_turns)),
+						CLAY_HUD_ROW_FONT,
+						ui_pkg.SB_OIL,
+						ui_pkg.SB_OIL,
+					)
+				} else {
+					clay_row(
+						"hud-light-row",
+						fmt.tprintf("LIGHT  %d", i32(game.player.light_radius)),
+						fmt.tprintf("ITEMS %d", i32(game.items_found)),
+						CLAY_HUD_ROW_FONT,
+						ui_pkg.SB_TEXT,
+						ui_pkg.SB_DIM,
+					)
+				}
 			}
 
-			clay_theme_divider("hud-equipment-divider")
-			clay_text("EQUIPMENT", CLAY_HUD_FONT, ui_pkg.SB_HEADER)
-			if game.equipped_weapon.occupied {
-				wpn := &game.equipped_weapon.item
-				clay_text(
-					fmt.tprintf("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
-					CLAY_HUD_FONT,
-					ui_pkg.SB_WPN,
-				)
-			} else {
-				clay_text("WPN  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
-			}
-			if game.equipped_armor.occupied {
-				arm := &game.equipped_armor.item
-				clay_text(
-					fmt.tprintf("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
-					CLAY_HUD_FONT,
-					ui_pkg.SB_ARM,
-				)
-			} else {
-				clay_text("ARM  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
-			}
-			if game.equipped_helmet.occupied {
-				hlm := &game.equipped_helmet.item
-				clay_text(
-					fmt.tprintf("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
-					CLAY_HUD_FONT,
-					ui_pkg.SB_HLM,
-				)
-			} else {
-				clay_text("HLM  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
+			// QUEST panel (amber, not gold)
+			if game.quest != .Complete {
+				if clay_panel_begin("hud-quest", "QUEST") {
+					clay_text(gcore.quest_objective_text(game), CLAY_HUD_ROW_FONT, ui_pkg.SB_OIL)
+				}
 			}
 
+			// GEAR panel
+			if clay_panel_begin("hud-gear", "GEAR") {
+				if game.equipped_weapon.occupied {
+					wpn := &game.equipped_weapon.item
+					clay_text(
+						fmt.tprintf("WPN  %s (+%d)", wpn.name, i32(wpn.stat_bonus)),
+						CLAY_HUD_FONT,
+						ui_pkg.SB_WPN,
+					)
+				} else {
+					clay_text("WPN  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
+				}
+				if game.equipped_armor.occupied {
+					arm := &game.equipped_armor.item
+					clay_text(
+						fmt.tprintf("ARM  %s (+%d)", arm.name, i32(arm.stat_bonus)),
+						CLAY_HUD_FONT,
+						ui_pkg.SB_ARM,
+					)
+				} else {
+					clay_text("ARM  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
+				}
+				if game.equipped_helmet.occupied {
+					hlm := &game.equipped_helmet.item
+					clay_text(
+						fmt.tprintf("HLM  %s (+%d)", hlm.name, i32(hlm.stat_bonus)),
+						CLAY_HUD_FONT,
+						ui_pkg.SB_HLM,
+					)
+				} else {
+					clay_text("HLM  ---", CLAY_HUD_FONT, ui_pkg.SB_DIM)
+				}
+			}
+
+			// STATUS panel (only when active)
 			has_status :=
 				game.light_boost_turns > 0 ||
 				game.poison_turns > 0 ||
 				game.burning_turns > 0 ||
 				game.frozen_turns > 0
 			if has_status {
-				clay_theme_divider("hud-status-divider")
-				clay_text("STATUS", CLAY_HUD_FONT, ui_pkg.SB_HEADER)
-				if game.light_boost_turns >
-				   0 {clay_text(fmt.tprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, ui_pkg.SB_OIL)}
-				if game.poison_turns >
-				   0 {clay_text(fmt.tprintf("POISON  %dt remaining", i32(game.poison_turns)), CLAY_HUD_FONT, ui_pkg.SB_POISON)}
-				if game.burning_turns >
-				   0 {clay_text(fmt.tprintf("BURNING (%d)", i32(game.burning_turns)), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
-				if game.frozen_turns >
-				   0 {clay_text(fmt.tprintf("FROZEN (%d)", i32(game.frozen_turns)), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
+				if clay_panel_begin("hud-status", "STATUS") {
+					if game.light_boost_turns >
+					   0 {clay_text(fmt.tprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, ui_pkg.SB_OIL)}
+					if game.poison_turns >
+					   0 {clay_text(fmt.tprintf("POISON  %dt remaining", i32(game.poison_turns)), CLAY_HUD_FONT, ui_pkg.SB_POISON)}
+					if game.burning_turns >
+					   0 {clay_text(fmt.tprintf("BURNING (%d)", i32(game.burning_turns)), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
+					if game.frozen_turns >
+					   0 {clay_text(fmt.tprintf("FROZEN (%d)", i32(game.frozen_turns)), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
+				}
 			}
 
+			// BOSS panel (only when a boss is alive)
 			for &enemy in game.enemies {
 				if !enemy.alive || !enemy.is_boss {continue}
-				clay_theme_divider("hud-boss-divider")
-				clay_row(
-					"hud-boss-row",
-					fmt.tprintf("%s", enemy.name),
-					fmt.tprintf("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
-					CLAY_HUD_FONT,
-					ui_pkg.SB_BOSS,
-					ui_pkg.SB_TEXT,
-				)
-				boss_ratio := f32(max(enemy.hp, 0)) / f32(max(enemy.max_hp, 1))
-				clay_bar(
-					"hud-boss-bar",
-					boss_ratio,
-					8,
-					eng.Engine_Color{50, 15, 15, 255},
-					ui_pkg.SB_BOSS,
-				)
+				if clay_panel_begin("hud-boss", "BOSS") {
+					clay_row(
+						"hud-boss-row",
+						fmt.tprintf("%s", enemy.name),
+						fmt.tprintf("%d/%d", i32(enemy.hp), i32(enemy.max_hp)),
+						CLAY_HUD_FONT,
+						ui_pkg.SB_BOSS,
+						ui_pkg.SB_TEXT,
+					)
+					boss_ratio := f32(max(enemy.hp, 0)) / f32(max(enemy.max_hp, 1))
+					clay_bar_segmented(
+						"hud-boss-bar",
+						boss_ratio,
+						10,
+						8,
+						eng.Engine_Color{50, 15, 15, 255},
+						ui_pkg.SB_BOSS,
+					)
+				}
 				break
 			}
 
 			clay_spacer_grow("hud-controls-spacer")
-			clay_theme_divider("hud-controls-divider")
-			clay_text("CONTROLS", CLAY_HUD_FONT, ui_pkg.SB_HEADER)
-			clay_text("[I]nv  [G]rab  [X]Mine", CLAY_HUD_FONT, ui_pkg.SB_KEY)
-			clay_text("[M]ap  [?]Help  [.]Wait", CLAY_HUD_FONT, ui_pkg.SB_KEY)
-			clay_text("[F1]Mute  [ ]/[ ] Vol", CLAY_HUD_FONT, ui_pkg.SB_KEY)
+
+			// CONTROLS panel
+			if clay_panel_begin("hud-controls", "CONTROLS") {
+				clay_text("[I]nv  [G]rab  [X]Mine", CLAY_HUD_FONT, ui_pkg.SB_KEY)
+				clay_text("[M]ap  [?]Help  [.]Wait", CLAY_HUD_FONT, ui_pkg.SB_KEY)
+				clay_text("[F1]Mute  [ ]/[ ] Vol", CLAY_HUD_FONT, ui_pkg.SB_KEY)
+			}
 		}
 	}
 }
