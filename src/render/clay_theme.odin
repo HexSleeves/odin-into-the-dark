@@ -2,6 +2,8 @@ package renderer
 
 import ui_pkg "../ui"
 
+import "core:math"
+
 import eng "../engine"
 import clay "libs:clay"
 
@@ -22,6 +24,12 @@ CLAY_SPACE_LG :: u16(16)
 
 clay_color :: proc(color: eng.Engine_Color) -> clay.Color {
 	return {f32(color.r), f32(color.g), f32(color.b), f32(color.a)}
+}
+
+// Number of filled cells for a segmented bar of `segments` cells at `ratio` (0..1).
+bar_segment_fill_count :: proc(ratio: f32, segments: int) -> int {
+	r := clamp(ratio, 0, 1)
+	return clamp(int(math.round(r * f32(segments))), 0, segments)
 }
 
 clay_theme_divider :: proc(id: string, color := ui_pkg.SB_DIVIDER) {
