@@ -3,6 +3,7 @@ package renderer
 import gcore "../core"
 
 import eng "../engine"
+import ui_pkg "../ui"
 import clay "libs:clay"
 
 @(private = "file")
@@ -33,17 +34,28 @@ clay_render_messages :: proc(messages: ^eng.Message_Manager) {
 			layoutDirection = .TopToBottom,
 			childGap = u16(MSG_LINE_HEIGHT - MSG_FONT_SIZE),
 		},
-		backgroundColor = clay_color(eng.Engine_Color{15, 15, 20, 255}),
+		backgroundColor = clay_color(ui_pkg.SB_BG),
+		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {0, 0, 1, 0, 0}}, // top edge only
 	},
 	) {
 		for i in 0 ..< visible_count {
 			msg_offset := visible_count - 1 - i
 			msg_idx := (log.head - 1 - msg_offset + gcore.MAX_MESSAGES * 2) % gcore.MAX_MESSAGES
 			msg := &log.messages[msg_idx]
+			// i == visible_count-1 is newest (brightest); older lines dim toward 0.5.
+			recency := f32(i + 1) / f32(visible_count)
+			fade := 0.5 + 0.5 * recency
+			c := msg.color
+			faded := eng.Engine_Color {
+				u8(f32(c.r) * fade),
+				u8(f32(c.g) * fade),
+				u8(f32(c.b) * fade),
+				c.a,
+			}
 			clay.TextDynamic(
 				string(msg.text[:msg.text_len]),
 				{
-					textColor = clay_color(msg.color),
+					textColor = clay_color(faded),
 					fontSize = CLAY_FONT_SMALL,
 					lineHeight = u16(MSG_LINE_HEIGHT),
 				},
