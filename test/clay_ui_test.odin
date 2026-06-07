@@ -186,7 +186,7 @@ clay_test_render_draw_rectangle :: proc(
 ) {
 	state := cast(^Clay_Test_Render_State)ctx
 	state.rectangle_count += 1
-	if color.r == 255 && color.g == 180 && color.b == 70 {
+	if color.r == 255 && color.g == 158 && color.b == 61 {
 		state.ember_rectangle_count += 1
 	}
 }
