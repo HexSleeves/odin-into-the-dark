@@ -3,6 +3,17 @@ package engine
 
 import rl "vendor:raylib"
 
+RAYLIB_TEXT_FONT_PATH :: "assets/fonts/SourceCodePro-Regular.ttf"
+RAYLIB_TEXT_FONT_BUNDLE_PATH :: "../Resources/assets/fonts/SourceCodePro-Regular.ttf"
+RAYLIB_TEXT_FONT_APP_RESOURCE_SUFFIX :: "../Resources/assets/fonts/SourceCodePro-Regular.ttf"
+RAYLIB_TEXT_MAX_FONT_SIZE :: 96
+RAYLIB_TEXT_SPACING :: f32(1)
+
+@(private = "file")
+raylib_text_fonts: [RAYLIB_TEXT_MAX_FONT_SIZE + 1]rl.Font
+@(private = "file")
+raylib_text_font_loaded: [RAYLIB_TEXT_MAX_FONT_SIZE + 1]bool
+
 // Raylib render backend — desktop default. Excluded from the JS/WASM build,
 // which cannot link libraylib.a; web uses the karl2d render backend instead.
 
@@ -10,6 +21,7 @@ engine_render_backend_raylib :: proc() -> Engine_Render_Backend {
 	return Engine_Render_Backend {
 		begin_frame = raylib_render_begin_frame,
 		end_frame = raylib_render_end_frame,
+		shutdown = raylib_render_shutdown,
 		clear = raylib_render_clear,
 		begin_scissor = raylib_render_begin_scissor,
 		end_scissor = raylib_render_end_scissor,
@@ -62,12 +74,29 @@ raylib_render_draw_rectangle_lines :: proc(
 
 @(private = "file")
 raylib_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, color: Engine_Color) {
-	rl.DrawText(text, x, y, size, engine_color_to_raylib(color))
+	font, loaded := raylib_render_font_for_size(size)
+	if !loaded {
+		rl.DrawText(text, x, y, size, engine_color_to_raylib(color))
+		return
+	}
+	rl.DrawTextEx(
+		font,
+		text,
+		rl.Vector2{f32(x), f32(y)},
+		f32(size),
+		RAYLIB_TEXT_SPACING,
+		engine_color_to_raylib(color),
+	)
 }
 
 @(private = "file")
 raylib_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
-	return rl.MeasureText(text, size)
+	font, loaded := raylib_render_font_for_size(size)
+	if !loaded {
+		return rl.MeasureText(text, size)
+	}
+	measured := rl.MeasureTextEx(font, text, f32(size), RAYLIB_TEXT_SPACING)
+	return i32(measured.x + 0.5)
 }
 
 @(private = "file")
@@ -90,6 +119,84 @@ raylib_render_draw_texture_region :: proc(
 		rotation,
 		engine_color_to_raylib(tint),
 	)
+}
+
+@(private = "file")
+raylib_render_shutdown :: proc(ctx: rawptr) {
+	for i in 0 ..< len(raylib_text_font_loaded) {
+		if raylib_text_font_loaded[i] {
+			rl.UnloadFont(raylib_text_fonts[i])
+			raylib_text_fonts[i] = {}
+			raylib_text_font_loaded[i] = false
+		}
+	}
+}
+
+@(private = "file")
+raylib_render_font_for_size :: proc(size: i32) -> (rl.Font, bool) {
+	if size <= 0 || size > RAYLIB_TEXT_MAX_FONT_SIZE {
+		return rl.GetFontDefault(), false
+	}
+
+	index := int(size)
+	if raylib_text_font_loaded[index] {
+		return raylib_text_fonts[index], true
+	}
+
+	font, loaded := raylib_render_load_font(RAYLIB_TEXT_FONT_PATH, size)
+	if !loaded {
+		font, loaded = raylib_render_load_font(RAYLIB_TEXT_FONT_BUNDLE_PATH, size)
+	}
+	if !loaded {
+		font, loaded = raylib_render_load_app_resource_font(size)
+	}
+	if !loaded {
+		return rl.GetFontDefault(), false
+	}
+
+	raylib_text_fonts[index] = font
+	raylib_text_font_loaded[index] = true
+	return font, true
+}
+
+@(private = "file")
+raylib_render_load_font :: proc(path: string, size: i32) -> (rl.Font, bool) {
+	path_buf: [1024]u8
+	copy_len := min(len(path), len(path_buf) - 1)
+	for i in 0 ..< copy_len {
+		path_buf[i] = path[i]
+	}
+	path_buf[copy_len] = 0
+
+	font := rl.LoadFontEx(cast(cstring)&path_buf[0], size, nil, 0)
+	return font, rl.IsFontValid(font)
+}
+
+@(private = "file")
+raylib_render_load_app_resource_font :: proc(size: i32) -> (rl.Font, bool) {
+	app_dir := string(rl.GetApplicationDirectory())
+	path_buf: [1024]u8
+	cursor := 0
+	for cursor < len(app_dir) && cursor < len(path_buf) - 1 {
+		path_buf[cursor] = app_dir[cursor]
+		cursor += 1
+	}
+	if cursor > 0 && path_buf[cursor - 1] != '/' && cursor < len(path_buf) - 1 {
+		path_buf[cursor] = '/'
+		cursor += 1
+	}
+	suffix := RAYLIB_TEXT_FONT_APP_RESOURCE_SUFFIX
+	for i in 0 ..< len(suffix) {
+		if cursor >= len(path_buf) - 1 {
+			break
+		}
+		path_buf[cursor] = suffix[i]
+		cursor += 1
+	}
+	path_buf[cursor] = 0
+
+	font := rl.LoadFontEx(cast(cstring)&path_buf[0], size, nil, 0)
+	return font, rl.IsFontValid(font)
 }
 
 @(private = "file")

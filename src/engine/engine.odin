@@ -290,6 +290,7 @@ engine_shutdown :: proc(state: ^Engine_State) {
 		engine_services_shutdown_runtime_assets(&state.services)
 	}
 	texture_manager_unload_all(&state.engine.texture_manager)
+	engine_render_shutdown(&state.engine)
 	if state.platform_started {
 		state.platform.shutdown(state.platform.ctx)
 	}

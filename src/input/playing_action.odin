@@ -99,17 +99,24 @@ handle_input :: proc(
 		return .Acted
 	}
 
+	t := tile_at(game, target_x, target_y)
+	if t != nil && t.type == .Descent && !descend_allowed(game) {
+		add_descent_locked_message(messages, game)
+		return .None
+	}
+
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
 	move_cost := BASE_MOVE_COST
 	if game.frozen_turns > 0 {move_cost *= 2}
 	game.player.energy -= move_cost
 
-	t := tile_at(game, target_x, target_y)
 	if t != nil {
 		if t.type == .Descent {
-			descend(content, camera, messages, game)
-			return .Descended
+			if descend(content, camera, messages, game) {
+				return .Descended
+			}
+			return .None
 		}
 		if t.type == .Ascent {
 			if ascend(content, camera, messages, game) {

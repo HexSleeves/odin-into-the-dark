@@ -13,8 +13,8 @@ clay_messages_import_anchor :: proc() {
 }
 
 MSG_PANEL_HEIGHT :: i32(gcore.MSG_REGION_HEIGHT)
-MSG_FONT_SIZE :: i32(14)
-MSG_LINE_HEIGHT :: i32(16)
+MSG_FONT_SIZE :: i32(16)
+MSG_LINE_HEIGHT :: i32(20)
 MSG_MAX_VISIBLE :: 7
 
 clay_render_messages :: proc(messages: ^eng.Message_Manager) {
@@ -56,7 +56,7 @@ clay_render_messages :: proc(messages: ^eng.Message_Manager) {
 				string(msg.text[:msg.text_len]),
 				{
 					textColor = clay_color(faded),
-					fontSize = CLAY_FONT_SMALL,
+					fontSize = u16(MSG_FONT_SIZE),
 					lineHeight = u16(MSG_LINE_HEIGHT),
 				},
 			)

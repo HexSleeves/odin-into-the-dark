@@ -40,6 +40,7 @@ load_game_from_path_uses_heap_allocator_for_persistent_loaded_state :: proc(t: ^
 	game := game_init(&content)
 	defer game_destroy(game)
 	game.depth = SURFACE_DEPTH
+	game.quest = Quest_State.Active
 	generate_map(&content, game)
 	messages := message_manager_make()
 	camera := eng.camera_manager_make()

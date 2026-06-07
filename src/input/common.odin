@@ -125,6 +125,8 @@ logger_debugf :: gameio.logger_debugf
 
 // ─── Gameplay helpers ─────────────────────────────────────────────────────────
 descend :: gp.descend
+descend_allowed :: gp.descend_allowed
+add_descent_locked_message :: gp.add_descent_locked_message
 trigger_enemy_rounds :: gp.trigger_enemy_rounds
 handle_player_moved :: gp.handle_player_moved
 handle_player_descended :: gp.handle_player_descended

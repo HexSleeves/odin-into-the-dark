@@ -70,6 +70,28 @@ talking_to_old_miner_activates_quest :: proc(t: ^testing.T) {
 }
 
 @(test)
+surface_descent_requires_old_miner_quest :: proc(t: ^testing.T) {
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+
+	game := game_init(&content)
+	defer game_destroy(game)
+	game.depth = SURFACE_DEPTH
+	game.quest = .Not_Started
+	generate_map(&content, game)
+	messages := message_manager_make()
+	camera := eng.camera_manager_make()
+
+	testing.expect(t, !descend(&content, &camera, &messages, game))
+	testing.expect_value(t, game.depth, SURFACE_DEPTH)
+
+	game.quest = .Active
+	testing.expect(t, descend(&content, &camera, &messages, game))
+	testing.expect_value(t, game.depth, 1)
+}
+
+@(test)
 ancient_treasure_spawns_at_max_depth :: proc(t: ^testing.T) {
 	content := content_manager_make()
 	defer content_manager_destroy(&content)
@@ -260,6 +282,7 @@ ascending_from_first_mine_floor_restores_surface_town :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 	game.depth = SURFACE_DEPTH
+	game.quest = Quest_State.Active
 	generate_map(&content, game)
 	messages := message_manager_make()
 	camera := eng.camera_manager_make()
@@ -286,6 +309,7 @@ save_load_preserves_floor_stack_for_return_trip :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 	game.depth = SURFACE_DEPTH
+	game.quest = Quest_State.Active
 	generate_map(&content, game)
 	game.tiles[pos_to_idx(5, 5)].type = .Chest
 	messages := message_manager_make()

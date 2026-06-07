@@ -30,6 +30,34 @@ frozen_status_doubles_player_movement_energy_cost :: proc(t: ^testing.T) {
 }
 
 @(test)
+surface_descent_input_is_blocked_until_old_miner_quest_is_active :: proc(t: ^testing.T) {
+	game: Game
+	game.depth = SURFACE_DEPTH
+	game.quest = .Not_Started
+	game.player.pos = Vec2{1, 1}
+	game.player.energy = 5000
+	game.tiles[pos_to_idx(1, 1)].type = .Floor
+	game.tiles[pos_to_idx(2, 1)].type = .Descent
+
+	backend_state := Test_Input_Backend_State{}
+	backend_state.down[eng.Engine_Key.D] = true
+	input := input_manager_make()
+	input.backend = test_input_backend(&backend_state)
+	content := content_manager_make()
+	turns := eng.turn_manager_make()
+	camera := eng.camera_manager_make()
+	messages := message_manager_make()
+
+	result := handle_input(&content, &turns, &camera, &messages, &game, &input)
+
+	testing.expect_value(t, result, Input_Result.None)
+	testing.expect_value(t, game.depth, SURFACE_DEPTH)
+	testing.expect_value(t, game.player.pos, Vec2{1, 1})
+	testing.expect_value(t, game.player.energy, 5000)
+	testing.expect_value(t, messages.log.count, 1)
+}
+
+@(test)
 frozen_status_ticks_down_and_announces_thaw :: proc(t: ^testing.T) {
 	game: Game
 	game.frozen_turns = 1

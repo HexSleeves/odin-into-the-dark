@@ -99,21 +99,42 @@ update_light_for_depth :: proc(content: ^Content_Manager, game: ^Game) {
 	game.light_drain_timer = 0
 }
 
+descend_allowed :: proc(game: ^Game) -> bool {
+	if game == nil {
+		return false
+	}
+	return game.depth != SURFACE_DEPTH || game.quest != .Not_Started
+}
+
+add_descent_locked_message :: proc(messages: ^Message_Manager, game: ^Game) {
+	add_message(
+		messages,
+		game,
+		"Speak to the Old Miner before entering the mine.",
+		eng.Engine_Color{230, 180, 90, 255},
+	)
+}
+
 descend :: proc(
 	content: ^Content_Manager,
 	camera: ^eng.Camera_Manager,
 	messages: ^Message_Manager,
 	game: ^Game,
-) {
+) -> bool {
 	old_context := context
 	context.allocator = runtime.default_allocator()
 	defer {
 		context = old_context
 	}
 
+	if !descend_allowed(game) {
+		add_descent_locked_message(messages, game)
+		return false
+	}
+
 	if game.depth >= MAX_DEPTH {
 		game.state = .Victory
-		return
+		return true
 	}
 
 	_ = save_current_floor(game)
@@ -144,6 +165,7 @@ descend :: proc(
 			eng.Engine_Color{0, 200, 200, 255},
 		)
 	}
+	return true
 }
 
 ascend :: proc(

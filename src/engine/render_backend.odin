@@ -16,6 +16,7 @@ Engine_Render_Backend :: struct {
 	ctx:                  rawptr,
 	begin_frame:          proc(ctx: rawptr),
 	end_frame:            proc(ctx: rawptr),
+	shutdown:             proc(ctx: rawptr),
 	clear:                proc(ctx: rawptr, color: Engine_Color),
 	begin_scissor:        proc(ctx: rawptr, x, y, width, height: i32),
 	end_scissor:          proc(ctx: rawptr),
@@ -90,6 +91,7 @@ engine_render_backend_nil :: proc() -> Engine_Render_Backend {
 		measure_text = nil_render_measure_text,
 		draw_rectangle_lines = nil_render_draw_rectangle_lines,
 		draw_texture_region = nil_render_draw_texture_region,
+		shutdown = nil_render_shutdown,
 	}
 }
 
@@ -101,6 +103,13 @@ engine_render_begin_frame :: proc(engine: ^Engine) {
 engine_render_end_frame :: proc(engine: ^Engine) {
 	render := engine_render_backend(engine)
 	render.end_frame(render.ctx)
+}
+
+engine_render_shutdown :: proc(engine: ^Engine) {
+	render := engine_render_backend(engine)
+	if render.shutdown != nil {
+		render.shutdown(render.ctx)
+	}
 }
 
 engine_render_clear :: proc(engine: ^Engine, color: Engine_Color) {
@@ -168,6 +177,9 @@ nil_render_begin_frame :: proc(ctx: rawptr) {}
 
 @(private = "file")
 nil_render_end_frame :: proc(ctx: rawptr) {}
+
+@(private = "file")
+nil_render_shutdown :: proc(ctx: rawptr) {}
 
 @(private = "file")
 nil_render_clear :: proc(ctx: rawptr, color: Engine_Color) {}

@@ -13,9 +13,9 @@ clay_theme_import_anchor :: proc() {
 	_ = clay.Color{}
 }
 
-CLAY_FONT_SMALL :: u16(12)
-CLAY_FONT_BODY :: u16(13)
-CLAY_FONT_TITLE :: u16(14)
+CLAY_FONT_SMALL :: u16(16)
+CLAY_FONT_BODY :: u16(18)
+CLAY_FONT_TITLE :: u16(20)
 
 CLAY_SPACE_XS :: u16(2)
 CLAY_SPACE_SM :: u16(4)

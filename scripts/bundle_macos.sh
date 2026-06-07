@@ -18,7 +18,7 @@ chmod +x "${BUNDLE_DIR}/Contents/MacOS/into_the_depths"
 cp scripts/Info.plist "${BUNDLE_DIR}/Contents/"
 
 if [ "${COPY_ASSETS}" = "true" ]; then
-    # Sprites are loaded by Raylib at runtime when sprite support is compiled in.
+    # Runtime assets are loaded by Raylib from disk.
     # Data files (enemies/items/player json5) are #load'd at compile time — not needed here.
     cp -r assets "${BUNDLE_DIR}/Contents/Resources/"
 fi

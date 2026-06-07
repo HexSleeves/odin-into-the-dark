@@ -17,7 +17,7 @@ clay_tooltip_import_anchor :: proc() {
 
 TOOLTIP_BG_COLOR :: ui_pkg.SB_PANEL
 TOOLTIP_TEXT_COLOR :: ui_pkg.SB_TEXT
-TOOLTIP_FONT_SIZE :: i32(14)
+TOOLTIP_FONT_SIZE :: i32(18)
 TOOLTIP_PAD_X :: i32(6)
 TOOLTIP_PAD_Y :: i32(4)
 TOOLTIP_OFFSET_X :: i32(12)
@@ -115,7 +115,14 @@ clay_render_hint_banner :: proc(id: string, text: string, y: i32, color: eng.Eng
 		},
 	},
 	) {
-		clay.TextDynamic(text, {textColor = clay_color(color), fontSize = 14, lineHeight = 14})
+		clay.TextDynamic(
+			text,
+			{
+				textColor = clay_color(color),
+				fontSize = CLAY_FONT_BODY,
+				lineHeight = CLAY_FONT_BODY,
+			},
+		)
 	}
 }
 

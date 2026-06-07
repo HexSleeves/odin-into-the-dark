@@ -26,7 +26,7 @@ content_handlers_accept_content_manager_context :: proc(t: ^testing.T) {
 			camera: ^eng.Camera_Manager,
 			messages: ^Message_Manager,
 			game: ^Game,
-		) =
+		) -> bool =
 		descend
 	advance_handler: proc(
 			turns: ^eng.Turn_Manager,
