@@ -319,6 +319,36 @@ clay_bar :: proc(id: string, ratio: f32, height: u16, bg, fg: eng.Engine_Color) 
 }
 
 
+clay_bar_segmented :: proc(
+	id: string,
+	ratio: f32,
+	segments: int,
+	height: u16,
+	bg, fg: eng.Engine_Color,
+) {
+	filled := bar_segment_fill_count(ratio, segments)
+	if clay.UI(clay.ID(id))(
+	clay.ElementDeclaration {
+		layout = {
+			sizing = {width = clay.SizingGrow(), height = clay.SizingFixed(f32(height))},
+			layoutDirection = .LeftToRight,
+			childGap = 1,
+		},
+	},
+	) {
+		for i in 0 ..< segments {
+			cell_color := bg
+			if i < filled {cell_color = fg}
+			if clay.UI(clay.ID_LOCAL("seg"))(
+			clay.ElementDeclaration {
+				layout = {sizing = {width = clay.SizingGrow(), height = clay.SizingGrow()}},
+				backgroundColor = clay_color(cell_color),
+			},
+			) {}
+		}
+	}
+}
+
 clay_spacer_fixed :: proc(id: string, width, height: f32) {
 	if clay.UI(clay.ID(id))(
 	clay.ElementDeclaration {
