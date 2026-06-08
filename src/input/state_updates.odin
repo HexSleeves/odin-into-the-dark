@@ -136,6 +136,13 @@ update_viewing_inventory :: proc(
 	if action_pressed(im, .Menu_Down) {
 		ui.inspect_slot = min(ui.inspect_slot + 1, MAX_INVENTORY + 2)
 	}
+	if action_pressed(im, .Inv_Tab_Equipment) {
+		if ui.inspect_slot < MAX_INVENTORY {
+			ui.inspect_slot = MAX_INVENTORY
+		} else {
+			ui.inspect_slot = 0
+		}
+	}
 	if action_pressed(im, .Inv_Drop_Mode) {
 		ui.dropping = !ui.dropping
 		ui.equipping = false

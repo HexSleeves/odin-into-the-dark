@@ -26,6 +26,9 @@ SB_LAMP_LOW :: eng.Engine_Color{122, 74, 28, 255} // #7A4A1C ember (low fuel)
 SB_POISON :: eng.Engine_Color{115, 200, 40, 255} // poison
 SB_BOSS :: eng.Engine_Color{216, 69, 62, 255} // #D8453E boss
 SB_KEY :: eng.Engine_Color{138, 130, 112, 255} // control keys (de-emphasized)
+SB_SELECT_BG :: eng.Engine_Color{245, 182, 56, 30} // translucent gold selection tint
+SB_BACKDROP :: eng.Engine_Color{6, 5, 9, 236} // full-screen dim backdrop
+SB_ACCENT :: SB_TITLE // gold accent (semantic alias)
 
 // Sidebar geometry shared by Clay HUD layout.
 SB_X :: i32(gcore.MAP_VIEW_WIDTH)

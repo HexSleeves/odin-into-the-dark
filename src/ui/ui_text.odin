@@ -15,24 +15,45 @@ UI_TITLE_OPTIONS :: [gcore.TITLE_OPTION_COUNT]string {
 	"Help",
 	"Quit",
 }
-UI_HELP_LINES :: [?]string {
-	"MOVEMENT",
-	"WASD / Arrows    Move",
-	".  (period)      Wait a turn",
-	"Walk into enemy  Attack",
-	"",
-	"ITEMS",
-	"G                Pick up item",
-	"I                Open inventory",
-	"1-9              Use item",
-	"D / E            Drop or equip from inventory",
-	"",
-	"TOOLS",
-	"X                Mine adjacent wall/hazard",
-	"C                Craft at anvils",
-	"M                Toggle minimap",
-	"F1               Mute audio",
-	"ESC/Q            Close menu / quit",
+UI_Help_Row :: struct {
+	key:    string,
+	action: string,
+}
+UI_Help_Section :: struct {
+	title: string,
+	rows:  []UI_Help_Row,
+}
+
+@(private = "file")
+ui_help_rows_movement := [?]UI_Help_Row {
+	{"WASD / Arrows", "Move"},
+	{".", "Wait a turn"},
+	{"Walk into enemy", "Attack"},
+}
+
+@(private = "file")
+ui_help_rows_items := [?]UI_Help_Row {
+	{"G", "Pick up item"},
+	{"I", "Open inventory"},
+	{"1-9", "Use item"},
+	{"D / E", "Drop or equip"},
+}
+
+@(private = "file")
+ui_help_rows_tools := [?]UI_Help_Row {
+	{"X", "Mine adjacent wall/hazard"},
+	{"C", "Craft at anvils"},
+	{"M", "Toggle minimap"},
+	{"F1", "Mute audio"},
+	{"ESC / Q", "Close menu / quit"},
+}
+
+ui_help_sections :: proc() -> []UI_Help_Section {
+	@(static) sections: [3]UI_Help_Section
+	sections[0] = {"MOVEMENT", ui_help_rows_movement[:]}
+	sections[1] = {"ITEMS", ui_help_rows_items[:]}
+	sections[2] = {"TOOLS", ui_help_rows_tools[:]}
+	return sections[:]
 }
 UI_HINT_MINING :: "[MINING] Direction (WASD/arrows) | ESC cancel"
 UI_HINT_ANVIL :: "[C = Craft]"

@@ -100,6 +100,7 @@ Item :: struct {
 	pos:            Vec2,
 	item_type:      string, // data-driven ID (e.g. "health_potion", "torch")
 	name:           string, // display name from data
+	description:    string, // flavour/stat description
 	glyph:          rune,
 	color:          eng.Engine_Color,
 	picked_up:      bool,

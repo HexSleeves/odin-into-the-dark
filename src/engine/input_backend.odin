@@ -42,6 +42,7 @@ Engine_Key :: enum {
 	Right_Shift,
 	Left_Bracket,
 	Right_Bracket,
+	Tab,
 }
 
 Engine_Mouse_Button :: enum {

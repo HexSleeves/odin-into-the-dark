@@ -10,9 +10,10 @@ clay_render_dialogue_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	if !ok {return}
 
 	if clay.UI(clay.ID("dialogue-overlay"))(clay_dialogue_decl()) {
-		clay_text(name, CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
+		clay_menu_title(name, ui_pkg.SB_TITLE, CLAY_FONT_TITLE)
+		clay_menu_accent_rule("dialogue-rule")
 		clay_text(line, CLAY_HUD_ROW_FONT, ui_pkg.SB_TEXT)
-		clay_text("[SPACE] continue   [ESC] end", CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
+		clay_menu_footer("dialogue-footer", "[SPACE] continue   [ESC] end")
 	}
 }
 

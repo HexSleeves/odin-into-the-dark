@@ -5,17 +5,19 @@
     {
       id: "health_potion",
       name: "Health Potion",
+      description: "Alchemical brew. Restores 10 HP.",
       glyph: "!",
       color: [255, 80, 80, 255],
       stack_limit: 3,
       effect: {
         type: "heal",
-        value: 10,  // was 8 — scales with new 25 max HP (40%)
+        value: 10,
       },
     },
     {
       id: "antidote",
       name: "Antidote",
+      description: "Neutralises poison. Cures the poisoned condition.",
       glyph: "!",
       color: [120, 220, 80, 255],
       stack_limit: 3,
@@ -27,43 +29,47 @@
     {
       id: "torch",
       name: "Torch",
+      description: "Burning pitch torch. Extends light radius by 2.",
       glyph: "t",
       color: [255, 180, 50, 255],
       stack_limit: 1,
       effect: {
         type: "light_boost",
-        value: 2,        // was 3 — less dominant, still useful
+        value: 2,
         max_radius: 10,
       },
     },
     {
       id: "lantern_oil",
       name: "Lantern Oil",
+      description: "Refined oil. Boosts light radius by 3 for 12 turns.",
       glyph: "o",
       color: [255, 200, 80, 255],
       stack_limit: 3,
       effect: {
         type: "timed_light_boost",
         value: 3,
-        duration: 12,    // was 15 — shorter window of power
+        duration: 12,
         max_radius: 12,
       },
     },
     {
       id: "bandage",
       name: "Bandage",
+      description: "Strips of cloth. Restores 5 HP.",
       glyph: "+",
       color: [200, 200, 200, 255],
       stack_limit: 5,
       effect: {
         type: "heal",
-        value: 5,  // was 4 — slightly better, 20% of max HP
+        value: 5,
       },
     },
     // ── Tier 1 Equipment (shallow floors) ──
     {
       id: "rusty_pickaxe",
       name: "Rusty Pickaxe",
+      description: "Worn but sturdy. +2 ATK, slow swing. 20 durability.",
       glyph: "P",
       color: [180, 130, 80, 255],
       stack_limit: 1,
@@ -75,6 +81,7 @@
     {
       id: "leather_vest",
       name: "Leather Vest",
+      description: "Tanned hide armour. +1 DEF.",
       glyph: "V",
       color: [139, 90, 43, 255],
       stack_limit: 1,
@@ -84,6 +91,7 @@
     {
       id: "miners_helmet",
       name: "Miner's Helmet",
+      description: "Dented hard hat. +1 DEF.",
       glyph: "H",
       color: [200, 200, 50, 255],
       stack_limit: 1,
@@ -94,6 +102,7 @@
     {
       id: "mine_dagger",
       name: "Mine Dagger",
+      description: "Short blade. +1 ATK, very fast attack.",
       glyph: "d",
       color: [190, 190, 210, 255],
       stack_limit: 1,
@@ -105,6 +114,7 @@
     {
       id: "steel_pickaxe",
       name: "Steel Pickaxe",
+      description: "Forged steel. +4 ATK, slow swing. 35 durability.",
       glyph: "P",
       color: [160, 180, 200, 255],
       stack_limit: 1,
@@ -116,6 +126,7 @@
     {
       id: "chainmail",
       name: "Chainmail",
+      description: "Interlocked rings. +2 DEF.",
       glyph: "V",
       color: [140, 150, 160, 255],
       stack_limit: 1,
@@ -125,6 +136,7 @@
     {
       id: "crystal_lamp",
       name: "Crystal Lamp",
+      description: "Glowing headgear. +2 DEF, illuminates surroundings.",
       glyph: "H",
       color: [100, 200, 220, 255],
       stack_limit: 1,
@@ -135,6 +147,7 @@
     {
       id: "greatsword",
       name: "Greatsword",
+      description: "Massive blade. +7 ATK, very slow swing.",
       glyph: "G",
       color: [200, 200, 220, 255],
       stack_limit: 1,
@@ -146,6 +159,7 @@
     {
       id: "iron_ore",
       name: "Iron Ore",
+      description: "Raw iron from the walls. Used in crafting.",
       glyph: "*",
       color: [200, 120, 50, 255],
       stack_limit: 5,
@@ -154,6 +168,7 @@
     {
       id: "copper_ore",
       name: "Copper Ore",
+      description: "Greenish metal chunk. Used in crafting.",
       glyph: "*",
       color: [80, 180, 80, 255],
       stack_limit: 5,
@@ -162,6 +177,7 @@
     {
       id: "crystal_shard",
       name: "Crystal Shard",
+      description: "Glittering fragment. Used in crafting.",
       glyph: "*",
       color: [100, 150, 255, 255],
       stack_limit: 5,
@@ -170,6 +186,7 @@
     {
       id: "gold_nugget",
       name: "Gold Nugget",
+      description: "Precious metal. Used in crafting.",
       glyph: "*",
       color: [255, 215, 0, 255],
       stack_limit: 5,
@@ -179,6 +196,7 @@
     {
       id: "copper_shield",
       name: "Copper Shield",
+      description: "Hammered copper plate. +1 DEF.",
       glyph: "V",
       color: [80, 180, 80, 255],
       stack_limit: 1,
@@ -188,6 +206,7 @@
     {
       id: "crystal_torch",
       name: "Crystal Torch",
+      description: "Crystal-infused torch. Extends light radius by 3.",
       glyph: "t",
       color: [100, 150, 255, 255],
       stack_limit: 1,
@@ -196,6 +215,7 @@
     {
       id: "golden_amulet",
       name: "Golden Amulet",
+      description: "Ancient relic. Fully restores HP.",
       glyph: "a",
       color: [255, 215, 0, 255],
       stack_limit: 1,
@@ -204,6 +224,7 @@
     {
       id: "vault_key",
       name: "Vault Key",
+      description: "Opens the vault on the deepest floor.",
       glyph: "k",
       color: [255, 215, 0, 255],
       stack_limit: 1,
@@ -212,6 +233,7 @@
     {
       id: "ancient_treasure",
       name: "Ancient Treasure",
+      description: "Priceless artefact from the deep. Victory awaits.",
       glyph: "*",
       color: [255, 215, 0, 255],
       stack_limit: 1,

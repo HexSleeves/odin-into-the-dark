@@ -46,6 +46,7 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		picked_up = false,
 		quantity = 1,
 		name = def.name,
+		description = def.description,
 		equipment_slot = def.equipment_slot,
 		stat_bonus = def.effect.value,
 		durability = def.durability,

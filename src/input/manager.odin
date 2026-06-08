@@ -44,6 +44,7 @@ Game_Action :: enum {
 	Craft_2,
 	Craft_3,
 	Craft_4,
+	Inv_Tab_Equipment,
 }
 
 Key_Binding :: eng.Engine_Key_Binding
@@ -105,6 +106,7 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Craft_2, {primary = .Two})
 	input_set_binding(im, .Craft_3, {primary = .Three})
 	input_set_binding(im, .Craft_4, {primary = .Four})
+	input_set_binding(im, .Inv_Tab_Equipment, {primary = .Tab})
 }
 
 input_set_binding :: proc(im: ^Input_Manager, action: Game_Action, binding: Key_Binding) -> bool {

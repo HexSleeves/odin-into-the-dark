@@ -67,6 +67,7 @@ Item_Spawn_Table :: struct {
 Item_Def :: struct {
 	id:             string,
 	name:           string,
+	description:    string,
 	glyph:          string,
 	color:          Color_Array,
 	stack_limit:    int,
@@ -128,6 +129,7 @@ data_registry_destroy :: proc(registry: ^Data_Registry) {
 	for &item in registry.items.items {
 		delete(item.id)
 		delete(item.name)
+		delete(item.description)
 		delete(item.glyph)
 		delete(item.effect.type)
 		delete(item.equipment_slot)

@@ -162,29 +162,44 @@ load_game_from_storage :: proc(
 	}
 
 	// ── Reconstruct transient state ──
-	// action_cost on items is not persisted — recover it from item defs
+	// action_cost and description are not persisted — recover from item defs
 	for &it in game.items {
 		def := content_manager_item_def(content, it.item_type)
-		if def != nil {it.action_cost = def.action_cost}
+		if def != nil {
+			it.action_cost = def.action_cost
+			it.description = def.description
+		}
 	}
 	for i in 0 ..< MAX_INVENTORY {
 		if game.inventory[i].occupied {
 			def := content_manager_item_def(content, game.inventory[i].item.item_type)
-			if def != nil {game.inventory[i].item.action_cost = def.action_cost}
+			if def != nil {
+				game.inventory[i].item.action_cost = def.action_cost
+				game.inventory[i].item.description = def.description
+			}
 		}
 	}
-	// Reconstruct action_cost on equipped items
+	// Reconstruct action_cost and description on equipped items
 	if game.equipped_weapon.occupied {
 		def := content_manager_item_def(content, game.equipped_weapon.item.item_type)
-		if def != nil {game.equipped_weapon.item.action_cost = def.action_cost}
+		if def != nil {
+			game.equipped_weapon.item.action_cost = def.action_cost
+			game.equipped_weapon.item.description = def.description
+		}
 	}
 	if game.equipped_armor.occupied {
 		def := content_manager_item_def(content, game.equipped_armor.item.item_type)
-		if def != nil {game.equipped_armor.item.action_cost = def.action_cost}
+		if def != nil {
+			game.equipped_armor.item.action_cost = def.action_cost
+			game.equipped_armor.item.description = def.description
+		}
 	}
 	if game.equipped_helmet.occupied {
 		def := content_manager_item_def(content, game.equipped_helmet.item.item_type)
-		if def != nil {game.equipped_helmet.item.action_cost = def.action_cost}
+		if def != nil {
+			game.equipped_helmet.item.action_cost = def.action_cost
+			game.equipped_helmet.item.description = def.description
+		}
 	}
 	game.palette = palette_for_depth(game.depth)
 	compute_fov(game)

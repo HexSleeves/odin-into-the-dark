@@ -4,7 +4,6 @@ import gcore "../core"
 import eng "../engine"
 import ui_pkg "../ui"
 import "core:fmt"
-import clay "libs:clay"
 
 // ─── Shrine overlay ──────────────────────────────────────────────────────────
 
@@ -19,35 +18,28 @@ SHRINE_BUFF_VALUES :: [3]int {
 clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	hp_cost := max(1, game.player.hp * gcore.SHRINE_HP_COST_PERCENT / 100)
 
-	if clay.UI(clay.ID("shrine-overlay"))(clay_overlay_decl(eng.Engine_Color{10, 20, 40, 220})) {
-		clay_text("=== SHRINE ===", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
-		clay_text(
-			fmt.tprintf("Sacrifice %d HP to receive a blessing:", hp_cost),
-			CLAY_HUD_ROW_FONT,
-			ui_pkg.SB_TEXT,
-		)
-
-		labels := SHRINE_BUFF_LABELS
-		values := SHRINE_BUFF_VALUES
-		for i in 0 ..< 3 {
-			color := ui_pkg.SB_TEXT
-			if i == game.shrine_choice {
-				color = ui_pkg.SB_TITLE
-			}
-			clay_text(
-				fmt.tprintf(
-					"[%d] +%d %s%s",
-					i + 1,
-					values[i],
-					labels[i],
-					i == game.shrine_choice ? " <" : "",
-				),
-				CLAY_HUD_ROW_FONT,
-				color,
+	if clay_menu_backdrop_begin("shrine-overlay", eng.Engine_Color{6, 5, 9, 140}) {
+		if clay_menu_card_begin("shrine-card", 480) {
+			clay_menu_title("SHRINE")
+			clay_menu_accent_rule("shrine-rule")
+			clay_menu_subtitle(
+				fmt.tprintf("Sacrifice %d HP to receive a blessing", hp_cost),
+				ui_pkg.SB_HEADER,
 			)
-		}
 
-		clay_text("[ESC] Leave", CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
+			labels := SHRINE_BUFF_LABELS
+			values := SHRINE_BUFF_VALUES
+			for i in 0 ..< 3 {
+				clay_menu_item(
+					fmt.tprintf("shrine-item-%d", i),
+					fmt.tprintf("+%d %s", values[i], labels[i]),
+					fmt.tprintf("[%d]", i + 1),
+					i == game.shrine_choice,
+				)
+			}
+
+			clay_menu_footer("shrine-footer", "[ESC] Leave")
+		}
 	}
 }
 
@@ -56,39 +48,46 @@ clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 clay_render_merchant_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
 
-	if clay.UI(clay.ID("merchant-overlay"))(clay_overlay_decl(eng.Engine_Color{10, 30, 20, 220})) {
-		clay_text("=== MERCHANT ===", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
-		clay_text("Trade materials for goods:", CLAY_HUD_ROW_FONT, ui_pkg.SB_TEXT)
+	if clay_menu_backdrop_begin("merchant-overlay", eng.Engine_Color{6, 5, 9, 140}) {
+		if clay_menu_card_begin("merchant-card", 480) {
+			clay_menu_title("MERCHANT")
+			clay_menu_accent_rule("merchant-rule")
+			clay_menu_subtitle("Trade materials for goods", ui_pkg.SB_HEADER)
 
-		for i in 0 ..< 3 {
-			offer := game.merchant_stock[i]
-			if offer.item_id == "" {continue}
+			for i in 0 ..< 3 {
+				offer := game.merchant_stock[i]
+				if offer.item_id == "" {continue}
 
-			def := gcore.content_manager_item_def(content, offer.item_id)
-			item_name := offer.item_id
-			if def != nil {item_name = def.name}
+				def := gcore.content_manager_item_def(content, offer.item_id)
+				item_name := offer.item_id
+				if def != nil {item_name = def.name}
 
-			if offer.sold {
-				clay_text(fmt.tprintf("[%d] SOLD", i + 1), CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
-			} else {
-				have := gcore.inventory_count_item_type(game, offer.cost_id)
-				color := ui_pkg.SB_TITLE // cost shown inline — gold = currency
-				if have < offer.cost_qty {color = ui_pkg.SB_HP_LOW}
-				clay_text(
-					fmt.tprintf(
-						"[%d] %s — %d %s (have %d)",
-						i + 1,
+				row_id := fmt.tprintf("merchant-item-%d", i)
+				hotkey := fmt.tprintf("[%d]", i + 1)
+
+				if offer.sold {
+					clay_menu_item(
+						row_id,
+						fmt.tprintf("%s — SOLD", item_name),
+						hotkey,
+						false,
+						true,
+					)
+				} else {
+					have := gcore.inventory_count_item_type(game, offer.cost_id)
+					label := fmt.tprintf(
+						"%s — %d %s (have %d)",
 						item_name,
 						offer.cost_qty,
 						offer.cost_id,
 						have,
-					),
-					CLAY_HUD_ROW_FONT,
-					color,
-				)
+					)
+					// affordable rows render normally; unaffordable rows show dimmed (disabled)
+					clay_menu_item(row_id, label, hotkey, false, have < offer.cost_qty)
+				}
 			}
-		}
 
-		clay_text("[ESC] Leave", CLAY_HUD_ROW_FONT, ui_pkg.SB_DIM)
+			clay_menu_footer("merchant-footer", "[ESC] Leave")
+		}
 	}
 }
