@@ -202,8 +202,6 @@ Quest_State :: enum {
 	Complete, // returned/rewarded
 }
 
-DEATH_CAUSE_MAX_LEN :: 128
-
 Saved_Floor :: struct {
 	tiles:         [MAP_WIDTH * MAP_HEIGHT]Tile,
 	web_tiles:     [MAP_WIDTH * MAP_HEIGHT]bool,
@@ -295,7 +293,16 @@ Game :: struct {
 	npc_count:              int,
 	quest:                  Quest_State,
 	active_npc:             int, // index into npcs during dialogue (-1 = none)
-	dialogue_line:          int, // current line of active NPC's dialogue
+	active_conv_idx:        int, // index into content.dialogue.conversations (-1 = none)
+	active_node_idx:        int, // index into conv.nodes (-1 = none)
+	dialogue_choice:        int, // selected choice when on a choice node (-1 = not in choice)
+	// Dialogue state persistence
+	seen_count:             int,
+	seen_convs:             [MAX_SEEN_CONVS][MAX_CONV_ID_LEN]u8,
+	seen_lens:              [MAX_SEEN_CONVS]int,
+	dlg_flag_count:         int,
+	dlg_flags:              [MAX_DLG_FLAGS][MAX_FLAG_LEN]u8,
+	dlg_flag_lens:          [MAX_DLG_FLAGS]int,
 	visited_floors:         [MAX_DEPTH + 1]^Saved_Floor,
 	floor_entry_pos:        Vec2,
 }

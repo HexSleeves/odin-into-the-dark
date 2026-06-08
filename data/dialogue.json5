@@ -1,0 +1,177 @@
+{
+    conversations: [
+        // ─── Old Miner: Quest Introduction (one-shot, branching) ───
+        {
+            id: "old_miner_intro",
+            npc_role: "Old_Miner",
+            priority: 10,
+            one_shot: true,
+            requires: { quest_is: "Not_Started" },
+            start: "hook",
+            nodes: [
+                {
+                    id: "hook",
+                    speaker: "Old Miner Tobias",
+                    text: "You there — you've the look of someone needing coin.",
+                    next: "offer",
+                },
+                {
+                    id: "offer",
+                    speaker: "Old Miner Tobias",
+                    text: "Deep in this mine lies an Ancient Treasure, lost generations ago. Bring it back and I'll make you rich. Do we have a deal?",
+                    choices: [
+                        {
+                            text: "I'll do it.",
+                            to: "accept",
+                            effects: [{ type: "set_quest", state: "Active" }],
+                        },
+                        {
+                            text: "Not interested.",
+                            to: "decline",
+                        },
+                    ],
+                },
+                {
+                    id: "accept",
+                    speaker: "Old Miner Tobias",
+                    text: "Good. The descent is right there. Mind the dark — few who go down ever climb back up.",
+                },
+                {
+                    id: "decline",
+                    speaker: "Old Miner Tobias",
+                    text: "Hmm. Perhaps another time, then. The offer stands.",
+                },
+            ],
+        },
+        // ─── Old Miner: Quest Active reminder ───
+        {
+            id: "old_miner_active",
+            npc_role: "Old_Miner",
+            priority: 5,
+            one_shot: false,
+            requires: { quest_is: "Active" },
+            start: "remind",
+            nodes: [
+                {
+                    id: "remind",
+                    speaker: "Old Miner Tobias",
+                    text: "Still here? The treasure won't fetch itself.",
+                    next: "urge",
+                },
+                {
+                    id: "urge",
+                    speaker: "Old Miner Tobias",
+                    text: "Take the descent. Go deep. Don't come back empty-handed.",
+                },
+            ],
+        },
+        // ─── Old Miner: Treasure returned (one-shot, triggers victory) ───
+        {
+            id: "old_miner_found",
+            npc_role: "Old_Miner",
+            priority: 20,
+            one_shot: true,
+            requires: { quest_is: "Treasure_Found" },
+            start: "reward",
+            nodes: [
+                {
+                    id: "reward",
+                    speaker: "Old Miner Tobias",
+                    text: "By the depths... you actually found it!",
+                    next: "legend",
+                },
+                {
+                    id: "legend",
+                    speaker: "Old Miner Tobias",
+                    text: "You've earned every coin. The town owes you its legend.",
+                    effects: [
+                        { type: "set_quest", state: "Complete" },
+                        { type: "trigger_victory" },
+                    ],
+                },
+            ],
+        },
+        // ─── Shopkeeper ───
+        {
+            id: "shopkeeper_main",
+            npc_role: "Shopkeeper",
+            priority: 5,
+            one_shot: false,
+            start: "greet",
+            nodes: [
+                {
+                    id: "greet",
+                    speaker: "Bram the Shopkeeper",
+                    text: "Welcome, traveler! Bram's Goods, finest in the valley.",
+                    next: "warn",
+                },
+                {
+                    id: "warn",
+                    speaker: "Bram the Shopkeeper",
+                    text: "Stock up before you go below — the mine eats the unprepared.",
+                    next: "shop",
+                },
+                {
+                    id: "shop",
+                    speaker: "Bram the Shopkeeper",
+                    text: "Let me show you what I have today.",
+                    effects: [{ type: "open_shop" }],
+                },
+            ],
+        },
+        // ─── Guard ───
+        {
+            id: "guard_main",
+            npc_role: "Guard",
+            priority: 5,
+            one_shot: false,
+            start: "halt",
+            nodes: [
+                {
+                    id: "halt",
+                    speaker: "Sergeant Hild",
+                    text: "Halt. ...Oh, just another treasure-seeker.",
+                    next: "warn",
+                },
+                {
+                    id: "warn",
+                    speaker: "Sergeant Hild",
+                    text: "The mine's been restless. Things crawl up from the deep.",
+                    next: "tip",
+                },
+                {
+                    id: "tip",
+                    speaker: "Sergeant Hild",
+                    text: "If you hear scratching in the dark, you're already too close.",
+                },
+            ],
+        },
+        // ─── Elder ───
+        {
+            id: "elder_main",
+            npc_role: "Elder",
+            priority: 5,
+            one_shot: false,
+            start: "history",
+            nodes: [
+                {
+                    id: "history",
+                    speaker: "Elder Marisa",
+                    text: "This town was carved by miners, long before the dark came.",
+                    next: "greed",
+                },
+                {
+                    id: "greed",
+                    speaker: "Elder Marisa",
+                    text: "They dug too greedily. Now something guards the depths.",
+                    next: "light",
+                },
+                {
+                    id: "light",
+                    speaker: "Elder Marisa",
+                    text: "Light keeps the worst of it at bay. Never let your torch die.",
+                },
+            ],
+        },
+    ],
+}

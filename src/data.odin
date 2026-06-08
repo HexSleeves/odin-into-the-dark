@@ -15,6 +15,8 @@ EMBEDDED_ENEMIES :: #load("../data/enemies.json5")
 EMBEDDED_ITEMS :: #load("../data/items.json5")
 @(private = "file")
 EMBEDDED_PLAYER :: #load("../data/player.json5")
+@(private = "file")
+EMBEDDED_DIALOGUE :: #load("../data/dialogue.json5")
 
 data_load_all :: proc() -> bool {
 	return data_load_all_into(&g_data)
@@ -44,6 +46,13 @@ data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 		return false
 	}
 	next.player = player
+
+	dialogue, dialogue_ok := load_json5_from_bytes(gcore.Dialogue_Data, EMBEDDED_DIALOGUE)
+	if !dialogue_ok {
+		gcore.data_registry_destroy(&next)
+		return false
+	}
+	next.dialogue = dialogue
 	next.loaded = true
 
 	gcore.data_registry_destroy(registry)

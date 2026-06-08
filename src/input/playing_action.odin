@@ -86,9 +86,9 @@ handle_input :: proc(
 
 	// Walking into an NPC starts dialogue (surface town).
 	if npc_idx := npc_at(game, target_x, target_y); npc_idx >= 0 {
-		game.active_npc = npc_idx
-		game.dialogue_line = 0
-		game.state = .Viewing_Dialogue
+		npc_content := game_engine_content_manager(engine)
+		npc_msgs := game_engine_message_manager(engine)
+		start_conversation(npc_msgs, npc_content, game, npc_idx)
 		return .None
 	}
 

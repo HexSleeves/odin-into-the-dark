@@ -55,15 +55,21 @@ talking_to_old_miner_activates_quest :: proc(t: ^testing.T) {
 	}
 	testing.expect(t, miner_idx >= 0)
 
-	game.active_npc = miner_idx
-	game.dialogue_line = 0
 	game.quest = .Not_Started
 
-	// Advance through every line — quest activates on the final line.
-	lines := npc_dialogue(game, &game.npcs[miner_idx])
-	for _ in 0 ..< len(lines) {
-		advance_dialogue(&messages, game)
-	}
+	// Start conversation — selects old_miner_intro (priority 10, quest Not_Started).
+	start_conversation(&messages, &content, game, miner_idx)
+	testing.expect(t, game.state == .Viewing_Dialogue)
+
+	// Advance past hook node, reach offer node (has choices).
+	advance_dialogue(&messages, &content, game)
+
+	// Choose "I'll do it." (choice 0) — applies set_quest: Active, moves to accept.
+	game.dialogue_choice = 0
+	confirm_dialogue_choice(&messages, &content, game)
+
+	// Advance past accept node (no next) — conversation closes.
+	advance_dialogue(&messages, &content, game)
 
 	testing.expect_value(t, game.quest, Quest_State.Active)
 	testing.expect_value(t, game.active_npc, -1) // dialogue closed
@@ -159,12 +165,14 @@ talking_to_shopkeeper_opens_fixed_town_shop :: proc(t: ^testing.T) {
 	}
 	testing.expect(t, shopkeeper_idx >= 0)
 
-	game.active_npc = shopkeeper_idx
-	game.dialogue_line = 0
-	lines := npc_dialogue(game, &game.npcs[shopkeeper_idx])
-	for _ in 0 ..< len(lines) {
-		advance_dialogue(&messages, game)
-	}
+	// Start conversation — selects shopkeeper_main.
+	start_conversation(&messages, &content, game, shopkeeper_idx)
+	testing.expect(t, game.state == .Viewing_Dialogue)
+
+	// greet → warn → shop (shop applies open_shop and closes conversation).
+	advance_dialogue(&messages, &content, game)
+	advance_dialogue(&messages, &content, game)
+	advance_dialogue(&messages, &content, game)
 
 	testing.expect_value(t, game.state, Game_State.Viewing_Merchant)
 	testing.expect_value(t, game.active_npc, -1)
@@ -384,11 +392,13 @@ treasure_can_be_carried_back_to_old_miner_by_ascending :: proc(t: ^testing.T) {
 		if game.npcs[i].role == .Old_Miner {miner_idx = i}
 	}
 	testing.expect(t, miner_idx >= 0)
-	game.active_npc = miner_idx
-	lines := npc_dialogue(game, &game.npcs[miner_idx])
-	for _ in 0 ..< len(lines) {
-		advance_dialogue(&messages, game)
-	}
+	// Start conversation — selects old_miner_found (priority 20, quest Treasure_Found).
+	start_conversation(&messages, &content, game, miner_idx)
+	testing.expect(t, game.state == .Viewing_Dialogue)
+
+	// reward → legend (legend applies set_quest: Complete + trigger_victory).
+	advance_dialogue(&messages, &content, game)
+	advance_dialogue(&messages, &content, game)
 
 	testing.expect_value(t, game.quest, Quest_State.Complete)
 	testing.expect_value(t, game.state, Game_State.Victory)

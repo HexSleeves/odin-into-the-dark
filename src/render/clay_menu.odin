@@ -16,47 +16,58 @@ clay_menu_import_anchor :: proc() {
 	_ = gcore.SCREEN_WIDTH
 }
 
-// full-screen dim backdrop; centers its children on BOTH axes. Caller opens with:
-//   if clay_menu_backdrop_begin("title-backdrop") { ...embers...; if clay_menu_card_begin(...){...} }
-clay_menu_backdrop_begin :: proc(id: string, color := ui_pkg.SB_BACKDROP) -> bool {
-	return (clay.UI(clay.ID(id))(
-			clay.ElementDeclaration {
-				layout = {
-					sizing = {
-						width = clay.SizingFixed(f32(gcore.SCREEN_WIDTH)),
-						height = clay.SizingFixed(f32(gcore.SCREEN_HEIGHT)),
-					},
-					padding = clay.Padding{left = 24, right = 24, top = 24, bottom = 24},
-					layoutDirection = .TopToBottom,
-					childAlignment = {x = .Center, y = .Center},
-				},
-				backgroundColor = clay_color(color),
-				floating = {
-					attachTo = .Parent,
-					attachment = {element = .LeftTop, parent = .LeftTop},
-				},
-			},
-			))
+// full-screen dim backdrop that centers its children on BOTH axes. Returns a decl —
+// the CALLER must open it so Clay's deferred close binds to the caller's scope:
+//   if clay.UI(clay.ID("title-backdrop"))(clay_menu_backdrop_decl()) {
+//       clay_render_title_embers(engine)
+//       if clay.UI(clay.ID("title-card"))(clay_menu_card_decl()) { ...content... }
+//   }
+// (Wrapping clay.UI inside a bool-returning helper closes the element immediately on
+// return, so children escape to the parent — hence decl-returning helpers.)
+clay_menu_backdrop_decl :: proc(
+	color := ui_pkg.SB_BACKDROP,
+	floating := false,
+) -> clay.ElementDeclaration {
+	decl := clay.ElementDeclaration {
+		layout = {
+			sizing = {width = clay.SizingGrow(), height = clay.SizingGrow()},
+			padding = clay.Padding{left = 24, right = 24, top = 24, bottom = 24},
+			layoutDirection = .TopToBottom,
+			childAlignment = {x = .Center, y = .Center},
+		},
+		backgroundColor = clay_color(color),
+	}
+	// Floating overlays (drawn over the live HUD) must cover the full screen out of
+	// normal flow. Pure-menu screens are the sole root child, so a non-floating Grow
+	// container fills the screen and centers the fixed-width card via childAlignment.
+	if floating {
+		decl.layout.sizing = {
+			width  = clay.SizingFixed(f32(gcore.SCREEN_WIDTH)),
+			height = clay.SizingFixed(f32(gcore.SCREEN_HEIGHT)),
+		}
+		decl.floating = {
+			attachTo = .Parent,
+			attachment = {element = .LeftTop, parent = .LeftTop},
+		}
+	}
+	return decl
 }
 
-// centered framed card. SB_PANEL bg, 1px SB_DIVIDER border {1,1,1,1,0}, cornerRadius {8,8,8,8},
-// padding {left=28,right=28,top=24,bottom=22}, childGap=8, layoutDirection=.TopToBottom,
-// childAlignment={x=.Center,y=.Top}, sizing width=SizingFixed(width), height=SizingFit().
-clay_menu_card_begin :: proc(id: string, width: f32 = 560) -> bool {
-	return (clay.UI(clay.ID(id))(
-			clay.ElementDeclaration {
-				layout = {
-					sizing = {width = clay.SizingFixed(width), height = clay.SizingFit()},
-					padding = clay.Padding{left = 28, right = 28, top = 24, bottom = 22},
-					childGap = 8,
-					layoutDirection = .TopToBottom,
-					childAlignment = {x = .Center, y = .Top},
-				},
-				backgroundColor = clay_color(ui_pkg.SB_PANEL),
-				cornerRadius = {8, 8, 8, 8},
-				border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {1, 1, 1, 1, 0}},
-			},
-			))
+// centered framed card. SB_CARD bg, 2px SB_DIVIDER border, cornerRadius 8, fixed width,
+// SizingFit height. Returns a decl — caller opens it (see clay_menu_backdrop_decl).
+clay_menu_card_decl :: proc(width: f32 = 680) -> clay.ElementDeclaration {
+	return clay.ElementDeclaration {
+		layout = {
+			sizing = {width = clay.SizingFixed(width), height = clay.SizingFit()},
+			padding = clay.Padding{left = 28, right = 28, top = 24, bottom = 22},
+			childGap = 8,
+			layoutDirection = .TopToBottom,
+			childAlignment = {x = .Center, y = .Top},
+		},
+		backgroundColor = clay_color(ui_pkg.SB_CARD),
+		cornerRadius = {8, 8, 8, 8},
+		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {2, 2, 2, 2, 0}},
+	}
 }
 
 // decorative full-width 3px gold rule (SB_ACCENT). Use right under the title.
@@ -169,5 +180,5 @@ clay_menu_footer :: proc(id: string, text: string) {
 	clay_spacer_fixed(fmt.tprintf("%s-gap", id), 1, 14)
 	clay_theme_divider(fmt.tprintf("%s-rule", id))
 	clay_spacer_fixed(fmt.tprintf("%s-gap2", id), 1, 8)
-	clay_text_centered(text, 13, ui_pkg.SB_DIM)
+	clay_text_centered(text, 15, ui_pkg.SB_DIM)
 }

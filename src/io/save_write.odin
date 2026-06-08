@@ -101,6 +101,18 @@ save_game_to_storage :: proc(
 		floor_to_save(game.visited_floors[depth], &data.visited_floors[depth])
 	}
 
+	// ── Write dialogue persistent state ──
+	data.seen_conv_count = game.seen_count
+	for i in 0 ..< game.seen_count {
+		data.seen_convs[i] = game.seen_convs[i]
+		data.seen_lens[i] = game.seen_lens[i]
+	}
+	data.dlg_flag_count = game.dlg_flag_count
+	for i in 0 ..< game.dlg_flag_count {
+		data.dlg_flags[i] = game.dlg_flags[i]
+		data.dlg_flag_lens[i] = game.dlg_flag_lens[i]
+	}
+
 	// ── Serialize header + data as raw bytes ──
 	total_size := size_of(Save_Header) + size_of(Save_Data)
 	buf := make([]u8, total_size)

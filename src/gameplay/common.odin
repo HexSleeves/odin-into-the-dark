@@ -166,6 +166,15 @@ spawn_treasure_vault :: genpkg.spawn_treasure_vault
 spawn_floor_event :: genpkg.spawn_floor_event
 generate_town :: genpkg.generate_town
 place_town_npcs :: gcore.place_town_npcs
+dialogue_current_line :: gcore.dialogue_current_line
+dialogue_current_node :: gcore.dialogue_current_node
+dialogue_has_flag :: gcore.dialogue_has_flag
+dialogue_set_flag :: gcore.dialogue_set_flag
+dialogue_clear_flag :: gcore.dialogue_clear_flag
+dialogue_has_seen :: gcore.dialogue_has_seen
+dialogue_mark_seen :: gcore.dialogue_mark_seen
+dialogue_check_requires :: gcore.dialogue_check_requires
+dialogue_select_conv :: gcore.dialogue_select_conv
 find_farthest_floor :: genpkg.find_farthest_floor
 
 // ─── AI package ───────────────────────────────────────────────────────────────

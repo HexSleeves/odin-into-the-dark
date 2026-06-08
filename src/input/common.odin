@@ -124,6 +124,10 @@ save_manager_save_exists :: gameio.save_manager_save_exists
 logger_debugf :: gameio.logger_debugf
 
 // ─── Gameplay helpers ─────────────────────────────────────────────────────────
+start_conversation :: gp.start_conversation
+advance_dialogue :: gp.advance_dialogue
+confirm_dialogue_choice :: gp.confirm_dialogue_choice
+close_dialogue :: gp.close_dialogue
 descend :: gp.descend
 descend_allowed :: gp.descend_allowed
 add_descent_locked_message :: gp.add_descent_locked_message

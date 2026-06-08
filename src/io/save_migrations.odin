@@ -18,6 +18,20 @@ load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok:
 		return data, true
 	}
 
+	if header.version == SAVE_VERSION_V7 {
+		expected_size := size_of(Save_Header) + size_of(Save_Data_V7)
+		if len(buf) != expected_size {return nil, false}
+		old := new(Save_Data_V7)
+		if old == nil {return nil, false}
+		defer free(old)
+		mem.copy(old, &buf[data_offset], size_of(Save_Data_V7))
+		data = new(Save_Data)
+		if data == nil {return nil, false}
+		// V8 is V7 + dialogue state. Copy V7 prefix; dialogue fields zero-init.
+		mem.copy(data, old, size_of(Save_Data_V7))
+		return data, true
+	}
+
 	if header.version == SAVE_VERSION_V6 {
 		expected_size := size_of(Save_Header) + size_of(Save_Data_V6)
 		if len(buf) != expected_size {return nil, false}

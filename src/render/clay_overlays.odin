@@ -26,9 +26,9 @@ clay_render_title_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	has_save := gcore.save_manager_save_exists(saves)
 	options := ui_pkg.UI_TITLE_OPTIONS
 
-	if clay_menu_backdrop_begin("title-backdrop") {
+	if clay.UI(clay.ID("title-backdrop"))(clay_menu_backdrop_decl()) {
 		clay_render_title_embers(engine)
-		if clay_menu_card_begin("title-card") {
+		if clay.UI(clay.ID("title-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_APP_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_TITLE_SUBTITLE)
 			clay_menu_accent_rule("title-rule")
@@ -98,8 +98,8 @@ clay_render_title_embers :: proc(engine: ^eng.Engine) {
 
 clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
-	if clay_menu_backdrop_begin("inventory-backdrop") {
-		if clay_menu_card_begin("inventory-card") {
+	if clay.UI(clay.ID("inventory-backdrop"))(clay_menu_backdrop_decl(floating = true)) {
+		if clay.UI(clay.ID("inventory-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_INVENTORY_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_INVENTORY_HELP)
 			clay_menu_accent_rule("inventory-rule")
@@ -150,8 +150,8 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 clay_render_crafting_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
-	if clay_menu_backdrop_begin("crafting-backdrop") {
-		if clay_menu_card_begin("crafting-card") {
+	if clay.UI(clay.ID("crafting-backdrop"))(clay_menu_backdrop_decl(floating = true)) {
+		if clay.UI(clay.ID("crafting-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_CRAFTING_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_CRAFTING_HELP)
 			clay_menu_accent_rule("crafting-rule")
@@ -181,8 +181,8 @@ clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = engine
 	_ = game
 	sections := ui_pkg.ui_help_sections()
-	if clay_menu_backdrop_begin("help-backdrop") {
-		if clay_menu_card_begin("help-card") {
+	if clay.UI(clay.ID("help-backdrop"))(clay_menu_backdrop_decl()) {
+		if clay.UI(clay.ID("help-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_HELP_TITLE)
 			clay_menu_accent_rule("help-rule")
 			for section, sidx in sections {
@@ -200,8 +200,8 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = game
 	table := score_manager_load(game_engine_score_manager(engine))
 	defer score_table_destroy(&table)
-	if clay_menu_backdrop_begin("scores-backdrop") {
-		if clay_menu_card_begin("scores-card") {
+	if clay.UI(clay.ID("scores-backdrop"))(clay_menu_backdrop_decl()) {
+		if clay.UI(clay.ID("scores-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_SCORES_TITLE)
 			clay_menu_accent_rule("scores-rule")
 			if table.count == 0 {
@@ -231,8 +231,8 @@ clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
-	if clay_menu_backdrop_begin("game-over-backdrop") {
-		if clay_menu_card_begin("game-over-card") {
+	if clay.UI(clay.ID("game-over-backdrop"))(clay_menu_backdrop_decl()) {
+		if clay.UI(clay.ID("game-over-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_GAME_OVER_TITLE, ui_pkg.SB_HP_LOW)
 			clay_menu_accent_rule("game-over-rule")
 			cause := game.death_cause if len(game.death_cause) > 0 else "Unknown cause of death"
@@ -251,8 +251,8 @@ clay_render_game_over_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 clay_render_victory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	turns := game_engine_turn_manager(engine)
-	if clay_menu_backdrop_begin("victory-backdrop") {
-		if clay_menu_card_begin("victory-card") {
+	if clay.UI(clay.ID("victory-backdrop"))(clay_menu_backdrop_decl()) {
+		if clay.UI(clay.ID("victory-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_VICTORY_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_VICTORY_SUBTITLE)
 			clay_menu_accent_rule("victory-rule")
@@ -273,8 +273,8 @@ clay_render_cheats_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
 	choice := 0
 	if ui != nil {choice = ui.cheat_choice}
-	if clay_menu_backdrop_begin("cheats-backdrop") {
-		if clay_menu_card_begin("cheats-card") {
+	if clay.UI(clay.ID("cheats-backdrop"))(clay_menu_backdrop_decl(floating = true)) {
+		if clay.UI(clay.ID("cheats-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_CHEATS_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_CHEATS_HELP)
 			clay_menu_accent_rule("cheats-rule")
@@ -308,20 +308,17 @@ clay_overlay_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
 }
 
 clay_equipment_line :: proc(label: string, equipment: ^gcore.Equipment, selected := false) {
-	if equipment != nil && equipment.occupied {
-		color := ui_pkg.SB_TITLE if selected else ui_pkg.SB_TEXT
-		clay_overlay_text(
-			fmt.tprintf(
-				"%s %s (+%d)",
-				label,
-				gcore.item_display_name(&equipment.item),
-				equipment.item.stat_bonus,
-			),
-			15,
-			color,
+	occupied := equipment != nil && equipment.occupied
+	text: string
+	if occupied {
+		text = fmt.tprintf(
+			"%s %s (+%d)",
+			label,
+			gcore.item_display_name(&equipment.item),
+			equipment.item.stat_bonus,
 		)
 	} else {
-		color := ui_pkg.SB_TITLE if selected else ui_pkg.SB_DIM
-		clay_overlay_text(fmt.tprintf("%s ---", label), 15, color)
+		text = fmt.tprintf("%s ---", label)
 	}
+	clay_menu_item(fmt.tprintf("equipment-%s", label), text, "", selected, !occupied)
 }

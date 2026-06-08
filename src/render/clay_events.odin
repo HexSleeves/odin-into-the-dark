@@ -4,6 +4,7 @@ import gcore "../core"
 import eng "../engine"
 import ui_pkg "../ui"
 import "core:fmt"
+import clay "libs:clay"
 
 // ─── Shrine overlay ──────────────────────────────────────────────────────────
 
@@ -18,8 +19,10 @@ SHRINE_BUFF_VALUES :: [3]int {
 clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	hp_cost := max(1, game.player.hp * gcore.SHRINE_HP_COST_PERCENT / 100)
 
-	if clay_menu_backdrop_begin("shrine-overlay", eng.Engine_Color{6, 5, 9, 140}) {
-		if clay_menu_card_begin("shrine-card", 480) {
+	if clay.UI(clay.ID("shrine-overlay"))(
+		clay_menu_backdrop_decl(eng.Engine_Color{6, 5, 9, 140}, floating = true),
+	) {
+		if clay.UI(clay.ID("shrine-card"))(clay_menu_card_decl(560)) {
 			clay_menu_title("SHRINE")
 			clay_menu_accent_rule("shrine-rule")
 			clay_menu_subtitle(
@@ -48,8 +51,10 @@ clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 clay_render_merchant_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	content := game_engine_content_manager(engine)
 
-	if clay_menu_backdrop_begin("merchant-overlay", eng.Engine_Color{6, 5, 9, 140}) {
-		if clay_menu_card_begin("merchant-card", 480) {
+	if clay.UI(clay.ID("merchant-overlay"))(
+		clay_menu_backdrop_decl(eng.Engine_Color{6, 5, 9, 140}, floating = true),
+	) {
+		if clay.UI(clay.ID("merchant-card"))(clay_menu_card_decl(560)) {
 			clay_menu_title("MERCHANT")
 			clay_menu_accent_rule("merchant-rule")
 			clay_menu_subtitle("Trade materials for goods", ui_pkg.SB_HEADER)

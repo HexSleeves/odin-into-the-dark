@@ -97,7 +97,9 @@ load_game_from_storage :: proc(
 	game.quest = data.quest
 	game.floor_entry_pos = data.floor_entry_pos
 	game.active_npc = -1
-	game.dialogue_line = 0
+	game.active_conv_idx = -1
+	game.active_node_idx = -1
+	game.dialogue_choice = -1
 	game.state = .Playing
 
 	// NPCs are deterministic — repopulate them when loading onto the surface.
@@ -111,6 +113,18 @@ load_game_from_storage :: proc(
 		if game.visited_floors[depth] != nil {
 			save_to_floor(content, &data.visited_floors[depth], game.visited_floors[depth])
 		}
+	}
+
+	// ── Restore dialogue persistent state ──
+	game.seen_count = data.seen_conv_count
+	for i in 0 ..< game.seen_count {
+		game.seen_convs[i] = data.seen_convs[i]
+		game.seen_lens[i] = data.seen_lens[i]
+	}
+	game.dlg_flag_count = data.dlg_flag_count
+	for i in 0 ..< game.dlg_flag_count {
+		game.dlg_flags[i] = data.dlg_flags[i]
+		game.dlg_flag_lens[i] = data.dlg_flag_lens[i]
 	}
 
 	// ── Restore ore veins ──

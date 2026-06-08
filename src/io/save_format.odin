@@ -6,7 +6,8 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-SAVE_VERSION :: u32(7)
+SAVE_VERSION :: u32(8)
+SAVE_VERSION_V7 :: u32(7)
 SAVE_VERSION_V6 :: u32(6)
 SAVE_VERSION_V4 :: u32(4)
 SAVE_VERSION_V3 :: u32(3)
@@ -104,7 +105,7 @@ Save_Header :: struct {
 	version: u32,
 }
 
-// Current save format (v7) — v6 is a strict prefix of this struct.
+// Current save format (v8) — v7 is a strict prefix of this struct.
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
 	tiles:                 [MAP_WIDTH * MAP_HEIGHT]Tile,
@@ -142,6 +143,47 @@ Save_Data :: struct {
 	// v6 additions
 	quest:                 Quest_State,
 	// v7 additions
+	floor_entry_pos:       Vec2,
+	visited_floor_present: [gcore.MAX_DEPTH + 1]bool,
+	visited_floors:        [gcore.MAX_DEPTH + 1]Save_Floor,
+	// v8 additions — dialogue persistent state
+	seen_conv_count:       int,
+	seen_convs:            [gcore.MAX_SEEN_CONVS][gcore.MAX_CONV_ID_LEN]u8,
+	seen_lens:             [gcore.MAX_SEEN_CONVS]int,
+	dlg_flag_count:        int,
+	dlg_flags:             [gcore.MAX_DLG_FLAGS][gcore.MAX_FLAG_LEN]u8,
+	dlg_flag_lens:         [gcore.MAX_DLG_FLAGS]int,
+}
+
+// v7 save format — byte-for-byte identical to Save_Data minus dialogue state.
+Save_Data_V7 :: struct {
+	tiles:                 [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:             [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:             [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	player:                Player,
+	enemy_count:           int,
+	enemies:               [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:            int,
+	items:                 [MAX_SAVE_ITEMS]Save_Item,
+	room_count:            int,
+	rooms:                 [MAX_SAVE_ROOMS]Room,
+	inventory:             [MAX_INVENTORY]Save_Inventory_Slot,
+	equipped_weapon:       Save_Equipment,
+	equipped_armor:        Save_Equipment,
+	equipped_helmet:       Save_Equipment,
+	depth:                 int,
+	turn_count:            int,
+	kills:                 int,
+	seed:                  u64,
+	light_boost_bonus:     int,
+	light_boost_turns:     int,
+	web_stuck_turns:       int,
+	water_slow_active:     bool,
+	items_found:           int,
+	poison_turns:          int,
+	burning_turns:         int,
+	frozen_turns:          int,
+	quest:                 Quest_State,
 	floor_entry_pos:       Vec2,
 	visited_floor_present: [gcore.MAX_DEPTH + 1]bool,
 	visited_floors:        [gcore.MAX_DEPTH + 1]Save_Floor,
