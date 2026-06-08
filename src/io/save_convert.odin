@@ -40,10 +40,12 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 	qn := 100
 	ms := 100
 	beh := ""
+	glyph := se.glyph
 	if def != nil {
 		qn = 100 if def.quickness == 0 else def.quickness
 		ms = 100 if def.move_speed == 0 else def.move_speed
 		beh = def.behavior
+		if len(def.glyph) > 0 {glyph = rune(def.glyph[0])}
 	}
 	return Enemy {
 		pos = se.pos,
@@ -52,7 +54,7 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 		attack = se.attack,
 		enemy_type = etype,
 		name = save_to_string(content, &se.name),
-		glyph = se.glyph,
+		glyph = glyph,
 		color = se.color,
 		alive = se.alive,
 		ability_type = save_to_string(content, &se.ability_type),
@@ -141,17 +143,23 @@ item_to_save :: proc(item: ^Item) -> Save_Item {
 }
 
 save_to_item :: proc(content: ^Content_Manager, si: ^Save_Item) -> Item {
+	itype := save_to_string(content, &si.item_type)
+	def := content_manager_item_def(content, itype)
+	glyph := si.glyph
+	if def != nil && len(def.glyph) > 0 {
+		glyph = rune(def.glyph[0])
+	}
 	return Item {
-		pos = si.pos,
-		item_type = save_to_string(content, &si.item_type),
-		name = save_to_string(content, &si.name),
-		glyph = si.glyph,
-		color = si.color,
-		picked_up = si.picked_up,
-		quantity = si.quantity,
+		pos            = si.pos,
+		item_type      = itype,
+		name           = save_to_string(content, &si.name),
+		glyph          = glyph,
+		color          = si.color,
+		picked_up      = si.picked_up,
+		quantity       = si.quantity,
 		equipment_slot = save_to_string(content, &si.equipment_slot),
-		stat_bonus = si.stat_bonus,
-		durability = si.durability,
+		stat_bonus     = si.stat_bonus,
+		durability     = si.durability,
 		max_durability = si.max_durability,
 	}
 }

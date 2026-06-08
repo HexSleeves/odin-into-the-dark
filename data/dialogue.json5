@@ -5,7 +5,6 @@
             id: "old_miner_intro",
             npc_role: "Old_Miner",
             priority: 10,
-            one_shot: true,
             requires: { quest_is: "Not_Started" },
             start: "hook",
             nodes: [

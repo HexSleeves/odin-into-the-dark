@@ -180,5 +180,5 @@ clay_menu_footer :: proc(id: string, text: string) {
 	clay_spacer_fixed(fmt.tprintf("%s-gap", id), 1, 14)
 	clay_theme_divider(fmt.tprintf("%s-rule", id))
 	clay_spacer_fixed(fmt.tprintf("%s-gap2", id), 1, 8)
-	clay_text_centered(text, 15, ui_pkg.SB_DIM)
+	clay_text_centered(text, 15, ui_pkg.SB_HEADER)
 }

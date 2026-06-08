@@ -8,9 +8,9 @@ SB_BG :: eng.Engine_Color{11, 10, 15, 255} // #0B0A0F screen void / sidebar base
 SB_PANEL :: eng.Engine_Color{21, 19, 28, 255} // #15131C readout panel background
 SB_DIVIDER :: eng.Engine_Color{58, 53, 80, 255} // #3A3550 panel border / divider
 SB_TITLE :: eng.Engine_Color{245, 182, 56, 255} // #F5B638 gold accent (treasure/title)
-SB_HEADER :: eng.Engine_Color{138, 130, 112, 255} // #8A8270 panel header labels
+SB_HEADER :: eng.Engine_Color{176, 167, 145, 255} // #B0A791 panel header labels
 SB_TEXT :: eng.Engine_Color{232, 223, 200, 255} // #E8DFC8 primary text
-SB_DIM :: eng.Engine_Color{90, 86, 72, 255} // #5A5648 passive/secondary
+SB_DIM :: eng.Engine_Color{140, 133, 113, 255} // #8C8571 passive/secondary
 SB_HP_BG :: eng.Engine_Color{30, 20, 20, 255} // HP bar empty cell
 SB_HP_FG :: eng.Engine_Color{111, 191, 115, 255} // #6FBF73 HP healthy
 SB_HP_LOW :: eng.Engine_Color{216, 69, 62, 255} // #D8453E HP danger
