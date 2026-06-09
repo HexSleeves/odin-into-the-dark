@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: |
           mkdir -p build/linux
-          odin build src/ -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check -define:PUBLIC_BUILD=true
+          odin build src/ -out:build/linux/into_the_depths -o:speed -disable-assert -no-bounds-check -collection:libs=vendor/ -define:PUBLIC_BUILD=true
 
       - name: Package
         run: |
@@ -76,7 +76,7 @@ jobs:
       - name: Build
         run: |
           mkdir -p build/macos
-          odin build src/ -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check -define:PUBLIC_BUILD=true
+          odin build src/ -out:build/macos/into_the_depths -o:speed -disable-assert -no-bounds-check -collection:libs=vendor/ -define:PUBLIC_BUILD=true
 
       - name: Bundle .app
         run: bash scripts/bundle_macos.sh build/macos/into_the_depths
@@ -125,7 +125,6 @@ jobs:
 
   release:
     needs: [build-linux, build-macos-arm64, build-web]
-    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -136,7 +135,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
-          fail_on_unmatched_files: false
+          fail_on_unmatched_files: true
           files: |
             into_the_depths-linux-x86_64.tar.gz
             into_the_depths-macos-arm64.tar.gz
