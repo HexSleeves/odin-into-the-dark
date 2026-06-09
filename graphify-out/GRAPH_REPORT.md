@@ -1,7 +1,7 @@
 # Graph Report - odin-into-the-dark  (2026-06-09)
 
 ## Corpus Check
-- 53 files · ~106,718 words
+- 53 files · ~106,771 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `95310060`
+- Built from commit: `d81a712b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

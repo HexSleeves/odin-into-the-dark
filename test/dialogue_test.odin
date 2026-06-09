@@ -36,11 +36,8 @@ dialogue_select_conv_returns_false_when_no_conversation_matches :: proc(t: ^test
 	game := game_init(&content)
 	defer game_destroy(game)
 
-	// Quest Not_Started + old_miner_intro already seen → no match (one_shot seen).
-	game.quest = .Not_Started
-	dialogue_mark_seen(game, "old_miner_intro")
-	// old_miner_active requires quest Active, old_miner_found requires Treasure_Found
-	// → no Old_Miner conversation matches
+	game.quest = .Complete
+	dialogue_mark_seen(game, "old_miner_found")
 	_, ok := dialogue_select_conv(&content, game, .Old_Miner)
 	testing.expect(t, !ok)
 }
@@ -54,7 +51,7 @@ dialogue_select_conv_respects_quest_state_filter :: proc(t: ^testing.T) {
 	game := game_init(&content)
 	defer game_destroy(game)
 
-	// Quest Active: old_miner_active should be selected (intro is one_shot and requires Not_Started).
+	// Quest Active: old_miner_active should be selected (intro requires Not_Started).
 	game.quest = .Active
 	idx, ok := dialogue_select_conv(&content, game, .Old_Miner)
 	testing.expect(t, ok)
@@ -251,7 +248,7 @@ close_dialogue_resets_active_state :: proc(t: ^testing.T) {
 }
 
 @(test)
-one_shot_conversation_is_marked_seen_after_completion :: proc(t: ^testing.T) {
+repeatable_conversation_is_not_marked_seen_after_completion :: proc(t: ^testing.T) {
 	content := content_manager_make()
 	defer content_manager_destroy(&content)
 	testing.expect(t, content_manager_load_all(&content))
@@ -281,7 +278,7 @@ one_shot_conversation_is_marked_seen_after_completion :: proc(t: ^testing.T) {
 	// decline has no next → conversation closes
 	advance_dialogue(&messages, &content, game)
 
-	testing.expect(t, dialogue_has_seen(game, "old_miner_intro"))
+	testing.expect(t, !dialogue_has_seen(game, "old_miner_intro"))
 }
 
 

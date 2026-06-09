@@ -161,6 +161,7 @@ engine_run_uses_configured_platform_backend :: proc(t: ^testing.T) {
 @(test)
 engine_shutdown_allows_app_without_shutdown_callback :: proc(t: ^testing.T) {
 	platform_state := Test_Platform_State{}
+	texture_state := Test_Texture_Backend_State{}
 	app_state := Test_Run_App_State{}
 	config := engine_config_make(640, 360, "Nil Shutdown Test", 60)
 	config.platform = Engine_Platform_Backend {
@@ -170,6 +171,11 @@ engine_shutdown_allows_app_without_shutdown_callback :: proc(t: ^testing.T) {
 		set_target_fps      = test_platform_set_target_fps,
 		disable_exit_key    = test_platform_disable_exit_key,
 		window_should_close = test_platform_window_should_close,
+	}
+	config.texture = Engine_Texture_Backend {
+		ctx    = &texture_state,
+		load   = test_texture_load,
+		unload = test_texture_unload,
 	}
 	app := Game_App {
 		name     = "Nil Shutdown App",

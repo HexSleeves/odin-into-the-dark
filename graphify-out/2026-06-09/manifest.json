@@ -1,1087 +1,1497 @@
 {
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/combat.odin": {
+  "src/ai/combat.odin": {
     "mtime": 1780891197.7594814,
     "ast_hash": "4d828c17abb7c9721c174637c8a0ce85",
     "semantic_hash": "4d828c17abb7c9721c174637c8a0ce85"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/common.odin": {
+  "src/ai/common.odin": {
     "mtime": 1780891197.7575371,
     "ast_hash": "1bc4a2a056562f5ebcadad9102603d7f",
     "semantic_hash": "1bc4a2a056562f5ebcadad9102603d7f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_abilities.odin": {
+  "src/ai/enemy_abilities.odin": {
     "mtime": 1780891197.7600577,
     "ast_hash": "ab39233c44fc8d7e6eadde3ef92ddcb8",
     "semantic_hash": "ab39233c44fc8d7e6eadde3ef92ddcb8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_cleanup.odin": {
+  "src/ai/enemy_cleanup.odin": {
     "mtime": 1780891197.7577276,
     "ast_hash": "51550e16c2fcd4b71cee302d0c89ca01",
     "semantic_hash": "51550e16c2fcd4b71cee302d0c89ca01"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_factory.odin": {
+  "src/ai/enemy_factory.odin": {
     "mtime": 1780891197.757937,
     "ast_hash": "acabf600809c72d24c2f578ec3af21e5",
     "semantic_hash": "acabf600809c72d24c2f578ec3af21e5"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_pathfinding.odin": {
+  "src/ai/enemy_pathfinding.odin": {
     "mtime": 1780891197.7572882,
     "ast_hash": "c0f000a18cd1c64d897404b46799c589",
     "semantic_hash": "c0f000a18cd1c64d897404b46799c589"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_spawn.odin": {
+  "src/ai/enemy_spawn.odin": {
     "mtime": 1780891197.7591405,
     "ast_hash": "21e3e69acefcc373d8962de5792cdfca",
     "semantic_hash": "21e3e69acefcc373d8962de5792cdfca"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ai/enemy_turns.odin": {
+  "src/ai/enemy_turns.odin": {
     "mtime": 1780891197.7586079,
     "ast_hash": "6833dff275d5ea29bb9795d55eccf7fc",
     "semantic_hash": "6833dff275d5ea29bb9795d55eccf7fc"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/audio/accessors.odin": {
+  "src/audio/accessors.odin": {
     "mtime": 1780891197.7558424,
     "ast_hash": "79b16bc8b9f72d8768bef34139d64fc5",
     "semantic_hash": "79b16bc8b9f72d8768bef34139d64fc5"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/audio/audio.odin": {
+  "src/audio/audio.odin": {
     "mtime": 1780891197.7568638,
     "ast_hash": "362d67b1f2e46d499d6c6c587df6352c",
     "semantic_hash": "362d67b1f2e46d499d6c6c587df6352c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/audio/audio_manager.odin": {
+  "src/audio/audio_manager.odin": {
     "mtime": 1780891197.7570434,
     "ast_hash": "7dd6bae99bd6eac3f71293adc55d435d",
     "semantic_hash": "7dd6bae99bd6eac3f71293adc55d435d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/audio/audio_raylib.odin": {
+  "src/audio/audio_raylib.odin": {
     "mtime": 1780891197.7556593,
     "ast_hash": "415530301c87d27f037756eceac50a2e",
     "semantic_hash": "415530301c87d27f037756eceac50a2e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/audio/music.odin": {
+  "src/audio/music.odin": {
     "mtime": 1780891197.7564602,
     "ast_hash": "8d0c7139dc809ac878e301b83a2bcfd0",
     "semantic_hash": "8d0c7139dc809ac878e301b83a2bcfd0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/build_config.odin": {
+  "src/build_config.odin": {
     "mtime": 1780891197.7180536,
     "ast_hash": "d592e41526a6a990d148fb949c973375",
     "semantic_hash": "d592e41526a6a990d148fb949c973375"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/content_manager.odin": {
+  "src/content_manager.odin": {
     "mtime": 1780891197.7196538,
     "ast_hash": "bb90e1bf89d806dd3ee869f5d57389b3",
     "semantic_hash": "bb90e1bf89d806dd3ee869f5d57389b3"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/cheat_defs.odin": {
+  "src/core/cheat_defs.odin": {
     "mtime": 1780891197.7211273,
     "ast_hash": "ad4acc8ac1f4e33000d63f188b8a26e2",
     "semantic_hash": "ad4acc8ac1f4e33000d63f188b8a26e2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/constants.odin": {
+  "src/core/constants.odin": {
     "mtime": 1780891197.7240436,
     "ast_hash": "6812f63915572c6d53a302d00306fced",
     "semantic_hash": "6812f63915572c6d53a302d00306fced"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/content_ids.odin": {
+  "src/core/content_ids.odin": {
     "mtime": 1780891197.724654,
     "ast_hash": "942b40cdabd470bfe9f185d7cd7c6ef6",
     "semantic_hash": "942b40cdabd470bfe9f185d7cd7c6ef6"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/content_manager.odin": {
+  "src/core/content_manager.odin": {
     "mtime": 1780891197.7279272,
     "ast_hash": "ffecdc65a89f3db73b0f49031cf48e78",
     "semantic_hash": "ffecdc65a89f3db73b0f49031cf48e78"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/data_defs.odin": {
+  "src/core/data_defs.odin": {
     "mtime": 1780891197.7262616,
     "ast_hash": "d554709942984699fc0e9a286f23f63d",
     "semantic_hash": "d554709942984699fc0e9a286f23f63d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/data_factory.odin": {
+  "src/core/data_factory.odin": {
     "mtime": 1780891197.7257712,
     "ast_hash": "7b4313e69f19925cdc8f51ee4e6113c4",
     "semantic_hash": "7b4313e69f19925cdc8f51ee4e6113c4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/dialogue.odin": {
+  "src/core/dialogue.odin": {
     "mtime": 1780966505.3399694,
     "ast_hash": "af22f52eee5174c3d741acd46b62052b",
     "semantic_hash": "af22f52eee5174c3d741acd46b62052b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/directions.odin": {
+  "src/core/directions.odin": {
     "mtime": 1780891197.7267256,
     "ast_hash": "51dfbfd1df326e4221205b2dc62a8e9f",
     "semantic_hash": "51dfbfd1df326e4221205b2dc62a8e9f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/equipment.odin": {
+  "src/core/equipment.odin": {
     "mtime": 1780891197.7264745,
     "ast_hash": "71faa2f5609982bfb8511a0ae18e9fbc",
     "semantic_hash": "71faa2f5609982bfb8511a0ae18e9fbc"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/game_utils.odin": {
+  "src/core/game_utils.odin": {
     "mtime": 1780891197.7225802,
     "ast_hash": "099a963288ed6286a33d1bb5eba99ce1",
     "semantic_hash": "099a963288ed6286a33d1bb5eba99ce1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/gameplay_tuning.odin": {
+  "src/core/gameplay_tuning.odin": {
     "mtime": 1780891197.7236817,
     "ast_hash": "51c44e78d4ddd278c3653fd52b7c9871",
     "semantic_hash": "51c44e78d4ddd278c3653fd52b7c9871"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/inventory.odin": {
+  "src/core/inventory.odin": {
     "mtime": 1780891197.7253008,
     "ast_hash": "2bc1337cec357a161db546a8533d264c",
     "semantic_hash": "2bc1337cec357a161db546a8533d264c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/item_helpers.odin": {
+  "src/core/item_helpers.odin": {
     "mtime": 1780891197.725494,
     "ast_hash": "7e3c33f8e29e0dd631aeae69f87252a2",
     "semantic_hash": "7e3c33f8e29e0dd631aeae69f87252a2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/palette.odin": {
+  "src/core/palette.odin": {
     "mtime": 1780891197.7270336,
     "ast_hash": "cfcef125d865d939a17cce617b62bdeb",
     "semantic_hash": "cfcef125d865d939a17cce617b62bdeb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/recipes.odin": {
+  "src/core/recipes.odin": {
     "mtime": 1780891197.7244155,
     "ast_hash": "d759d6385936bb3749f4cf7fba108282",
     "semantic_hash": "d759d6385936bb3749f4cf7fba108282"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/save_manager.odin": {
+  "src/core/save_manager.odin": {
     "mtime": 1780891197.72341,
     "ast_hash": "682e92af864801d19a3afafd859d3ae9",
     "semantic_hash": "682e92af864801d19a3afafd859d3ae9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/screen_layout.odin": {
+  "src/core/screen_layout.odin": {
     "mtime": 1780891197.727226,
     "ast_hash": "67396d9d0fcf4a11f2a9f906e1938668",
     "semantic_hash": "67396d9d0fcf4a11f2a9f906e1938668"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/service_ids.odin": {
+  "src/core/service_ids.odin": {
     "mtime": 1780891197.7274842,
     "ast_hash": "c7a5cd1b176d8e9fa49ff0db3b640975",
     "semantic_hash": "c7a5cd1b176d8e9fa49ff0db3b640975"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/types.odin": {
+  "src/core/types.odin": {
     "mtime": 1780891197.7217002,
     "ast_hash": "5b70c5daf29351ba8634977ce16d0c1e",
     "semantic_hash": "5b70c5daf29351ba8634977ce16d0c1e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/core/ui_constants.odin": {
+  "src/core/ui_constants.odin": {
     "mtime": 1780891197.7249231,
     "ast_hash": "9bbb1292b0c0962f10856028a4ae32fb",
     "semantic_hash": "9bbb1292b0c0962f10856028a4ae32fb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/data.odin": {
+  "src/data.odin": {
     "mtime": 1780891197.7194088,
     "ast_hash": "fbc5a24726ee269c6d1c4ed00512db7c",
     "semantic_hash": "fbc5a24726ee269c6d1c4ed00512db7c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/action_input_manager.odin": {
+  "src/engine/action_input_manager.odin": {
     "mtime": 1780891197.7743633,
     "ast_hash": "0edc5a52d28355207f0a6369d81d5a03",
     "semantic_hash": "0edc5a52d28355207f0a6369d81d5a03"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/audio_backend.odin": {
+  "src/engine/audio_backend.odin": {
     "mtime": 1780891197.7758837,
     "ast_hash": "9f665ac3bf5e1bf1e17e93cfb72c60d3",
     "semantic_hash": "9f665ac3bf5e1bf1e17e93cfb72c60d3"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/audio_manager.odin": {
+  "src/engine/audio_manager.odin": {
     "mtime": 1780891197.7728624,
     "ast_hash": "3f8f75d8a31e48593dda90c2dc3500f4",
     "semantic_hash": "3f8f75d8a31e48593dda90c2dc3500f4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/bool_grid_manager.odin": {
+  "src/engine/bool_grid_manager.odin": {
     "mtime": 1780891197.7771442,
     "ast_hash": "086aa80d65d0a50c231151dcf362c407",
     "semantic_hash": "086aa80d65d0a50c231151dcf362c407"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/camera_manager.odin": {
+  "src/engine/camera_manager.odin": {
     "mtime": 1780891197.7666743,
     "ast_hash": "8f92a48d8fbb1c758608e24bfac2699e",
     "semantic_hash": "8f92a48d8fbb1c758608e24bfac2699e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/config_manager.odin": {
+  "src/engine/config_manager.odin": {
     "mtime": 1780891197.7766085,
     "ast_hash": "730fed1e3c3fe333bbab031508e3f372",
     "semantic_hash": "730fed1e3c3fe333bbab031508e3f372"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/distance_map.odin": {
+  "src/engine/distance_map.odin": {
     "mtime": 1780891197.777397,
     "ast_hash": "02d2d1aed4860b540f86eab19b10603e",
     "semantic_hash": "02d2d1aed4860b540f86eab19b10603e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/engine.odin": {
+  "src/engine/engine.odin": {
     "mtime": 1780891197.768357,
     "ast_hash": "7f47ea2a08ea5090fe4208c21f6c1c12",
     "semantic_hash": "7f47ea2a08ea5090fe4208c21f6c1c12"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/engine_services.odin": {
+  "src/engine/engine_services.odin": {
     "mtime": 1780891197.7716143,
     "ast_hash": "d2307c273923f430c137995f8980cf6c",
     "semantic_hash": "d2307c273923f430c137995f8980cf6c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/event_manager.odin": {
+  "src/engine/event_manager.odin": {
     "mtime": 1780891197.777931,
     "ast_hash": "29366f36f24bc929ce51eb609e8202bb",
     "semantic_hash": "29366f36f24bc929ce51eb609e8202bb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/file_system.odin": {
+  "src/engine/file_system.odin": {
     "mtime": 1780891197.769492,
     "ast_hash": "741f6454be4d92b3014ffe24fcf27eb2",
     "semantic_hash": "741f6454be4d92b3014ffe24fcf27eb2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/file_system_desktop.odin": {
+  "src/engine/file_system_desktop.odin": {
     "mtime": 1780891197.7776067,
     "ast_hash": "15e00353f96d79ef731a25890da4d263",
     "semantic_hash": "15e00353f96d79ef731a25890da4d263"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/file_system_web.odin": {
+  "src/engine/file_system_web.odin": {
     "mtime": 1780891197.7684832,
     "ast_hash": "4f852c2c77120d233e010810db57f6bd",
     "semantic_hash": "4f852c2c77120d233e010810db57f6bd"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/frame_manager.odin": {
+  "src/engine/frame_manager.odin": {
     "mtime": 1780891197.7691848,
     "ast_hash": "2d0f45c55a725037313ab266b1c66047",
     "semantic_hash": "2d0f45c55a725037313ab266b1c66047"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/grid_2d.odin": {
+  "src/engine/grid_2d.odin": {
     "mtime": 1780891197.7671854,
     "ast_hash": "86d619058b4a5b707b928ec7cb663dee",
     "semantic_hash": "86d619058b4a5b707b928ec7cb663dee"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/grid_manager_helpers.odin": {
+  "src/engine/grid_manager_helpers.odin": {
     "mtime": 1780891197.7760756,
     "ast_hash": "3892a4204307ce99344a17dc9383e8c9",
     "semantic_hash": "3892a4204307ce99344a17dc9383e8c9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/input_backend.odin": {
+  "src/engine/input_backend.odin": {
     "mtime": 1780891197.7705073,
     "ast_hash": "4aea14bd0682d1b56ed5bdabaca4d786",
     "semantic_hash": "4aea14bd0682d1b56ed5bdabaca4d786"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/input_backend_raylib.odin": {
+  "src/engine/input_backend_raylib.odin": {
     "mtime": 1780891197.772188,
     "ast_hash": "30d1d8855bd21f653de3dadab96cde67",
     "semantic_hash": "30d1d8855bd21f653de3dadab96cde67"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/message_manager.odin": {
+  "src/engine/message_manager.odin": {
     "mtime": 1780891197.7689486,
     "ast_hash": "523db3f684ab019beb903e1ff6dde4c4",
     "semantic_hash": "523db3f684ab019beb903e1ff6dde4c4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/particle_manager.odin": {
+  "src/engine/particle_manager.odin": {
     "mtime": 1780891197.7738364,
     "ast_hash": "2928a24de27b141804909dfd3e1f361a",
     "semantic_hash": "2928a24de27b141804909dfd3e1f361a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/platform_backend.odin": {
+  "src/engine/platform_backend.odin": {
     "mtime": 1780891197.7674508,
     "ast_hash": "8ff430b4bf3f9f80e2a45519f24aebe7",
     "semantic_hash": "8ff430b4bf3f9f80e2a45519f24aebe7"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/platform_backend_raylib.odin": {
+  "src/engine/platform_backend_raylib.odin": {
     "mtime": 1780891197.768704,
     "ast_hash": "9ecb7b056e2b7915e379788045ded464",
     "semantic_hash": "9ecb7b056e2b7915e379788045ded464"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/render_backend.odin": {
+  "src/engine/render_backend.odin": {
     "mtime": 1780891197.7711654,
     "ast_hash": "5d1a41b4ce4baa76d5d6e9a6c566b512",
     "semantic_hash": "5d1a41b4ce4baa76d5d6e9a6c566b512"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/render_backend_raylib.odin": {
+  "src/engine/render_backend_raylib.odin": {
     "mtime": 1780891197.7700436,
     "ast_hash": "1fc4ccccc6f68393049a48cbda25fd70",
     "semantic_hash": "1fc4ccccc6f68393049a48cbda25fd70"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/scene_manager.odin": {
+  "src/engine/scene_manager.odin": {
     "mtime": 1780891197.778771,
     "ast_hash": "192d5b7db982a480f647cb9c25615347",
     "semantic_hash": "192d5b7db982a480f647cb9c25615347"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/storage_manager.odin": {
+  "src/engine/storage_manager.odin": {
     "mtime": 1780891197.7782724,
     "ast_hash": "0d0f01e7300aefd0375ec0420135e004",
     "semantic_hash": "0d0f01e7300aefd0375ec0420135e004"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/texture_backend.odin": {
+  "src/engine/texture_backend.odin": {
     "mtime": 1780891197.771842,
     "ast_hash": "5490ec57efebd57e732899b2ab5a04d5",
     "semantic_hash": "5490ec57efebd57e732899b2ab5a04d5"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/texture_backend_raylib.odin": {
+  "src/engine/texture_backend_raylib.odin": {
     "mtime": 1780891197.7669287,
     "ast_hash": "06dec8ac48e8c0432cd6740f74120e52",
     "semantic_hash": "06dec8ac48e8c0432cd6740f74120e52"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/texture_manager.odin": {
+  "src/engine/texture_manager.odin": {
     "mtime": 1780891197.7747936,
     "ast_hash": "efed1bb30c6d5ce704913e2fb035f4df",
     "semantic_hash": "efed1bb30c6d5ce704913e2fb035f4df"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/tile_state_manager.odin": {
+  "src/engine/tile_state_manager.odin": {
     "mtime": 1780891197.773387,
     "ast_hash": "6604aab3347e39978634d2f03115f431",
     "semantic_hash": "6604aab3347e39978634d2f03115f431"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/turn_manager.odin": {
+  "src/engine/turn_manager.odin": {
     "mtime": 1780891197.7723994,
     "ast_hash": "a8d4c734900ef00af5e7183047446741",
     "semantic_hash": "a8d4c734900ef00af5e7183047446741"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/vfx_manager.odin": {
+  "src/engine/vfx_manager.odin": {
     "mtime": 1780891197.7726398,
     "ast_hash": "5016ac6536ed345894505dd10f39c150",
     "semantic_hash": "5016ac6536ed345894505dd10f39c150"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/engine/world_manager.odin": {
+  "src/engine/world_manager.odin": {
     "mtime": 1780891197.7677112,
     "ast_hash": "402e2c04cdcba3dd4c0a3b34469180c2",
     "semantic_hash": "402e2c04cdcba3dd4c0a3b34469180c2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/game_app_config.odin": {
+  "src/game_app_config.odin": {
     "mtime": 1780891197.7173262,
     "ast_hash": "67ad33b9c1dec41c6ff3302fdeec473d",
     "semantic_hash": "67ad33b9c1dec41c6ff3302fdeec473d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/game_app_lifecycle.odin": {
+  "src/game_app_lifecycle.odin": {
     "mtime": 1780891197.716878,
     "ast_hash": "8ac1c99b8b89ccc8cf9eaf58409fd0c2",
     "semantic_hash": "8ac1c99b8b89ccc8cf9eaf58409fd0c2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/game_services.odin": {
+  "src/game_services.odin": {
     "mtime": 1780891197.7185328,
     "ast_hash": "79c6c36ef6ca864837b04e6e636f3d68",
     "semantic_hash": "79c6c36ef6ca864837b04e6e636f3d68"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/actions.odin": {
+  "src/gameplay/actions.odin": {
     "mtime": 1780891197.7649977,
     "ast_hash": "ad99e228ead295c018636ea0bef3bc73",
     "semantic_hash": "ad99e228ead295c018636ea0bef3bc73"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/common.odin": {
+  "src/gameplay/common.odin": {
     "mtime": 1780891197.7614145,
     "ast_hash": "731b1c2723119d52f3a8b448f4757e4a",
     "semantic_hash": "731b1c2723119d52f3a8b448f4757e4a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/dialogue.odin": {
+  "src/gameplay/dialogue.odin": {
     "mtime": 1780966505.3402808,
     "ast_hash": "db2e924d413419884ccafdd416f7c70f",
     "semantic_hash": "db2e924d413419884ccafdd416f7c70f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/events.odin": {
+  "src/gameplay/events.odin": {
     "mtime": 1780891197.7633805,
     "ast_hash": "96dc315ffa9833c12cb81bb4508cbad2",
     "semantic_hash": "96dc315ffa9833c12cb81bb4508cbad2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/fov.odin": {
+  "src/gameplay/fov.odin": {
     "mtime": 1780891197.7661374,
     "ast_hash": "7fa94b120df381b8bf9d0c9399c839e0",
     "semantic_hash": "7fa94b120df381b8bf9d0c9399c839e0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/game_lifecycle.odin": {
+  "src/gameplay/game_lifecycle.odin": {
     "mtime": 1780891197.765551,
     "ast_hash": "0acb2d2f7ac9a0fab09f961b0f2070b3",
     "semantic_hash": "0acb2d2f7ac9a0fab09f961b0f2070b3"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/generation.odin": {
+  "src/gameplay/generation.odin": {
     "mtime": 1780891197.7640607,
     "ast_hash": "c0762ae940cd005dd0e8a48df8ad03f4",
     "semantic_hash": "c0762ae940cd005dd0e8a48df8ad03f4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/items.odin": {
+  "src/gameplay/items.odin": {
     "mtime": 1780891197.7608085,
     "ast_hash": "e7e1c6ce91be5faad256dcdf5be5d1bf",
     "semantic_hash": "e7e1c6ce91be5faad256dcdf5be5d1bf"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/mining.odin": {
+  "src/gameplay/mining.odin": {
     "mtime": 1780891197.7627697,
     "ast_hash": "e6adae5cc211976cb21a11fb18d5c16b",
     "semantic_hash": "e6adae5cc211976cb21a11fb18d5c16b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/restart.odin": {
+  "src/gameplay/restart.odin": {
     "mtime": 1780891197.7663357,
     "ast_hash": "f122cbc1c3e5dedcd0e6709a8560ae37",
     "semantic_hash": "f122cbc1c3e5dedcd0e6709a8560ae37"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gameplay/status_effects.odin": {
+  "src/gameplay/status_effects.odin": {
     "mtime": 1780891197.7623222,
     "ast_hash": "aa034c9ff6bd6bbfa1c8a9afaa9d7f79",
     "semantic_hash": "aa034c9ff6bd6bbfa1c8a9afaa9d7f79"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/common.odin": {
+  "src/gen/common.odin": {
     "mtime": 1780891197.7512243,
     "ast_hash": "e522127bd06f172ddb70ecc79caf73c1",
     "semantic_hash": "e522127bd06f172ddb70ecc79caf73c1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_events.odin": {
+  "src/gen/generation_events.odin": {
     "mtime": 1780891197.7522707,
     "ast_hash": "fde6c27b4c883615d55af3af16b55657",
     "semantic_hash": "fde6c27b4c883615d55af3af16b55657"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_features.odin": {
+  "src/gen/generation_features.odin": {
     "mtime": 1780891197.75346,
     "ast_hash": "c4e8e31385e3485e6e5e32d907de08c5",
     "semantic_hash": "c4e8e31385e3485e6e5e32d907de08c5"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_hazards.odin": {
+  "src/gen/generation_hazards.odin": {
     "mtime": 1780891197.7515402,
     "ast_hash": "bacc5074025593ca9e774e7794b16796",
     "semantic_hash": "bacc5074025593ca9e774e7794b16796"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_ore.odin": {
+  "src/gen/generation_ore.odin": {
     "mtime": 1780891197.752577,
     "ast_hash": "ca2f936b3d2b1afe1c15ca4aabceead9",
     "semantic_hash": "ca2f936b3d2b1afe1c15ca4aabceead9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_town.odin": {
+  "src/gen/generation_town.odin": {
     "mtime": 1780891197.7548518,
     "ast_hash": "1b6d75818a0f3af48e2aee75e9aa9ebb",
     "semantic_hash": "1b6d75818a0f3af48e2aee75e9aa9ebb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/generation_vault.odin": {
+  "src/gen/generation_vault.odin": {
     "mtime": 1780891197.7519736,
     "ast_hash": "033dd4d24981eab3d84e8681a43e4d1f",
     "semantic_hash": "033dd4d24981eab3d84e8681a43e4d1f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/mapgen_cave.odin": {
+  "src/gen/mapgen_cave.odin": {
     "mtime": 1780891197.7545912,
     "ast_hash": "7b1515d5bc2a35441567128fe592177d",
     "semantic_hash": "7b1515d5bc2a35441567128fe592177d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/gen/mapgen_rooms.odin": {
+  "src/gen/mapgen_rooms.odin": {
     "mtime": 1780891197.7530513,
     "ast_hash": "4c905c7d7ddcb6144070893b1a0f90fc",
     "semantic_hash": "4c905c7d7ddcb6144070893b1a0f90fc"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/cheats.odin": {
+  "src/input/cheats.odin": {
     "mtime": 1780891197.7315514,
     "ast_hash": "6434efe3217de6581ee38f69c8e170d8",
     "semantic_hash": "6434efe3217de6581ee38f69c8e170d8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/common.odin": {
+  "src/input/common.odin": {
     "mtime": 1780891197.7284455,
     "ast_hash": "78fee8b06d968e443827eaeb255159d4",
     "semantic_hash": "78fee8b06d968e443827eaeb255159d4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/global_state.odin": {
+  "src/input/global_state.odin": {
     "mtime": 1780891197.728631,
     "ast_hash": "f955374f87dfafb4235040fcefcebdad",
     "semantic_hash": "f955374f87dfafb4235040fcefcebdad"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/manager.odin": {
+  "src/input/manager.odin": {
     "mtime": 1780891197.7303865,
     "ast_hash": "e7fb84ff101d315c86ec1517dd01112d",
     "semantic_hash": "e7fb84ff101d315c86ec1517dd01112d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/playing_action.odin": {
+  "src/input/playing_action.odin": {
     "mtime": 1780966505.340519,
     "ast_hash": "fccb76b8d5185a01f3cb51717c29184f",
     "semantic_hash": "fccb76b8d5185a01f3cb51717c29184f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/playing_state.odin": {
+  "src/input/playing_state.odin": {
     "mtime": 1780891197.7320645,
     "ast_hash": "445ecca25c0f2aecf706619e67ce4b53",
     "semantic_hash": "445ecca25c0f2aecf706619e67ce4b53"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/state_dialogue.odin": {
+  "src/input/state_dialogue.odin": {
     "mtime": 1780891197.7289062,
     "ast_hash": "c4671dd708ba5fcb7837ab2468040cd9",
     "semantic_hash": "c4671dd708ba5fcb7837ab2468040cd9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/state_events.odin": {
+  "src/input/state_events.odin": {
     "mtime": 1780891197.7323349,
     "ast_hash": "f1e49d4733f72fd16974e24ac8aad85b",
     "semantic_hash": "f1e49d4733f72fd16974e24ac8aad85b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/state_shared.odin": {
+  "src/input/state_shared.odin": {
     "mtime": 1780891197.730517,
     "ast_hash": "569aad323bb736162af1593c3f0f300a",
     "semantic_hash": "569aad323bb736162af1593c3f0f300a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/state_updates.odin": {
+  "src/input/state_updates.odin": {
     "mtime": 1780891197.7298534,
     "ast_hash": "caa559b89de5818a6c445f3a03bb0c54",
     "semantic_hash": "caa559b89de5818a6c445f3a03bb0c54"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/input/title_state.odin": {
+  "src/input/title_state.odin": {
     "mtime": 1780891197.7309804,
     "ast_hash": "c8e67b48343385982e2f2d8d16aa34d1",
     "semantic_hash": "c8e67b48343385982e2f2d8d16aa34d1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/accessors.odin": {
+  "src/io/accessors.odin": {
     "mtime": 1780891197.7329104,
     "ast_hash": "26a4035b5bca6dd0d617203e642892fd",
     "semantic_hash": "26a4035b5bca6dd0d617203e642892fd"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/karl2d_backend.odin": {
+  "src/io/karl2d_backend.odin": {
     "mtime": 1780891197.7344317,
     "ast_hash": "c6fa322155b8918b6179525b594b8608",
     "semantic_hash": "c6fa322155b8918b6179525b594b8608"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/logger.odin": {
+  "src/io/logger.odin": {
     "mtime": 1780891197.7380137,
     "ast_hash": "026eb811d0fc233e231bde1f7d791aa8",
     "semantic_hash": "026eb811d0fc233e231bde1f7d791aa8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/logger_desktop.odin": {
+  "src/io/logger_desktop.odin": {
     "mtime": 1780891197.7360096,
     "ast_hash": "c93c9e775faba89df2746fba0054d3b0",
     "semantic_hash": "c93c9e775faba89df2746fba0054d3b0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/logger_web.odin": {
+  "src/io/logger_web.odin": {
     "mtime": 1780891197.7370229,
     "ast_hash": "1a409dfa23edcd41f98680847087c77a",
     "semantic_hash": "1a409dfa23edcd41f98680847087c77a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_common.odin": {
+  "src/io/save_common.odin": {
     "mtime": 1780891197.733794,
     "ast_hash": "dde87e44dabc244f1c8c215ae551c43f",
     "semantic_hash": "dde87e44dabc244f1c8c215ae551c43f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_convert.odin": {
+  "src/io/save_convert.odin": {
     "mtime": 1780923583.9757636,
     "ast_hash": "f506aa5a4a539166fe76f84558a2cb3c",
     "semantic_hash": "f506aa5a4a539166fe76f84558a2cb3c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_format.odin": {
+  "src/io/save_format.odin": {
     "mtime": 1780891197.7386699,
     "ast_hash": "e9f1c6bd3b7311b672d45a5823526db4",
     "semantic_hash": "e9f1c6bd3b7311b672d45a5823526db4"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_manager.odin": {
+  "src/io/save_manager.odin": {
     "mtime": 1780891197.7332244,
     "ast_hash": "0067aedec6c11fa972fbc6a6e2f7978d",
     "semantic_hash": "0067aedec6c11fa972fbc6a6e2f7978d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_migrations.odin": {
+  "src/io/save_migrations.odin": {
     "mtime": 1780891197.732694,
     "ast_hash": "85347a90f02da017087ae2c606f24669",
     "semantic_hash": "85347a90f02da017087ae2c606f24669"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_query.odin": {
+  "src/io/save_query.odin": {
     "mtime": 1780891197.7345824,
     "ast_hash": "d8fd1bdfe7f2fd5a2e125496b0a6824b",
     "semantic_hash": "d8fd1bdfe7f2fd5a2e125496b0a6824b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_restore.odin": {
+  "src/io/save_restore.odin": {
     "mtime": 1780966505.3408136,
     "ast_hash": "4eec770dc9f4c7dd71f642972c6e2c37",
     "semantic_hash": "4eec770dc9f4c7dd71f642972c6e2c37"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/save_write.odin": {
+  "src/io/save_write.odin": {
     "mtime": 1780966505.341051,
     "ast_hash": "95bf15e1a3cf2c3b9acf1061e94a0fa2",
     "semantic_hash": "95bf15e1a3cf2c3b9acf1061e94a0fa2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/io/web_assets.odin": {
+  "src/io/web_assets.odin": {
     "mtime": 1780891197.7368186,
     "ast_hash": "58c0556dc1111658a1a26ee4f20e3de7",
     "semantic_hash": "58c0556dc1111658a1a26ee4f20e3de7"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/main.odin": {
+  "src/main.odin": {
     "mtime": 1780891197.7170627,
     "ast_hash": "934f2d84ff87d57b3d3815dab6c7cb8f",
     "semantic_hash": "934f2d84ff87d57b3d3815dab6c7cb8f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/main_desktop.odin": {
+  "src/main_desktop.odin": {
     "mtime": 1780891197.71911,
     "ast_hash": "a7825f827f6bdcaca2c78dbd420e4a6d",
     "semantic_hash": "a7825f827f6bdcaca2c78dbd420e4a6d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/main_web_stub.odin": {
+  "src/main_web_stub.odin": {
     "mtime": 1780891197.7189171,
     "ast_hash": "9a2cac711f6fba4a7263b9f7f83b31a9",
     "semantic_hash": "9a2cac711f6fba4a7263b9f7f83b31a9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/build_config.odin": {
+  "src/render/build_config.odin": {
     "mtime": 1780891197.7407835,
     "ast_hash": "9d3f9ff001db2a94c2940ca0ac03cafb",
     "semantic_hash": "9d3f9ff001db2a94c2940ca0ac03cafb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_dialogue.odin": {
+  "src/render/clay_dialogue.odin": {
     "mtime": 1780891197.7502027,
     "ast_hash": "4658fe56746d21e3039e72567b3cf272",
     "semantic_hash": "4658fe56746d21e3039e72567b3cf272"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_events.odin": {
+  "src/render/clay_events.odin": {
     "mtime": 1780891197.7405863,
     "ast_hash": "66b86d0aaf02d61c1d40d6bb88db42d7",
     "semantic_hash": "66b86d0aaf02d61c1d40d6bb88db42d7"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_hud.odin": {
+  "src/render/clay_hud.odin": {
     "mtime": 1780891197.7423735,
     "ast_hash": "5451c03f661ed112d3d0c90131297125",
     "semantic_hash": "5451c03f661ed112d3d0c90131297125"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_menu.odin": {
+  "src/render/clay_menu.odin": {
     "mtime": 1780891197.7434306,
     "ast_hash": "f793dabda779d1d5f7477552a1cea0a3",
     "semantic_hash": "f793dabda779d1d5f7477552a1cea0a3"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_messages.odin": {
+  "src/render/clay_messages.odin": {
     "mtime": 1780891197.7495959,
     "ast_hash": "b43a8efc67994de8b757c6d45eba07d0",
     "semantic_hash": "b43a8efc67994de8b757c6d45eba07d0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_minimap.odin": {
+  "src/render/clay_minimap.odin": {
     "mtime": 1780891197.750776,
     "ast_hash": "87dcafe4e5a9e8db51b57bd8a87192d8",
     "semantic_hash": "87dcafe4e5a9e8db51b57bd8a87192d8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_overlays.odin": {
+  "src/render/clay_overlays.odin": {
     "mtime": 1780891197.7402802,
     "ast_hash": "02a4e14c3cf62db631fdca404c1861d6",
     "semantic_hash": "02a4e14c3cf62db631fdca404c1861d6"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_renderer.odin": {
+  "src/render/clay_renderer.odin": {
     "mtime": 1780891197.7491188,
     "ast_hash": "9d8e3e3c2c3aded577286d17233c8533",
     "semantic_hash": "9d8e3e3c2c3aded577286d17233c8533"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_screen_ui.odin": {
+  "src/render/clay_screen_ui.odin": {
     "mtime": 1780891197.746157,
     "ast_hash": "6241896dc5d0f9a63dec1ca767dd2bf2",
     "semantic_hash": "6241896dc5d0f9a63dec1ca767dd2bf2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_theme.odin": {
+  "src/render/clay_theme.odin": {
     "mtime": 1780891197.7485795,
     "ast_hash": "869ccc8f254b89ec4a3f92087cdbeb66",
     "semantic_hash": "869ccc8f254b89ec4a3f92087cdbeb66"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_tooltip.odin": {
+  "src/render/clay_tooltip.odin": {
     "mtime": 1780891197.739213,
     "ast_hash": "75b0e5e20a596479d5bdffa6b55cbffc",
     "semantic_hash": "75b0e5e20a596479d5bdffa6b55cbffc"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/clay_ui.odin": {
+  "src/render/clay_ui.odin": {
     "mtime": 1780891197.7414057,
     "ast_hash": "59e4d18f7521f41c1b65c00f612baf1d",
     "semantic_hash": "59e4d18f7521f41c1b65c00f612baf1d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/particles.odin": {
+  "src/render/particles.odin": {
     "mtime": 1780891197.749895,
     "ast_hash": "1b4881e57beef4ed8a66b3333f1a2d5f",
     "semantic_hash": "1b4881e57beef4ed8a66b3333f1a2d5f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render.odin": {
+  "src/render/render.odin": {
     "mtime": 1780891197.7451932,
     "ast_hash": "e789b33fab98fc23b423f286a1bda744",
     "semantic_hash": "e789b33fab98fc23b423f286a1bda744"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_color.odin": {
+  "src/render/render_color.odin": {
     "mtime": 1780891197.743685,
     "ast_hash": "d45034b334d24c0f354b0a0ba2a37c27",
     "semantic_hash": "d45034b334d24c0f354b0a0ba2a37c27"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_hud.odin": {
+  "src/render/render_hud.odin": {
     "mtime": 1780891197.7509694,
     "ast_hash": "7178928219a170dec746aff30e3dad01",
     "semantic_hash": "7178928219a170dec746aff30e3dad01"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_items.odin": {
+  "src/render/render_items.odin": {
     "mtime": 1780891197.7394063,
     "ast_hash": "9e3ce4d410ba28747609a61d7d540a47",
     "semantic_hash": "9e3ce4d410ba28747609a61d7d540a47"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_map.odin": {
+  "src/render/render_map.odin": {
     "mtime": 1780891197.7473474,
     "ast_hash": "f69a89874ca1d733aaba521c7fc47213",
     "semantic_hash": "f69a89874ca1d733aaba521c7fc47213"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_minimap.odin": {
+  "src/render/render_minimap.odin": {
     "mtime": 1780891197.750325,
     "ast_hash": "7178928219a170dec746aff30e3dad01",
     "semantic_hash": "7178928219a170dec746aff30e3dad01"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_title_fx.odin": {
+  "src/render/render_title_fx.odin": {
     "mtime": 1780891197.7480159,
     "ast_hash": "adee53c3716114b9d21ee6e730f03cf1",
     "semantic_hash": "adee53c3716114b9d21ee6e730f03cf1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_ui.odin": {
+  "src/render/render_ui.odin": {
     "mtime": 1780891197.7428656,
     "ast_hash": "7178928219a170dec746aff30e3dad01",
     "semantic_hash": "7178928219a170dec746aff30e3dad01"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/render_world.odin": {
+  "src/render/render_world.odin": {
     "mtime": 1780891197.7476401,
     "ast_hash": "846b1db2b1f34c5c9d16c3e450579820",
     "semantic_hash": "846b1db2b1f34c5c9d16c3e450579820"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/scores.odin": {
+  "src/render/scores.odin": {
     "mtime": 1780891197.7427378,
     "ast_hash": "71684ef0c5684ac5447fb6636a9c4ab0",
     "semantic_hash": "71684ef0c5684ac5447fb6636a9c4ab0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/services.odin": {
+  "src/render/services.odin": {
     "mtime": 1780891197.7441444,
     "ast_hash": "7b207dcf8f53e5bdc48b27251e9ed33e",
     "semantic_hash": "7b207dcf8f53e5bdc48b27251e9ed33e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/sprite_manager.odin": {
+  "src/render/sprite_manager.odin": {
     "mtime": 1780891197.7457795,
     "ast_hash": "015bb1e76e83d43094cf4f01448a9f31",
     "semantic_hash": "015bb1e76e83d43094cf4f01448a9f31"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/render/sprites.odin": {
+  "src/render/sprites.odin": {
     "mtime": 1780891197.7448788,
     "ast_hash": "8cfd38e61ecc5c73fa5bd736017818e0",
     "semantic_hash": "8cfd38e61ecc5c73fa5bd736017818e0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/scene.odin": {
+  "src/scene.odin": {
     "mtime": 1780891197.7179017,
     "ast_hash": "9d53a124ec7a660c26fb46d9ae9c635d",
     "semantic_hash": "9d53a124ec7a660c26fb46d9ae9c635d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ui/messages.odin": {
+  "src/ui/messages.odin": {
     "mtime": 1780891197.7198994,
     "ast_hash": "70584c7dd42755a0f85e045bf5bd5a09",
     "semantic_hash": "70584c7dd42755a0f85e045bf5bd5a09"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ui/ui_manager.odin": {
+  "src/ui/ui_manager.odin": {
     "mtime": 1780891197.7202053,
     "ast_hash": "6e25ae1e3e2269156bf6928bc4ebb5aa",
     "semantic_hash": "6e25ae1e3e2269156bf6928bc4ebb5aa"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ui/ui_text.odin": {
+  "src/ui/ui_text.odin": {
     "mtime": 1780891197.720511,
     "ast_hash": "f8f228da60c948372600a3cbafe59641",
     "semantic_hash": "f8f228da60c948372600a3cbafe59641"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/src/ui/ui_theme.odin": {
+  "src/ui/ui_theme.odin": {
     "mtime": 1780891197.720851,
     "ast_hash": "3b87563421fdd4691ce8d4ae3e8a597f",
     "semantic_hash": "3b87563421fdd4691ce8d4ae3e8a597f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/audio/audio_manager_test.odin": {
+  "test/audio/audio_manager_test.odin": {
     "mtime": 1780891197.8059459,
     "ast_hash": "1f6c9bdd75158214dac20de395741d42",
     "semantic_hash": "1f6c9bdd75158214dac20de395741d42"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/build_flags_test.odin": {
+  "test/build_flags_test.odin": {
     "mtime": 1780891197.7989464,
     "ast_hash": "91a333fba1a93846837c0487295827a5",
     "semantic_hash": "91a333fba1a93846837c0487295827a5"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/cheat_menu_test.odin": {
+  "test/cheat_menu_test.odin": {
     "mtime": 1780891197.7985632,
     "ast_hash": "325b7d1fc0c65193fd4c99999b3cadea",
     "semantic_hash": "325b7d1fc0c65193fd4c99999b3cadea"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/clay_ui_test.odin": {
+  "test/clay_ui_test.odin": {
     "mtime": 1780891197.8004801,
     "ast_hash": "1b53e5da00b9321b132d253f590a67ba",
     "semantic_hash": "1b53e5da00b9321b132d253f590a67ba"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/combat_test.odin": {
+  "test/combat_test.odin": {
     "mtime": 1780891197.8019476,
     "ast_hash": "5cca12c245307c571471af2802ad0766",
     "semantic_hash": "5cca12c245307c571471af2802ad0766"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/content_handlers_test.odin": {
+  "test/content_handlers_test.odin": {
     "mtime": 1780891197.7893474,
     "ast_hash": "eed793c33beefacff16d9689f0e4221c",
     "semantic_hash": "eed793c33beefacff16d9689f0e4221c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/content_manager_test.odin": {
+  "test/content_manager_test.odin": {
     "mtime": 1780891197.7875779,
     "ast_hash": "e15972918457ceeb5b98dcde4e837ea1",
     "semantic_hash": "e15972918457ceeb5b98dcde4e837ea1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/dialogue_test.odin": {
+  "test/dialogue_test.odin": {
     "mtime": 1780966505.341347,
     "ast_hash": "32a1837bd6130db7cc41b2b8fc95a6e2",
     "semantic_hash": "32a1837bd6130db7cc41b2b8fc95a6e2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_abilities_test.odin": {
+  "test/enemy_abilities_test.odin": {
     "mtime": 1780891197.802494,
     "ast_hash": "404521c0ec6de99105035b4d20849220",
     "semantic_hash": "404521c0ec6de99105035b4d20849220"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_pathfinding_test.odin": {
+  "test/enemy_pathfinding_test.odin": {
     "mtime": 1780891197.7930515,
     "ast_hash": "775a95b2c47ebbf2acb17fcdfe827056",
     "semantic_hash": "775a95b2c47ebbf2acb17fcdfe827056"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_saveload_test.odin": {
+  "test/enemy_saveload_test.odin": {
     "mtime": 1780891197.7969134,
     "ast_hash": "fd0a0d8ad8f39cfd920f6a01b1d0882f",
     "semantic_hash": "fd0a0d8ad8f39cfd920f6a01b1d0882f"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_spawn_coverage_test.odin": {
+  "test/enemy_spawn_coverage_test.odin": {
     "mtime": 1780891197.7907274,
     "ast_hash": "ddbb660f07b7dcba10989585637b557c",
     "semantic_hash": "ddbb660f07b7dcba10989585637b557c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_spawn_regression_test.odin": {
+  "test/enemy_spawn_regression_test.odin": {
     "mtime": 1780891197.7977948,
     "ast_hash": "f45cff8d363ad764f600b7a03cb30f58",
     "semantic_hash": "f45cff8d363ad764f600b7a03cb30f58"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/enemy_turns_test.odin": {
+  "test/enemy_turns_test.odin": {
     "mtime": 1780891197.79158,
     "ast_hash": "32af98c767beceec4c741b3de73ce3ce",
     "semantic_hash": "32af98c767beceec4c741b3de73ce3ce"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/action_input_manager_test.odin": {
+  "test/engine/action_input_manager_test.odin": {
     "mtime": 1780891197.810064,
     "ast_hash": "0cd528ca939dd6581deeb6b450bc7e38",
     "semantic_hash": "0cd528ca939dd6581deeb6b450bc7e38"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/audio_manager_test.odin": {
+  "test/engine/audio_manager_test.odin": {
     "mtime": 1780891197.811601,
     "ast_hash": "11a782fa352264b15c7f23f2718bc7ae",
     "semantic_hash": "11a782fa352264b15c7f23f2718bc7ae"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/backend_nil_test.odin": {
+  "test/engine/backend_nil_test.odin": {
     "mtime": 1780891197.8128297,
     "ast_hash": "2ad657e4d93ca9157b06d446637250b3",
     "semantic_hash": "2ad657e4d93ca9157b06d446637250b3"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/bool_grid_manager_test.odin": {
+  "test/engine/bool_grid_manager_test.odin": {
     "mtime": 1780891197.8070452,
     "ast_hash": "8f1682899b4c0d4aa3f028ccc55d12bd",
     "semantic_hash": "8f1682899b4c0d4aa3f028ccc55d12bd"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/camera_manager_test.odin": {
+  "test/engine/camera_manager_test.odin": {
     "mtime": 1780891197.8102918,
     "ast_hash": "d4a8e596dd9a5fe315b2230fe23ba466",
     "semantic_hash": "d4a8e596dd9a5fe315b2230fe23ba466"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/config_manager_test.odin": {
+  "test/engine/config_manager_test.odin": {
     "mtime": 1780891197.8095894,
     "ast_hash": "0e9c3afea9e8a0f1c08339048f17a22d",
     "semantic_hash": "0e9c3afea9e8a0f1c08339048f17a22d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/distance_map_test.odin": {
+  "test/engine/distance_map_test.odin": {
     "mtime": 1780891197.8130813,
     "ast_hash": "48916ffe5ba6444c3fde962f0f761d78",
     "semantic_hash": "48916ffe5ba6444c3fde962f0f761d78"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/engine_services_test.odin": {
+  "test/engine/engine_services_test.odin": {
     "mtime": 1780891197.8113003,
     "ast_hash": "98fe5099cca5871857544eda342d50cb",
     "semantic_hash": "98fe5099cca5871857544eda342d50cb"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/engine_test.odin": {
+  "test/engine/engine_test.odin": {
     "mtime": 1780891197.808926,
     "ast_hash": "144d4c7cb2ad6874ace5751c84595b3b",
     "semantic_hash": "144d4c7cb2ad6874ace5751c84595b3b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/event_manager_test.odin": {
+  "test/engine/event_manager_test.odin": {
     "mtime": 1780891197.8105133,
     "ast_hash": "984c74da5f7ce31329e440f7d0c21b3b",
     "semantic_hash": "984c74da5f7ce31329e440f7d0c21b3b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/frame_manager_test.odin": {
+  "test/engine/frame_manager_test.odin": {
     "mtime": 1780891197.8072371,
     "ast_hash": "fc56b59c3f323869a7f3941adb730cb8",
     "semantic_hash": "fc56b59c3f323869a7f3941adb730cb8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/grid_2d_test.odin": {
+  "test/engine/grid_2d_test.odin": {
     "mtime": 1780891197.8136206,
     "ast_hash": "a794b7f13fac97547ce8600188043f29",
     "semantic_hash": "a794b7f13fac97547ce8600188043f29"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/message_manager_test.odin": {
+  "test/engine/message_manager_test.odin": {
     "mtime": 1780891197.8107922,
     "ast_hash": "2a807c8b0ff884bb29d02221ab55cfed",
     "semantic_hash": "2a807c8b0ff884bb29d02221ab55cfed"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/particle_manager_test.odin": {
+  "test/engine/particle_manager_test.odin": {
     "mtime": 1780891197.8122854,
     "ast_hash": "a14964a4a3ffcb13b8d57b1932f46e22",
     "semantic_hash": "a14964a4a3ffcb13b8d57b1932f46e22"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/scene_manager_test.odin": {
+  "test/engine/scene_manager_test.odin": {
     "mtime": 1780891197.809289,
     "ast_hash": "074fa26ab59a17c7ec90efeacbe4b822",
     "semantic_hash": "074fa26ab59a17c7ec90efeacbe4b822"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/storage_manager_test.odin": {
+  "test/engine/storage_manager_test.odin": {
     "mtime": 1780891197.8067868,
     "ast_hash": "1aeff0448c8ec4531b9284abcdd18632",
     "semantic_hash": "1aeff0448c8ec4531b9284abcdd18632"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/texture_manager_test.odin": {
+  "test/engine/texture_manager_test.odin": {
     "mtime": 1780891197.8133926,
     "ast_hash": "babcdc611024d8a3c27e3440bda2eb82",
     "semantic_hash": "babcdc611024d8a3c27e3440bda2eb82"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/tile_state_manager_test.odin": {
+  "test/engine/tile_state_manager_test.odin": {
     "mtime": 1780891197.8063152,
     "ast_hash": "f68b52cec7c2bf2e1294d3d79d68e4d8",
     "semantic_hash": "f68b52cec7c2bf2e1294d3d79d68e4d8"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/turn_manager_test.odin": {
+  "test/engine/turn_manager_test.odin": {
     "mtime": 1780891197.8074527,
     "ast_hash": "a37292c3f2f67df53c9ccdf0c572895b",
     "semantic_hash": "a37292c3f2f67df53c9ccdf0c572895b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/vfx_manager_test.odin": {
+  "test/engine/vfx_manager_test.odin": {
     "mtime": 1780891197.8118732,
     "ast_hash": "a934c7be0d84923f84f03d59b33e935d",
     "semantic_hash": "a934c7be0d84923f84f03d59b33e935d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/engine/world_manager_test.odin": {
+  "test/engine/world_manager_test.odin": {
     "mtime": 1780891197.8077424,
     "ast_hash": "74bf652506f664a6070dc939ec474e9a",
     "semantic_hash": "74bf652506f664a6070dc939ec474e9a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/equipment_test.odin": {
+  "test/equipment_test.odin": {
     "mtime": 1780891197.7885346,
     "ast_hash": "e68fb1350979c0a641aafac5df26c817",
     "semantic_hash": "e68fb1350979c0a641aafac5df26c817"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/floor_snapshot_allocator_test.odin": {
+  "test/floor_snapshot_allocator_test.odin": {
     "mtime": 1780891197.792483,
     "ast_hash": "3cd947b240eea05e5a097143a4847bb2",
     "semantic_hash": "3cd947b240eea05e5a097143a4847bb2"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/fov_test.odin": {
+  "test/fov_test.odin": {
     "mtime": 1780891197.7962394,
     "ast_hash": "15277500a57779263b4299052f9cd54d",
     "semantic_hash": "15277500a57779263b4299052f9cd54d"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/game_app_services_test.odin": {
+  "test/game_app_services_test.odin": {
     "mtime": 1780891197.7959483,
     "ast_hash": "86205bf2082cdb394567b863adc6f71a",
     "semantic_hash": "86205bf2082cdb394567b863adc6f71a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/generation_test.odin": {
+  "test/generation_test.odin": {
     "mtime": 1780891197.7922103,
     "ast_hash": "e1dec069a2441eb3b94b341340c35072",
     "semantic_hash": "e1dec069a2441eb3b94b341340c35072"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/input_handlers_test.odin": {
+  "test/input_handlers_test.odin": {
     "mtime": 1780891197.789017,
     "ast_hash": "ecba8dea180fd6a641e98580ea75c046",
     "semantic_hash": "ecba8dea180fd6a641e98580ea75c046"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/input_manager_test.odin": {
+  "test/input_manager_test.odin": {
     "mtime": 1780891197.7868767,
     "ast_hash": "40107c9dc055e03395035e57382d6833",
     "semantic_hash": "40107c9dc055e03395035e57382d6833"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/io/logger_test.odin": {
+  "test/io/logger_test.odin": {
     "mtime": 1780891197.8030334,
     "ast_hash": "a079fd278a5d30a009cc0dc7eb444e96",
     "semantic_hash": "a079fd278a5d30a009cc0dc7eb444e96"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/item_use_regression_test.odin": {
+  "test/item_use_regression_test.odin": {
     "mtime": 1780891197.7971208,
     "ast_hash": "47a1e04b5059efe454e88173180c3a12",
     "semantic_hash": "47a1e04b5059efe454e88173180c3a12"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/items_test.odin": {
+  "test/items_test.odin": {
     "mtime": 1780891197.78649,
     "ast_hash": "9afbdce392302ff1fd7051e70f592612",
     "semantic_hash": "9afbdce392302ff1fd7051e70f592612"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/map_utils_test.odin": {
+  "test/map_utils_test.odin": {
     "mtime": 1780891197.7909167,
     "ast_hash": "1e29b90b3ebc548b62e1ef5de023481b",
     "semantic_hash": "1e29b90b3ebc548b62e1ef5de023481b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/message_manager_test.odin": {
+  "test/message_manager_test.odin": {
     "mtime": 1780891197.793302,
     "ast_hash": "d37b0d110472d7d2589440df29ef4840",
     "semantic_hash": "d37b0d110472d7d2589440df29ef4840"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/mining_test.odin": {
+  "test/mining_test.odin": {
     "mtime": 1780891197.7888336,
     "ast_hash": "0c9ef3a99061310b7d005b626e9101b9",
     "semantic_hash": "0c9ef3a99061310b7d005b626e9101b9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/next_steps_regression_test.odin": {
+  "test/next_steps_regression_test.odin": {
     "mtime": 1780891197.801382,
     "ast_hash": "0444d8c78583c39364cfa0ff5fd19896",
     "semantic_hash": "0444d8c78583c39364cfa0ff5fd19896"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/particle_manager_test.odin": {
+  "test/particle_manager_test.odin": {
     "mtime": 1780891197.7976332,
     "ast_hash": "cfad97092855258b5e83d6034981f5c1",
     "semantic_hash": "cfad97092855258b5e83d6034981f5c1"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/render/clay_bar_test.odin": {
+  "test/render/clay_bar_test.odin": {
     "mtime": 1780891197.8033986,
     "ast_hash": "a398272a043a21a14d9b975985db71d0",
     "semantic_hash": "a398272a043a21a14d9b975985db71d0"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/render/light_glow_test.odin": {
+  "test/render/light_glow_test.odin": {
     "mtime": 1780891197.8051217,
     "ast_hash": "449d9039acac377f2e1d313c5680883e",
     "semantic_hash": "449d9039acac377f2e1d313c5680883e"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/render/render_handlers_test.odin": {
+  "test/render/render_handlers_test.odin": {
     "mtime": 1780891197.8047824,
     "ast_hash": "7dea66aa29a58099b33f2a6b0b2e2b0a",
     "semantic_hash": "7dea66aa29a58099b33f2a6b0b2e2b0a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/render/sprite_manager_test.odin": {
+  "test/render/sprite_manager_test.odin": {
     "mtime": 1780891197.8040838,
     "ast_hash": "0f9a596db8e6113a7e70e274451e4792",
     "semantic_hash": "0f9a596db8e6113a7e70e274451e4792"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/render_minimap_test.odin": {
+  "test/render_minimap_test.odin": {
     "mtime": 1780891197.787735,
     "ast_hash": "70469082d8244afcce7de12f4c6fc03a",
     "semantic_hash": "70469082d8244afcce7de12f4c6fc03a"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/save_manager_test.odin": {
+  "test/save_manager_test.odin": {
     "mtime": 1780891197.7980082,
     "ast_hash": "2f7cbea4cc8b050e433ba6d3e32236cc",
     "semantic_hash": "2f7cbea4cc8b050e433ba6d3e32236cc"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/saveload_dependency_test.odin": {
+  "test/saveload_dependency_test.odin": {
     "mtime": 1780891197.7973711,
     "ast_hash": "266a83e14ab21070be310ac76280386c",
     "semantic_hash": "266a83e14ab21070be310ac76280386c"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/scene_test.odin": {
+  "test/scene_test.odin": {
     "mtime": 1780891197.7870715,
     "ast_hash": "f04f0c18e8bca1859d3c95d1eaea2683",
     "semantic_hash": "f04f0c18e8bca1859d3c95d1eaea2683"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/score_manager_test.odin": {
+  "test/score_manager_test.odin": {
     "mtime": 1780891197.795367,
     "ast_hash": "1fb554f3bea285090d59b03735117501",
     "semantic_hash": "1fb554f3bea285090d59b03735117501"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/status_effects_test.odin": {
+  "test/status_effects_test.odin": {
     "mtime": 1780891197.7998652,
     "ast_hash": "b13eca6b3069e40105580a0fbf5bdaa9",
     "semantic_hash": "b13eca6b3069e40105580a0fbf5bdaa9"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/test_imports_test.odin": {
+  "test/test_imports_test.odin": {
     "mtime": 1780891197.79485,
     "ast_hash": "397c85a085352b5ecd469f57c047d72b",
     "semantic_hash": "397c85a085352b5ecd469f57c047d72b"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/tile_state_saveload_test.odin": {
+  "test/tile_state_saveload_test.odin": {
     "mtime": 1780891197.799358,
     "ast_hash": "8d073319c19d1b7a52f6fb840337e407",
     "semantic_hash": "8d073319c19d1b7a52f6fb840337e407"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/town_story_test.odin": {
+  "test/town_story_test.odin": {
     "mtime": 1780891197.790416,
     "ast_hash": "cc98695789b6752633bceaed0afee5de",
     "semantic_hash": "cc98695789b6752633bceaed0afee5de"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/ui/ui_manager_test.odin": {
+  "test/ui/ui_manager_test.odin": {
     "mtime": 1780891197.8026905,
     "ast_hash": "a29c972c268d6c89144909ca96d72668",
     "semantic_hash": "a29c972c268d6c89144909ca96d72668"
   },
-  "/Users/lecoqjacob/Developer/games/odin-into-the-dark/test/world_manager_integration_test.odin": {
+  "test/world_manager_integration_test.odin": {
     "mtime": 1780891197.7965353,
     "ast_hash": "be2cac0b88d6d24f42b90adcce2a5901",
     "semantic_hash": "be2cac0b88d6d24f42b90adcce2a5901"
+  },
+  ".claude/settings.json": {
+    "mtime": 1781024528.605427,
+    "ast_hash": "f4d5b2a8e3dfda71e13dd7e2d44162e5",
+    "semantic_hash": ""
+  },
+  ".claude/settings.local.json": {
+    "mtime": 1780666172.6942368,
+    "ast_hash": "6c451b3f1dcf51d4fb26e579fa508fff",
+    "semantic_hash": ""
+  },
+  ".claude/workflows/odin-prod-audit.js": {
+    "mtime": 1780630898.2087395,
+    "ast_hash": "c6935b1ca3dfa6574048505d2e05571e",
+    "semantic_hash": ""
+  },
+  ".codex/hooks.json": {
+    "mtime": 1781024528.6080482,
+    "ast_hash": "0200c577102dda55369836c91c0b145e",
+    "semantic_hash": ""
+  },
+  ".kilo/kilo.json": {
+    "mtime": 1780624186.4398632,
+    "ast_hash": "4324622fda468a1b218b64c676f162c7",
+    "semantic_hash": ""
+  },
+  ".kilo/package.json": {
+    "mtime": 1780623890.8362627,
+    "ast_hash": "1accad958a1dc257a0a974f8624ba3cd",
+    "semantic_hash": ""
+  },
+  "ols.json": {
+    "mtime": 1780201848.2106948,
+    "ast_hash": "41f81f4e7855e0c044375ff7ed01cb77",
+    "semantic_hash": ""
+  },
+  "scripts/build_karl2d_web.sh": {
+    "mtime": 1781024528.615347,
+    "ast_hash": "c4ab7b947408ce4de21e7f701878f058",
+    "semantic_hash": ""
+  },
+  "scripts/bundle_macos.sh": {
+    "mtime": 1780839639.6764114,
+    "ast_hash": "a9d43bc6bdd0ad24cb9d09b6c4dad46f",
+    "semantic_hash": ""
+  },
+  "scripts/run_odin_tests.py": {
+    "mtime": 1781024528.6155944,
+    "ast_hash": "cce2c70d09a1af9a548bd15a58c37d79",
+    "semantic_hash": ""
+  },
+  ".claude/CLAUDE.md": {
+    "mtime": 1781024528.6052294,
+    "ast_hash": "fc2f077e6573c5eec12d973a39263cf0",
+    "semantic_hash": ""
+  },
+  ".claude/commands/build.md": {
+    "mtime": 1780630542.2608955,
+    "ast_hash": "a742bf3c2d1a77c64a7ab05a66085ab5",
+    "semantic_hash": ""
+  },
+  ".claude/commands/debug-run.md": {
+    "mtime": 1780630541.2721093,
+    "ast_hash": "bada8754834af1cc73f9b54fef661330",
+    "semantic_hash": ""
+  },
+  ".claude/commands/issue-done.md": {
+    "mtime": 1780630540.7142248,
+    "ast_hash": "ad74056d07d41f8462e57ce60bc534ef",
+    "semantic_hash": ""
+  },
+  ".claude/commands/issue-start.md": {
+    "mtime": 1780630739.848332,
+    "ast_hash": "7a501f9184af14e405b313815bf8854e",
+    "semantic_hash": ""
+  },
+  ".claude/commands/new-enemy.md": {
+    "mtime": 1780630392.2592363,
+    "ast_hash": "af47b2121bc9473821a65aafb0f81485",
+    "semantic_hash": ""
+  },
+  ".claude/commands/new-feature.md": {
+    "mtime": 1780630542.8723688,
+    "ast_hash": "c27a8334cd94ddb9277d7ce867ed5723",
+    "semantic_hash": ""
+  },
+  ".claude/commands/new-item.md": {
+    "mtime": 1780630543.395164,
+    "ast_hash": "fe0f7552ca2099ec09f1a621523b8203",
+    "semantic_hash": ""
+  },
+  ".claude/commands/new-manager.md": {
+    "mtime": 1780630543.7855422,
+    "ast_hash": "bdbf863c8c0bfeb550952d12a1173272",
+    "semantic_hash": ""
+  },
+  ".claude/commands/new-scene.md": {
+    "mtime": 1780630544.2632725,
+    "ast_hash": "7a53607d30ab2ee5aec39fdd64adc082",
+    "semantic_hash": ""
+  },
+  ".claude/commands/review.md": {
+    "mtime": 1780630544.7343547,
+    "ast_hash": "e5f21ea0f2aafbc775f21d7af29d3578",
+    "semantic_hash": ""
+  },
+  ".claude/commands/stats.md": {
+    "mtime": 1780630545.1772878,
+    "ast_hash": "81cd73136a3b74c6d4343af85968124e",
+    "semantic_hash": ""
+  },
+  ".claude/commands/test.md": {
+    "mtime": 1780630545.6431317,
+    "ast_hash": "f3d2aefb514e4fe0a9eee6edc0629df8",
+    "semantic_hash": ""
+  },
+  ".claude/commands/verify.md": {
+    "mtime": 1780630546.2095692,
+    "ast_hash": "88c46922364d88947043e8ed4aed1578",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/SKILL.md": {
+    "mtime": 1781024528.605972,
+    "ast_hash": "41f700d6535cc2f2b6b6d0a9eecc7525",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/add-watch.md": {
+    "mtime": 1781024528.606202,
+    "ast_hash": "0df0589623217ca38a12bdcabfb42f4c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/exports.md": {
+    "mtime": 1781024528.6064143,
+    "ast_hash": "7fb1a81aca17a462db70684a324fcfb0",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1781024528.6068292,
+    "ast_hash": "24808b03abfeaf5f6435bb69c0125b2c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1781024528.6070118,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/hooks.md": {
+    "mtime": 1781024528.607196,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/query.md": {
+    "mtime": 1781024528.6073668,
+    "ast_hash": "8b40ed8c9e9060fc215219a8fc964091",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/transcribe.md": {
+    "mtime": 1781024528.6075222,
+    "ast_hash": "70f6aa30d6211f3a2c7e9fc45479f50c",
+    "semantic_hash": ""
+  },
+  ".claude/skills/graphify/references/update.md": {
+    "mtime": 1781024528.6077547,
+    "ast_hash": "0dad167a95bdb389f02fecffb60b1bc8",
+    "semantic_hash": ""
+  },
+  ".claude/skills/update-board/SKILL.md": {
+    "mtime": 1780435599.365891,
+    "ast_hash": "d842e9b21f632cae29f0468d11595a5f",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/SKILL.md": {
+    "mtime": 1781024528.6084564,
+    "ast_hash": "387caca7fe66d3151e67c512bc93dd25",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/add-watch.md": {
+    "mtime": 1781024528.6086035,
+    "ast_hash": "0df0589623217ca38a12bdcabfb42f4c",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/exports.md": {
+    "mtime": 1781024528.6087017,
+    "ast_hash": "7fb1a81aca17a462db70684a324fcfb0",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/extraction-spec.md": {
+    "mtime": 1781024528.608914,
+    "ast_hash": "a86a7321597b23cc2b22e011b3dc6e1d",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/github-and-merge.md": {
+    "mtime": 1781024528.6090186,
+    "ast_hash": "cde13df085e4c492aeb7ba298a996d0d",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/hooks.md": {
+    "mtime": 1781024528.609137,
+    "ast_hash": "3f545db6ce646650bb9de588f5512a27",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/query.md": {
+    "mtime": 1781024528.6093392,
+    "ast_hash": "c2a8e798674a81b02aa9975f43023819",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/transcribe.md": {
+    "mtime": 1781024528.6094666,
+    "ast_hash": "70f6aa30d6211f3a2c7e9fc45479f50c",
+    "semantic_hash": ""
+  },
+  ".codex/skills/graphify/references/update.md": {
+    "mtime": 1781024528.609584,
+    "ast_hash": "0dad167a95bdb389f02fecffb60b1bc8",
+    "semantic_hash": ""
+  },
+  ".github/workflows/ci.yml": {
+    "mtime": 1781028509.138411,
+    "ast_hash": "cbd58dc9389999e3562a3be608ef2a3a",
+    "semantic_hash": ""
+  },
+  ".github/workflows/release.yml": {
+    "mtime": 1781028509.1385434,
+    "ast_hash": "5b69b4eea35a3af2bd9aa7bf3be2a4ae",
+    "semantic_hash": ""
+  },
+  ".serena/project.local.yml": {
+    "mtime": 1780803877.9754739,
+    "ast_hash": "f136e7d47205d9a758913615074760e5",
+    "semantic_hash": ""
+  },
+  ".serena/project.yml": {
+    "mtime": 1780803892.6857293,
+    "ast_hash": "0b63d829af912838f2bbbac324ca8d9d",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1781024528.6099045,
+    "ast_hash": "da22bdf773c36805524c1351c955a21a",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1781024528.6102815,
+    "ast_hash": "59f37c64ec44009cc2957991d5a0a3a2",
+    "semantic_hash": ""
+  },
+  "CONTEXT.md": {
+    "mtime": 1781024528.6105177,
+    "ast_hash": "5e1ab047802bce579752cc6f696685ae",
+    "semantic_hash": ""
+  },
+  "NEXT_STEPS.md": {
+    "mtime": 1781024528.6106977,
+    "ast_hash": "b068eba23e95cdb9512197f556b71352",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1780435179.6857834,
+    "ast_hash": "54d6386d1b86530acc6c26cd47836185",
+    "semantic_hash": ""
+  },
+  "assets/fonts/LICENSE-SourceCodePro.md": {
+    "mtime": 1780839519.180843,
+    "ast_hash": "675ca52130f5d1c4025d2480caaec5a7",
+    "semantic_hash": ""
+  },
+  "data/README.md": {
+    "mtime": 1780201305.4942932,
+    "ast_hash": "e081865db4925fe1fc2e653229e2c386",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/plans/2026-06-06-ui-redesign.md": {
+    "mtime": 1780799073.1146452,
+    "ast_hash": "c0a9351400a79315f8ecab406271c405",
+    "semantic_hash": ""
+  },
+  "docs/superpowers/specs/2026-06-06-ui-redesign-design.md": {
+    "mtime": 1780798781.5340586,
+    "ast_hash": "891dc4eedfbabd2e02b2e2cf12ad00d3",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20260609_023617_what_are_next_steps.md": {
+    "mtime": 1781024528.6147213,
+    "ast_hash": "111d83cd6c09c12f7daf732f8979254b",
+    "semantic_hash": ""
+  },
+  "assets/characters/Demon0.png": {
+    "mtime": 1780281291.821384,
+    "ast_hash": "0f1fd4bbe46cde895838cb6e9ab12107",
+    "semantic_hash": ""
+  },
+  "assets/characters/Elemental0.png": {
+    "mtime": 1780281291.8252692,
+    "ast_hash": "6011ce1acbb118de7affd74a1cbc3dd7",
+    "semantic_hash": ""
+  },
+  "assets/characters/Humanoid0.png": {
+    "mtime": 1780281291.8272464,
+    "ast_hash": "060faf962dc945e093a81e7fd29653ca",
+    "semantic_hash": ""
+  },
+  "assets/characters/Pest0.png": {
+    "mtime": 1780281291.8170812,
+    "ast_hash": "7940c71be0aa603185ad3b212e81238a",
+    "semantic_hash": ""
+  },
+  "assets/characters/Plant0.png": {
+    "mtime": 1780281291.8233583,
+    "ast_hash": "8109b7e0f559ec69125f3a73fa915f2a",
+    "semantic_hash": ""
+  },
+  "assets/characters/Player0.png": {
+    "mtime": 1780281291.8150144,
+    "ast_hash": "d42a06883b158abd5c907ce43b97d798",
+    "semantic_hash": ""
+  },
+  "assets/characters/Undead0.png": {
+    "mtime": 1780281291.8195357,
+    "ast_hash": "4acebab6af5aa9202d9ab16e3e42d17d",
+    "semantic_hash": ""
+  },
+  "assets/items/Amulet.png": {
+    "mtime": 1780281291.84231,
+    "ast_hash": "75749028178b0c0b06ed15f3f66c597f",
+    "semantic_hash": ""
+  },
+  "assets/items/Armor.png": {
+    "mtime": 1780281291.8368406,
+    "ast_hash": "5bf50e8e7d34f4d84b888421e3216c6e",
+    "semantic_hash": ""
+  },
+  "assets/items/Hat.png": {
+    "mtime": 1780281291.8388236,
+    "ast_hash": "4c2ece9b93c4524ace84be06b6659dce",
+    "semantic_hash": ""
+  },
+  "assets/items/Light.png": {
+    "mtime": 1780281291.840559,
+    "ast_hash": "32fe930a75a921fb3cb8f97549869f12",
+    "semantic_hash": ""
+  },
+  "assets/items/Potion.png": {
+    "mtime": 1780281291.8289883,
+    "ast_hash": "a1c25f66888d1cb94bb1df7ada631ef4",
+    "semantic_hash": ""
+  },
+  "assets/items/Rock.png": {
+    "mtime": 1780281291.84402,
+    "ast_hash": "8b862891ffccf6cde8f77fd7a4c07129",
+    "semantic_hash": ""
+  },
+  "assets/items/Shield.png": {
+    "mtime": 1780281291.834656,
+    "ast_hash": "b5682b16d8457d5a014be3db2e6bf19d",
+    "semantic_hash": ""
+  },
+  "assets/items/ShortWep.png": {
+    "mtime": 1780281291.8324811,
+    "ast_hash": "4ecbba71e4e0b6d95aabf5b2db14e17d",
+    "semantic_hash": ""
+  },
+  "assets/items/Tool.png": {
+    "mtime": 1780281291.830726,
+    "ast_hash": "2ebce4d513b1a75fabf98810714b53cc",
+    "semantic_hash": ""
+  },
+  "assets/kenney_1bit.png": {
+    "mtime": 1780283962.4424868,
+    "ast_hash": "ee8d8143c9fad67009a36572b3d2c940",
+    "semantic_hash": ""
+  },
+  "assets/sand.png": {
+    "mtime": 1780188376.948121,
+    "ast_hash": "07f86cff9a1be4042a2ad352ec9a7036",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Decor0.png": {
+    "mtime": 1780281291.8111362,
+    "ast_hash": "5c4f403ad2eb329148f8f8a821052141",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Floor.png": {
+    "mtime": 1780281291.8032687,
+    "ast_hash": "ed22cafa1fd9354195bfb13a6545ce1d",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Ore0.png": {
+    "mtime": 1780281291.8054166,
+    "ast_hash": "466474178125cb76233e140d88205b2a",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Pit0.png": {
+    "mtime": 1780281291.8128333,
+    "ast_hash": "56b01b18f807bac21ab0d60c40065426",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Tile.png": {
+    "mtime": 1780281291.807436,
+    "ast_hash": "a7d602cf506b06dafa5812d49648a460",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Trap0.png": {
+    "mtime": 1780281291.8093593,
+    "ast_hash": "48c597de42709d2e91c4afa021e2ed80",
+    "semantic_hash": ""
+  },
+  "assets/tiles/Wall.png": {
+    "mtime": 1780281291.80095,
+    "ast_hash": "905d9c6627e93fbf5f702657ec4bf17a",
+    "semantic_hash": ""
   }
 }
