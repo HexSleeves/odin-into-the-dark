@@ -33,6 +33,15 @@ jobs:
 
       - uses: actions/checkout@v6
 
+      - name: Checkout karl2d
+        uses: actions/checkout@v6
+        with:
+          repository: karl-zylinski/karl2d
+          path: karl2d
+
+      - name: Link karl2d sibling import path
+        run: ln -sfn "$GITHUB_WORKSPACE/karl2d" "$GITHUB_WORKSPACE/../karl2d"
+
       - name: Run tests
         run: |
           odin test src/ -collection:libs=vendor/

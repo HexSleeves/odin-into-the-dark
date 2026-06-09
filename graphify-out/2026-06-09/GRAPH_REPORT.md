@@ -1,18 +1,13 @@
-# Graph Report - odin-into-the-dark  (2026-06-09)
+# Graph Report - .  (2026-06-08)
 
 ## Corpus Check
-- 53 files · ~106,718 words
+- 217 files · ~90,388 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1352 nodes · 1054 edges · 388 communities (116 shown, 272 thin omitted)
-- Extraction: 79% EXTRACTED · 20% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
-- Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `95310060`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
+- 924 nodes · 675 edges · 325 communities (65 shown, 260 thin omitted)
+- Extraction: 68% EXTRACTED · 32% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
+- Token cost: 1,571,039 input · 0 output
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Engine Core & Input Services|Engine Core & Input Services]]
@@ -340,80 +335,18 @@
 - [[_COMMUNITY_Community 322|Community 322]]
 - [[_COMMUNITY_Community 323|Community 323]]
 - [[_COMMUNITY_Community 324|Community 324]]
-- [[_COMMUNITY_Community 325|Community 325]]
-- [[_COMMUNITY_Community 326|Community 326]]
-- [[_COMMUNITY_Community 327|Community 327]]
-- [[_COMMUNITY_Community 328|Community 328]]
-- [[_COMMUNITY_Community 329|Community 329]]
-- [[_COMMUNITY_Community 330|Community 330]]
-- [[_COMMUNITY_Community 331|Community 331]]
-- [[_COMMUNITY_Community 332|Community 332]]
-- [[_COMMUNITY_Community 333|Community 333]]
-- [[_COMMUNITY_Community 334|Community 334]]
-- [[_COMMUNITY_Community 335|Community 335]]
-- [[_COMMUNITY_Community 336|Community 336]]
-- [[_COMMUNITY_Community 337|Community 337]]
-- [[_COMMUNITY_Community 338|Community 338]]
-- [[_COMMUNITY_Community 339|Community 339]]
-- [[_COMMUNITY_Community 340|Community 340]]
-- [[_COMMUNITY_Community 341|Community 341]]
-- [[_COMMUNITY_Community 342|Community 342]]
-- [[_COMMUNITY_Community 343|Community 343]]
-- [[_COMMUNITY_Community 344|Community 344]]
-- [[_COMMUNITY_Community 345|Community 345]]
-- [[_COMMUNITY_Community 346|Community 346]]
-- [[_COMMUNITY_Community 347|Community 347]]
-- [[_COMMUNITY_Community 348|Community 348]]
-- [[_COMMUNITY_Community 349|Community 349]]
-- [[_COMMUNITY_Community 350|Community 350]]
-- [[_COMMUNITY_Community 351|Community 351]]
-- [[_COMMUNITY_Community 352|Community 352]]
-- [[_COMMUNITY_Community 353|Community 353]]
-- [[_COMMUNITY_Community 354|Community 354]]
-- [[_COMMUNITY_Community 355|Community 355]]
-- [[_COMMUNITY_Community 356|Community 356]]
-- [[_COMMUNITY_Community 357|Community 357]]
-- [[_COMMUNITY_Community 358|Community 358]]
-- [[_COMMUNITY_Community 359|Community 359]]
-- [[_COMMUNITY_Community 360|Community 360]]
-- [[_COMMUNITY_Community 361|Community 361]]
-- [[_COMMUNITY_Community 362|Community 362]]
-- [[_COMMUNITY_Community 363|Community 363]]
-- [[_COMMUNITY_Community 364|Community 364]]
-- [[_COMMUNITY_Community 365|Community 365]]
-- [[_COMMUNITY_Community 366|Community 366]]
-- [[_COMMUNITY_Community 367|Community 367]]
-- [[_COMMUNITY_Community 368|Community 368]]
-- [[_COMMUNITY_Community 369|Community 369]]
-- [[_COMMUNITY_Community 370|Community 370]]
-- [[_COMMUNITY_Community 371|Community 371]]
-- [[_COMMUNITY_Community 372|Community 372]]
-- [[_COMMUNITY_Community 373|Community 373]]
-- [[_COMMUNITY_Community 374|Community 374]]
-- [[_COMMUNITY_Community 375|Community 375]]
-- [[_COMMUNITY_Community 376|Community 376]]
-- [[_COMMUNITY_Community 377|Community 377]]
-- [[_COMMUNITY_Community 378|Community 378]]
-- [[_COMMUNITY_Community 379|Community 379]]
-- [[_COMMUNITY_Community 380|Community 380]]
-- [[_COMMUNITY_Community 381|Community 381]]
-- [[_COMMUNITY_Community 382|Community 382]]
-- [[_COMMUNITY_Community 383|Community 383]]
-- [[_COMMUNITY_Community 384|Community 384]]
-- [[_COMMUNITY_Community 385|Community 385]]
-- [[_COMMUNITY_Community 386|Community 386]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `generate_map` - 17 edges
-2. `Into the Depths — UI/HUD Redesign` - 14 edges
-3. `Game` - 14 edges
-4. `clay_render_screen_ui` - 13 edges
-5. `Repository Guidelines` - 12 edges
-6. `Into the Depths` - 12 edges
-7. `Into the Depths UI Redesign — Implementation Plan` - 12 edges
-8. `render_game` - 12 edges
-9. `What You Must Do When Invoked` - 11 edges
-10. `What You Must Do When Invoked` - 11 edges
+2. `Game` - 14 edges
+3. `clay_render_screen_ui` - 13 edges
+4. `render_game` - 12 edges
+5. `enemy AI / pathfinding (process_enemy_turns, dijkstra)` - 11 edges
+6. `equipment system (equip_item, unequip_slot, effective_attack/defense)` - 11 edges
+7. `load_game_from_storage` - 10 edges
+8. `map generation (generate_map)` - 10 edges
+9. `generate_rooms` - 9 edges
+10. `save_game_to_storage` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `skip_title_flag_controls_initial_state` --semantically_similar_to--> `game_engine_frame_manager`  [INFERRED] [semantically similar]
@@ -470,11 +403,11 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (388 total, 272 thin omitted)
+## Communities (325 total, 260 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
-Cohesion: 0.22
-Nodes (10): Camera_Manager, Engine, Engine_Config, Engine_Event, Engine_Event_Type, Event_Manager, Frame_Manager, frame_manager_allocator (+2 more)
+Cohesion: 0.05
+Nodes (45): GAME_ENGINE_SERVICE_AUDIO, GAME_ENGINE_SERVICE_CONTENT, action_input_binding_held, action_input_binding_pressed, action_input_held, Action_Input_Manager, action_input_manager_make, action_input_pressed (+37 more)
 
 ### Community 1 - "Game Init & World Generation"
 Cohesion: 0.06
@@ -485,12 +418,12 @@ Cohesion: 0.06
 Nodes (41): resolve_attack_player_on_enemy, enemy_make, audio_state, audio_init, Game_Audio (struct), play_sfx, Sound_Type (enum), content_manager_load_all (+33 more)
 
 ### Community 3 - "Game State & Title/Game-Over Flow"
-Cohesion: 0.06
-Nodes (43): handle_input, Input_Result, Game_Config, handle_forced_turn, handle_mining_input, handle_playing_hotkeys, update_viewing_dialogue, death_sound_played (+35 more)
+Cohesion: 0.08
+Nodes (35): handle_playing_hotkeys, death_sound_played, update_game_over, activate_title_choice, update_title_screen, compute_fov, game_cleanup, saved_floor_destroy (+27 more)
 
 ### Community 4 - "Clay UI Overlays & HUD"
-Cohesion: 0.17
-Nodes (12): clay_dialogue_decl, clay_render_dialogue_overlay, clay_render_merchant_overlay, clay_render_cheats_overlay, clay_render_crafting_overlay, clay_render_game_over_overlay, clay_render_help_overlay, clay_render_inventory_overlay (+4 more)
+Cohesion: 0.06
+Nodes (32): clay_dialogue_decl, clay_render_dialogue_overlay, clay_render_merchant_overlay, clay_render_shrine_overlay, clay_bar, clay_bar_segmented, clay_render_hud, clay_row (+24 more)
 
 ### Community 5 - "Content Manager & Definitions"
 Cohesion: 0.08
@@ -513,8 +446,8 @@ Cohesion: 0.13
 Nodes (20): sprite_manager_draw, sprite_manager_enemy, sprite_manager_fallback, sprite_manager_item, sprite_manager_make, sprite_manager_named, sprite_manager_tile, draw_sprite (+12 more)
 
 ### Community 10 - "Clay Renderer & Particles"
-Cohesion: 0.20
-Nodes (10): clay_ui_begin_frame, clay_ui_end_frame, render_particles, update_particles, render_items, render_enemies, render_npcs, render_player (+2 more)
+Cohesion: 0.11
+Nodes (18): clay_color_to_engine, clay_render_border, clay_render_commands, clay_color, clay_ui_begin_frame, clay_ui_end_frame, render_particles, update_particles (+10 more)
 
 ### Community 11 - "Combat Resolution & Enemy Death"
 Cohesion: 0.14
@@ -561,8 +494,8 @@ Cohesion: 0.25
 Nodes (8): engine_services_default_config_has_no_game_callbacks, engine_services_lifecycle_invokes_configured_callbacks, engine_services_make_starts_uninitialized, engine_services_registers_and_replaces_service_contexts, engine_services_registers_engine_owned_service_values, engine_services_rejects_invalid_or_overflow_registrations, engine_services_rejects_oversized_engine_owned_values, engine engine_services
 
 ### Community 22 - "Input Handling Dispatch"
-Cohesion: 0.07
-Nodes (29): Architecture & Data Flow, Backend Injection Pattern, Close Issue + Move to Done, Code Conventions & Common Patterns, Comments, Coverage Expectations, Create Issue + Add to Board, Data-Driven Design (+21 more)
+Cohesion: 0.29
+Nodes (8): handle_input, Input_Result, Game_Config, handle_forced_turn, handle_mining_input, update_viewing_dialogue, handle_player_action, update_playing
 
 ### Community 23 - "Items & Inventory"
 Cohesion: 0.25
@@ -732,206 +665,6 @@ Nodes (3): scene mapping (scene_for_state / game_scene_manager), game_scene_mana
 Cohesion: 0.67
 Nodes (3): UI_Help_Row, UI_Help_Section, ui_help_sections
 
-### Community 325 - "Community 325"
-Cohesion: 0.08
-Nodes (23): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+15 more)
-
-### Community 326 - "Community 326"
-Cohesion: 0.08
-Nodes (23): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+15 more)
-
-### Community 327 - "Community 327"
-Cohesion: 0.09
-Nodes (21): Architecture, Backlog / Under Consideration, Backlog / Under Consideration, Build & Run, Contributing, Controls, Data-Driven Design, Development (+13 more)
-
-### Community 328 - "Community 328"
-Cohesion: 0.12
-Nodes (16): 10. Component boundaries, 11. Testing, 12. Out of scope, 13. Risks, 1. Goal, 2.1 Palette — rewrite `src/ui/ui_theme.odin` SB_* constants, 2.2 Spacing/fonts — `src/render/clay_theme.odin`, 2. Design tokens (+8 more)
-
-### Community 329 - "Community 329"
-Cohesion: 0.13
-Nodes (12): allFindings, auditTasks, confirmed, FINDINGS_SCHEMA, GROUPS, lowFindings, meta, needsContext (+4 more)
-
-### Community 330 - "Community 330"
-Cohesion: 0.14
-Nodes (12): Architecture, Build / Vendor Collection, Commands, File Locations (post-reorg), Formatting, Formatting, graphify, Headroom Learned Patterns (+4 more)
-
-### Community 331 - "Community 331"
-Cohesion: 0.15
-Nodes (12): checker_args, collections, enable_checker_only_saved, enable_document_symbols, enable_format, enable_hover, enable_inlay_hints, enable_semantic_tokens (+4 more)
-
-### Community 332 - "Community 332"
-Cohesion: 0.15
-Nodes (12): Into the Depths UI Redesign — Implementation Plan, Self-review notes, Task 10: Final gate, Task 1: Lamplit Mine palette tokens, Task 2: Segmented-bar fill math (pure, TDD), Task 3: Panel + segmented-bar Clay helpers, Task 4: Rewrite the gameplay HUD into readout panels, Task 5: Message log panel (+4 more)
-
-### Community 333 - "Community 333"
-Cohesion: 0.17
-Nodes (11): 1. Understand the Scope, 2. Check Existing Code, 3. Design the Data Structures, 4. Implement the Feature, 5. Write Tests, 6. Update Rendering (if visual), 7. Add Messages (if player-facing), 8. Verify (+3 more)
-
-### Community 334 - "Community 334"
-Cohesion: 0.17
-Nodes (11): 1. Add to `Game_State` enum — `src/types.odin`, 2. Add to `Game_Scene` enum — `src/scene.odin`, 3. Map state → scene — `src/scene.odin` in `scene_for_state`, 4. Register callbacks — `src/scene.odin` in `scene_register_all`, 5. Implement callbacks — `src/scene_my_new_scene.odin`, 6. Transition to the scene, 7. Write a smoke test — `src/scene_test.odin`, 8. Verify (+3 more)
-
-### Community 335 - "Community 335"
-Cohesion: 0.17
-Nodes (11): 1. Get the Diff, 2. Correctness, 3. Architecture, 4. Odin Style (`-vet -strict-style`), 5. Tests, 6. Data Files, 7. Run Verification, How to Use (+3 more)
-
-### Community 336 - "Community 336"
-Cohesion: 0.18
-Nodes (10): Both packages (default), Commands, Compile-flag matrix, Engine package only, Finding Test Files, Game package only, Test Conventions, Test — Run Test Suite (+2 more)
-
-### Community 337 - "Community 337"
-Cohesion: 0.18
-Nodes (10): Check Board Status, Close Issue + Move to Done, Create New Issue + Add to Board, Labels Reference, Move Issue to In Progress, Project Constants, Rules, Update Project Board (+2 more)
-
-### Community 338 - "Community 338"
-Cohesion: 0.20
-Nodes (9): 1. Design the Enemy, 2. Add to `data/enemies.json5`, 3. Add to Spawn Tables, 4. Verify (no recompile needed for data changes), 5. If Adding a New Ability Type, Existing Ability Types, New Enemy — Add a Data-Driven Enemy, Stat Reference (+1 more)
-
-### Community 339 - "Community 339"
-Cohesion: 0.20
-Nodes (9): 1. Design the Item, 2. Add to `data/items.json5`, 3. Add to Spawn Weights, 4. Verify (data-only change), 5. If Adding a New Effect Type, Existing Effect Types, Glyph Conventions, New Item — Add a Data-Driven Item (+1 more)
-
-### Community 340 - "Community 340"
-Cohesion: 0.20
-Nodes (9): Commands, File count by layer, Largest files (good candidates for refactoring), Lines by file (sorted by size), Recent changes, Stats — Codebase Statistics, Test file count, Total lines (+1 more)
-
-### Community 341 - "Community 341"
-Cohesion: 0.22
-Nodes (8): 1. Run Final Verification, 2. Close the Issue with a Summary Comment, 3. Move to Done on the Project Board, 4. Update `NEXT_STEPS.md` (if applicable), 5. Commit (if not already done), Board Constants, Issue Done — Close a GitHub Issue and Mark Complete, Steps
-
-### Community 342 - "Community 342"
-Cohesion: 0.22
-Nodes (8): 1. View the Issue, 2. Move to In Progress on the Project Board, 3. Understand the Work, 4. Plan Before Coding, 5. Run Baseline Verify, Board Constants, Issue Start — Begin Work on a GitHub Issue, Steps
-
-### Community 343 - "Community 343"
-Cohesion: 0.22
-Nodes (8): 1. Manager file — `src/engine/foo_manager.odin`, 2. Test file — `src/engine/foo_manager_test.odin`, 3. If the manager needs a backend (injectable dependency), 4. Register as a service (if game layer needs it), 5. Run tests, New Manager — Scaffold an Engine Manager, Scaffold, When to Create an Engine Manager
-
-### Community 344 - "Community 344"
-Cohesion: 0.22
-Nodes (9): Engine_Audio_Backend, engine_audio_backend_is_valid, engine_audio_backend_nil, engine_audio_backend_or_default, engine_audio_backend_play, Audio_Manager, audio_manager_make, audio_manager_play (+1 more)
-
-### Community 345 - "Community 345"
-Cohesion: 0.22
-Nodes (9): clay_render_messages, clay_minimap_cell_color, clay_render_minimap, minimap_should_draw_enemy_dot, clay_render_gameplay_ui, clay_render_gameplay_hints, clay_render_hint_banner, clay_render_tooltip (+1 more)
-
-### Community 346 - "Community 346"
-Cohesion: 0.25
-Nodes (7): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
-
-### Community 347 - "Community 347"
-Cohesion: 0.25
-Nodes (7): graphify reference: extra exports and benchmark, Step 6b - Wiki (only if --wiki flag), Step 7 - Neo4j export (only if --neo4j or --neo4j-push flag), Step 7b - SVG export (only if --svg flag), Step 7c - GraphML export (only if --graphml flag), Step 7d - MCP server (only if --mcp flag), Step 8 - Token reduction benchmark (only if total_words > 5000)
-
-### Community 348 - "Community 348"
-Cohesion: 0.25
-Nodes (7): Build — Compile the Game, Build Outputs, Clean Build, Example Combinations, Feature Flags, Interpreting Errors, Quick Reference
-
-### Community 349 - "Community 349"
-Cohesion: 0.25
-Nodes (7): Cheat Menu (in-game), Checking Logs, Debug Run — Run the Game with Debug Flags, Default Debug Session, Save File Location, Useful Flag Combinations, With a Fixed Seed
-
-### Community 350 - "Community 350"
-Cohesion: 0.25
-Nodes (8): action_input_binding_held, action_input_held, action_input_manager_make, action_input_repeat, engine_input_backend_default, engine_input_backend_nil, engine_input_backend_or_default, engine_input_key_down
-
-### Community 351 - "Community 351"
-Cohesion: 0.29
-Nodes (7): clay_bar, clay_bar_segmented, clay_render_hud, clay_row, clay_text, bar_segment_fill_count, clay_panel_begin
-
-### Community 352 - "Community 352"
-Cohesion: 0.33
-Nodes (5): env, ECC_DISABLED_HOOKS, ECC_GATEGUARD, permissions, allow
-
-### Community 353 - "Community 353"
-Cohesion: 0.33
-Nodes (5): For /graphify explain, For /graphify path, graphify reference: query, path, explain, Step 0 — Constrained query expansion (REQUIRED before traversal), Step 1 — Traversal
-
-### Community 354 - "Community 354"
-Cohesion: 0.33
-Nodes (5): Current status, Handoff Context: src/ Folder Organization, Immediate next steps, Package naming notes, Verified package state
-
-### Community 355 - "Community 355"
-Cohesion: 0.33
-Nodes (6): GAME_ENGINE_SERVICE_AUDIO, GAME_ENGINE_SERVICE_CONTENT, Engine_Service_Id, Engine_Service_Registration, Engine_Services, Engine_Services_Config
-
-### Community 356 - "Community 356"
-Cohesion: 0.33
-Nodes (5): Adding Content, Conventions, Data Directory — Into the Depths, Editing, Files
-
-### Community 357 - "Community 357"
-Cohesion: 0.33
-Nodes (5): Build flag reference, Into the Depths — Next Steps, Recently shipped, Remaining work, Roadmap candidates
-
-### Community 358 - "Community 358"
-Cohesion: 0.60
-Nodes (5): copy_tree(), main(), overlay_tests(), package_args(), run_package()
-
-### Community 359 - "Community 359"
-Cohesion: 0.40
-Nodes (4): Interpreting Results, Rules, Steps, Verify — Full CI Gate
-
-### Community 360 - "Community 360"
-Cohesion: 0.40
-Nodes (5): camera_manager_make, engine_init, engine_run, engine_step, engine_services_make
-
-### Community 361 - "Community 361"
-Cohesion: 0.50
-Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
-
-### Community 362 - "Community 362"
-Cohesion: 0.50
-Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
-
-### Community 363 - "Community 363"
-Cohesion: 0.50
-Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
-
-### Community 364 - "Community 364"
-Cohesion: 0.50
-Nodes (3): For /graphify add, For --watch, graphify reference: add a URL and watch a folder
-
-### Community 365 - "Community 365"
-Cohesion: 0.50
-Nodes (3): For git commit hook, For native CLAUDE.md integration, graphify reference: commit hook and native CLAUDE.md integration
-
-### Community 366 - "Community 366"
-Cohesion: 0.50
-Nodes (3): For /graphify explain, For /graphify path, graphify reference: query, path, explain
-
-### Community 367 - "Community 367"
-Cohesion: 0.50
-Nodes (3): For --cluster-only, For --update (incremental re-extraction), graphify reference: incremental update and cluster-only
-
-### Community 368 - "Community 368"
-Cohesion: 0.50
-Nodes (4): action_input_binding_pressed, action_input_pressed, action_input_released, engine_input_key_pressed
-
-### Community 369 - "Community 369"
-Cohesion: 0.50
-Nodes (3): indexing, enabled, $schema
-
-### Community 370 - "Community 370"
-Cohesion: 0.50
-Nodes (3): Answer, Q: What are next steps, Source Nodes
-
-### Community 371 - "Community 371"
-Cohesion: 0.50
-Nodes (4): clay_render_shrine_overlay, clay_menu_backdrop_decl, clay_menu_subtitle, clay_menu_title
-
-### Community 372 - "Community 372"
-Cohesion: 0.50
-Nodes (4): clay_color_to_engine, clay_render_border, clay_render_commands, clay_color
-
-### Community 373 - "Community 373"
-Cohesion: 0.50
-Nodes (4): base_tile_color, dim_color, get_tile_color, render_map
-
-### Community 380 - "Community 380"
-Cohesion: 0.67
-Nodes (3): Action_Input_Manager, Engine_Key_Binding, Engine_Repeat_State
-
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
   src/scene.odin · relation: references
@@ -939,9 +672,9 @@ Nodes (3): Action_Input_Manager, Engine_Key_Binding, Engine_Repeat_State
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **915 isolated node(s):** `PreToolUse`, `allow`, `ECC_GATEGUARD`, `ECC_DISABLED_HOOKS`, `meta` (+910 more)
+- **617 isolated node(s):** `_set_bundle_working_dir (desktop)`, `step (web frame)`, `shutdown (web)`, `load_json5_from_bytes`, `g_data (Data_Registry)` (+612 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **260 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -951,12 +684,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
+  _High betweenness centrality (0.004) - this node is a cross-community bridge._
+- **Why does `cheat_set_depth` connect `Field of View & Lifecycle Cleanup` to `Game Init & World Generation`?**
   _High betweenness centrality (0.002) - this node is a cross-community bridge._
-- **Why does `clay_render_screen_ui` connect `Clay UI Overlays & HUD` to `Community 345`, `Clay Renderer & Particles`, `Community 371`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **What connects `PreToolUse`, `allow`, `ECC_GATEGUARD` to the rest of the system?**
-  _915 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Game Init & World Generation` be split into smaller, more focused modules?**
-  _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
-- **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
-  _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._
+- **Why does `Engine_Config` connect `Engine Core & Input Services` to `Config & File System`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Are the 11 inferred relationships involving `enemy AI / pathfinding (process_enemy_turns, dijkstra)` (e.g. with `adjacent_visible_enemy_attacks_instead_of_moving` and `dijkstra_map_treats_locked_doors_as_unreachable_barriers`) actually correct?**
+  _`enemy AI / pathfinding (process_enemy_turns, dijkstra)` has 11 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `_set_bundle_working_dir (desktop)`, `step (web frame)`, `shutdown (web)` to the rest of the system?**
+  _617 weakly-connected nodes found - possible documentation gaps or missing edges._

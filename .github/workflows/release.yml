@@ -24,6 +24,15 @@ jobs:
 
       - uses: actions/checkout@v6
 
+      - name: Checkout karl2d
+        uses: actions/checkout@v6
+        with:
+          repository: karl-zylinski/karl2d
+          path: karl2d
+
+      - name: Link karl2d sibling import path
+        run: ln -sfn "$GITHUB_WORKSPACE/karl2d" "$GITHUB_WORKSPACE/../karl2d"
+
       - name: Build
         run: |
           mkdir -p build/linux
@@ -51,6 +60,15 @@ jobs:
         run: brew install lld
 
       - uses: actions/checkout@v6
+
+      - name: Checkout karl2d
+        uses: actions/checkout@v6
+        with:
+          repository: karl-zylinski/karl2d
+          path: karl2d
+
+      - name: Link karl2d sibling import path
+        run: ln -sfn "$GITHUB_WORKSPACE/karl2d" "$GITHUB_WORKSPACE/../karl2d"
 
       - name: Build
         run: |
@@ -103,7 +121,7 @@ jobs:
           path: into_the_depths-web.zip
 
   release:
-    needs: [build-linux, build-macos-arm64]
+    needs: [build-linux, build-macos-arm64, build-web]
     if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     steps:
