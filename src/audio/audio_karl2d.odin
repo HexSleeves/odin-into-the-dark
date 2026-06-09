@@ -144,7 +144,9 @@ karl2d_audio_play_looped :: proc(ctx: rawptr, sound_id: int) {
 	state := cast(^Karl2D_Audio_State)ctx
 	if !karl2d_audio_sound_valid(state, sound_id) || !state.enabled {return}
 	k2.set_sound_loop(state.sounds[sound_id], true)
-	k2.play_sound(state.sounds[sound_id])
+	if !k2.sound_is_playing(state.sounds[sound_id]) {
+		k2.play_sound(state.sounds[sound_id])
+	}
 }
 
 karl2d_audio_is_playing :: proc(ctx: rawptr, sound_id: int) -> bool {
@@ -199,7 +201,7 @@ karl2d_audio_load_music :: proc(
 	data_len: i32,
 ) -> eng.Engine_Music_Handle {
 	state := cast(^Karl2D_Audio_State)ctx
-	if state == nil || data == nil || data_len <= 0 {return nil}
+	if state == nil || data == nil || data_len <= 0 || format != ".wav" {return nil}
 	slot := karl2d_audio_first_free_music(state)
 	if slot < 0 {return nil}
 	bytes := ([^]u8)(data)[:int(data_len)]
@@ -251,9 +253,7 @@ karl2d_audio_set_music_volume :: proc(ctx: rawptr, handle: eng.Engine_Music_Hand
 	k2.set_sound_volume(state.music[idx], state.music_volume[idx] * state.master_volume)
 }
 
-karl2d_audio_update_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {
-	k2.update_audio_mixer()
-}
+karl2d_audio_update_music :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) {}
 
 karl2d_audio_is_music_valid :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle) -> bool {
 	state := cast(^Karl2D_Audio_State)ctx

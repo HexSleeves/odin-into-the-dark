@@ -57,7 +57,7 @@ KARL2D_NIL_AUDIO_PACKAGES = {"src/audio", "src/io", "src/render"}
 
 
 def package_args(package: str, args: list[str]) -> list[str]:
-    if package in KARL2D_NIL_AUDIO_PACKAGES and KARL2D_NIL_AUDIO_DEFINE not in args:
+    if package in KARL2D_NIL_AUDIO_PACKAGES and not any(arg.startswith("-define:KARL2D_AUDIO_BACKEND") for arg in args):
         return args + [KARL2D_NIL_AUDIO_DEFINE]
     return args
 
