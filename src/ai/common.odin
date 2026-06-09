@@ -64,6 +64,7 @@ damage_roll :: gcore.damage_roll
 crit_roll :: gcore.crit_roll
 effective_crit_chance :: gcore.effective_crit_chance
 CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
+SLAM_BASE_DAMAGE :: gcore.SLAM_BASE_DAMAGE
 
 Status_Kind :: gcore.Status_Kind
 Status_Turns :: gcore.Status_Turns

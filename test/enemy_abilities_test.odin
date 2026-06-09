@@ -192,7 +192,12 @@ ranged_shoot_deals_damage_when_in_range_and_visible :: proc(t: ^testing.T) {
 
 	process_enemy_abilities(&msgs, &g)
 
-	testing.expect_value(t, g.player.hp, 20 - enemy.attack)
+	lo, hi := damage_roll_bounds(enemy.attack)
+	testing.expect(
+		t,
+		g.player.hp >= 20 - hi && g.player.hp <= 20 - lo,
+		"expected player hp reduced by damage_roll(attack) with no armor",
+	)
 	testing.expect(
 		t,
 		g.enemies[0].ability_cooldown == g.enemies[0].ability_max_cd,

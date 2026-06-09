@@ -69,7 +69,7 @@
     {
       id: "rusty_pickaxe",
       name: "Rusty Pickaxe",
-      description: "Worn but sturdy. +2 ATK, slow swing. 20 durability.",
+      description: "Worn but sturdy. The head is pitted with rust, yet the haft holds firm.",
       glyph: "P",
       color: [180, 130, 80, 255],
       stack_limit: 1,
@@ -82,7 +82,7 @@
     {
       id: "leather_vest",
       name: "Leather Vest",
-      description: "Tanned hide armour. +1 DEF.",
+      description: "Tanned hide armour, stitched tight against the damp.",
       glyph: "V",
       color: [139, 90, 43, 255],
       stack_limit: 1,
@@ -92,7 +92,7 @@
     {
       id: "miners_helmet",
       name: "Miner's Helmet",
-      description: "Dented hard hat. +1 DEF.",
+      description: "Dented hard hat. Chipped from years in the tunnels.",
       glyph: "H",
       color: [200, 200, 50, 255],
       stack_limit: 1,
@@ -103,7 +103,7 @@
     {
       id: "mine_dagger",
       name: "Mine Dagger",
-      description: "Short blade. +1 ATK, very fast attack.",
+      description: "Short blade, ground from a broken drill bit. Fits between the ribs.",
       glyph: "d",
       color: [190, 190, 210, 255],
       stack_limit: 1,
@@ -116,7 +116,7 @@
     {
       id: "steel_pickaxe",
       name: "Steel Pickaxe",
-      description: "Forged steel. +4 ATK, slow swing. 35 durability.",
+      description: "Forged from smelted ore deep underground. Heavy, purposeful.",
       glyph: "P",
       color: [160, 180, 200, 255],
       stack_limit: 1,
@@ -129,7 +129,7 @@
     {
       id: "chainmail",
       name: "Chainmail",
-      description: "Interlocked rings. +2 DEF.",
+      description: "Interlocked rings, cold and heavy. Every link was hammered by hand.",
       glyph: "V",
       color: [140, 150, 160, 255],
       stack_limit: 1,
@@ -139,7 +139,7 @@
     {
       id: "crystal_lamp",
       name: "Crystal Lamp",
-      description: "Glowing headgear. +2 DEF, illuminates surroundings.",
+      description: "A crystalline helm that pulses with cold light, warding off the dark.",
       glyph: "H",
       color: [100, 200, 220, 255],
       stack_limit: 1,
@@ -150,7 +150,7 @@
     {
       id: "greatsword",
       name: "Greatsword",
-      description: "Massive blade. +7 ATK, very slow swing.",
+      description: "Massive blade, taller than a man. The grip is wrapped in rotting leather.",
       glyph: "G",
       color: [200, 200, 220, 255],
       stack_limit: 1,

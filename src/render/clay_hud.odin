@@ -93,6 +93,17 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 					spd_color,
 				)
 
+				lo, hi := gcore.damage_roll_bounds(gcore.effective_attack(game))
+				crit := gcore.effective_crit_chance(game)
+				clay_row(
+					"hud-dmg-row",
+					"DMG",
+					fmt.tprintf("%d-%d  crit %d%%", lo, hi, crit),
+					CLAY_HUD_FONT,
+					ui_pkg.SB_HEADER,
+					ui_pkg.SB_TEXT,
+				)
+
 				if game.equipped_weapon.occupied {
 					wpn := game.equipped_weapon.item
 					if wpn.max_durability > 0 {

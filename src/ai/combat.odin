@@ -116,14 +116,28 @@ resolve_attack_player_on_enemy :: proc(
 
 // Enemy attacks player
 resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
-	damage := max(damage_roll(enemy.attack) - effective_defense(game), 1)
+	raw_damage := damage_roll(enemy.attack)
+	crit := crit_roll(enemy.crit_chance)
+	if crit {
+		raw_damage = raw_damage * CRIT_DAMAGE_MULT_PCT / 100
+	}
+	damage := max(raw_damage - effective_defense(game), 1)
 	game.player.hp = max(game.player.hp - damage, 0)
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("The %s hits you for %d damage!", enemy_display_name(enemy), damage),
-		eng.Engine_Color{255, 100, 100, 255},
-	)
+	if crit {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("The %s lands a vicious blow for %d damage!", enemy_display_name(enemy), damage),
+			eng.Engine_Color{255, 60, 60, 255},
+		)
+	} else {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("The %s hits you for %d damage!", enemy_display_name(enemy), damage),
+			eng.Engine_Color{255, 100, 100, 255},
+		)
+	}
 
 	if game.player.hp <= 0 {
 		player_die(messages, game, fmt.tprintf("Killed by a %s", enemy_display_name(enemy)))

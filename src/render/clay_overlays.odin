@@ -130,6 +130,62 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 							ui_pkg.SB_DIM,
 						)
 					}
+					if selected && len(slot.item.equipment_slot) > 0 {
+						item := slot.item
+						stat_text: string
+						if item.equipment_slot == gcore.EQUIPMENT_SLOT_WEAPON {
+							lo, hi := gcore.damage_roll_bounds(game.player.attack + item.stat_bonus)
+							wpn_cost := item.action_cost if item.action_cost > 0 else gcore.BASE_ACTION_COST
+							spd_label: string
+							if wpn_cost <= 700 {
+								spd_label = "Fast"
+							} else if wpn_cost <= 1100 {
+								spd_label = "Normal"
+							} else if wpn_cost <= 1600 {
+								spd_label = "Slow"
+							} else {
+								spd_label = "Very Slow"
+							}
+							if item.max_durability > 0 {
+								stat_text = fmt.tprintf(
+									"ATK %d-%d  crit +%d%%  %s  dur %d/%d",
+									lo,
+									hi,
+									item.crit_chance,
+									spd_label,
+									item.durability,
+									item.max_durability,
+								)
+							} else {
+								stat_text = fmt.tprintf(
+									"ATK %d-%d  crit +%d%%  %s",
+									lo,
+									hi,
+									item.crit_chance,
+									spd_label,
+								)
+							}
+						} else {
+							if item.max_durability > 0 {
+								stat_text = fmt.tprintf(
+									"DEF +%d  dur %d/%d",
+									item.stat_bonus,
+									item.durability,
+									item.max_durability,
+								)
+							} else {
+								stat_text = fmt.tprintf("DEF +%d", item.stat_bonus)
+							}
+						}
+						clay_menu_kv(
+							fmt.tprintf("inventory-stat-%d", idx),
+							"",
+							stat_text,
+							13,
+							ui_pkg.SB_DIM,
+							ui_pkg.SB_DIM,
+						)
+					}
 				} else {
 					clay_menu_item(
 						fmt.tprintf("inventory-item-%d", idx),

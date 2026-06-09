@@ -13,6 +13,7 @@ LIGHT_DRAIN_MIN :: 2
 LIGHT_DRAIN_START_DEPTH :: 3
 
 // ─── Combat rolls ─────────────────────────────────────────────────────────────
+SLAM_BASE_DAMAGE :: 4
 DAMAGE_VARIANCE_MIN_PCT :: 75 // damage rolls span 75%..125% of base
 DAMAGE_VARIANCE_MAX_PCT :: 125
 BASE_CRIT_CHANCE_PCT :: 5 // unarmed crit chance; weapons add crit_chance on top

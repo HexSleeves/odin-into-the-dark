@@ -91,6 +91,7 @@ Enemy :: struct {
 	hp:               int,
 	max_hp:           int,
 	attack:           int,
+	crit_chance:      int,
 	enemy_type:       string, // data-driven ID (e.g. "rat", "cave_crawler")
 	name:             string, // display name from data
 	glyph:            rune,
@@ -101,6 +102,7 @@ Enemy :: struct {
 	ability_cooldown: int, // current cooldown (decrements each turn)
 	ability_max_cd:   int, // max cooldown for reset
 	ability_range:    int, // range of the ability
+	ability_damage:   int, // base damage for damage-dealing abilities (0 = use fallback)
 	is_boss:          bool,
 	behavior:         string, // "lurker" or "" for standard
 	// Detection / awareness

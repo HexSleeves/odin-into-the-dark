@@ -113,15 +113,21 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist <= 2 {
 				if dist == 1 {
-					game.player.hp -= 4
+					base := enemy.ability_damage if enemy.ability_damage > 0 else SLAM_BASE_DAMAGE
+					dmg := max(damage_roll(base) - effective_defense(game), 1)
+					game.player.hp = max(game.player.hp - dmg, 0)
 					add_message(
 						messages,
 						game,
-						"The Mine Guardian slams the ground! (-4 HP)",
+						fmt.tprintf(
+							"The %s slams the ground! (-%d HP)",
+							enemy_display_name(&enemy),
+							dmg,
+						),
 						eng.Engine_Color{220, 180, 60, 255},
 					)
 					if game.player.hp <= 0 {
-						player_die(messages, game, "Crushed by the Mine Guardian")
+						player_die(messages, game, fmt.tprintf("Crushed by the %s", enemy_display_name(&enemy)))
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd
@@ -143,8 +149,9 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 2 && dist <= enemy.ability_range {
 				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
-					dmg := enemy.attack
-					game.player.hp -= dmg
+					base := enemy.ability_damage if enemy.ability_damage > 0 else enemy.attack
+					dmg := max(damage_roll(base) - effective_defense(game), 1)
+					game.player.hp = max(game.player.hp - dmg, 0)
 					enemy.ability_cooldown = enemy.ability_max_cd
 					add_message(
 						messages,

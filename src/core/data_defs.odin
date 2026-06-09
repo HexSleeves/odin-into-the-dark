@@ -16,6 +16,7 @@ Ability_Def :: struct {
 	type:     string,
 	cooldown: int,
 	range:    int,
+	damage:   int,
 }
 
 Enemy_Def :: struct {
@@ -25,6 +26,7 @@ Enemy_Def :: struct {
 	color:            Color_Array,
 	hp:               int,
 	attack:           int,
+	crit_chance:      int,
 	quickness:        int,
 	move_speed:       int,
 	detection_radius: int, // 0 = use default

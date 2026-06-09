@@ -41,10 +41,14 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 	ms := 100
 	beh := ""
 	glyph := se.glyph
+	cc := 0
+	ad := 0
 	if def != nil {
 		qn = 100 if def.quickness == 0 else def.quickness
 		ms = 100 if def.move_speed == 0 else def.move_speed
 		beh = def.behavior
+		cc = def.crit_chance
+		ad = def.ability.damage
 		if len(def.glyph) > 0 {glyph = rune(def.glyph[0])}
 	}
 	return Enemy {
@@ -52,6 +56,7 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 		hp = se.hp,
 		max_hp = se.max_hp,
 		attack = se.attack,
+		crit_chance = cc,
 		enemy_type = etype,
 		name = save_to_string(content, &se.name),
 		glyph = glyph,
@@ -61,6 +66,7 @@ save_to_enemy :: proc(content: ^Content_Manager, se: ^Save_Enemy) -> Enemy {
 		ability_cooldown = se.ability_cooldown,
 		ability_max_cd = se.ability_max_cd,
 		ability_range = se.ability_range,
+		ability_damage = ad,
 		is_boss = se.is_boss,
 		detection_radius = max(se.detection_radius, DEFAULT_ENEMY_DETECTION_RADIUS),
 		memory_turns = max(se.memory_turns, DEFAULT_ENEMY_MEMORY_TURNS),

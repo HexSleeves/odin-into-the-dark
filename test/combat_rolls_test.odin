@@ -94,3 +94,60 @@ item_defs_carry_crit_chance_into_made_items :: proc(t: ^testing.T) {
 	it := item_make_from_def(def, Vec2{0, 0})
 	testing.expect_value(t, it.crit_chance, def.crit_chance)
 }
+
+// ─── enemy_make_from_def ──────────────────────────────────────────────────────
+
+@(test)
+enemy_make_from_def_carries_crit_chance_and_ability_damage :: proc(t: ^testing.T) {
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+
+	// depth_king has crit_chance: 10 and ability: { damage: 8 } in enemies.json5.
+	def := content_manager_enemy_def(&content, "depth_king")
+	testing.expect(t, def != nil)
+	testing.expect(t, def.crit_chance > 0)
+	testing.expect(t, def.ability.damage > 0)
+
+	enemy := enemy_make_from_def(def, Vec2{0, 0})
+	testing.expect_value(t, enemy.crit_chance, def.crit_chance)
+	testing.expect_value(t, enemy.ability_damage, def.ability.damage)
+}
+
+@(test)
+enemy_with_zero_crit_chance_never_crits :: proc(t: ^testing.T) {
+	rand.reset(0)
+	// Build a minimal enemy with no crit chance.
+	e: Enemy
+	e.crit_chance = 0
+	e.attack = 8
+	_, non_crit_hi := damage_roll_bounds(e.attack)
+
+	for _ in 0 ..< 1000 {
+		// crit_roll(0) must be false, so any damage is post-variance only.
+		fired := crit_roll(e.crit_chance)
+		testing.expect(t, !fired, "enemy with crit_chance=0 must never crit")
+		d := damage_roll(e.attack)
+		testing.expect(t, d <= non_crit_hi, "non-crit damage must not exceed non-crit hi bound")
+	}
+}
+
+@(test)
+enemy_with_100_crit_chance_always_crits :: proc(t: ^testing.T) {
+	rand.reset(0)
+	// crit_roll(100) must always return true.
+	for _ in 0 ..< 1000 {
+		testing.expect(t, crit_roll(100), "enemy with crit_chance=100 must always crit")
+	}
+
+	// Verify the crit multiplier actually inflates damage above the non-crit ceiling.
+	base := 10
+	_, non_crit_hi := damage_roll_bounds(base)
+	crit_min := non_crit_hi * CRIT_DAMAGE_MULT_PCT / 100
+	// crit_min (200% of non_crit_hi) must exceed non_crit_hi when CRIT_DAMAGE_MULT_PCT > 100.
+	testing.expect(
+		t,
+		crit_min > non_crit_hi,
+		"crit damage ceiling must exceed non-crit ceiling",
+	)
+}
