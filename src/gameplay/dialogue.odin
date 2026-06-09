@@ -182,7 +182,17 @@ apply_single_effect :: proc(
 		if def != nil {
 			it := item_make_from_def(def, game.player.pos)
 			slot := inventory_first_empty_slot(game)
-			if slot >= 0 {inventory_put_slot(game, slot, it, 1)}
+			if slot >= 0 {
+				inventory_put_slot(game, slot, it, 1)
+			} else {
+				append(&game.items, it)
+				add_message(
+					messages,
+					game,
+					"Your pack is full — the item was dropped at your feet.",
+					eng.Engine_Color{255, 200, 80, 255},
+				)
+			}
 		}
 	case "open_shop":
 		generate_shopkeeper_stock(game)

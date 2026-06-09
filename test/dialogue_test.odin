@@ -2,6 +2,8 @@
 package main
 
 import eng "./engine"
+import "core:fmt"
+import "core:os"
 import "core:testing"
 
 
@@ -301,7 +303,12 @@ save_restore_preserves_dialogue_flags_and_seen_conversations :: proc(t: ^testing
 	dialogue_set_flag(game, "flag_b")
 	dialogue_mark_seen(game, "old_miner_intro")
 
-	path := "/tmp/into-the-dark-dialogue-test.dat"
+	tmp := os.get_env_alloc("TMPDIR", context.allocator)
+	defer delete(tmp)
+	base := tmp if len(tmp) > 0 else "/tmp"
+	path := fmt.aprintf("%s/into-the-dark-dialogue-test.dat", base)
+	defer delete(path)
+	defer os.remove(path)
 	turns := eng.turn_manager_make()
 	testing.expect(t, save_game_to_path(&turns, game, path))
 

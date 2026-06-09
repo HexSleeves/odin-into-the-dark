@@ -41,7 +41,8 @@ dialogue_find_node :: proc(
 	node: ^Dlg_Node,
 	ok: bool,
 ) {
-	if game.active_conv_idx < 0 {return nil, false}
+	if game.active_conv_idx < 0 ||
+	   game.active_conv_idx >= len(content.registry.dialogue.conversations) {return nil, false}
 	conv := &content.registry.dialogue.conversations[game.active_conv_idx]
 	for &n in conv.nodes {
 		if n.id == node_id {return &n, true}
@@ -57,7 +58,9 @@ dialogue_current_node :: proc(
 	node: ^Dlg_Node,
 	ok: bool,
 ) {
-	if game.active_conv_idx < 0 || game.active_node_idx < 0 {return nil, false}
+	if game.active_conv_idx < 0 ||
+	   game.active_conv_idx >= len(content.registry.dialogue.conversations) {return nil, false}
+	if game.active_node_idx < 0 {return nil, false}
 	conv := &content.registry.dialogue.conversations[game.active_conv_idx]
 	if game.active_node_idx >= len(conv.nodes) {return nil, false}
 	return &conv.nodes[game.active_node_idx], true

@@ -116,12 +116,12 @@ load_game_from_storage :: proc(
 	}
 
 	// ── Restore dialogue persistent state ──
-	game.seen_count = data.seen_conv_count
+	game.seen_count = min(data.seen_conv_count, gcore.MAX_SEEN_CONVS)
 	for i in 0 ..< game.seen_count {
 		game.seen_convs[i] = data.seen_convs[i]
 		game.seen_lens[i] = data.seen_lens[i]
 	}
-	game.dlg_flag_count = data.dlg_flag_count
+	game.dlg_flag_count = min(data.dlg_flag_count, gcore.MAX_DLG_FLAGS)
 	for i in 0 ..< game.dlg_flag_count {
 		game.dlg_flags[i] = data.dlg_flags[i]
 		game.dlg_flag_lens[i] = data.dlg_flag_lens[i]

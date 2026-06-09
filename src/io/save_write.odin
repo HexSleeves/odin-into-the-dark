@@ -2,6 +2,7 @@ package gameio
 import "core:mem"
 
 
+import gcore "../core"
 import eng "../engine"
 
 
@@ -102,13 +103,13 @@ save_game_to_storage :: proc(
 	}
 
 	// ── Write dialogue persistent state ──
-	data.seen_conv_count = game.seen_count
-	for i in 0 ..< game.seen_count {
+	data.seen_conv_count = min(game.seen_count, gcore.MAX_SEEN_CONVS)
+	for i in 0 ..< data.seen_conv_count {
 		data.seen_convs[i] = game.seen_convs[i]
 		data.seen_lens[i] = game.seen_lens[i]
 	}
-	data.dlg_flag_count = game.dlg_flag_count
-	for i in 0 ..< game.dlg_flag_count {
+	data.dlg_flag_count = min(game.dlg_flag_count, gcore.MAX_DLG_FLAGS)
+	for i in 0 ..< data.dlg_flag_count {
 		data.dlg_flags[i] = game.dlg_flags[i]
 		data.dlg_flag_lens[i] = game.dlg_flag_lens[i]
 	}

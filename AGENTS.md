@@ -7,7 +7,7 @@ Turn-based 2D roguelike written in [Odin](https://odin-lang.org/) + Raylib.
 
 ## Project Overview
 
-*Into the Depths* is a procedurally generated mine-descending roguelike. The player descends floors, fights data-driven enemies, collects/equips items, and is scored on depth, kills, and turns survived. The game is implemented in two Odin packages: a reusable `engine` layer and the game-specific `main` layer.
+_Into the Depths_ is a procedurally generated mine-descending roguelike. The player descends floors, fights data-driven enemies, collects/equips items, and is scored on depth, kills, and turns survived. The game is implemented in two Odin packages: a reusable `engine` layer and the game-specific `main` layer.
 
 ---
 
@@ -27,10 +27,10 @@ main()  →  engine_run(config, services, &app)
 
 **Two-package split:**
 
-| Package | Path | Role |
-|---|---|---|
+| Package  | Path          | Role                                                    |
+| -------- | ------------- | ------------------------------------------------------- |
 | `engine` | `src/engine/` | Backend-agnostic, window-free managers and abstractions |
-| `main` | `src/` | Game-specific logic, scenes, rendering, data |
+| `main`   | `src/`        | Game-specific logic, scenes, rendering, data            |
 
 **`Game_App` is a vtable struct** — `init`, `update`, `render`, `shutdown`, `autosave` are function pointers with a `rawptr state` field. The game layer fills this struct; the engine calls it.
 
@@ -51,19 +51,19 @@ Defaults use OS/Raylib implementations. Tests inject fake backends by constructi
 
 ## Key Directories
 
-| Path | Purpose |
-|---|---|
-| `src/` | Game package (`package main`) — app lifecycle, scene routing, and alias shims |
-| `src/core/` | Pure data layer — game types, constants, content/save managers, inventory/equipment helpers |
-| `src/gameplay/` | Gameplay orchestration — actions, items, mining, FOV, generation, status effects |
-| `src/input/` | Input package (`package gameinput`) — input manager, key bindings, all input state handlers |
-| `src/render/` | Rendering package — Clay UI, world rendering, sprites, particles |
-| `src/audio/` / `src/io/` / `src/ui/` | Audio, logging/platform I/O, and UI manager packages |
-| `src/ai/` / `src/gen/` | AI (enemy turns, combat, abilities) and map generation packages |
-| `src/engine/` | Engine package (`package engine`) — reusable, backend-agnostic managers |
-| `data/` | json5 data files — enemies, items, player, sprites |
-| `assets/` | PNG spritesheets (tiles, characters, items, GUI) |
-| `scripts/` | Python runtime evidence/verification scripts |
+| Path                                 | Purpose                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| `src/`                               | Game package (`package main`) — app lifecycle, scene routing, and alias shims               |
+| `src/core/`                          | Pure data layer — game types, constants, content/save managers, inventory/equipment helpers |
+| `src/gameplay/`                      | Gameplay orchestration — actions, items, mining, FOV, generation, status effects            |
+| `src/input/`                         | Input package (`package gameinput`) — input manager, key bindings, all input state handlers |
+| `src/render/`                        | Rendering package — Clay UI, world rendering, sprites, particles                            |
+| `src/audio/` / `src/io/` / `src/ui/` | Audio, logging/platform I/O, and UI manager packages                                        |
+| `src/ai/` / `src/gen/`               | AI (enemy turns, combat, abilities) and map generation packages                             |
+| `src/engine/`                        | Engine package (`package engine`) — reusable, backend-agnostic managers                     |
+| `data/`                              | json5 data files — enemies, items, player, sprites                                          |
+| `assets/`                            | PNG spritesheets (tiles, characters, items, GUI)                                            |
+| `scripts/`                           | Python runtime evidence/verification scripts                                                |
 
 ---
 
@@ -95,15 +95,15 @@ just stats           # wc -l on all .odin and .json5 files
 
 ### Naming
 
-| Kind | Convention | Example |
-|---|---|---|
-| Types / Enums | `PascalCase` | `Engine_File_System`, `Game_State` |
-| Procedures | `snake_case` with `type_verb` prefix | `storage_manager_read`, `turn_manager_advance` |
-| Constants | `SCREAMING_SNAKE_CASE` | `MAP_WIDTH`, `SAVE_MAGIC` |
-| Fields / locals | `snake_case` | `file_system`, `depth_min` |
-| Constructor procs | `type_make` | `storage_manager_make()`, `turn_manager_make()` |
-| Destructor procs | `type_destroy` | `game_destroy()`, `score_table_destroy()` |
-| File-private helpers | `@(private = "file")` attribute | internal find_index procs |
+| Kind                 | Convention                           | Example                                         |
+| -------------------- | ------------------------------------ | ----------------------------------------------- |
+| Types / Enums        | `PascalCase`                         | `Engine_File_System`, `Game_State`              |
+| Procedures           | `snake_case` with `type_verb` prefix | `storage_manager_read`, `turn_manager_advance`  |
+| Constants            | `SCREAMING_SNAKE_CASE`               | `MAP_WIDTH`, `SAVE_MAGIC`                       |
+| Fields / locals      | `snake_case`                         | `file_system`, `depth_min`                      |
+| Constructor procs    | `type_make`                          | `storage_manager_make()`, `turn_manager_make()` |
+| Destructor procs     | `type_destroy`                       | `game_destroy()`, `score_table_destroy()`       |
+| File-private helpers | `@(private = "file")` attribute      | internal find_index procs                       |
 
 ### Error Handling
 
@@ -152,45 +152,45 @@ Write comments only when the **why** is non-obvious — hidden constraints, subt
 
 ## Important Files
 
-| File | Purpose |
-|---|---|
-| `src/main.odin` | Entry point — 12 lines, calls `engine_run` |
-| `src/game_app_lifecycle.odin` / `src/game_app_config.odin` / `src/game_services.odin` | App lifecycle, build/runtime config, and game service registration/accessors |
-| `src/core/types.odin` | Core game types: `Game`, `Player`, `Enemy`, `Item`, `Tile`, `Game_State` |
-| `src/core/screen_layout.odin` / `src/core/gameplay_tuning.odin` / `src/core/build_config.odin` | Screen geometry, gameplay tuning constants, build flags |
-| `src/game.odin` | `game_init`, `game_destroy`, `game_camera_update` |
-| `src/scene.odin` | `Game_Scene` enum, `scene_for_state`, scene update/render callbacks |
-| `src/gameplay/generation.odin` | Map generation dispatch and item spawning |
-| `src/gameplay/actions.odin` | Turn/combat orchestration: descend, advance_turn, trigger_enemy_rounds, tile effects |
-| `src/gameplay/items.odin` | Item factory, pickup, use, drop, equip, apply_item_effect |
-| `src/gameplay/mining.odin` | Mining and crafting orchestration |
-| `src/gameplay/fov.odin` | Field-of-view computation |
-| `src/gameplay/status_effects.odin` | Timed effect ticking (poison, fire, light drain) |
-| `src/gameplay/restart.odin` | Score saving |
-| `src/gen/*.odin` | Procedural room/cave/mixed map generation |
-| `src/data.odin` / `src/core/data_defs.odin` / `src/core/content_manager.odin` | json5 parsing, data schemas, content registry/accessors |
-| `src/io/save_*.odin` | Binary save format and persistence flow |
-| `src/actions.odin` | Root bridge: handle_player_action, restart_game |
-| `src/ai/combat.odin` | Combat resolution |
-| `src/input/manager.odin` | Input manager, key bindings, Game_Action enum |
-| `src/input/playing_action.odin` | Movement/combat input dispatch (handle_input) |
-| `src/input/playing_state.odin` | Playing state hotkeys, mining input, forced turns |
-| `src/input/state_updates.odin` | Per-state update handlers (inventory, crafting, help, scores, game over, victory) |
-| `src/input/cheats.odin` | Cheat menu input handling |
-| `src/render/render.odin` | Top-level render dispatch |
-| `src/render/render_map.odin` / `src/render/render_items.odin` / `src/render/render_world.odin` / `src/render/render_title_fx.odin` | World/map/item rendering and title fire backdrop effects |
-| `src/render/clay_ui.odin` / `src/render/clay_renderer.odin` / `src/render/clay_hud.odin` / `src/render/clay_overlays.odin` / `src/render/clay_*` | Clay immediate-mode UI path |
-| `src/vendor/clay/` | Vendored Clay Odin binding and prebuilt platform libraries |
-| `src/engine/engine.odin` | `Engine` struct, `engine_run` loop, all manager accessors |
-| `src/engine/engine_services.odin` | Service registry (up to 16 services, inline arena) |
-| `src/engine/file_system.odin` | `Engine_File_System` abstraction + OS default |
-| `src/engine/storage_manager.odin` | Generic byte-level persistence via injected FS |
-| `src/engine/scene_manager.odin` | Scene lifecycle (enter/update/render/exit) |
-| `src/engine/turn_manager.odin` | Turn counter |
-| `data/enemies.json5` | Enemy stats, abilities, depth-weighted spawn tables |
-| `data/items.json5` | Item stats, effects, stack limits, equipment slots |
-| `data/player.json5` | Player starting stats |
-| `data/sprites.json5` | Sprite sheet mapping |
+| File                                                                                                                                             | Purpose                                                                              |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `src/main.odin`                                                                                                                                  | Entry point — 12 lines, calls `engine_run`                                           |
+| `src/game_app_lifecycle.odin` / `src/game_app_config.odin` / `src/game_services.odin`                                                            | App lifecycle, build/runtime config, and game service registration/accessors         |
+| `src/core/types.odin`                                                                                                                            | Core game types: `Game`, `Player`, `Enemy`, `Item`, `Tile`, `Game_State`             |
+| `src/core/screen_layout.odin` / `src/core/gameplay_tuning.odin` / `src/core/build_config.odin`                                                   | Screen geometry, gameplay tuning constants, build flags                              |
+| `src/game.odin`                                                                                                                                  | `game_init`, `game_destroy`, `game_camera_update`                                    |
+| `src/scene.odin`                                                                                                                                 | `Game_Scene` enum, `scene_for_state`, scene update/render callbacks                  |
+| `src/gameplay/generation.odin`                                                                                                                   | Map generation dispatch and item spawning                                            |
+| `src/gameplay/actions.odin`                                                                                                                      | Turn/combat orchestration: descend, advance_turn, trigger_enemy_rounds, tile effects |
+| `src/gameplay/items.odin`                                                                                                                        | Item factory, pickup, use, drop, equip, apply_item_effect                            |
+| `src/gameplay/mining.odin`                                                                                                                       | Mining and crafting orchestration                                                    |
+| `src/gameplay/fov.odin`                                                                                                                          | Field-of-view computation                                                            |
+| `src/gameplay/status_effects.odin`                                                                                                               | Timed effect ticking (poison, fire, light drain)                                     |
+| `src/gameplay/restart.odin`                                                                                                                      | Score saving                                                                         |
+| `src/gen/*.odin`                                                                                                                                 | Procedural room/cave/mixed map generation                                            |
+| `src/data.odin` / `src/core/data_defs.odin` / `src/core/content_manager.odin`                                                                    | json5 parsing, data schemas, content registry/accessors                              |
+| `src/io/save_*.odin`                                                                                                                             | Binary save format and persistence flow                                              |
+| `src/actions.odin`                                                                                                                               | Root bridge: handle_player_action, restart_game                                      |
+| `src/ai/combat.odin`                                                                                                                             | Combat resolution                                                                    |
+| `src/input/manager.odin`                                                                                                                         | Input manager, key bindings, Game_Action enum                                        |
+| `src/input/playing_action.odin`                                                                                                                  | Movement/combat input dispatch (handle_input)                                        |
+| `src/input/playing_state.odin`                                                                                                                   | Playing state hotkeys, mining input, forced turns                                    |
+| `src/input/state_updates.odin`                                                                                                                   | Per-state update handlers (inventory, crafting, help, scores, game over, victory)    |
+| `src/input/cheats.odin`                                                                                                                          | Cheat menu input handling                                                            |
+| `src/render/render.odin`                                                                                                                         | Top-level render dispatch                                                            |
+| `src/render/render_map.odin` / `src/render/render_items.odin` / `src/render/render_world.odin` / `src/render/render_title_fx.odin`               | World/map/item rendering and title fire backdrop effects                             |
+| `src/render/clay_ui.odin` / `src/render/clay_renderer.odin` / `src/render/clay_hud.odin` / `src/render/clay_overlays.odin` / `src/render/clay_*` | Clay immediate-mode UI path                                                          |
+| `src/vendor/clay/`                                                                                                                               | Vendored Clay Odin binding and prebuilt platform libraries                           |
+| `src/engine/engine.odin`                                                                                                                         | `Engine` struct, `engine_run` loop, all manager accessors                            |
+| `src/engine/engine_services.odin`                                                                                                                | Service registry (up to 16 services, inline arena)                                   |
+| `src/engine/file_system.odin`                                                                                                                    | `Engine_File_System` abstraction + OS default                                        |
+| `src/engine/storage_manager.odin`                                                                                                                | Generic byte-level persistence via injected FS                                       |
+| `src/engine/scene_manager.odin`                                                                                                                  | Scene lifecycle (enter/update/render/exit)                                           |
+| `src/engine/turn_manager.odin`                                                                                                                   | Turn counter                                                                         |
+| `data/enemies.json5`                                                                                                                             | Enemy stats, abilities, depth-weighted spawn tables                                  |
+| `data/items.json5`                                                                                                                               | Item stats, effects, stack limits, equipment slots                                   |
+| `data/player.json5`                                                                                                                              | Player starting stats                                                                |
+| `data/sprites.json5`                                                                                                                             | Sprite sheet mapping                                                                 |
 
 ---
 
@@ -262,12 +262,12 @@ STATUS_DONE:        98236657
 
 ### Required Board Actions
 
-| Situation | Action |
-|---|---|
-| Starting work on a tracked issue | Set issue to **In Progress** on board |
-| Completing tracked work | Close issue + set to **Done** on board |
-| Discovering untracked work | Create issue, add to board, set **In Progress** |
-| Opening a PR for a feature | Add `Closes #N` to PR body |
+| Situation                        | Action                                          |
+| -------------------------------- | ----------------------------------------------- |
+| Starting work on a tracked issue | Set issue to **In Progress** on board           |
+| Completing tracked work          | Close issue + set to **Done** on board          |
+| Discovering untracked work       | Create issue, add to board, set **In Progress** |
+| Opening a PR for a feature       | Add `Closes #N` to PR body                      |
 
 ### Move Issue to In Progress
 
@@ -317,12 +317,12 @@ gh api graphql -f query='mutation {
 
 ### Milestones
 
-| Number | Name |
-|---|---|
-| 1 | v0.2 — Content & Polish |
-| 2 | v0.3 — Depth & Progression |
-| 3 | v0.4 — Game Modes & Polish |
-| 4 | v0.5 — Engine Maturity |
+| Number | Name                       |
+| ------ | -------------------------- |
+| 1      | v0.2 — Content & Polish    |
+| 2      | v0.3 — Depth & Progression |
+| 3      | v0.4 — Game Modes & Polish |
+| 4      | v0.5 — Engine Maturity     |
 
 ### Labels
 
@@ -332,3 +332,17 @@ gh api graphql -f query='mutation {
 
 - Always run `just verify` before claiming a task is done.
 - Always run `just fmt` before committing code.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
+
+Rules:
+
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
