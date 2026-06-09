@@ -132,6 +132,7 @@ Item :: struct {
 	durability:     int, // current durability (0 = broken, -1 = no durability)
 	max_durability: int, // max durability (0 = item has no durability)
 	action_cost:    int, // AP to attack with this weapon (0 = use BASE_ACTION_COST)
+	crit_chance:    int, // weapon crit % added to BASE_CRIT_CHANCE_PCT (0 = no bonus)
 }
 
 Inventory_Slot :: struct {

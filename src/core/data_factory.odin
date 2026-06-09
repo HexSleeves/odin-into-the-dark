@@ -52,5 +52,6 @@ item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 		durability = def.durability,
 		max_durability = def.durability,
 		action_cost = def.action_cost,
+		crit_chance = def.crit_chance,
 	}
 }

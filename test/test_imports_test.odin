@@ -108,6 +108,14 @@ game_camera_update :: gcore.game_camera_update
 game_equipment_slot :: gcore.game_equipment_slot
 effective_attack :: gcore.effective_attack
 effective_defense :: gcore.effective_defense
+damage_roll :: gcore.damage_roll
+damage_roll_bounds :: gcore.damage_roll_bounds
+crit_roll :: gcore.crit_roll
+effective_crit_chance :: gcore.effective_crit_chance
+BASE_CRIT_CHANCE_PCT :: gcore.BASE_CRIT_CHANCE_PCT
+CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
+DAMAGE_VARIANCE_MIN_PCT :: gcore.DAMAGE_VARIANCE_MIN_PCT
+DAMAGE_VARIANCE_MAX_PCT :: gcore.DAMAGE_VARIANCE_MAX_PCT
 effective_attack_cost :: gcore.effective_attack_cost
 effective_light_bonus :: gcore.effective_light_bonus
 inventory_first_empty_slot :: gcore.inventory_first_empty_slot

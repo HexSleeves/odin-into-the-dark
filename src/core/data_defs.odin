@@ -75,6 +75,7 @@ Item_Def :: struct {
 	equipment_slot: string,
 	durability:     int,
 	action_cost:    int,
+	crit_chance:    int,
 }
 
 Item_Spawn_Weight :: struct {

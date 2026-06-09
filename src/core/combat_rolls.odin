@@ -18,8 +18,10 @@ damage_roll :: proc(base: int) -> int {
 // for a base value — used by tests and UI previews.
 damage_roll_bounds :: proc(base: int) -> (lo, hi: int) {
 	if base <= 0 {return 0, 0}
-	return max(base * DAMAGE_VARIANCE_MIN_PCT / 100, 1),
-		max(base * DAMAGE_VARIANCE_MAX_PCT / 100, 1)
+	return max(
+		base * DAMAGE_VARIANCE_MIN_PCT / 100,
+		1,
+	), max(base * DAMAGE_VARIANCE_MAX_PCT / 100, 1)
 }
 
 crit_roll :: proc(chance_pct: int) -> bool {

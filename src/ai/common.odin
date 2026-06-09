@@ -60,6 +60,11 @@ effective_attack :: gcore.effective_attack
 effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
 
+damage_roll :: gcore.damage_roll
+crit_roll :: gcore.crit_roll
+effective_crit_chance :: gcore.effective_crit_chance
+CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
+
 Status_Kind :: gcore.Status_Kind
 Status_Turns :: gcore.Status_Turns
 status_apply :: gcore.status_apply

@@ -40,19 +40,41 @@ resolve_attack_player_on_enemy :: proc(
 	enemy: ^Enemy,
 	engine: ^eng.Engine = nil,
 ) {
-	damage := effective_attack(game)
+	damage := damage_roll(effective_attack(game))
+	crit := crit_roll(effective_crit_chance(game))
+	if crit {
+		damage = damage * CRIT_DAMAGE_MULT_PCT / 100
+	}
 	enemy.hp -= damage
 	play_sfx(.Hit)
-	add_message(
-		messages,
-		game,
-		fmt.tprintf("You hit the %s for %d damage.", enemy_display_name(enemy), damage),
-		eng.Engine_Color{200, 200, 200, 255},
-	)
+	if crit {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf(
+				"Critical hit! You strike the %s for %d damage!",
+				enemy_display_name(enemy),
+				damage,
+			),
+			eng.Engine_Color{255, 220, 80, 255},
+		)
+	} else {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("You hit the %s for %d damage.", enemy_display_name(enemy), damage),
+			eng.Engine_Color{200, 200, 200, 255},
+		)
+	}
 
 	if engine != nil {
 		vfx := game_engine_vfx_manager(engine)
-		eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 220, 80, 200}, 0.15)
+		if crit {
+			eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 240, 120, 230}, 0.25)
+			eng.vfx_manager_shake(vfx, 3.0)
+		} else {
+			eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 220, 80, 200}, 0.15)
+		}
 	}
 
 	if enemy.hp <= 0 {
@@ -94,7 +116,7 @@ resolve_attack_player_on_enemy :: proc(
 
 // Enemy attacks player
 resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
-	damage := max(enemy.attack - effective_defense(game), 1)
+	damage := max(damage_roll(enemy.attack) - effective_defense(game), 1)
 	game.player.hp = max(game.player.hp - damage, 0)
 	add_message(
 		messages,

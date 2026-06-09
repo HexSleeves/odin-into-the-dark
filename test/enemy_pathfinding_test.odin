@@ -127,7 +127,10 @@ adjacent_visible_enemy_attacks_instead_of_moving :: proc(t: ^testing.T) {
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, Vec2{2, 1})
-	testing.expect_value(t, game.player.hp, 17)
+	// Enemy attack(3) is rolled with variance (no defense equipped), floored at 1.
+	lo, hi := damage_roll_bounds(3)
+	dealt := 20 - game.player.hp
+	testing.expect(t, dealt >= max(lo, 1) && dealt <= max(hi, 1))
 }
 
 @(test)

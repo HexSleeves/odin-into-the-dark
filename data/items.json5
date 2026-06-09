@@ -77,6 +77,7 @@
       equipment_slot: "weapon",
       durability: 20,
       action_cost: 1200,
+      crit_chance: 5,
     },
     {
       id: "leather_vest",
@@ -109,6 +110,7 @@
       effect: { type: "equip", value: 1 },
       equipment_slot: "weapon",
       action_cost: 700,
+      crit_chance: 15,
     },
     // ── Tier 2 Equipment (deeper floors) ──
     {
@@ -122,6 +124,7 @@
       equipment_slot: "weapon",
       durability: 35,
       action_cost: 1100,
+      crit_chance: 5,
     },
     {
       id: "chainmail",
@@ -154,6 +157,7 @@
       effect: { type: "equip", value: 7 },
       equipment_slot: "weapon",
       action_cost: 2100,
+      crit_chance: 10,
     },
     // ── Materials (from mining) ──
     {

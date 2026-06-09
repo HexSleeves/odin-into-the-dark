@@ -93,7 +93,10 @@ player_attack_reduces_enemy_hp_by_effective_attack :: proc(t: ^testing.T) {
 
 	resolve_attack_player_on_enemy(&msgs, &g, &e)
 
-	testing.expect_value(t, e.hp, 6)
+	// Damage is rolled with variance and may crit: bounds derive from effective_attack(4).
+	lo, hi := damage_roll_bounds(4)
+	dealt := 10 - e.hp
+	testing.expect(t, dealt >= lo && dealt <= hi * CRIT_DAMAGE_MULT_PCT / 100)
 }
 
 @(test)
@@ -109,7 +112,10 @@ player_attack_with_weapon_bonus_applies_full_damage :: proc(t: ^testing.T) {
 
 	resolve_attack_player_on_enemy(&msgs, &g, &e)
 
-	testing.expect_value(t, e.hp, 5) // 10 - (2+3) = 5
+	// effective_attack = 2+3 = 5; damage rolled with variance, may crit.
+	lo, hi := damage_roll_bounds(5)
+	dealt := 10 - e.hp
+	testing.expect(t, dealt >= lo && dealt <= hi * CRIT_DAMAGE_MULT_PCT / 100)
 }
 
 @(test)
@@ -188,7 +194,10 @@ enemy_attack_reduces_player_hp_by_attack_minus_defense :: proc(t: ^testing.T) {
 
 	resolve_attack_enemy_on_player(&msgs, &g, &e)
 
-	testing.expect_value(t, g.player.hp, 17) // 20 - (5-2) = 17
+	// Enemy attack(5) is rolled with variance, then reduced by defense(2), floored at 1.
+	lo, hi := damage_roll_bounds(5)
+	dealt := 20 - g.player.hp
+	testing.expect(t, dealt >= max(lo - 2, 1) && dealt <= max(hi - 2, 1))
 }
 
 @(test)
