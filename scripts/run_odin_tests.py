@@ -55,7 +55,7 @@ def overlay_tests() -> None:
 KARL2D_NIL_AUDIO_DEFINE = "-define:KARL2D_AUDIO_BACKEND=nil"
 KARL2D_NIL_AUDIO_PACKAGES = {"src/audio", "src/io", "src/render"}
 KARL2D_NIL_RENDER_DEFINE = "-define:KARL2D_RENDER_BACKEND=nil"
-KARL2D_NIL_RENDER_PACKAGES = {"src/audio", "src/io", "src/render"}
+KARL2D_NIL_RENDER_PACKAGES = {"src", "src/audio", "src/io", "src/render"}
 
 
 def package_args(package: str, args: list[str]) -> list[str]:
