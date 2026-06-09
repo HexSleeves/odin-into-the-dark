@@ -88,12 +88,9 @@ load_game_from_storage :: proc(
 	game.seed = data.seed
 	game.light_boost_bonus = data.light_boost_bonus
 	game.light_boost_turns = data.light_boost_turns
-	game.web_stuck_turns = data.web_stuck_turns
 	game.water_slow_active = data.water_slow_active
 	game.items_found = data.items_found
-	game.poison_turns = data.poison_turns
-	game.burning_turns = data.burning_turns
-	game.frozen_turns = data.frozen_turns
+	game.player_status = data.player_status
 	game.quest = data.quest
 	game.floor_entry_pos = data.floor_entry_pos
 	game.active_npc = -1
@@ -112,6 +109,10 @@ load_game_from_storage :: proc(
 		game.visited_floors[depth] = new(Saved_Floor, runtime.default_allocator())
 		if game.visited_floors[depth] != nil {
 			save_to_floor(content, &data.visited_floors[depth], game.visited_floors[depth])
+			floor_enemy_count := min(len(game.visited_floors[depth].enemies), MAX_SAVE_ENEMIES)
+			for i in 0 ..< floor_enemy_count {
+				game.visited_floors[depth].enemies[i].status = data.floor_enemy_status[depth][i]
+			}
 		}
 	}
 
@@ -143,7 +144,9 @@ load_game_from_storage :: proc(
 
 	game.enemies = make([dynamic]Enemy)
 	for i in 0 ..< data.enemy_count {
-		append(&game.enemies, save_to_enemy(content, &data.enemies[i]))
+		restored := save_to_enemy(content, &data.enemies[i])
+		restored.status = data.enemy_status[i]
+		append(&game.enemies, restored)
 	}
 
 	game.items = make([dynamic]Item)

@@ -235,19 +235,22 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			// STATUS panel (only when active)
 			has_status :=
 				game.light_boost_turns > 0 ||
-				game.poison_turns > 0 ||
-				game.burning_turns > 0 ||
-				game.frozen_turns > 0
+				game.player_status[.Poison] > 0 ||
+				game.player_status[.Burning] > 0 ||
+				game.player_status[.Frozen] > 0 ||
+				game.player_status[.Webbed] > 0
 			if has_status {
 				if clay_panel_begin("hud-status", "STATUS") {
 					if game.light_boost_turns >
 					   0 {clay_text(fmt.tprintf("OIL   %dt remaining", i32(game.light_boost_turns)), CLAY_HUD_FONT, ui_pkg.SB_OIL)}
-					if game.poison_turns >
-					   0 {clay_text(fmt.tprintf("POISON  %dt remaining", i32(game.poison_turns)), CLAY_HUD_FONT, ui_pkg.SB_POISON)}
-					if game.burning_turns >
-					   0 {clay_text(fmt.tprintf("BURNING (%d)", i32(game.burning_turns)), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
-					if game.frozen_turns >
-					   0 {clay_text(fmt.tprintf("FROZEN (%d)", i32(game.frozen_turns)), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
+					if game.player_status[.Poison] >
+					   0 {clay_text(fmt.tprintf("POISON  %dt remaining", i32(game.player_status[.Poison])), CLAY_HUD_FONT, ui_pkg.SB_POISON)}
+					if game.player_status[.Burning] >
+					   0 {clay_text(fmt.tprintf("BURNING (%d)", i32(game.player_status[.Burning])), CLAY_HUD_FONT, eng.Engine_Color{255, 120, 20, 255})}
+					if game.player_status[.Frozen] >
+					   0 {clay_text(fmt.tprintf("FROZEN (%d)", i32(game.player_status[.Frozen])), CLAY_HUD_FONT, eng.Engine_Color{100, 180, 255, 255})}
+					if game.player_status[.Webbed] >
+					   0 {clay_text(fmt.tprintf("WEBBED (%d)", i32(game.player_status[.Webbed])), CLAY_HUD_FONT, eng.Engine_Color{180, 180, 180, 255})}
 				}
 			}
 

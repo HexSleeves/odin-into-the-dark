@@ -34,6 +34,10 @@ Audio_Manager :: gameaudio.Audio_Manager
 Sound_Type :: gameaudio.Sound_Type
 Particle_Manager :: eng.Particle_Manager
 Item_Def :: gcore.Item_Def
+Status_Kind :: gcore.Status_Kind
+Status_Turns :: gcore.Status_Turns
+status_apply :: gcore.status_apply
+status_active :: gcore.status_active
 
 // ─── Core constants ───────────────────────────────────────────────────────────
 MAP_WIDTH :: gcore.MAP_WIDTH

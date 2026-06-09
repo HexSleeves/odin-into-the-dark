@@ -112,7 +112,7 @@ handle_input :: proc(
 	game.player.pos.x = target_x
 	game.player.pos.y = target_y
 	move_cost := BASE_MOVE_COST
-	if game.frozen_turns > 0 {move_cost *= 2}
+	if status_active(&game.player_status, .Frozen) {move_cost *= 2}
 	game.player.energy -= move_cost
 
 	if t != nil {

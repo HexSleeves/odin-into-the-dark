@@ -62,7 +62,7 @@ frozen_status_doubles_player_movement_energy_cost :: proc(t: ^testing.T) {
 	game: Game
 	game.player.pos = Vec2{1, 1}
 	game.player.energy = 5000
-	game.frozen_turns = 2
+	game.player_status[.Frozen] = 2
 	game.tiles[pos_to_idx(1, 1)].type = .Floor
 	game.tiles[pos_to_idx(2, 1)].type = .Floor
 
@@ -113,12 +113,12 @@ surface_descent_input_is_blocked_until_old_miner_quest_is_active :: proc(t: ^tes
 @(test)
 frozen_status_ticks_down_and_announces_thaw :: proc(t: ^testing.T) {
 	game: Game
-	game.frozen_turns = 1
+	game.player_status[.Frozen] = 1
 	messages := message_manager_make()
 
 	tick_timed_effects(&messages, &game)
 
-	testing.expect_value(t, game.frozen_turns, 0)
+	testing.expect_value(t, game.player_status[.Frozen], 0)
 	testing.expect_value(t, messages.log.count, 1)
 	testing.expect(
 		t,
@@ -132,18 +132,18 @@ timed_effects_do_not_tick_after_game_over :: proc(t: ^testing.T) {
 	game: Game
 	game.state = .Game_Over
 	game.player.hp = 1
-	game.poison_turns = 2
-	game.burning_turns = 2
-	game.frozen_turns = 2
+	game.player_status[.Poison] = 2
+	game.player_status[.Burning] = 2
+	game.player_status[.Frozen] = 2
 	game.death_cause = "Already dead"
 	messages := message_manager_make()
 
 	tick_timed_effects(&messages, &game)
 
 	testing.expect_value(t, game.player.hp, 1)
-	testing.expect_value(t, game.poison_turns, 2)
-	testing.expect_value(t, game.burning_turns, 2)
-	testing.expect_value(t, game.frozen_turns, 2)
+	testing.expect_value(t, game.player_status[.Poison], 2)
+	testing.expect_value(t, game.player_status[.Burning], 2)
+	testing.expect_value(t, game.player_status[.Frozen], 2)
 	testing.expect(t, game.death_cause == "Already dead")
 	testing.expect_value(t, messages.log.count, 0)
 }
@@ -153,16 +153,16 @@ timed_effects_stop_when_poison_kills_player :: proc(t: ^testing.T) {
 	game: Game
 	game.state = .Playing
 	game.player.hp = 1
-	game.poison_turns = 1
-	game.burning_turns = 1
+	game.player_status[.Poison] = 1
+	game.player_status[.Burning] = 1
 	messages := message_manager_make()
 
 	tick_timed_effects(&messages, &game)
 
 	testing.expect_value(t, game.state, Game_State.Game_Over)
 	testing.expect_value(t, game.player.hp, 0)
-	testing.expect_value(t, game.poison_turns, 0)
-	testing.expect_value(t, game.burning_turns, 1)
+	testing.expect_value(t, game.player_status[.Poison], 0)
+	testing.expect_value(t, game.player_status[.Burning], 1)
 	testing.expect(t, game.death_cause == "Died from poison")
 }
 
@@ -259,7 +259,7 @@ adjacent_attack_consumes_action_without_consuming_web_under_player :: proc(t: ^t
 	testing.expect_value(t, game.player.energy, BASE_AP_PER_ROUND)
 	testing.expect_value(t, eng.turn_manager_current(&engine.turn_manager), 1)
 	testing.expect(t, web_tile_at(&game, 1, 1))
-	testing.expect(t, game.web_stuck_turns == 0)
+	testing.expect(t, game.player_status[.Webbed] == 0)
 }
 
 @(test)
@@ -289,7 +289,7 @@ locked_door_unlock_consumes_action_without_consuming_web_under_player :: proc(t:
 	testing.expect_value(t, game.tiles[pos_to_idx(2, 1)].type, Tile_Type.Floor)
 	testing.expect(t, !game.inventory[0].occupied)
 	testing.expect(t, web_tile_at(&game, 1, 1))
-	testing.expect(t, game.web_stuck_turns == 0)
+	testing.expect(t, game.player_status[.Webbed] == 0)
 }
 
 @(test)

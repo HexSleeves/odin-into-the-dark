@@ -37,14 +37,16 @@ save_game_to_storage :: proc(
 	data.seed = game.seed
 	data.light_boost_bonus = game.light_boost_bonus
 	data.light_boost_turns = game.light_boost_turns
-	data.web_stuck_turns = game.web_stuck_turns
 	data.water_slow_active = game.water_slow_active
 	data.items_found = game.items_found
-	data.poison_turns = game.poison_turns
-	data.burning_turns = game.burning_turns
-	data.frozen_turns = game.frozen_turns
 	data.quest = game.quest
 	data.floor_entry_pos = game.floor_entry_pos
+	data.player_status = game.player_status
+	// Legacy mirrors — kept so the v8 prefix region stays meaningful.
+	data.poison_turns = game.player_status[gcore.Status_Kind.Poison]
+	data.burning_turns = game.player_status[gcore.Status_Kind.Burning]
+	data.frozen_turns = game.player_status[gcore.Status_Kind.Frozen]
+	data.web_stuck_turns = game.player_status[gcore.Status_Kind.Webbed]
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
@@ -59,6 +61,7 @@ save_game_to_storage :: proc(
 	for i in 0 ..< data.enemy_count {
 		e := &game.enemies[i]
 		data.enemies[i] = enemy_to_save(e)
+		data.enemy_status[i] = e.status
 	}
 
 	// ── Convert items ──
@@ -100,6 +103,10 @@ save_game_to_storage :: proc(
 		if game.visited_floors[depth] == nil {continue}
 		data.visited_floor_present[depth] = true
 		floor_to_save(game.visited_floors[depth], &data.visited_floors[depth])
+		floor_enemy_count := min(len(game.visited_floors[depth].enemies), MAX_SAVE_ENEMIES)
+		for i in 0 ..< floor_enemy_count {
+			data.floor_enemy_status[depth][i] = game.visited_floors[depth].enemies[i].status
+		}
 	}
 
 	// ── Write dialogue persistent state ──

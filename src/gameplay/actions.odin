@@ -296,7 +296,7 @@ consume_web_if_present :: proc(messages: ^Message_Manager, game: ^Game) {
 	pidx := pos_to_idx(game.player.pos.x, game.player.pos.y)
 	if web_tile_at_idx(game, pidx) {
 		web_tile_set_idx(game, pidx, false)
-		game.web_stuck_turns = WEB_STUCK_TURNS
+		status_apply(&game.player_status, .Webbed, WEB_STUCK_TURNS)
 		add_message(
 			messages,
 			game,
@@ -326,7 +326,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 	if cur_tile.type == .Gas_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= GAS_VENT_DAMAGE
-		game.poison_turns = max(game.poison_turns, GAS_VENT_POISON_TURNS)
+		status_apply(&game.player_status, .Poison, GAS_VENT_POISON_TURNS)
 		eng.vfx_manager_flash(
 			game_engine_vfx_manager(engine),
 			eng.Engine_Color{160, 180, 40, 255},
@@ -370,7 +370,7 @@ apply_current_tile_effects :: proc(engine: ^eng.Engine, game: ^Game) {
 	if cur_tile.type == .Fire_Vent {
 		messages := game_engine_message_manager(engine)
 		game.player.hp -= FIRE_VENT_DAMAGE
-		game.burning_turns = max(game.burning_turns, FIRE_VENT_BURNING_TURNS)
+		status_apply(&game.player_status, .Burning, FIRE_VENT_BURNING_TURNS)
 		eng.vfx_manager_flash(
 			game_engine_vfx_manager(engine),
 			eng.Engine_Color{255, 120, 20, 255},

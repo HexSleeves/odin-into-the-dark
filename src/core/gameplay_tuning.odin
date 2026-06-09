@@ -12,6 +12,12 @@ LIGHT_DRAIN_INTERVAL :: 30
 LIGHT_DRAIN_MIN :: 2
 LIGHT_DRAIN_START_DEPTH :: 3
 
+// ─── Combat rolls ─────────────────────────────────────────────────────────────
+DAMAGE_VARIANCE_MIN_PCT :: 75 // damage rolls span 75%..125% of base
+DAMAGE_VARIANCE_MAX_PCT :: 125
+BASE_CRIT_CHANCE_PCT :: 5 // unarmed crit chance; weapons add crit_chance on top
+CRIT_DAMAGE_MULT_PCT :: 200 // crits deal 2x post-variance damage
+
 GAS_VENT_DAMAGE :: 3
 GAS_VENT_POISON_TURNS :: 5
 FIRE_VENT_DAMAGE :: 2

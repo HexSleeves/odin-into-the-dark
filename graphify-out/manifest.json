@@ -1300,13 +1300,13 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1781025199.117081,
-    "ast_hash": "9191ed85a111401569cde07f0779d8fe",
+    "mtime": 1781028509.138411,
+    "ast_hash": "cbd58dc9389999e3562a3be608ef2a3a",
     "semantic_hash": ""
   },
   ".github/workflows/release.yml": {
-    "mtime": 1781025199.1176364,
-    "ast_hash": "8177cfd148beda59fc047994d064a961",
+    "mtime": 1781028509.1385434,
+    "ast_hash": "5b69b4eea35a3af2bd9aa7bf3be2a4ae",
     "semantic_hash": ""
   },
   ".serena/project.local.yml": {

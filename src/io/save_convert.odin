@@ -150,16 +150,16 @@ save_to_item :: proc(content: ^Content_Manager, si: ^Save_Item) -> Item {
 		glyph = rune(def.glyph[0])
 	}
 	return Item {
-		pos            = si.pos,
-		item_type      = itype,
-		name           = save_to_string(content, &si.name),
-		glyph          = glyph,
-		color          = si.color,
-		picked_up      = si.picked_up,
-		quantity       = si.quantity,
+		pos = si.pos,
+		item_type = itype,
+		name = save_to_string(content, &si.name),
+		glyph = glyph,
+		color = si.color,
+		picked_up = si.picked_up,
+		quantity = si.quantity,
 		equipment_slot = save_to_string(content, &si.equipment_slot),
-		stat_bonus     = si.stat_bonus,
-		durability     = si.durability,
+		stat_bonus = si.stat_bonus,
+		durability = si.durability,
 		max_durability = si.max_durability,
 	}
 }

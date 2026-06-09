@@ -1,8 +1,8 @@
 #+build !js
 package engine
 
-import rl "vendor:raylib"
 import "core:c"
+import rl "vendor:raylib"
 
 // Raylib texture backend — desktop default. Excluded from the JS/WASM build,
 // which cannot link libraylib.a; web uses the karl2d texture backend (loading
@@ -44,7 +44,11 @@ raylib_texture_load_bytes :: proc(ctx: rawptr, name: string, data: []u8) -> Engi
 	if len(data) == 0 {
 		return {}
 	}
-	image := rl.LoadImageFromMemory(raylib_texture_file_type(name), rawptr(&data[0]), c.int(len(data)))
+	image := rl.LoadImageFromMemory(
+		raylib_texture_file_type(name),
+		rawptr(&data[0]),
+		c.int(len(data)),
+	)
 	if !rl.IsImageValid(image) {
 		return {}
 	}

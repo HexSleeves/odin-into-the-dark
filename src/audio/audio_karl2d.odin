@@ -1,7 +1,7 @@
 package audio
 
-import eng "../engine"
 import k2 "../../../karl2d"
+import eng "../engine"
 
 MAX_KARL2D_SOUNDS :: 64
 MAX_KARL2D_MUSIC :: 8
@@ -260,7 +260,11 @@ karl2d_audio_is_music_valid :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle
 	return karl2d_audio_music_index(state, handle) >= 0
 }
 
-karl2d_audio_set_music_looping :: proc(ctx: rawptr, handle: eng.Engine_Music_Handle, looping: bool) {
+karl2d_audio_set_music_looping :: proc(
+	ctx: rawptr,
+	handle: eng.Engine_Music_Handle,
+	looping: bool,
+) {
 	state := cast(^Karl2D_Audio_State)ctx
 	idx := karl2d_audio_music_index(state, handle)
 	if idx < 0 {return}
@@ -289,11 +293,19 @@ karl2d_audio_first_free_music :: proc(state: ^Karl2D_Audio_State) -> int {
 
 @(private = "file")
 karl2d_audio_sound_valid :: proc(state: ^Karl2D_Audio_State, sound_id: int) -> bool {
-	return state != nil && sound_id >= 0 && sound_id < MAX_KARL2D_SOUNDS && state.sound_loaded[sound_id]
+	return(
+		state != nil &&
+		sound_id >= 0 &&
+		sound_id < MAX_KARL2D_SOUNDS &&
+		state.sound_loaded[sound_id] \
+	)
 }
 
 @(private = "file")
-karl2d_audio_music_index :: proc(state: ^Karl2D_Audio_State, handle: eng.Engine_Music_Handle) -> int {
+karl2d_audio_music_index :: proc(
+	state: ^Karl2D_Audio_State,
+	handle: eng.Engine_Music_Handle,
+) -> int {
 	if state == nil || handle == nil {return -1}
 	for i in 0 ..< MAX_KARL2D_MUSIC {
 		if rawptr(&state.music[i]) == handle && state.music_loaded[i] {return i}

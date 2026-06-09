@@ -64,6 +64,26 @@ Player :: struct {
 	move_speed:   int, // movement cost modifier (100 = normal). Default 100.
 }
 
+// ─── Status Effects ───────────────────────────────────────────────────────────
+
+Status_Kind :: enum {
+	Poison,
+	Burning,
+	Frozen,
+	Webbed,
+}
+
+// Turns remaining per status. 0 = inactive.
+Status_Turns :: [Status_Kind]int
+
+status_apply :: proc(s: ^Status_Turns, kind: Status_Kind, turns: int) {
+	s[kind] = max(s[kind], turns)
+}
+
+status_active :: proc(s: ^Status_Turns, kind: Status_Kind) -> bool {
+	return s[kind] > 0
+}
+
 // ─── Enemies ──────────────────────────────────────────────────────────────────
 
 Enemy :: struct {
@@ -92,6 +112,8 @@ Enemy :: struct {
 	energy:           int, // current action points (may be negative = debt)
 	quickness:        int, // AP generated per round = quickness * 10. Default 100.
 	move_speed:       int, // movement cost modifier (100 = normal). Default 100.
+	// Per-entity status effects (poison/burning tick damage, frozen/webbed impair)
+	status:           Status_Turns,
 }
 
 // ─── Items ────────────────────────────────────────────────────────────────────
@@ -256,7 +278,6 @@ Game :: struct {
 	// Web tiles (Cave Crawler ability)
 	web_tiles:              eng.Bool_Grid_Manager,
 	tile_states:            eng.Tile_State_Manager,
-	web_stuck_turns:        int, // turns remaining stuck in web (0 = free)
 	// Equipment slots
 	equipped_weapon:        Equipment,
 	equipped_armor:         Equipment,
@@ -276,10 +297,8 @@ Game :: struct {
 	render_map_dirty:       bool,
 	render_last_cam_x:      int,
 	render_last_cam_y:      int,
-	// Status effects
-	poison_turns:           int,
-	burning_turns:          int,
-	frozen_turns:           int,
+	// Player status effects (Poison/Burning/Frozen/Webbed turns remaining)
+	player_status:          Status_Turns,
 	boss_killed_this_turn:  bool,
 	// Run statistics
 	items_found:            int,

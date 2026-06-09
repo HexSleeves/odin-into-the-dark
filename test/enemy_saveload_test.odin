@@ -58,9 +58,10 @@ save_load_round_trip_preserves_status_effect_timers :: proc(t: ^testing.T) {
 
 	game := game_init(&content)
 	defer game_destroy(game)
-	game.poison_turns = 5
-	game.burning_turns = 4
-	game.frozen_turns = 3
+	game.player_status[.Poison] = 5
+	game.player_status[.Burning] = 4
+	game.player_status[.Frozen] = 3
+	game.player_status[.Webbed] = 2
 
 	turns := eng.turn_manager_make()
 	testing.expect(t, save_game_to_path(&turns, game, path))
@@ -84,7 +85,53 @@ save_load_round_trip_preserves_status_effect_timers :: proc(t: ^testing.T) {
 	defer game_cleanup(&loaded)
 
 	testing.expect(t, loaded_ok)
-	testing.expect_value(t, loaded.poison_turns, 5)
-	testing.expect_value(t, loaded.burning_turns, 4)
-	testing.expect_value(t, loaded.frozen_turns, 3)
+	testing.expect_value(t, loaded.player_status[.Poison], 5)
+	testing.expect_value(t, loaded.player_status[.Burning], 4)
+	testing.expect_value(t, loaded.player_status[.Frozen], 3)
+	testing.expect_value(t, loaded.player_status[.Webbed], 2)
+}
+
+@(test)
+save_load_round_trip_preserves_enemy_status_effects :: proc(t: ^testing.T) {
+	path := "/tmp/into-the-depths-enemy-status-save.dat"
+	defer os.remove(path)
+
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+
+	game := game_init(&content)
+	defer game_destroy(game)
+	game.state = .Playing
+	game.depth = 1
+	generate_map(&content, game)
+	testing.expect(t, len(game.enemies) > 0)
+	game.enemies[0].status[.Poison] = 4
+	game.enemies[0].status[.Burning] = 2
+
+	turns := eng.turn_manager_make()
+	testing.expect(t, save_game_to_path(&turns, game, path))
+
+	loaded: Game
+	loaded_turns := eng.turn_manager_make()
+	camera := eng.camera_manager_make()
+	vfx := eng.vfx_manager_make()
+	ui := ui_manager_make(false)
+	messages := message_manager_make()
+	loaded_ok := load_game_from_path(
+		&content,
+		&loaded_turns,
+		&camera,
+		&vfx,
+		&ui,
+		&messages,
+		&loaded,
+		path,
+	)
+	defer game_cleanup(&loaded)
+
+	testing.expect(t, loaded_ok)
+	testing.expect(t, len(loaded.enemies) > 0)
+	testing.expect_value(t, loaded.enemies[0].status[.Poison], 4)
+	testing.expect_value(t, loaded.enemies[0].status[.Burning], 2)
 }

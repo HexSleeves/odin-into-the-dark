@@ -6,4 +6,3 @@ package audio
 audio_state :: proc() -> ^Game_Audio {
 	return &g_audio
 }
-

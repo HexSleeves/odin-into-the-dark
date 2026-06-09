@@ -156,7 +156,7 @@ open_chest :: proc(engine: ^eng.Engine, game: ^Game) {
 				return
 			}
 		} else {
-			game.poison_turns = max(game.poison_turns, gcore.CHEST_TRAP_POISON_TURNS)
+			status_apply(&game.player_status, .Poison, gcore.CHEST_TRAP_POISON_TURNS)
 			add_message(
 				messages,
 				game,

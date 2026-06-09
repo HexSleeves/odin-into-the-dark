@@ -1,8 +1,8 @@
 package main
 
+import gameaudio "./audio"
 import gcore "./core"
 import eng "./engine"
-import gameaudio "./audio"
 import gameinput "./input"
 import gameio "./io"
 import "core:strconv"

@@ -169,7 +169,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist <= enemy.ability_range {
 				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
-					game.frozen_turns = max(game.frozen_turns, 3)
+					status_apply(&game.player_status, .Frozen, 3)
 					enemy.ability_cooldown = enemy.ability_max_cd
 					add_message(
 						messages,

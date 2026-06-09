@@ -34,6 +34,10 @@ Player_Def :: gcore.Player_Def
 Item_Spawn_Weight :: gcore.Item_Spawn_Weight
 Spawn_Table :: gcore.Spawn_Table
 Game_State :: gcore.Game_State
+Status_Kind :: gcore.Status_Kind
+Status_Turns :: gcore.Status_Turns
+status_apply :: gcore.status_apply
+status_active :: gcore.status_active
 Message_Manager :: eng.Message_Manager
 UI_Manager :: gameui.UI_Manager
 Input_Manager :: gameinput.Input_Manager

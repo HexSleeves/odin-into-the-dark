@@ -35,7 +35,14 @@ process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 // Returns true if an action was taken, false if the enemy should stop acting.
 @(private = "file")
 enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -> bool {
+	// Webbed enemies are stuck — they lose their whole round struggling.
+	if status_active(&enemy.status, .Webbed) {
+		enemy.energy = 0
+		return false
+	}
+
 	move_cost := max(1, BASE_MOVE_COST * enemy.move_speed / 100)
+	if status_active(&enemy.status, .Frozen) {move_cost *= 2}
 
 	switch enemy.behavior {
 	case ENEMY_BEHAVIOR_LURKER:

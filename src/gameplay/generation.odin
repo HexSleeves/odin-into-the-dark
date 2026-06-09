@@ -185,7 +185,7 @@ generate_map :: proc(content: ^Content_Manager, game: ^Game) {
 	}
 	web_tiles_clear(game)
 	clear(&game.rooms)
-	game.web_stuck_turns = 0
+	game.player_status[.Webbed] = 0
 	game.npc_count = 0
 
 	// Depth 0 is the surface town — a safe hub, no combat or hazards.

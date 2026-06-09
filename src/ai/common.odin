@@ -60,6 +60,11 @@ effective_attack :: gcore.effective_attack
 effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
 
+Status_Kind :: gcore.Status_Kind
+Status_Turns :: gcore.Status_Turns
+status_apply :: gcore.status_apply
+status_active :: gcore.status_active
+
 enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 	return gcore.enemy_at(game, x, y)
 }

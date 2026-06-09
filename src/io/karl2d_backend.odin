@@ -97,13 +97,18 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 			k2.clear(to_k2_color(color))
 		},
 		begin_scissor = proc(ctx: rawptr, x, y, width, height: i32) {
-			k2.set_scissor_rect(scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()))
+			k2.set_scissor_rect(
+				scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()),
+			)
 		},
 		end_scissor = proc(ctx: rawptr) {
 			k2.set_scissor_rect(nil)
 		},
 		draw_rectangle = proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {
-			k2.draw_rect(scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()), to_k2_color(color))
+			k2.draw_rect(
+				scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()),
+				to_k2_color(color),
+			)
 		},
 		draw_rectangle_lines = proc(
 			ctx: rawptr,
@@ -111,11 +116,20 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 			color: eng.Engine_Color,
 		) {
 			scale := karl2d_window_scale()
-			k2.draw_rect_outline(scale_k2_rect(to_k2_rect_i(x, y, width, height), scale), scale, to_k2_color(color))
+			k2.draw_rect_outline(
+				scale_k2_rect(to_k2_rect_i(x, y, width, height), scale),
+				scale,
+				to_k2_color(color),
+			)
 		},
 		draw_text = proc(ctx: rawptr, text: cstring, x, y, size: i32, color: eng.Engine_Color) {
 			scale := karl2d_window_scale()
-			k2.draw_text(string(text), k2.Vec2{f32(x) * scale, f32(y) * scale}, f32(size) * scale, to_k2_color(color))
+			k2.draw_text(
+				string(text),
+				k2.Vec2{f32(x) * scale, f32(y) * scale},
+				f32(size) * scale,
+				to_k2_color(color),
+			)
 		},
 		measure_text = proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
 			scale := karl2d_window_scale()
@@ -174,7 +188,11 @@ karl2d_texture_backend :: proc() -> eng.Engine_Texture_Backend {
 	return eng.Engine_Texture_Backend {
 		load = proc(ctx: rawptr, path: string) -> eng.Engine_Texture {
 			// karl2d uses load_bytes with compile-time embedded assets.
-			logger_errorf(.Sprites, "unsupported karl2d texture path load for '%s'; use load_bytes", path)
+			logger_errorf(
+				.Sprites,
+				"unsupported karl2d texture path load for '%s'; use load_bytes",
+				path,
+			)
 			return {}
 		},
 		load_bytes = proc(ctx: rawptr, name: string, data: []u8) -> eng.Engine_Texture {

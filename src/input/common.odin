@@ -26,6 +26,8 @@ Message_Manager :: eng.Message_Manager
 Engine :: eng.Engine
 UI_Manager :: gameui.UI_Manager
 UI_State :: gcore.UI_State
+Status_Kind :: gcore.Status_Kind
+status_active :: gcore.status_active
 Score_Manager :: renderer.Score_Manager
 Audio_Manager :: gameaudio.Audio_Manager
 Sound_Type :: gameaudio.Sound_Type

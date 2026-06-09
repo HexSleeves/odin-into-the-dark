@@ -224,8 +224,8 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^gcore.I
 			eng.Engine_Color{180, 180, 100, 255},
 		)
 	} else if eff.type == ITEM_EFFECT_CURE_POISON {
-		if game.poison_turns > 0 {
-			game.poison_turns = 0
+		if status_active(&game.player_status, .Poison) {
+			game.player_status[.Poison] = 0
 			add_message(
 				messages,
 				game,
