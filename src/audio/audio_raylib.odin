@@ -6,9 +6,7 @@ import rl "vendor:raylib"
 
 // ─── Raylib audio backend implementation ─────────────────────────────────────
 //
-// Desktop only. Excluded from the JS/WASM build (no libraylib.a on web); the web
-// build leaves config.audio unset, so the engine falls back to its nil audio
-// backend. game_audio_backend's only callers are gated behind when ODIN_OS != .JS.
+// Legacy desktop fallback. The default game backend is karl2d audio.
 
 MAX_RAYLIB_SOUNDS :: 32
 
@@ -21,7 +19,7 @@ Raylib_Audio_State :: struct {
 
 g_raylib_audio: Raylib_Audio_State
 
-game_audio_backend :: proc(audio: ^Game_Audio) -> eng.Engine_Audio_Backend {
+raylib_game_audio_backend :: proc(audio: ^Game_Audio) -> eng.Engine_Audio_Backend {
 	return eng.Engine_Audio_Backend {
 		ctx = &g_raylib_audio,
 		init_audio = raylib_audio_init,

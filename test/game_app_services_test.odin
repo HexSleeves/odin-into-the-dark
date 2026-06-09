@@ -96,10 +96,14 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 }
 
 @(test)
-game_engine_config_defers_audio_backend_for_karl2d_cutover :: proc(t: ^testing.T) {
+game_engine_config_audio_backend_matches_audio_build_flag :: proc(t: ^testing.T) {
 	config := game_engine_config()
 
-	testing.expect(t, !eng.engine_audio_backend_is_valid(config.audio))
+	when NO_AUDIO {
+		testing.expect(t, !eng.engine_audio_backend_is_valid(config.audio))
+	} else {
+		testing.expect(t, eng.engine_audio_backend_is_valid(config.audio))
+	}
 }
 
 Test_Game_App_Input_Backend_State :: struct {}

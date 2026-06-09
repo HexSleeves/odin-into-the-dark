@@ -52,15 +52,15 @@ def overlay_tests() -> None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(test_file, dest)
 
-
-KARL2D_DEFINE = "-define:KARL2D_AUDIO_BACKEND=nil"
-KARL2D_DEFINE_PACKAGES = {"src", "src/io", "src/render"}
+KARL2D_NIL_AUDIO_DEFINE = "-define:KARL2D_AUDIO_BACKEND=nil"
+KARL2D_NIL_AUDIO_PACKAGES = {"src/audio", "src/io", "src/render"}
 
 
 def package_args(package: str, args: list[str]) -> list[str]:
-    if KARL2D_DEFINE in args and package not in KARL2D_DEFINE_PACKAGES:
-        return [arg for arg in args if arg != KARL2D_DEFINE]
+    if package in KARL2D_NIL_AUDIO_PACKAGES and KARL2D_NIL_AUDIO_DEFINE not in args:
+        return args + [KARL2D_NIL_AUDIO_DEFINE]
     return args
+
 
 
 def run_package(package: str, args: list[str]) -> int:
@@ -69,7 +69,13 @@ def run_package(package: str, args: list[str]) -> int:
         return 0
     cmd = ["odin", "test", str(path), f"-collection:libs={ROOT / 'vendor'}"] + package_args(package, args)
     print("$", " ".join(cmd), flush=True)
-    return subprocess.run(cmd, cwd=ROOT).returncode
+    for attempt in range(3):
+        result = subprocess.run(cmd, cwd=ROOT)
+        if result.returncode not in (133, 251):
+            return result.returncode
+        if attempt < 2:
+            print("Odin compiler assertion during test compile; retrying...", flush=True)
+    return result.returncode
 
 def main() -> int:
     args = sys.argv[1:]

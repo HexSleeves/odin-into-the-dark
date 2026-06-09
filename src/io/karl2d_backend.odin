@@ -2,12 +2,9 @@ package gameio
 
 // karl2d backend implementation for desktop and web builds.
 //
-// The game uses karl2d for platform, rendering, input, and texture loading.
-// karl2d selects GL on desktop targets and WebGL on JS/WASM.
-//
-// Audio is NOT covered — the game uses nil audio until a karl2d audio backend
-// is implemented.
-
+// The game uses karl2d for platform, rendering, input, texture loading, and
+// audio. karl2d selects GL/CoreAudio on desktop targets and WebGL/WebAudio on
+// JS/WASM.
 import k2 "../../../karl2d"
 import eng "../engine"
 import "core:math"

@@ -4,8 +4,8 @@ import eng "../engine"
 
 // ─── Audio manager facade ────────────────────────────────────────────────────
 //
-// Backend-agnostic. The Raylib audio backend implementation lives in
-// audio_raylib.odin (#+build !js); the web build runs with nil audio.
+// Backend-agnostic. The default backend is karl2d audio; the Raylib backend is
+// kept as a legacy desktop fallback.
 
 Audio_Manager :: eng.Audio_Manager
 

@@ -10,6 +10,17 @@ import "core:testing"
 audio_manager_test_g_audio_mutex: sync.Mutex
 
 @(test)
+karl2d_audio_backend_exposes_sound_and_music_dispatch :: proc(t: ^testing.T) {
+	backend := game_audio_backend(audio_state())
+
+	testing.expect(t, eng.engine_audio_backend_is_valid(backend))
+	testing.expect(t, backend.init_audio == karl2d_audio_init)
+	testing.expect(t, backend.load_sound == karl2d_audio_load_sound)
+	testing.expect(t, backend.load_music == karl2d_audio_load_music)
+	testing.expect(t, backend.play_music == karl2d_audio_play_music)
+}
+
+@(test)
 audio_manager_make_wraps_current_audio_backend :: proc(t: ^testing.T) {
 	sync.mutex_lock(&audio_manager_test_g_audio_mutex)
 	defer sync.mutex_unlock(&audio_manager_test_g_audio_mutex)
