@@ -20,7 +20,7 @@ jobs:
           release: nightly
 
       - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev
+        run: sudo apt-get update && sudo apt-get install -y lld libgl1-mesa-dev libx11-dev libxrandr-dev libxi-dev libasound2-dev libudev-dev libwayland-dev
 
       - name: Build vendor stb libs
         run: make -C "$(odin root)/vendor/stb/src"
