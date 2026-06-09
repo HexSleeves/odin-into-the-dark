@@ -6,6 +6,7 @@ UI_APP_TITLE :: "INTO THE DEPTHS"
 UI_APP_NAME :: "Into the Depths"
 UI_APP_VERSION :: "v0.1.0"
 UI_TITLE_SUBTITLE :: "A turn-based mining roguelike"
+UI_TITLE_TAGLINE :: "Mine the dark. Keep the lamp alive. Escape with the treasure."
 UI_TITLE_CONTINUE_DISABLED :: "No save file found — Continue is disabled"
 UI_TITLE_FOOTER :: "Up/Down: Select  |  Enter: Confirm  |  N/C/H/?: Shortcuts  |  Esc/Q: Quit"
 UI_TITLE_OPTIONS :: [gcore.TITLE_OPTION_COUNT]string {

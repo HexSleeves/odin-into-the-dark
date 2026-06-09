@@ -11,9 +11,11 @@ no_sprites_define := if env_var_or_default("NO_SPRITES", "false") == "true" { "-
 skip_title_define := if env_var_or_default("SKIP_TITLE", "false") == "true" { "-define:SKIP_TITLE=true" } else { "" }
 fixed_seed_value := env_var_or_default("FIXED_SEED", "")
 fixed_seed_define := if fixed_seed_value != "" { "-define:FIXED_SEED=" + fixed_seed_value } else { "" }
+karl2d_audio_define := "-define:KARL2D_AUDIO_BACKEND=nil"
 vendor_collection := "-collection:libs=vendor/"
 build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define
-release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " -define:PUBLIC_BUILD=true"
+compile_defines := build_defines + " " + karl2d_audio_define
+release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " -define:PUBLIC_BUILD=true " + karl2d_audio_define
 copy_assets := if env_var_or_default("NO_SPRITES", "false") == "true" { "false" } else { "true" }
 
 default:
@@ -23,15 +25,15 @@ default:
 
 # Type-check without building
 check:
-    odin check {{ src }} -vet -strict-style {{ vendor_collection }} {{ build_defines }}
+    odin check {{ src }} -vet -strict-style {{ vendor_collection }} {{ compile_defines }}
 
 # Build debug binary
 build:
-    odin build {{ src }} -out:{{ binary }} {{ vendor_collection }} {{ build_defines }}
+    odin build {{ src }} -out:{{ binary }} {{ vendor_collection }} {{ compile_defines }}
 
 # Build and run
 run:
-    odin run {{ src }} {{ vendor_collection }} {{ build_defines }}
+    odin run {{ src }} {{ vendor_collection }} {{ compile_defines }}
 
 # Build then run the binary
 run-built: build
@@ -83,16 +85,16 @@ fmt:
 
 # Run all tests staged from test/ into temporary package mirrors.
 test:
-    python3 scripts/run_odin_tests.py {{ build_defines }}
+    python3 scripts/run_odin_tests.py {{ compile_defines }}
 
 # Run compile-flag matrix tests that should stay green regardless of environment.
 test-flags:
-    python3 scripts/run_odin_tests.py --root-only -define:CHEATS=true
-    python3 scripts/run_odin_tests.py --root-only -define:NO_AUDIO=true
-    python3 scripts/run_odin_tests.py --root-only -define:SPRITES=true -define:NO_SPRITES=true
-    python3 scripts/run_odin_tests.py --root-only -define:SKIP_TITLE=true
-    python3 scripts/run_odin_tests.py --root-only -define:FIXED_SEED=12345
-    odin check {{ src }} -vet -strict-style {{ vendor_collection }} -define:CHEATS=true -define:NO_AUDIO=true -define:SPRITES=true -define:NO_SPRITES=true -define:SKIP_TITLE=true -define:FIXED_SEED=12345
+    python3 scripts/run_odin_tests.py --root-only -define:CHEATS=true {{ karl2d_audio_define }}
+    python3 scripts/run_odin_tests.py --root-only -define:NO_AUDIO=true {{ karl2d_audio_define }}
+    python3 scripts/run_odin_tests.py --root-only -define:SPRITES=true -define:NO_SPRITES=true {{ karl2d_audio_define }}
+    python3 scripts/run_odin_tests.py --root-only -define:SKIP_TITLE=true {{ karl2d_audio_define }}
+    python3 scripts/run_odin_tests.py --root-only -define:FIXED_SEED=12345 {{ karl2d_audio_define }}
+    odin check {{ src }} -vet -strict-style {{ vendor_collection }} -define:CHEATS=true -define:NO_AUDIO=true -define:SPRITES=true -define:NO_SPRITES=true -define:SKIP_TITLE=true -define:FIXED_SEED=12345 {{ karl2d_audio_define }}
 
 # Check and build (CI-style verification)
 verify: test test-flags check build

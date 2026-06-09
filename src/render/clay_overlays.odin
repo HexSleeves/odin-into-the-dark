@@ -31,6 +31,7 @@ clay_render_title_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		if clay.UI(clay.ID("title-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_APP_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_TITLE_SUBTITLE)
+			clay_menu_subtitle(ui_pkg.UI_TITLE_TAGLINE, ui_pkg.SB_DIM, 14)
 			clay_menu_accent_rule("title-rule")
 			for label, idx in options {
 				disabled := idx == gcore.TITLE_CONTINUE && !has_save

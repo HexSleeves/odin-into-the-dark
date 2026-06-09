@@ -2,8 +2,61 @@
 package main
 
 import eng "./engine"
+import gameio "./io"
+import "base:runtime"
+import "core:mem"
 import "core:testing"
 
+@(test)
+game_engine_config_uses_karl2d_backends_on_desktop :: proc(t: ^testing.T) {
+	config := game_engine_config()
+	karl_platform := gameio.karl2d_platform_backend()
+	karl_render := gameio.karl2d_render_backend()
+	karl_input := gameio.karl2d_input_backend()
+	karl_texture := gameio.karl2d_texture_backend()
+
+	testing.expect(t, config.platform.init == karl_platform.init)
+	testing.expect(t, config.render.begin_frame == karl_render.begin_frame)
+	testing.expect(t, config.input.key_down == karl_input.key_down)
+	testing.expect(t, config.texture.load_bytes == karl_texture.load_bytes)
+}
+
+@(test)
+boss_camera_zoom_uses_playtested_focus_level_while_boss_is_alive :: proc(t: ^testing.T) {
+	game: Game
+	game_init_world(&game)
+	camera := eng.camera_manager_make()
+	game.player.pos = Vec2{10, 10}
+	append(&game.enemies, Enemy{alive = true, is_boss = true})
+	defer delete(game.enemies)
+
+	game_camera_update(&camera, &game, true)
+
+	testing.expect_value(t, eng.camera_manager_zoom(&camera), BOSS_CAMERA_ZOOM)
+}
+
+
+@(test)
+game_reinit_restores_caller_allocator_after_persistent_allocations :: proc(t: ^testing.T) {
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+	game := game_init(&content)
+	defer game_destroy(game)
+	messages := message_manager_make()
+
+	previous_context := context
+	defer context = previous_context
+	track: mem.Tracking_Allocator
+	mem.tracking_allocator_init(&track, runtime.default_allocator())
+	defer mem.tracking_allocator_destroy(&track)
+	context.allocator = mem.tracking_allocator(&track)
+
+	game_reinit(&content, &messages, game)
+
+	testing.expect_value(t, len(track.allocation_map), 0)
+	testing.expect_value(t, len(track.bad_free_array), 0)
+}
 @(test)
 frozen_status_doubles_player_movement_energy_cost :: proc(t: ^testing.T) {
 	game: Game

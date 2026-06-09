@@ -32,6 +32,15 @@ def copy_tree() -> None:
     data_src = ROOT / "data"
     if data_src.exists():
         shutil.copytree(data_src, WORK / "data")
+    assets_src = ROOT / "assets"
+    if assets_src.exists():
+        shutil.copytree(assets_src, WORK / "assets")
+    karl2d_src = ROOT.parent / "karl2d"
+    if not karl2d_src.exists():
+        karl2d_src = ROOT / "karl2d"
+    karl2d_link = ROOT / "build" / "karl2d"
+    if karl2d_src.exists() and not karl2d_link.exists():
+        karl2d_link.symlink_to(karl2d_src, target_is_directory=True)
 
 
 def overlay_tests() -> None:
@@ -44,11 +53,21 @@ def overlay_tests() -> None:
         shutil.copy2(test_file, dest)
 
 
+KARL2D_DEFINE = "-define:KARL2D_AUDIO_BACKEND=nil"
+KARL2D_DEFINE_PACKAGES = {"src", "src/io", "src/render"}
+
+
+def package_args(package: str, args: list[str]) -> list[str]:
+    if KARL2D_DEFINE in args and package not in KARL2D_DEFINE_PACKAGES:
+        return [arg for arg in args if arg != KARL2D_DEFINE]
+    return args
+
+
 def run_package(package: str, args: list[str]) -> int:
     path = WORK / package
     if not path.exists():
         return 0
-    cmd = ["odin", "test", str(path), f"-collection:libs={ROOT / 'vendor'}"] + args
+    cmd = ["odin", "test", str(path), f"-collection:libs={ROOT / 'vendor'}"] + package_args(package, args)
     print("$", " ".join(cmd), flush=True)
     return subprocess.run(cmd, cwd=ROOT).returncode
 

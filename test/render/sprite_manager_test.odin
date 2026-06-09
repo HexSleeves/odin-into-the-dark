@@ -35,7 +35,7 @@ sprite_manager_reports_loaded_state_from_backend :: proc(t: ^testing.T) {
 }
 
 @(test)
-sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
+sprites_use_embedded_tileset_bytes_for_texture_lifetime :: proc(t: ^testing.T) {
 	sync.mutex_lock(&sprite_manager_test_g_sprites_mutex)
 	defer sync.mutex_unlock(&sprite_manager_test_g_sprites_mutex)
 
@@ -51,8 +51,10 @@ sprites_use_engine_texture_manager_for_tileset_lifetime :: proc(t: ^testing.T) {
 
 	testing.expect(t, g_sprites.loaded)
 	testing.expect_value(t, eng.texture_manager_loaded_count(engine.texture_manager), 1)
-	testing.expect(t, state.last_path == "assets/kenney_1bit.png")
-
+	testing.expect_value(t, state.load_count, 0)
+	testing.expect_value(t, state.load_bytes_count, 1)
+	testing.expect(t, state.last_name == "assets/kenney_1bit.png")
+	testing.expect(t, state.last_bytes_len > 0)
 	sprites_cleanup(&engine)
 	testing.expect_value(t, eng.texture_manager_loaded_count(engine.texture_manager), 0)
 	testing.expect_value(t, state.unload_count, 1)
@@ -162,7 +164,7 @@ sprites_init_replaces_existing_atlas_without_leaking_previous_metadata :: proc(t
 
 	testing.expect(t, first_loaded)
 	testing.expect(t, second_loaded)
-	testing.expect_value(t, state.load_count, 2)
+	testing.expect_value(t, state.load_bytes_count, 2)
 	testing.expect_value(t, state.unload_count, 2)
 	testing.expect_value(t, len(track.allocation_map), 0)
 }
@@ -259,9 +261,12 @@ test_sprite_render_draw_texture_region :: proc(
 }
 
 Test_Sprite_Texture_Backend_State :: struct {
-	load_count:   int,
-	unload_count: int,
-	last_path:    string,
+	load_count:       int,
+	load_bytes_count: int,
+	unload_count:     int,
+	last_path:        string,
+	last_name:        string,
+	last_bytes_len:   int,
 }
 
 test_sprite_texture_backend :: proc(
@@ -270,6 +275,7 @@ test_sprite_texture_backend :: proc(
 	return eng.Engine_Texture_Backend {
 		ctx = state,
 		load = test_sprite_texture_load,
+		load_bytes = test_sprite_texture_load_bytes,
 		unload = test_sprite_texture_unload,
 	}
 }
@@ -278,6 +284,18 @@ test_sprite_texture_load :: proc(ctx: rawptr, path: string) -> eng.Engine_Textur
 	state := cast(^Test_Sprite_Texture_Backend_State)ctx
 	state.load_count += 1
 	state.last_path = path
+	return eng.Engine_Texture{handle = ctx, width = 16, height = 16}
+}
+
+test_sprite_texture_load_bytes :: proc(
+	ctx: rawptr,
+	name: string,
+	data: []u8,
+) -> eng.Engine_Texture {
+	state := cast(^Test_Sprite_Texture_Backend_State)ctx
+	state.load_bytes_count += 1
+	state.last_name = name
+	state.last_bytes_len = len(data)
 	return eng.Engine_Texture{handle = ctx, width = 16, height = 16}
 }
 

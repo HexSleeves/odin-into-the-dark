@@ -1,6 +1,5 @@
 package main
 
-import gameaudio "./audio"
 import gcore "./core"
 import eng "./engine"
 import gameinput "./input"
@@ -13,10 +12,6 @@ g_game_config: Game_Config
 g_config: eng.Config_Manager
 
 
-@(private = "file")
-_config_import_anchor :: proc() {
-	_ = gameaudio.Audio_Manager{}
-}
 game_engine_config :: proc() -> eng.Engine_Config {
 	config := eng.engine_config_make(
 		gcore.SCREEN_WIDTH,
@@ -24,16 +19,10 @@ game_engine_config :: proc() -> eng.Engine_Config {
 		"Into the Depths",
 		60,
 	)
-	when ODIN_OS == .JS {
-		config.platform = gameio.karl2d_platform_backend()
-		config.render = gameio.karl2d_render_backend()
-		config.input = gameio.karl2d_input_backend()
-		config.texture = gameio.karl2d_texture_backend()
-	} else {
-		when !NO_AUDIO {
-			config.audio = gameaudio.game_audio_backend(gameaudio.audio_state())
-		}
-	}
+	config.platform = gameio.karl2d_platform_backend()
+	config.render = gameio.karl2d_render_backend()
+	config.input = gameio.karl2d_input_backend()
+	config.texture = gameio.karl2d_texture_backend()
 	return config
 }
 
@@ -70,22 +59,8 @@ game_diagnostics_shutdown :: proc() {
 }
 
 game_runtime_assets_init :: proc() {
-	when ODIN_OS != .JS {
-		when !NO_AUDIO {
-			backend := gameaudio.game_audio_backend(gameaudio.audio_state())
-			gameaudio.audio_init(backend)
-			gameaudio.music_init()
-			gameaudio.audio_set_master_volume(g_game_config.master_volume)
-			gameaudio.music_set_volume(g_game_config.music_volume)
-		}
-	}
+	// karl2d is the default backend for desktop and web. Audio remains disabled
+	// until a karl2d-compatible audio backend replaces the old Raylib bridge.
 }
 
-game_runtime_assets_shutdown :: proc() {
-	when ODIN_OS != .JS {
-		when !NO_AUDIO {
-			gameaudio.music_cleanup()
-			gameaudio.audio_cleanup()
-		}
-	}
-}
+game_runtime_assets_shutdown :: proc() {}

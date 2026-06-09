@@ -84,6 +84,7 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	// Compile-time embedded sprite data — no runtime file I/O.
 	// json.unmarshal still allocates strings/maps; ownership is moved into g_sprites.
 	EMBEDDED_SPRITES :: #load("../../data/sprites.json5")
+	EMBEDDED_TILESET :: #load("../../assets/kenney_1bit.png")
 
 	sprite_data: Sprite_Data
 	parse_err := json.unmarshal(EMBEDDED_SPRITES, &sprite_data, spec = .JSON5)
@@ -94,11 +95,16 @@ sprites_init :: proc(engine: ^eng.Engine) {
 	}
 
 
-	// Load the tileset texture
+	// Load the tileset texture from compile-time bytes so sprite assets do not need
+	// filesystem access on desktop or web builds.
 	tileset_path := sprite_data.tileset
 	if tileset_path == "" {tileset_path = "assets/kenney_1bit.png"}
 
-	g_sprites.texture_handle = eng.engine_texture_manager_load(engine, tileset_path)
+	g_sprites.texture_handle = eng.engine_texture_manager_load_bytes(
+		engine,
+		tileset_path,
+		EMBEDDED_TILESET,
+	)
 	g_sprites.texture = eng.engine_texture_manager_get(engine, g_sprites.texture_handle)
 	if !eng.engine_texture_is_valid(g_sprites.texture) {
 		gameio.logger_errorf(.Sprites, "failed to load texture '%s'", tileset_path)

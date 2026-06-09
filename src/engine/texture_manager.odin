@@ -37,6 +37,32 @@ texture_manager_load :: proc(manager: ^Texture_Manager, path: string) -> Engine_
 	return Engine_Texture_Handle(slot + 1)
 }
 
+texture_manager_load_bytes :: proc(
+	manager: ^Texture_Manager,
+	name: string,
+	data: []u8,
+) -> Engine_Texture_Handle {
+	if manager == nil {
+		return ENGINE_TEXTURE_HANDLE_NONE
+	}
+	slot := texture_manager_first_free_slot(manager^)
+	if slot < 0 {
+		return ENGINE_TEXTURE_HANDLE_NONE
+	}
+	backend := engine_texture_backend_or_default(manager.backend)
+	if backend.load_bytes == nil {
+		return ENGINE_TEXTURE_HANDLE_NONE
+	}
+	texture := backend.load_bytes(backend.ctx, name, data)
+	if !engine_texture_is_valid(texture) {
+		return ENGINE_TEXTURE_HANDLE_NONE
+	}
+	manager.loaded[slot] = true
+	manager.textures[slot] = texture
+	return Engine_Texture_Handle(slot + 1)
+}
+
+
 texture_manager_get :: proc(
 	manager: Texture_Manager,
 	handle: Engine_Texture_Handle,
@@ -93,6 +119,18 @@ engine_texture_manager_load :: proc(engine: ^Engine, path: string) -> Engine_Tex
 		return ENGINE_TEXTURE_HANDLE_NONE
 	}
 	return texture_manager_load(manager, path)
+}
+
+engine_texture_manager_load_bytes :: proc(
+	engine: ^Engine,
+	name: string,
+	data: []u8,
+) -> Engine_Texture_Handle {
+	manager := engine_texture_manager(engine)
+	if manager == nil {
+		return ENGINE_TEXTURE_HANDLE_NONE
+	}
+	return texture_manager_load_bytes(manager, name, data)
 }
 
 engine_texture_manager_get :: proc(

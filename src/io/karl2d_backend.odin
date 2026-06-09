@@ -1,14 +1,12 @@
-#+build js
 package gameio
 
-// karl2d backend implementation for web builds.
+// karl2d backend implementation for desktop and web builds.
 //
-// On WASM, the game uses karl2d's native WebGL backend instead of Raylib+emscripten.
-// This file provides the four backend constructors (platform/render/input/texture)
-// that slot into game_engine_config via `when ODIN_OS == .JS`.
+// The game uses karl2d for platform, rendering, input, and texture loading.
+// karl2d selects GL on desktop targets and WebGL on JS/WASM.
 //
-// Audio is NOT covered — karl2d's mixer has no streaming equivalent for music.
-// The web build uses nil audio until a web-audio backend is implemented.
+// Audio is NOT covered — the game uses nil audio until a karl2d audio backend
+// is implemented.
 
 import k2 "../../../karl2d"
 import eng "../engine"
@@ -19,6 +17,33 @@ import "core:math"
 @(private = "file")
 to_k2_color :: proc(c: eng.Engine_Color) -> k2.Color {
 	return k2.Color{c.r, c.g, c.b, c.a}
+}
+
+@(private = "file")
+karl2d_window_scale :: proc() -> f32 {
+	scale := k2.get_window_scale()
+	if scale <= 0 {
+		return 1
+	}
+	return scale
+}
+
+@(private = "file")
+scale_k2_rect :: proc(r: k2.Rect, scale: f32) -> k2.Rect {
+	return k2.Rect{r.x * scale, r.y * scale, r.w * scale, r.h * scale}
+}
+
+@(private = "file")
+scale_k2_vec2 :: proc(v: k2.Vec2, scale: f32) -> k2.Vec2 {
+	return k2.Vec2{v.x * scale, v.y * scale}
+}
+
+@(private = "file")
+unscale_k2_vec2 :: proc(v: k2.Vec2, scale: f32) -> k2.Vec2 {
+	if scale <= 0 {
+		return v
+	}
+	return k2.Vec2{v.x / scale, v.y / scale}
 }
 
 @(private = "file")
@@ -75,26 +100,29 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 			k2.clear(to_k2_color(color))
 		},
 		begin_scissor = proc(ctx: rawptr, x, y, width, height: i32) {
-			k2.set_scissor_rect(to_k2_rect_i(x, y, width, height))
+			k2.set_scissor_rect(scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()))
 		},
 		end_scissor = proc(ctx: rawptr) {
 			k2.set_scissor_rect(nil)
 		},
 		draw_rectangle = proc(ctx: rawptr, x, y, width, height: i32, color: eng.Engine_Color) {
-			k2.draw_rect(to_k2_rect_i(x, y, width, height), to_k2_color(color))
+			k2.draw_rect(scale_k2_rect(to_k2_rect_i(x, y, width, height), karl2d_window_scale()), to_k2_color(color))
 		},
 		draw_rectangle_lines = proc(
 			ctx: rawptr,
 			x, y, width, height: i32,
 			color: eng.Engine_Color,
 		) {
-			k2.draw_rect_outline(to_k2_rect_i(x, y, width, height), 1, to_k2_color(color))
+			scale := karl2d_window_scale()
+			k2.draw_rect_outline(scale_k2_rect(to_k2_rect_i(x, y, width, height), scale), scale, to_k2_color(color))
 		},
 		draw_text = proc(ctx: rawptr, text: cstring, x, y, size: i32, color: eng.Engine_Color) {
-			k2.draw_text(string(text), k2.Vec2{f32(x), f32(y)}, f32(size), to_k2_color(color))
+			scale := karl2d_window_scale()
+			k2.draw_text(string(text), k2.Vec2{f32(x) * scale, f32(y) * scale}, f32(size) * scale, to_k2_color(color))
 		},
 		measure_text = proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
-			return i32(k2.measure_text(string(text), f32(size)).x)
+			scale := karl2d_window_scale()
+			return i32(k2.measure_text(string(text), f32(size) * scale).x / scale)
 		},
 		draw_texture_region = proc(
 			ctx: rawptr,
@@ -111,8 +139,8 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 			k2.draw_texture_fit(
 				tex,
 				to_k2_rect(source),
-				to_k2_rect(dest),
-				to_k2_vec2(origin),
+				scale_k2_rect(to_k2_rect(dest), karl2d_window_scale()),
+				scale_k2_vec2(to_k2_vec2(origin), karl2d_window_scale()),
 				rad,
 				to_k2_color(tint),
 			)
@@ -124,15 +152,15 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 
 karl2d_input_backend :: proc() -> eng.Engine_Input_Backend {
 	return eng.Engine_Input_Backend{key_down = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.web_key_is_held(to_k2_key(key))
+			return k2.key_is_held(to_k2_key(key))
 		}, key_pressed = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.web_key_went_down(to_k2_key(key))
+			return k2.key_went_down(to_k2_key(key))
 		}, key_released = proc(ctx: rawptr, key: eng.Engine_Key) -> bool {
-			return k2.web_key_went_up(to_k2_key(key))
+			return k2.key_went_up(to_k2_key(key))
 		}, frame_time = proc(ctx: rawptr) -> f32 {
 			return k2.get_frame_time()
 		}, mouse_position = proc(ctx: rawptr) -> eng.Engine_Mouse_Position {
-			p := k2.get_mouse_position()
+			p := unscale_k2_vec2(k2.get_mouse_position(), karl2d_window_scale())
 			return eng.Engine_Mouse_Position{x = p.x, y = p.y}
 		}, mouse_button_down = proc(ctx: rawptr, button: eng.Engine_Mouse_Button) -> bool {
 			return k2.mouse_button_is_held(to_k2_mouse_button(button))
@@ -143,14 +171,17 @@ karl2d_input_backend :: proc() -> eng.Engine_Input_Backend {
 		}}
 }
 
-// ── Texture backend (web: bytes-based) ────────────────────────────────────────
+// ── Texture backend ────────────────────────────────────────────────────────────
 
 karl2d_texture_backend :: proc() -> eng.Engine_Texture_Backend {
 	return eng.Engine_Texture_Backend {
 		load = proc(ctx: rawptr, path: string) -> eng.Engine_Texture {
-			// On web, path-based loading uses the compile-time embedded asset registry.
-			data, ok := web_asset_lookup(path)
-			if !ok {return {}}
+			// karl2d uses load_bytes with compile-time embedded assets.
+			logger_errorf(.Sprites, "unsupported karl2d texture path load for '%s'; use load_bytes", path)
+			return {}
+		},
+		load_bytes = proc(ctx: rawptr, name: string, data: []u8) -> eng.Engine_Texture {
+			if len(data) == 0 {return {}}
 			tex := new(k2.Texture)
 			tex^ = k2.load_texture_from_bytes(data)
 			if tex.width == 0 {
@@ -237,6 +268,8 @@ to_k2_key :: proc(key: eng.Engine_Key) -> k2.Keyboard_Key {
 		return .Enter
 	case .Space:
 		return .Space
+	case .Tab:
+		return .Tab
 	case .N:
 		return .N
 	case .H:

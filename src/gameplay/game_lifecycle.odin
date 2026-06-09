@@ -67,6 +67,10 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	// context.allocator to a per-frame arena. Dynamic arrays allocated
 	// from the frame arena would be freed next frame. Force the heap
 	// allocator for all persistent allocations.
+	old_context := context
+	defer {
+		context = old_context
+	}
 	context.allocator = runtime.default_allocator()
 
 	seed := game_next_seed()

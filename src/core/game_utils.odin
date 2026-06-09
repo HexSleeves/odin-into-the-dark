@@ -232,7 +232,7 @@ game_has_live_boss :: proc(game: ^Game) -> bool {
 
 game_camera_update :: proc(camera: ^eng.Camera_Manager, game: ^Game, snap: bool = false) {
 	if camera == nil || game == nil {return}
-	zoom := f32(1.12) if game_has_live_boss(game) else f32(1)
+	zoom := BOSS_CAMERA_ZOOM if game_has_live_boss(game) else f32(1)
 	eng.camera_manager_set_zoom(camera, zoom)
 	eng.camera_manager_update(
 		camera,

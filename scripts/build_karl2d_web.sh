@@ -35,12 +35,14 @@ echo "Compiling to WASM (karl2d backend)..."
 odin build "${REPO_DIR}/src/" \
     -target:js_wasm32 \
     -define:PUBLIC_BUILD=true \
+    -define:KARL2D_AUDIO_BACKEND=nil \
+    -collection:libs="${REPO_DIR}/vendor" \
     -out:"${OUT_DIR}/main.wasm"
 
 # Step 2: Copy Odin JS runtime
 cp "${ODIN_ROOT}/core/sys/wasm/js/odin.js" "${OUT_DIR}/"
 
-# Step 3: Copy karl2d audio JS (web audio backend)
+# Step 3: Copy karl2d audio JS. Currently inactive because KARL2D_AUDIO_BACKEND=nil.
 cp "${KARL2D_DIR}/audio_backend_web_audio.js" "${OUT_DIR}/"
 cp "${KARL2D_DIR}/audio_backend_web_audio_processor.js" "${OUT_DIR}/"
 

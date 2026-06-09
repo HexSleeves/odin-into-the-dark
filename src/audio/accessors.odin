@@ -7,6 +7,8 @@ audio_state :: proc() -> ^Game_Audio {
 	return &g_audio
 }
 
-raylib_audio_state_ptr :: proc() -> rawptr {
-	return &g_raylib_audio
+when ODIN_OS != .JS {
+	raylib_audio_state_ptr :: proc() -> rawptr {
+		return &g_raylib_audio
+	}
 }

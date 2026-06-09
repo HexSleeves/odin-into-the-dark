@@ -4,16 +4,16 @@
 
 | Area        | Feature                                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------------------ |
+| Shipping    | Build-flag matrix, macOS bundle, and WASM/web smoke validation completed                                     |
+| Engine      | Texture manager and desktop/web backends can load textures from embedded bytes                               |
+| Engine      | Sprite atlas now loads from compile-time PNG bytes instead of runtime filesystem paths                       |
+| Engine      | Persistent game reinitialization restores caller allocator context after heap-scoped allocations             |
+| Polish      | Boss camera focus tuned to a named `BOSS_CAMERA_ZOOM` level                                                  |
+| Polish      | Title screen adds a stronger atmospheric tagline                                                             |
+| Content     | Old Miner intro is correctly marked as one-shot dialogue content                                             |
 | Content     | Frozen status effect: deep_watcher freeze, doubled movement cost, timed thaw message, HUD indicator          |
 | Content     | Treasure vault room: sealed perimeter, locked door, key elsewhere, guaranteed rare loot                      |
 | Game feel   | Tile-specific footsteps for water, rubble, and stone/descent/anvil                                           |
-| Progression | Victory screen score breakdown with boss status and item counts                                              |
-| Dev tooling | `CHEATS` build flag with Shift+C cheat menu: heal, cure statuses, teleport to descent, depth jump, vault key |
-| Dev tooling | ASCII is the default render mode; `SPRITES=true` opts into sprite default                                    |
-| Dev tooling | Additional build flags: `NO_AUDIO`, `NO_SPRITES`, `SKIP_TITLE`, `FIXED_SEED=<n>`                             |
-| Game feel   | Boss floors set a tighter camera zoom while a boss is alive                                                  |
-| Engine      | App update/render now run with `engine_frame_allocator(engine)` as the default context allocator             |
-| Shipping    | Release recipes propagate build flags; macOS bundler can skip asset copy for `NO_SPRITES=true`               |
 
 ## Build flag reference
 
@@ -35,36 +35,19 @@ NO_AUDIO=true NO_SPRITES=true just release-macos
 
 ## Remaining work
 
-### Priority 1 — Shipping validation
+### Roadmap candidates
 
-1. **Manual QA pass for build flags**
-   - Confirm each flag and common combinations behave correctly in a real run.
-   - Especially verify `NO_SPRITES=true` cannot leave the renderer in sprite mode.
+1. **CI/CD: automated test and build pipeline**
+   - Capture the now-verified `just verify`, macOS release, and web release gates in CI.
 
-2. **macOS bundle smoke test**
-   - Run `just release-macos` and launch the `.app`.
-   - Verify ad-hoc signing and resource paths.
+2. **Settings menu: volume, keybindings, display**
+   - Build on the existing title/help/menu structure and input action binding table.
 
-3. **WASM/web target smoke test**
-   - Run `just release-web` and `just run-web`.
-   - Verify karl2d backend, input, audio fallback, and embedded data path.
+3. **Accessibility: colorblind modes, larger text**
+   - Extend the UI theme constants and render text sizing paths.
 
-### Priority 2 — Polish
+4. **Deeper content and progression**
+   - Deeper depth tiers, additional floor events, cursed/enchanted items, crafting tiers, and hazards are still tracked as roadmap issues.
 
-1. **Tune boss camera zoom**
-   - Current zoom is intentionally conservative (`1.12`).
-   - Adjust after playtesting boss rooms.
-
-2. **Title screen polish follow-up**
-   - Existing title has glow/embers and recent scores.
-   - Next pass can add richer animation or title art if desired.
-
-### Priority 3 — Engine maturity
-
-1. **Texture-from-memory backend**
-   - Data files are compile-time embedded.
-   - PNG assets still need filesystem paths unless the texture backend gains `load_bytes`/memory-image support.
-
-2. **Frame allocator audit**
-   - Engine now scopes app update/render to the frame allocator.
-   - Next pass: look for allocations that must outlive a frame and make those explicit.
+5. **Engine maturity follow-ups**
+   - Performance profiling, replay support, hot-reload, and map editor/seed export remain larger roadmap items.

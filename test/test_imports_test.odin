@@ -61,6 +61,7 @@ TILE_SIZE :: gcore.TILE_SIZE
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
 BASE_AP_PER_ROUND :: gcore.BASE_AP_PER_ROUND
+BOSS_CAMERA_ZOOM :: gcore.BOSS_CAMERA_ZOOM
 ITEM_ID_RUSTY_PICKAXE :: gcore.ITEM_ID_RUSTY_PICKAXE
 ITEM_ID_TORCH :: gcore.ITEM_ID_TORCH
 ITEM_ID_BANDAGE :: gcore.ITEM_ID_BANDAGE
@@ -170,7 +171,6 @@ game_init :: gp.game_init
 game_reinit :: gp.game_reinit
 game_cleanup :: gp.game_cleanup
 minimap_should_draw_enemy_dot :: renderer.minimap_should_draw_enemy_dot
-raylib_audio_state_ptr :: gameaudio.raylib_audio_state_ptr
 game_destroy :: gp.game_destroy
 game_initial_state :: gp.game_initial_state
 game_next_seed :: gp.game_next_seed
