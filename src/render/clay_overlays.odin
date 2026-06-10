@@ -134,8 +134,11 @@ clay_render_inventory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 						item := slot.item
 						stat_text: string
 						if item.equipment_slot == gcore.EQUIPMENT_SLOT_WEAPON {
-							lo, hi := gcore.damage_roll_bounds(game.player.attack + item.stat_bonus)
-							wpn_cost := item.action_cost if item.action_cost > 0 else gcore.BASE_ACTION_COST
+							lo, hi := gcore.damage_roll_bounds(
+								game.player.attack + item.stat_bonus,
+							)
+							wpn_cost :=
+								item.action_cost if item.action_cost > 0 else gcore.BASE_ACTION_COST
 							spd_label: string
 							if wpn_cost <= 700 {
 								spd_label = "Fast"
@@ -351,16 +354,24 @@ clay_render_cheats_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 }
 
 clay_title_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
-	clay_overlay_text(text, size, color)
+	clay_overlay_text(text, size, color, CLAY_FONT_ID_DISPLAY)
 }
 
-clay_overlay_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
+clay_overlay_text :: proc(
+	text: string,
+	size: u16,
+	color: eng.Engine_Color,
+	font_id := CLAY_FONT_ID_BODY,
+) {
 	if clay.UI(clay.ID_LOCAL("overlay-text"))(
 	clay.ElementDeclaration {
 		layout = {sizing = {width = clay.SizingFit(), height = clay.SizingFit()}},
 	},
 	) {
-		clay.TextDynamic(text, {textColor = clay_color(color), fontSize = size, lineHeight = size})
+		clay.TextDynamic(
+			text,
+			{textColor = clay_color(color), fontSize = size, lineHeight = size, fontId = font_id},
+		)
 	}
 }
 

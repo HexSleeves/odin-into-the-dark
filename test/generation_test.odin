@@ -43,6 +43,16 @@ count_tiles_of_type :: proc(game: ^Game, t: Tile_Type) -> int {
 	return count
 }
 
+count_walkable_tiles :: proc(game: ^Game) -> int {
+	count := 0
+	for y in 0 ..< MAP_HEIGHT {
+		for x in 0 ..< MAP_WIDTH {
+			if is_walkable(game, x, y) {count += 1}
+		}
+	}
+	return count
+}
+
 // tile_hash returns a cheap XOR fingerprint over all tile types.
 tile_hash :: proc(game: ^Game) -> u64 {
 	h: u64 = 0xcbf29ce484222325 // FNV offset basis
@@ -77,6 +87,63 @@ same_seed_produces_identical_tile_layout :: proc(t: ^testing.T) {
 
 	testing.expect(t, hash_a == hash_b, "identical seeds must produce identical tile layouts")
 	testing.expect_value(t, rooms_b, rooms_a)
+}
+
+@(test)
+map_generation_bounds_expand_with_depth :: proc(t: ^testing.T) {
+	shallow := mapgen_bounds_for_depth(1)
+	mid := mapgen_bounds_for_depth(6)
+	deep := mapgen_bounds_for_depth(MAX_DEPTH)
+
+	testing.expect(t, mapgen_bounds_width(shallow) < mapgen_bounds_width(mid))
+	testing.expect(t, mapgen_bounds_height(shallow) < mapgen_bounds_height(mid))
+	testing.expect(t, mapgen_bounds_width(mid) < mapgen_bounds_width(deep))
+	testing.expect(t, mapgen_bounds_height(mid) < mapgen_bounds_height(deep))
+	testing.expect_value(t, mapgen_bounds_width(deep), MAP_WIDTH)
+	testing.expect_value(t, mapgen_bounds_height(deep), MAP_HEIGHT)
+}
+
+@(test)
+deeper_generation_creates_more_walkable_space_for_same_seed :: proc(t: ^testing.T) {
+	content := make_empty_content()
+	seed := u64(0x5151515151515151)
+
+	shallow := make_test_game_for_gen(1)
+	defer game_destroy_for_gen(shallow)
+	rand.reset(seed)
+	generate_map(&content, shallow)
+
+	deep := make_test_game_for_gen(MAX_DEPTH)
+	defer game_destroy_for_gen(deep)
+	rand.reset(seed)
+	generate_map(&content, deep)
+
+	testing.expect(
+		t,
+		count_walkable_tiles(deep) > count_walkable_tiles(shallow),
+		"deeper maps should expose more walkable space than shallow maps",
+	)
+}
+
+@(test)
+shallow_generation_keeps_walkable_tiles_inside_depth_bounds :: proc(t: ^testing.T) {
+	content := make_empty_content()
+	game := make_test_game_for_gen(1)
+	defer game_destroy_for_gen(game)
+	rand.reset(0x6161616161616161)
+	generate_map(&content, game)
+
+	bounds := mapgen_bounds_for_depth(game.depth)
+	for y in 0 ..< MAP_HEIGHT {
+		for x in 0 ..< MAP_WIDTH {
+			if mapgen_bounds_contains(bounds, x, y) {continue}
+			testing.expect(
+				t,
+				!is_walkable(game, x, y),
+				"shallow generated maps should reserve outside-depth bounds as solid rock",
+			)
+		}
+	}
 }
 
 @(test)

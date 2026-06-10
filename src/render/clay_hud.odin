@@ -52,7 +52,13 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			backgroundColor = clay_color(ui_pkg.SB_BG),
 		},
 		) {
-			clay_text_centered("INTO THE DEPTHS", CLAY_FONT_TITLE, ui_pkg.SB_TITLE)
+			clay_text_centered(
+				"INTO THE DEPTHS",
+				CLAY_FONT_TITLE_DISPLAY,
+				ui_pkg.SB_TITLE,
+				CLAY_FONT_ID_DISPLAY,
+			)
+			clay_theme_divider("hud-title-rule", ui_pkg.SB_RULE_GOLD)
 
 			// VITALS panel
 			if clay_panel_begin("hud-vitals", "VITALS") {
@@ -302,11 +308,19 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	}
 }
 
-clay_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
-	clay.TextDynamic(text, {textColor = clay_color(color), fontSize = size, lineHeight = size})
+clay_text :: proc(text: string, size: u16, color: eng.Engine_Color, font_id := CLAY_FONT_ID_BODY) {
+	clay.TextDynamic(
+		text,
+		{textColor = clay_color(color), fontSize = size, lineHeight = size, fontId = font_id},
+	)
 }
 
-clay_text_centered :: proc(text: string, size: u16, color: eng.Engine_Color) {
+clay_text_centered :: proc(
+	text: string,
+	size: u16,
+	color: eng.Engine_Color,
+	font_id := CLAY_FONT_ID_BODY,
+) {
 	if clay.UI(clay.ID_LOCAL("centered-text"))(
 	clay.ElementDeclaration {
 		layout = {
@@ -314,7 +328,7 @@ clay_text_centered :: proc(text: string, size: u16, color: eng.Engine_Color) {
 			childAlignment = {x = .Center, y = .Top},
 		},
 	},
-	) {clay_text(text, size, color)}
+	) {clay_text(text, size, color, font_id)}
 }
 
 clay_row :: proc(
@@ -382,6 +396,10 @@ clay_bar_segmented :: proc(
 			clay.ElementDeclaration {
 				layout = {sizing = {width = clay.SizingGrow(), height = clay.SizingGrow()}},
 				backgroundColor = clay_color(cell_color),
+				border = {
+					color = clay_color(clay_shade(cell_color, 0.45)),
+					width = {right = 1, bottom = 2},
+				},
 			},
 			) {}
 		}

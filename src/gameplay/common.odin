@@ -160,6 +160,10 @@ rand_room_interior :: gcore.rand_room_interior
 generate_rooms :: genpkg.generate_rooms
 generate_mixed :: genpkg.generate_mixed
 generate_cave :: genpkg.generate_cave
+mapgen_bounds_for_depth :: genpkg.mapgen_bounds_for_depth
+mapgen_bounds_width :: genpkg.mapgen_bounds_width
+mapgen_bounds_height :: genpkg.mapgen_bounds_height
+mapgen_bounds_contains :: genpkg.mapgen_bounds_contains
 spawn_hazards :: genpkg.spawn_hazards
 spawn_ore_veins :: genpkg.spawn_ore_veins
 spawn_anvil :: genpkg.spawn_anvil

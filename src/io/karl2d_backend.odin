@@ -122,7 +122,14 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 				to_k2_color(color),
 			)
 		},
-		draw_text = proc(ctx: rawptr, text: cstring, x, y, size: i32, color: eng.Engine_Color) {
+		draw_text = proc(
+			ctx: rawptr,
+			text: cstring,
+			x, y, size: i32,
+			color: eng.Engine_Color,
+			font: eng.Engine_Font,
+		) {
+			// karl2d has a single font; Display falls back to it.
 			scale := karl2d_window_scale()
 			k2.draw_text(
 				string(text),
@@ -131,7 +138,7 @@ karl2d_render_backend :: proc() -> eng.Engine_Render_Backend {
 				to_k2_color(color),
 			)
 		},
-		measure_text = proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
+		measure_text = proc(ctx: rawptr, text: cstring, size: i32, font: eng.Engine_Font) -> i32 {
 			scale := karl2d_window_scale()
 			return i32(k2.measure_text(string(text), f32(size) * scale).x / scale)
 		},

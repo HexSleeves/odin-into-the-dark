@@ -1,11 +1,11 @@
 # Graph Report - odin-into-the-dark  (2026-06-10)
 
 ## Corpus Check
-- 75 files · ~123,367 words
+- 74 files · ~123,150 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1581 nodes · 1261 edges · 417 communities (144 shown, 273 thin omitted)
+- 1576 nodes · 1257 edges · 409 communities (136 shown, 273 thin omitted)
 - Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
@@ -422,14 +422,6 @@
 - [[_COMMUNITY_Community 405|Community 405]]
 - [[_COMMUNITY_Community 406|Community 406]]
 - [[_COMMUNITY_Community 407|Community 407]]
-- [[_COMMUNITY_Community 409|Community 409]]
-- [[_COMMUNITY_Community 410|Community 410]]
-- [[_COMMUNITY_Community 411|Community 411]]
-- [[_COMMUNITY_Community 412|Community 412]]
-- [[_COMMUNITY_Community 413|Community 413]]
-- [[_COMMUNITY_Community 414|Community 414]]
-- [[_COMMUNITY_Community 415|Community 415]]
-- [[_COMMUNITY_Community 416|Community 416]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `generate_map` - 17 edges
@@ -498,15 +490,15 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (417 total, 273 thin omitted)
+## Communities (409 total, 273 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
 Cohesion: 0.22
 Nodes (10): Camera_Manager, Engine, Engine_Config, Engine_Event, Engine_Event_Type, Event_Manager, Frame_Manager, frame_manager_allocator (+2 more)
 
 ### Community 1 - "Game Init & World Generation"
-Cohesion: 0.20
-Nodes (14): place_ancient_treasure, count_wall_neighbors, find_farthest_floor, find_nearest_floor, flood_fill_count, flood_fill_mark, generate_cave, generate_mixed (+6 more)
+Cohesion: 0.06
+Nodes (44): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, can_place_item, generate_map, place_ancient_treasure (+36 more)
 
 ### Community 2 - "Combat, Audio & Content Loading"
 Cohesion: 0.06
@@ -525,8 +517,8 @@ Cohesion: 0.08
 Nodes (29): Content_Manager, content_manager_destroy, content_manager_enemy_def, content_manager_enemy_def_for_depth, content_manager_item_def, content_manager_pick_item_def, content_manager_pick_item_def_for_depth, Conversation_Def (+21 more)
 
 ### Community 6 - "Field of View & Lifecycle Cleanup"
-Cohesion: 0.15
-Nodes (14): item_make, cheat_add_item_to_inventory, cheat_apply, cheat_explore_map, cheat_find_descent, cheat_open_if_requested, update_viewing_cheats, handle_global_input (+6 more)
+Cohesion: 0.08
+Nodes (28): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, game_cleanup, game_destroy, restart_game, clear_visited_floors (+20 more)
 
 ### Community 7 - "Enemy AI & Pathfinding (tests)"
 Cohesion: 0.09
@@ -1036,38 +1028,6 @@ Nodes (3): Loop Verifier (Checker), Verdict, What you verify
 Cohesion: 0.50
 Nodes (4): action_input_binding_pressed, action_input_pressed, action_input_released, engine_input_key_pressed
 
-### Community 409 - "Community 409"
-Cohesion: 0.18
-Nodes (11): can_place_item, generate_map, spawn_items, mine_wall, mineable_tile_type, spawn_anvil, spawn_boss, spawn_fountain (+3 more)
-
-### Community 410 - "Community 410"
-Cohesion: 0.28
-Nodes (9): game_cleanup, game_destroy, restart_game, clear_visited_floors, ensure_floor_snapshot, restore_dynamic_array, restore_saved_floor, save_current_floor (+1 more)
-
-### Community 411 - "Community 411"
-Cohesion: 0.47
-Nodes (6): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, give_starter_gear
-
-### Community 412 - "Community 412"
-Cohesion: 0.40
-Nodes (6): find_vault_door_position, room_contains_point, room_perimeter_contains_point, seal_room_perimeter_for_vault, spawn_treasure_vault, vault_loot_def
-
-### Community 413 - "Community 413"
-Cohesion: 0.40
-Nodes (4): Algorithms, Depth Profiles, Map Generation, Source Notes
-
-### Community 414 - "Community 414"
-Cohesion: 0.50
-Nodes (5): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, cheat_set_depth
-
-### Community 415 - "Community 415"
-Cohesion: 0.50
-Nodes (4): carve_building, generate_town, set_wall, carve_rect
-
-### Community 416 - "Community 416"
-Cohesion: 0.67
-Nodes (3): can_place_event, pick_event_type, spawn_floor_event
-
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
   src/scene.odin · relation: references
@@ -1075,7 +1035,7 @@ Nodes (3): can_place_event, pick_event_type, spawn_floor_event
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1089 isolated node(s):** `PreToolUse`, `allow`, `ECC_GATEGUARD`, `ECC_DISABLED_HOOKS`, `meta` (+1084 more)
+- **1086 isolated node(s):** `PreToolUse`, `allow`, `ECC_GATEGUARD`, `ECC_DISABLED_HOOKS`, `meta` (+1081 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **273 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1086,13 +1046,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `render_game` connect `Clay Renderer & Particles` to `Community 373`, `Community 372`, `Clay UI Overlays & HUD`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `clay_render_screen_ui` connect `Clay UI Overlays & HUD` to `Community 345`, `Clay Renderer & Particles`, `Community 371`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `Engine_Config` connect `Engine Core & Input Services` to `Community 344`, `Config & File System`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
+  _High betweenness centrality (0.000) - this node is a cross-community bridge._
 - **What connects `PreToolUse`, `allow`, `ECC_GATEGUARD` to the rest of the system?**
-  _1089 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1086 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Game Init & World Generation` be split into smaller, more focused modules?**
+  _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
 - **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
   _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._
+- **Should `Game State & Title/Game-Over Flow` be split into smaller, more focused modules?**
+  _Cohesion score 0.06090808416389812 - nodes in this community are weakly interconnected._

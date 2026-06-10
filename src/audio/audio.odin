@@ -1,7 +1,6 @@
 package audio
 
 import eng "../engine"
-import "core:math"
 
 Sound_Type :: enum {
 	Footstep,
@@ -25,89 +24,48 @@ Game_Audio :: struct {
 
 g_audio: Game_Audio
 
-@(private = "file")
-generate_tone_samples :: proc(
-	frequency: f32,
-	duration: f32,
-	volume: f32,
-	sample_rate: u32 = 44100,
-) -> (
-	samples: []i16,
-	frame_count: u32,
-) {
-	frame_count = u32(duration * f32(sample_rate))
-	samples = make([]i16, frame_count)
-	for i in 0 ..< frame_count {
-		t := f32(i) / f32(sample_rate)
-		envelope := 1.0 - f32(i) / f32(frame_count)
-		sample := math.sin(2.0 * math.PI * frequency * t) * volume * envelope
-		samples[i] = i16(sample * 32000.0)
-	}
-	return
-}
+// ─── Embedded sound assets ───────────────────────────────────────────────────
+//
+// CC0 sounds (Kenney RPG Audio + Interface Sounds), normalized to 16-bit mono
+// 44100 PCM WAV. See assets/sounds/CREDITS.md. Embedded at compile time so the
+// same data ships on desktop and web with no runtime file IO.
+
+@(rodata)
+WAV_FOOTSTEP := #load("../../assets/sounds/footstep.wav")
+@(rodata)
+WAV_HIT := #load("../../assets/sounds/hit.wav")
+@(rodata)
+WAV_MINE := #load("../../assets/sounds/mine.wav")
+@(rodata)
+WAV_PICKUP := #load("../../assets/sounds/pickup.wav")
+@(rodata)
+WAV_DEATH := #load("../../assets/sounds/death.wav")
+@(rodata)
+WAV_DESCENT := #load("../../assets/sounds/descent.wav")
+@(rodata)
+WAV_WATER := #load("../../assets/sounds/water.wav")
+@(rodata)
+WAV_BOSS_KILL := #load("../../assets/sounds/boss_kill.wav")
+@(rodata)
+WAV_STEP_RUBBLE := #load("../../assets/sounds/step_rubble.wav")
+@(rodata)
+WAV_STEP_STONE := #load("../../assets/sounds/step_stone.wav")
 
 @(private = "file")
-generate_noise_samples :: proc(
-	duration: f32,
-	volume: f32,
-	sample_rate: u32 = 44100,
-) -> (
-	samples: []i16,
-	frame_count: u32,
-) {
-	frame_count = u32(duration * f32(sample_rate))
-	samples = make([]i16, frame_count)
-	seed: u32 = 12345
-	for i in 0 ..< frame_count {
-		seed = seed * 1103515245 + 12345
-		noise := f32(i16(seed >> 16)) / 32768.0
-		envelope := 1.0 - f32(i) / f32(frame_count)
-		samples[i] = i16(noise * volume * envelope * 32000.0)
-	}
-	return
-}
-
-@(private = "file")
-load_generated_sound :: proc(
-	backend: eng.Engine_Audio_Backend,
-	samples: []i16,
-	frame_count: u32,
-	volume: f32,
-) -> int {
+load_wav :: proc(backend: eng.Engine_Audio_Backend, data: []u8, volume: f32) -> int {
+	wav, ok := parse_wav_pcm16(data)
+	if !ok {return -1}
 	desc := eng.Engine_Sound_Desc {
-		samples     = rawptr(raw_data(samples)),
-		frame_count = frame_count,
-		sample_rate = 44100,
+		samples     = rawptr(raw_data(wav.samples)),
+		frame_count = wav.frame_count,
+		sample_rate = wav.sample_rate,
 		sample_size = 16,
-		channels    = 1,
+		channels    = wav.channels,
 		volume      = volume,
 	}
 	id := eng.engine_audio_backend_load_sound(backend, desc)
-	delete(samples)
+	delete(wav.samples)
 	return id
-}
-
-@(private = "file")
-load_tone :: proc(
-	backend: eng.Engine_Audio_Backend,
-	frequency: f32,
-	duration: f32,
-	volume: f32,
-	final_volume: f32,
-) -> int {
-	samples, frame_count := generate_tone_samples(frequency, duration, volume)
-	return load_generated_sound(backend, samples, frame_count, final_volume)
-}
-
-@(private = "file")
-load_noise :: proc(
-	backend: eng.Engine_Audio_Backend,
-	duration: f32,
-	volume: f32,
-	final_volume: f32,
-) -> int {
-	samples, frame_count := generate_noise_samples(duration, volume)
-	return load_generated_sound(backend, samples, frame_count, final_volume)
 }
 
 audio_init :: proc(backend: eng.Engine_Audio_Backend) {
@@ -122,16 +80,16 @@ audio_init :: proc(backend: eng.Engine_Audio_Backend) {
 	}
 	g_audio.enabled = true
 
-	g_audio.sounds[.Footstep] = load_noise(backend, 0.05, 0.15, 0.3)
-	g_audio.sounds[.Hit] = load_tone(backend, 200, 0.1, 0.5, 0.5)
-	g_audio.sounds[.Mine] = load_tone(backend, 800, 0.08, 0.4, 0.4)
-	g_audio.sounds[.Pickup] = load_tone(backend, 1200, 0.12, 0.3, 0.4)
-	g_audio.sounds[.Death] = load_tone(backend, 80, 0.5, 0.6, 0.6)
-	g_audio.sounds[.Descent] = load_tone(backend, 300, 0.3, 0.4, 0.5)
-	g_audio.sounds[.Water] = load_noise(backend, 0.12, 0.25, 0.35)
-	g_audio.sounds[.Boss_Kill] = load_tone(backend, 440, 0.6, 0.7, 0.7)
-	g_audio.sounds[.Step_Rubble] = load_noise(backend, 0.06, 0.25, 0.35)
-	g_audio.sounds[.Step_Stone] = load_tone(backend, 150, 0.04, 0.2, 0.25)
+	g_audio.sounds[.Footstep] = load_wav(backend, WAV_FOOTSTEP, 0.30)
+	g_audio.sounds[.Hit] = load_wav(backend, WAV_HIT, 0.55)
+	g_audio.sounds[.Mine] = load_wav(backend, WAV_MINE, 0.50)
+	g_audio.sounds[.Pickup] = load_wav(backend, WAV_PICKUP, 0.50)
+	g_audio.sounds[.Death] = load_wav(backend, WAV_DEATH, 0.70)
+	g_audio.sounds[.Descent] = load_wav(backend, WAV_DESCENT, 0.55)
+	g_audio.sounds[.Water] = load_wav(backend, WAV_WATER, 0.40)
+	g_audio.sounds[.Boss_Kill] = load_wav(backend, WAV_BOSS_KILL, 0.70)
+	g_audio.sounds[.Step_Rubble] = load_wav(backend, WAV_STEP_RUBBLE, 0.30)
+	g_audio.sounds[.Step_Stone] = load_wav(backend, WAV_STEP_STONE, 0.30)
 }
 
 audio_cleanup :: proc() {

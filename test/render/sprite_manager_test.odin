@@ -240,8 +240,14 @@ test_sprite_render_draw_text :: proc(
 	text: cstring,
 	x, y, size: i32,
 	color: eng.Engine_Color,
+	font: eng.Engine_Font,
 ) {}
-test_sprite_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {return 0}
+test_sprite_render_measure_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	size: i32,
+	font: eng.Engine_Font,
+) -> i32 {return 0}
 test_sprite_render_draw_rectangle_lines :: proc(
 	ctx: rawptr,
 	x, y, width, height: i32,

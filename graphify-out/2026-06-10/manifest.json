@@ -1648,10 +1648,5 @@
     "mtime": 1781101795.2192657,
     "ast_hash": "97f512e71d649c4a0c35b09a26ea346a",
     "semantic_hash": ""
-  },
-  "internal-docs/ai/map-generation.md": {
-    "mtime": 1781102676.464644,
-    "ast_hash": "338fa9112e41ef271489abf2e26745d5",
-    "semantic_hash": ""
   }
 }

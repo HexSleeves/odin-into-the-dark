@@ -135,7 +135,12 @@ clay_ui_measure_text :: proc "c" (
 		allocator = eng.frame_manager_allocator(frames)
 	}
 	c_text := clay_string_slice_to_cstring(text, allocator)
-	width := eng.engine_render_measure_text(engine, c_text, i32(config.fontSize))
+	width := eng.engine_render_measure_text(
+		engine,
+		c_text,
+		i32(config.fontSize),
+		clay_font_id_to_engine(config.fontId),
+	)
 	height := i32(config.lineHeight)
 	if height <= 0 {
 		height = i32(config.fontSize)

@@ -4,6 +4,14 @@ Engine_Color :: struct {
 	r, g, b, a: u8,
 }
 
+// Font family for text drawing. Body is the monospace default; Display is the
+// serif face used for titles and panel headers. Backends without a display
+// face fall back to Body.
+Engine_Font :: enum u8 {
+	Body,
+	Display,
+}
+
 Engine_Rect :: struct {
 	x, y, width, height: f32,
 }
@@ -21,8 +29,14 @@ Engine_Render_Backend :: struct {
 	begin_scissor:        proc(ctx: rawptr, x, y, width, height: i32),
 	end_scissor:          proc(ctx: rawptr),
 	draw_rectangle:       proc(ctx: rawptr, x, y, width, height: i32, color: Engine_Color),
-	draw_text:            proc(ctx: rawptr, text: cstring, x, y, size: i32, color: Engine_Color),
-	measure_text:         proc(ctx: rawptr, text: cstring, size: i32) -> i32,
+	draw_text:            proc(
+		ctx: rawptr,
+		text: cstring,
+		x, y, size: i32,
+		color: Engine_Color,
+		font: Engine_Font,
+	),
+	measure_text:         proc(ctx: rawptr, text: cstring, size: i32, font: Engine_Font) -> i32,
 	draw_rectangle_lines: proc(ctx: rawptr, x, y, width, height: i32, color: Engine_Color),
 	draw_texture_region:  proc(
 		ctx: rawptr,
@@ -150,14 +164,20 @@ engine_render_draw_text :: proc(
 	text: cstring,
 	x, y, size: i32,
 	color: Engine_Color,
+	font := Engine_Font.Body,
 ) {
 	render := engine_render_backend(engine)
-	render.draw_text(render.ctx, text, x, y, size, color)
+	render.draw_text(render.ctx, text, x, y, size, color, font)
 }
 
-engine_render_measure_text :: proc(engine: ^Engine, text: cstring, size: i32) -> i32 {
+engine_render_measure_text :: proc(
+	engine: ^Engine,
+	text: cstring,
+	size: i32,
+	font := Engine_Font.Body,
+) -> i32 {
 	render := engine_render_backend(engine)
-	return render.measure_text(render.ctx, text, size)
+	return render.measure_text(render.ctx, text, size, font)
 }
 
 engine_render_draw_texture_region :: proc(
@@ -194,10 +214,16 @@ nil_render_end_scissor :: proc(ctx: rawptr) {}
 nil_render_draw_rectangle :: proc(ctx: rawptr, x, y, width, height: i32, color: Engine_Color) {}
 
 @(private = "file")
-nil_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, color: Engine_Color) {}
+nil_render_draw_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	x, y, size: i32,
+	color: Engine_Color,
+	font: Engine_Font,
+) {}
 
 @(private = "file")
-nil_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
+nil_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32, font: Engine_Font) -> i32 {
 	return 0
 }
 

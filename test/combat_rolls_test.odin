@@ -145,9 +145,5 @@ enemy_with_100_crit_chance_always_crits :: proc(t: ^testing.T) {
 	_, non_crit_hi := damage_roll_bounds(base)
 	crit_min := non_crit_hi * CRIT_DAMAGE_MULT_PCT / 100
 	// crit_min (200% of non_crit_hi) must exceed non_crit_hi when CRIT_DAMAGE_MULT_PCT > 100.
-	testing.expect(
-		t,
-		crit_min > non_crit_hi,
-		"crit damage ceiling must exceed non-crit ceiling",
-	)
+	testing.expect(t, crit_min > non_crit_hi, "crit damage ceiling must exceed non-crit ceiling")
 }

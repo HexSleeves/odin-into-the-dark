@@ -476,12 +476,18 @@ test_render_draw_rectangle :: proc(ctx: rawptr, x, y, width, height: i32, color:
 	state.rectangle_count += 1
 }
 
-test_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, color: Engine_Color) {
+test_render_draw_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	x, y, size: i32,
+	color: Engine_Color,
+	font: Engine_Font,
+) {
 	state := cast(^Test_Render_Backend_State)ctx
 	state.text_count += 1
 }
 
-test_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
+test_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32, font: Engine_Font) -> i32 {
 	state := cast(^Test_Render_Backend_State)ctx
 	state.measure_count += 1
 	return 42

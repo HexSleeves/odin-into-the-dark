@@ -189,6 +189,10 @@ game_next_seed :: gp.game_next_seed
 init_player_from_content :: gp.init_player_from_content
 compute_fov :: gp.compute_fov
 generate_map :: gp.generate_map
+mapgen_bounds_for_depth :: gp.mapgen_bounds_for_depth
+mapgen_bounds_width :: gp.mapgen_bounds_width
+mapgen_bounds_height :: gp.mapgen_bounds_height
+mapgen_bounds_contains :: gp.mapgen_bounds_contains
 spawn_items :: gp.spawn_items
 pickup_item :: gp.pickup_item
 use_item :: gp.use_item

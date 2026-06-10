@@ -127,7 +127,11 @@ resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, 
 		add_message(
 			messages,
 			game,
-			fmt.tprintf("The %s lands a vicious blow for %d damage!", enemy_display_name(enemy), damage),
+			fmt.tprintf(
+				"The %s lands a vicious blow for %d damage!",
+				enemy_display_name(enemy),
+				damage,
+			),
 			eng.Engine_Color{255, 60, 60, 255},
 		)
 	} else {

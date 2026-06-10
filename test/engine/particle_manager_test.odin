@@ -100,8 +100,14 @@ test_particle_render_draw_text :: proc(
 	text: cstring,
 	x, y, size: i32,
 	color: Engine_Color,
+	font: Engine_Font,
 ) {}
-test_particle_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {return 0}
+test_particle_render_measure_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	size: i32,
+	font: Engine_Font,
+) -> i32 {return 0}
 test_particle_render_draw_rectangle_lines :: proc(
 	ctx: rawptr,
 	x, y, width, height: i32,

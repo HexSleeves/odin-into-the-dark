@@ -16,6 +16,16 @@ clay_theme_import_anchor :: proc() {
 CLAY_FONT_SMALL :: u16(16)
 CLAY_FONT_BODY :: u16(18)
 CLAY_FONT_TITLE :: u16(20)
+CLAY_FONT_TITLE_DISPLAY :: u16(26)
+CLAY_FONT_HEADER_DISPLAY :: u16(15)
+
+// Clay fontId values mapped to engine font families by clay_font_id_to_engine.
+CLAY_FONT_ID_BODY :: u16(0)
+CLAY_FONT_ID_DISPLAY :: u16(1)
+
+clay_font_id_to_engine :: proc(font_id: u16) -> eng.Engine_Font {
+	return .Display if font_id == CLAY_FONT_ID_DISPLAY else .Body
+}
 
 CLAY_SPACE_XS :: u16(2)
 CLAY_SPACE_SM :: u16(4)
@@ -26,6 +36,16 @@ CLAY_PANEL_PAD :: u16(6)
 
 clay_color :: proc(color: eng.Engine_Color) -> clay.Color {
 	return {f32(color.r), f32(color.g), f32(color.b), f32(color.a)}
+}
+
+// Darken a color toward black; used for beveled bar segment edges.
+clay_shade :: proc(color: eng.Engine_Color, factor: f32) -> eng.Engine_Color {
+	return {
+		u8(f32(color.r) * factor),
+		u8(f32(color.g) * factor),
+		u8(f32(color.b) * factor),
+		color.a,
+	}
 }
 
 // Number of filled cells for a segmented bar of `segments` cells at `ratio` (0..1).
@@ -56,7 +76,26 @@ clay_panel_begin :: proc(id: string, header: string) -> bool {
 	},
 	)
 	if open {
-		clay_text(header, CLAY_FONT_SMALL, ui_pkg.SB_HEADER)
+		// Engraved header: display-face caps with a rule running out to the
+		// panel's right edge.
+		if clay.UI(clay.ID_LOCAL("panel-header"))(
+		clay.ElementDeclaration {
+			layout = {
+				sizing = {width = clay.SizingGrow(), height = clay.SizingFit()},
+				layoutDirection = .LeftToRight,
+				childGap = CLAY_SPACE_SM,
+				childAlignment = {y = .Center},
+			},
+		},
+		) {
+			clay_text(header, CLAY_FONT_HEADER_DISPLAY, ui_pkg.SB_HEADER, CLAY_FONT_ID_DISPLAY)
+			if clay.UI(clay.ID_LOCAL("panel-header-rule"))(
+			clay.ElementDeclaration {
+				layout = {sizing = {width = clay.SizingGrow(), height = clay.SizingFixed(1)}},
+				backgroundColor = clay_color(ui_pkg.SB_DIVIDER),
+			},
+			) {}
+		}
 	}
 	return open
 }

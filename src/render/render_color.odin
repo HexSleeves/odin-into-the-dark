@@ -23,12 +23,18 @@ render_draw_text :: proc(
 	text: cstring,
 	x, y, size: i32,
 	color: eng.Engine_Color,
+	font := eng.Engine_Font.Body,
 ) {
-	eng.engine_render_draw_text(engine, text, x, y, size, color)
+	eng.engine_render_draw_text(engine, text, x, y, size, color, font)
 }
 
-render_measure_text :: proc(engine: ^eng.Engine, text: cstring, size: i32) -> i32 {
-	return eng.engine_render_measure_text(engine, text, size)
+render_measure_text :: proc(
+	engine: ^eng.Engine,
+	text: cstring,
+	size: i32,
+	font := eng.Engine_Font.Body,
+) -> i32 {
+	return eng.engine_render_measure_text(engine, text, size, font)
 }
 
 render_draw_texture_region :: proc(

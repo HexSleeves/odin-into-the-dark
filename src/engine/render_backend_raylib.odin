@@ -6,13 +6,16 @@ import rl "vendor:raylib"
 RAYLIB_TEXT_FONT_PATH :: "assets/fonts/SourceCodePro-Regular.ttf"
 RAYLIB_TEXT_FONT_BUNDLE_PATH :: "../Resources/assets/fonts/SourceCodePro-Regular.ttf"
 RAYLIB_TEXT_FONT_APP_RESOURCE_SUFFIX :: "../Resources/assets/fonts/SourceCodePro-Regular.ttf"
+RAYLIB_DISPLAY_FONT_PATH :: "assets/fonts/Cinzel-Regular.ttf"
+RAYLIB_DISPLAY_FONT_BUNDLE_PATH :: "../Resources/assets/fonts/Cinzel-Regular.ttf"
+RAYLIB_DISPLAY_FONT_APP_RESOURCE_SUFFIX :: "../Resources/assets/fonts/Cinzel-Regular.ttf"
 RAYLIB_TEXT_MAX_FONT_SIZE :: 96
 RAYLIB_TEXT_SPACING :: f32(1)
 
 @(private = "file")
-raylib_text_fonts: [RAYLIB_TEXT_MAX_FONT_SIZE + 1]rl.Font
+raylib_text_fonts: [Engine_Font][RAYLIB_TEXT_MAX_FONT_SIZE + 1]rl.Font
 @(private = "file")
-raylib_text_font_loaded: [RAYLIB_TEXT_MAX_FONT_SIZE + 1]bool
+raylib_text_font_loaded: [Engine_Font][RAYLIB_TEXT_MAX_FONT_SIZE + 1]bool
 
 // Raylib render backend — desktop default. Excluded from the JS/WASM build,
 // which cannot link libraylib.a; web uses the karl2d render backend instead.
@@ -73,8 +76,14 @@ raylib_render_draw_rectangle_lines :: proc(
 }
 
 @(private = "file")
-raylib_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, color: Engine_Color) {
-	font, loaded := raylib_render_font_for_size(size)
+raylib_render_draw_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	x, y, size: i32,
+	color: Engine_Color,
+	family: Engine_Font,
+) {
+	font, loaded := raylib_render_font_for_size(size, family)
 	if !loaded {
 		rl.DrawText(text, x, y, size, engine_color_to_raylib(color))
 		return
@@ -90,8 +99,13 @@ raylib_render_draw_text :: proc(ctx: rawptr, text: cstring, x, y, size: i32, col
 }
 
 @(private = "file")
-raylib_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {
-	font, loaded := raylib_render_font_for_size(size)
+raylib_render_measure_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	size: i32,
+	family: Engine_Font,
+) -> i32 {
+	font, loaded := raylib_render_font_for_size(size, family)
 	if !loaded {
 		return rl.MeasureText(text, size)
 	}
@@ -123,39 +137,61 @@ raylib_render_draw_texture_region :: proc(
 
 @(private = "file")
 raylib_render_shutdown :: proc(ctx: rawptr) {
-	for i in 0 ..< len(raylib_text_font_loaded) {
-		if raylib_text_font_loaded[i] {
-			rl.UnloadFont(raylib_text_fonts[i])
-			raylib_text_fonts[i] = {}
-			raylib_text_font_loaded[i] = false
+	for family in Engine_Font {
+		for i in 0 ..< len(raylib_text_font_loaded[family]) {
+			if raylib_text_font_loaded[family][i] {
+				rl.UnloadFont(raylib_text_fonts[family][i])
+				raylib_text_fonts[family][i] = {}
+				raylib_text_font_loaded[family][i] = false
+			}
 		}
 	}
 }
 
 @(private = "file")
-raylib_render_font_for_size :: proc(size: i32) -> (rl.Font, bool) {
+raylib_font_paths :: proc(family: Engine_Font) -> (primary, bundle, app_suffix: string) {
+	switch family {
+	case .Display:
+		return RAYLIB_DISPLAY_FONT_PATH,
+			RAYLIB_DISPLAY_FONT_BUNDLE_PATH,
+			RAYLIB_DISPLAY_FONT_APP_RESOURCE_SUFFIX
+	case .Body:
+	}
+	return RAYLIB_TEXT_FONT_PATH,
+		RAYLIB_TEXT_FONT_BUNDLE_PATH,
+		RAYLIB_TEXT_FONT_APP_RESOURCE_SUFFIX
+}
+
+@(private = "file")
+raylib_render_font_for_size :: proc(size: i32, family: Engine_Font) -> (rl.Font, bool) {
 	if size <= 0 || size > RAYLIB_TEXT_MAX_FONT_SIZE {
 		return rl.GetFontDefault(), false
 	}
 
 	index := int(size)
-	if raylib_text_font_loaded[index] {
-		return raylib_text_fonts[index], true
+	if raylib_text_font_loaded[family][index] {
+		return raylib_text_fonts[family][index], true
 	}
 
-	font, loaded := raylib_render_load_font(RAYLIB_TEXT_FONT_PATH, size)
+	primary, bundle, app_suffix := raylib_font_paths(family)
+	font, loaded := raylib_render_load_font(primary, size)
 	if !loaded {
-		font, loaded = raylib_render_load_font(RAYLIB_TEXT_FONT_BUNDLE_PATH, size)
+		font, loaded = raylib_render_load_font(bundle, size)
 	}
 	if !loaded {
-		font, loaded = raylib_render_load_app_resource_font(size)
+		font, loaded = raylib_render_load_app_resource_font(app_suffix, size)
 	}
 	if !loaded {
+		// Display face missing → fall back to the body face rather than the
+		// raylib default bitmap font.
+		if family == .Display {
+			return raylib_render_font_for_size(size, .Body)
+		}
 		return rl.GetFontDefault(), false
 	}
 
-	raylib_text_fonts[index] = font
-	raylib_text_font_loaded[index] = true
+	raylib_text_fonts[family][index] = font
+	raylib_text_font_loaded[family][index] = true
 	return font, true
 }
 
@@ -173,7 +209,7 @@ raylib_render_load_font :: proc(path: string, size: i32) -> (rl.Font, bool) {
 }
 
 @(private = "file")
-raylib_render_load_app_resource_font :: proc(size: i32) -> (rl.Font, bool) {
+raylib_render_load_app_resource_font :: proc(suffix: string, size: i32) -> (rl.Font, bool) {
 	app_dir := string(rl.GetApplicationDirectory())
 	path_buf: [1024]u8
 	cursor := 0
@@ -185,7 +221,6 @@ raylib_render_load_app_resource_font :: proc(size: i32) -> (rl.Font, bool) {
 		path_buf[cursor] = '/'
 		cursor += 1
 	}
-	suffix := RAYLIB_TEXT_FONT_APP_RESOURCE_SUFFIX
 	for i in 0 ..< len(suffix) {
 		if cursor >= len(path_buf) - 1 {
 			break

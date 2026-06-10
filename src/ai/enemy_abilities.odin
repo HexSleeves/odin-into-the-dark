@@ -127,7 +127,11 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						eng.Engine_Color{220, 180, 60, 255},
 					)
 					if game.player.hp <= 0 {
-						player_die(messages, game, fmt.tprintf("Crushed by the %s", enemy_display_name(&enemy)))
+						player_die(
+							messages,
+							game,
+							fmt.tprintf("Crushed by the %s", enemy_display_name(&enemy)),
+						)
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd

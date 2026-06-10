@@ -82,7 +82,7 @@ clay_menu_accent_rule :: proc(id: string) {
 
 // large centered title (default gold). Uses clay_text_centered.
 clay_menu_title :: proc(text: string, color := ui_pkg.SB_TITLE, size: u16 = 40) {
-	clay_text_centered(text, size, color)
+	clay_text_centered(text, size, color, CLAY_FONT_ID_DISPLAY)
 }
 
 // centered tagline / subtitle.
@@ -102,7 +102,7 @@ clay_menu_section :: proc(id: string, label: string) {
 		},
 	},
 	) {
-		clay_text(label, 14, ui_pkg.SB_HEADER)
+		clay_text(label, 14, ui_pkg.SB_HEADER, CLAY_FONT_ID_DISPLAY)
 	}
 	clay_theme_divider(fmt.tprintf("%s-rule", id))
 }

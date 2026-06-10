@@ -43,7 +43,15 @@ clay_render_commands :: proc(engine: ^eng.Engine, commands: clay.ClayArray(clay.
 				allocator = eng.frame_manager_allocator(frames)
 			}
 			c_text := clay_string_slice_to_cstring(text.stringContents, allocator)
-			render_draw_text(engine, c_text, i32(box.x), i32(box.y), i32(text.fontSize), color)
+			render_draw_text(
+				engine,
+				c_text,
+				i32(box.x),
+				i32(box.y),
+				i32(text.fontSize),
+				color,
+				clay_font_id_to_engine(text.fontId),
+			)
 		case .ScissorStart:
 			eng.engine_render_begin_scissor(
 				engine,

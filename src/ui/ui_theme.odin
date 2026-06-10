@@ -5,8 +5,9 @@ import eng "../engine"
 
 // Sidebar palette — "Lamplit Mine". Gold (SB_TITLE) is reserved for treasure/title only.
 SB_BG :: eng.Engine_Color{11, 10, 15, 255} // #0B0A0F screen void / sidebar base
-SB_PANEL :: eng.Engine_Color{21, 19, 28, 255} // #15131C readout panel background
-SB_DIVIDER :: eng.Engine_Color{58, 53, 80, 255} // #3A3550 panel border / divider
+SB_PANEL :: eng.Engine_Color{22, 19, 15, 255} // #16130F readout panel background (warm coal)
+SB_DIVIDER :: eng.Engine_Color{84, 68, 40, 255} // #544428 gold-tinted panel border / divider
+SB_RULE_GOLD :: eng.Engine_Color{122, 95, 32, 255} // #7A5F20 ornate rule under the title
 SB_TITLE :: eng.Engine_Color{245, 182, 56, 255} // #F5B638 gold accent (treasure/title)
 SB_HEADER :: eng.Engine_Color{176, 167, 145, 255} // #B0A791 panel header labels
 SB_TEXT :: eng.Engine_Color{232, 223, 200, 255} // #E8DFC8 primary text
@@ -28,7 +29,7 @@ SB_BOSS :: eng.Engine_Color{216, 69, 62, 255} // #D8453E boss
 SB_KEY :: eng.Engine_Color{138, 130, 112, 255} // control keys (de-emphasized)
 SB_SELECT_BG :: eng.Engine_Color{245, 182, 56, 38} // translucent gold selection tint
 SB_BACKDROP :: eng.Engine_Color{4, 3, 6, 242} // full-screen dim backdrop
-SB_CARD :: eng.Engine_Color{28, 26, 38, 255} // #1C1A26 menu card panel (lifts off backdrop)
+SB_CARD :: eng.Engine_Color{32, 27, 19, 255} // #201B13 menu card panel (lifts off backdrop)
 SB_ACCENT :: SB_TITLE // gold accent (semantic alias)
 
 // Sidebar geometry shared by Clay HUD layout.

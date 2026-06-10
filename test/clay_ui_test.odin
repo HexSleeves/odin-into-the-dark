@@ -197,14 +197,17 @@ clay_test_render_draw_text :: proc(
 	text: cstring,
 	x, y, size: i32,
 	color: eng.Engine_Color,
+	font: eng.Engine_Font,
 ) {
 	state := cast(^Clay_Test_Render_State)ctx
 	state.text_count += 1
 }
-clay_test_render_measure_text :: proc(ctx: rawptr, text: cstring, size: i32) -> i32 {return max(
-		size * 4,
-		1,
-	)}
+clay_test_render_measure_text :: proc(
+	ctx: rawptr,
+	text: cstring,
+	size: i32,
+	font: eng.Engine_Font,
+) -> i32 {return max(size * 4, 1)}
 clay_test_render_draw_rectangle_lines :: proc(
 	ctx: rawptr,
 	x, y, width, height: i32,
