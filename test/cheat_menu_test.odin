@@ -12,8 +12,7 @@ when CHEATS_ENABLED {
 		game.state = .Playing
 		ui := ui_manager_make(false)
 		input_state := Test_Input_Backend_State{}
-		input_state.pressed[eng.Engine_Key.C] = true
-		input_state.down[eng.Engine_Key.Left_Shift] = true
+		input_state.pressed[eng.Engine_Key.Grave] = true
 		input := input_manager_make()
 		input.backend = test_input_backend(&input_state)
 
@@ -25,28 +24,27 @@ when CHEATS_ENABLED {
 	}
 
 	@(test)
-	shift_c_resolves_to_cheat_menu_and_suppresses_crafting :: proc(t: ^testing.T) {
+	backtick_opens_cheat_menu_without_triggering_crafting :: proc(t: ^testing.T) {
 		input_state := Test_Input_Backend_State{}
-		input_state.pressed[eng.Engine_Key.C] = true
-		input_state.down[eng.Engine_Key.C] = true
-		input_state.down[eng.Engine_Key.Left_Shift] = true
+		input_state.pressed[eng.Engine_Key.Grave] = true
+		input_state.down[eng.Engine_Key.Grave] = true
 		input := input_manager_make()
 		input.backend = test_input_backend(&input_state)
 
-		// Shift+C must open the cheat menu, not crafting.
+		// Dedicated ` key opens cheats; it must not collide with crafting (C).
 		testing.expect(t, action_pressed(&input, .Cheat_Menu))
 		testing.expect(t, !action_pressed(&input, .Crafting))
 	}
 
 	@(test)
-	plain_c_resolves_to_crafting_not_cheat_menu :: proc(t: ^testing.T) {
+	plain_c_triggers_crafting_not_cheat_menu :: proc(t: ^testing.T) {
 		input_state := Test_Input_Backend_State{}
 		input_state.pressed[eng.Engine_Key.C] = true
 		input_state.down[eng.Engine_Key.C] = true
 		input := input_manager_make()
 		input.backend = test_input_backend(&input_state)
 
-		// Plain C must trigger crafting; cheat menu requires shift.
+		// C is now crafting only; the cheat menu lives on its own key.
 		testing.expect(t, action_pressed(&input, .Crafting))
 		testing.expect(t, !action_pressed(&input, .Cheat_Menu))
 	}

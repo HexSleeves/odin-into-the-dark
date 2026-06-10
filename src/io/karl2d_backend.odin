@@ -321,6 +321,8 @@ to_k2_key :: proc(key: eng.Engine_Key) -> k2.Keyboard_Key {
 		return .Left_Bracket
 	case .Right_Bracket:
 		return .Right_Bracket
+	case .Grave:
+		return .Backtick
 	case:
 		return .None
 	}

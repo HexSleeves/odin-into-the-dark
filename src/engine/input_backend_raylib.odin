@@ -157,6 +157,8 @@ engine_key_to_raylib :: proc(key: Engine_Key) -> rl.KeyboardKey {
 		return .RIGHT_BRACKET
 	case .Tab:
 		return .TAB
+	case .Grave:
+		return .GRAVE
 	case:
 		return .KEY_NULL
 	}
