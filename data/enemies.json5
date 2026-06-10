@@ -45,6 +45,20 @@
       ability: { type: "web", cooldown: 5, range: 1 },
     },
     {
+      id: "cave_spider",
+      name: "Cave Spider",
+      glyph: "x",
+      color: [60, 40, 70, 255],
+      hp: 7,
+      attack: 3,
+      crit_chance: 5,
+      quickness: 120,
+      move_speed: 75,        // fast skittering
+      detection_radius: 9,
+      memory_turns: 8,       // persistent hunter — webs and pursues
+      ability: { type: "web", cooldown: 4, range: 1 },
+    },
+    {
       id: "deep_watcher",
       name: "Deep Watcher",
       glyph: "W",
@@ -124,6 +138,102 @@
       memory_turns: 25,      // patient ambusher — once triggered, never stops
       behavior: "lurker",
     },
+    // ── Fleet additions ──────────────────────────────────────────────
+    // Tier 1 (shallow, d1-3): low-threat fodder & skirmishers
+    {
+      id: "tunnel_grub",
+      name: "Tunnel Grub",
+      glyph: "g",
+      color: [130, 110, 70, 255],
+      hp: 6,
+      attack: 2,
+      quickness: 80,
+      move_speed: 130,       // slow, bloated crawler
+      detection_radius: 5,
+      memory_turns: 3,       // mindless fodder
+    },
+    {
+      id: "cave_kobold",
+      name: "Cave Kobold",
+      glyph: "k",
+      color: [160, 140, 90, 255],
+      hp: 5,
+      attack: 3,
+      crit_chance: 5,
+      quickness: 110,
+      move_speed: 90,
+      detection_radius: 8,
+      memory_turns: 6,       // opportunistic skirmisher
+    },
+    // Tier 2 (mid, d3-7): introduce control + bruiser pressure
+    {
+      id: "grasping_root",
+      name: "Grasping Root",
+      glyph: "Y",
+      color: [80, 120, 60, 255],
+      hp: 14,
+      attack: 4,
+      quickness: 70,
+      move_speed: 150,       // near-rooted; controls space instead of chasing
+      detection_radius: 12,
+      memory_turns: 99,      // rooted sentinel — always aware once seen
+      ability: { type: "pull", cooldown: 3, range: 5 },
+    },
+    {
+      id: "flesh_brute",
+      name: "Flesh Brute",
+      glyph: "B",
+      color: [180, 90, 90, 255],
+      hp: 20,
+      attack: 6,
+      crit_chance: 5,
+      quickness: 80,
+      move_speed: 110,
+      detection_radius: 8,
+      memory_turns: 10,      // slow tank that ground-slams in melee
+      ability: { type: "slam", cooldown: 4, range: 1, damage: 3 },
+    },
+    // Tier 3 (deep, d7-12): boss-grade mechanics on regular spawns
+    {
+      id: "frost_wraith",
+      name: "Frost Wraith",
+      glyph: "f",
+      color: [120, 180, 230, 255],
+      hp: 12,
+      attack: 4,
+      quickness: 120,
+      move_speed: 80,        // fast, glassy freezer
+      detection_radius: 14,
+      memory_turns: 15,      // hunts and locks the player down
+      ability: { type: "freeze", cooldown: 5, range: 4 },
+    },
+    {
+      id: "void_caller",
+      name: "Void Caller",
+      glyph: "v",
+      color: [120, 40, 160, 255],
+      hp: 16,
+      attack: 5,
+      quickness: 90,
+      move_speed: 100,
+      detection_radius: 16,
+      memory_turns: 18,      // smothers the light to hunt in the dark
+      ability: { type: "darkness", cooldown: 5, range: 6 },
+    },
+    {
+      id: "bone_archer",
+      name: "Bone Archer",
+      glyph: "a",
+      color: [220, 210, 180, 255],
+      hp: 11,
+      attack: 4,
+      crit_chance: 10,
+      quickness: 100,
+      move_speed: 110,
+      detection_radius: 14,
+      memory_turns: 12,      // ranged harasser — keeps distance and shoots
+      ability: { type: "ranged_shoot", cooldown: 3, range: 6, damage: 4 },
+    },
     // Bosses — high detection, long memory (effectively permanent)
     {
       id: "mine_guardian",
@@ -174,7 +284,8 @@
       // Depth 1: mostly rats, intro floor
       depth_min: 1, depth_max: 1,
       weights: [
-        { id: "rat", weight: 75 },
+        { id: "rat", weight: 60 },
+        { id: "tunnel_grub", weight: 15 },
         { id: "miner_husk", weight: 10 },
         { id: "cave_bat", weight: 15 },
       ],
@@ -183,9 +294,11 @@
       // Depth 2: introduce husks and bats
       depth_min: 2, depth_max: 2,
       weights: [
-        { id: "rat", weight: 40 },
-        { id: "miner_husk", weight: 30 },
-        { id: "cave_bat", weight: 25 },
+        { id: "rat", weight: 35 },
+        { id: "tunnel_grub", weight: 12 },
+        { id: "cave_kobold", weight: 13 },
+        { id: "miner_husk", weight: 25 },
+        { id: "cave_bat", weight: 20 },
         { id: "cave_crawler", weight: 5 },
       ],
     },
@@ -193,10 +306,14 @@
       // Depth 3-4: cave crawlers and spores appear
       depth_min: 3, depth_max: 4,
       weights: [
-        { id: "rat", weight: 15 },
-        { id: "miner_husk", weight: 25 },
-        { id: "cave_bat", weight: 15 },
-        { id: "cave_crawler", weight: 25 },
+        { id: "rat", weight: 12 },
+        { id: "cave_kobold", weight: 15 },
+        { id: "miner_husk", weight: 20 },
+        { id: "cave_bat", weight: 12 },
+        { id: "cave_crawler", weight: 22 },
+        { id: "cave_spider", weight: 15 },
+        { id: "grasping_root", weight: 10 },
+        { id: "flesh_brute", weight: 6 },
         { id: "toxic_spore", weight: 10 },
         { id: "stone_thrower", weight: 10 },
       ],
@@ -205,10 +322,14 @@
       // Depth 5-6: tougher mid-game
       depth_min: 5, depth_max: 6,
       weights: [
-        { id: "miner_husk", weight: 15 },
-        { id: "cave_crawler", weight: 25 },
-        { id: "toxic_spore", weight: 15 },
-        { id: "stone_thrower", weight: 20 },
+        { id: "miner_husk", weight: 12 },
+        { id: "cave_crawler", weight: 20 },
+        { id: "cave_spider", weight: 18 },
+        { id: "grasping_root", weight: 12 },
+        { id: "flesh_brute", weight: 12 },
+        { id: "frost_wraith", weight: 8 },
+        { id: "toxic_spore", weight: 12 },
+        { id: "stone_thrower", weight: 18 },
         { id: "shadow_stalker", weight: 10 },
         { id: "deep_watcher", weight: 10 },
         { id: "mine_lurker", weight: 5 },
@@ -218,25 +339,30 @@
       // Depth 7-9: deep danger
       depth_min: 7, depth_max: 9,
       weights: [
-        { id: "cave_crawler", weight: 15 },
-        { id: "toxic_spore", weight: 10 },
-        { id: "stone_thrower", weight: 15 },
-        { id: "shadow_stalker", weight: 20 },
-        { id: "deep_watcher", weight: 20 },
-        { id: "mine_lurker", weight: 15 },
-        { id: "cave_bat", weight: 5 },
+        { id: "cave_crawler", weight: 12 },
+        { id: "flesh_brute", weight: 12 },
+        { id: "frost_wraith", weight: 15 },
+        { id: "bone_archer", weight: 14 },
+        { id: "void_caller", weight: 10 },
+        { id: "toxic_spore", weight: 8 },
+        { id: "stone_thrower", weight: 12 },
+        { id: "shadow_stalker", weight: 18 },
+        { id: "deep_watcher", weight: 18 },
+        { id: "mine_lurker", weight: 13 },
       ],
     },
     {
       // Depth 10-12: endgame gauntlet
       depth_min: 10, depth_max: 12,
       weights: [
-        { id: "shadow_stalker", weight: 25 },
-        { id: "deep_watcher", weight: 25 },
-        { id: "mine_lurker", weight: 20 },
-        { id: "stone_thrower", weight: 15 },
-        { id: "toxic_spore", weight: 10 },
-        { id: "cave_bat", weight: 5 },
+        { id: "shadow_stalker", weight: 22 },
+        { id: "deep_watcher", weight: 22 },
+        { id: "mine_lurker", weight: 18 },
+        { id: "void_caller", weight: 15 },
+        { id: "frost_wraith", weight: 13 },
+        { id: "bone_archer", weight: 12 },
+        { id: "stone_thrower", weight: 10 },
+        { id: "toxic_spore", weight: 8 },
       ],
     },
   ],

@@ -25,6 +25,33 @@ when CHEATS_ENABLED {
 	}
 
 	@(test)
+	shift_c_resolves_to_cheat_menu_and_suppresses_crafting :: proc(t: ^testing.T) {
+		input_state := Test_Input_Backend_State{}
+		input_state.pressed[eng.Engine_Key.C] = true
+		input_state.down[eng.Engine_Key.C] = true
+		input_state.down[eng.Engine_Key.Left_Shift] = true
+		input := input_manager_make()
+		input.backend = test_input_backend(&input_state)
+
+		// Shift+C must open the cheat menu, not crafting.
+		testing.expect(t, action_pressed(&input, .Cheat_Menu))
+		testing.expect(t, !action_pressed(&input, .Crafting))
+	}
+
+	@(test)
+	plain_c_resolves_to_crafting_not_cheat_menu :: proc(t: ^testing.T) {
+		input_state := Test_Input_Backend_State{}
+		input_state.pressed[eng.Engine_Key.C] = true
+		input_state.down[eng.Engine_Key.C] = true
+		input := input_manager_make()
+		input.backend = test_input_backend(&input_state)
+
+		// Plain C must trigger crafting; cheat menu requires shift.
+		testing.expect(t, action_pressed(&input, .Crafting))
+		testing.expect(t, !action_pressed(&input, .Cheat_Menu))
+	}
+
+	@(test)
 	cheat_heal_restores_player_to_full_health :: proc(t: ^testing.T) {
 		game: Game
 		game.player.hp = 3

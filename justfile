@@ -4,7 +4,9 @@ src := "src/"
 test := "test/"
 engine_src := "src/engine"
 binary := "into_the_depths"
-cheat_define := if env_var_or_default("CHEATS", "false") == "true" { "-define:CHEATS=true" } else { "" }
+# Dev builds enable the cheat menu (Shift+C) by default. Disable with CHEATS=false.
+# Release recipes use release_defines (no cheat_define), so cheats never ship.
+cheat_define := if env_var_or_default("CHEATS", "true") == "false" { "" } else { "-define:CHEATS=true" }
 sprite_define := if env_var_or_default("SPRITES", "false") == "true" { "-define:SPRITES=true" } else { "" }
 no_audio_define := if env_var_or_default("NO_AUDIO", "false") == "true" { "-define:NO_AUDIO=true" } else { "" }
 no_sprites_define := if env_var_or_default("NO_SPRITES", "false") == "true" { "-define:NO_SPRITES=true" } else { "" }
