@@ -62,7 +62,6 @@ apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
 effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
 player_effective_light_radius :: gcore.player_effective_light_radius
-LIGHT_AFFECTS_DETECTION :: gcore.LIGHT_AFFECTS_DETECTION
 DETECTION_HEARING_RADIUS :: gcore.DETECTION_HEARING_RADIUS
 LEVELUP_ENABLED :: gcore.LEVELUP_ENABLED
 

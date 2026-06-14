@@ -65,11 +65,9 @@ enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -
 
 // enemy_update_awareness manages detection and memory decay.
 //
-// Default (LIGHT_AFFECTS_DETECTION off): plain Manhattan distance — the player
-//   is detected within detection_radius regardless of light or LOS.
-// Flag on: sight reaches the full detection_radius only while the player stands
-//   inside their own emitted light; outside the light, detection clamps to the
-//   small DETECTION_HEARING_RADIUS. This turns torches into genuine risk/reward.
+// Sight reaches the full detection_radius only while the player stands inside
+//   their own emitted light; outside the light, detection clamps to the small
+//   DETECTION_HEARING_RADIUS. This turns torches into genuine risk/reward.
 // detection_radius <= 0: always aware (legacy / hand-built enemies, unaffected).
 @(private = "file")
 enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
@@ -81,18 +79,12 @@ enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 
 	dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 
-	detected := false
-	when LIGHT_AFFECTS_DETECTION {
-		// Sight reaches the full radius only if the player is lit (their emitted
-		// light covers the gap to the enemy); otherwise fall back to hearing.
-		light_radius := player_effective_light_radius(game)
-		in_light := dist <= light_radius
-		sight_range := enemy.detection_radius if in_light else DETECTION_HEARING_RADIUS
-		detected = dist <= sight_range
-	} else {
-		// Legacy: pure Manhattan detection radius.
-		detected = dist <= enemy.detection_radius
-	}
+	// Sight reaches the full radius only if the player is lit (their emitted
+	// light covers the gap to the enemy); otherwise fall back to hearing.
+	light_radius := player_effective_light_radius(game)
+	in_light := dist <= light_radius
+	sight_range := enemy.detection_radius if in_light else DETECTION_HEARING_RADIUS
+	detected := dist <= sight_range
 
 	if detected {
 		enemy.aware = true

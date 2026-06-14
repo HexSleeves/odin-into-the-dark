@@ -28,13 +28,10 @@ WEB_STUCK_TURNS :: 3
 DEFAULT_ENEMY_DETECTION_RADIUS :: 10
 DEFAULT_ENEMY_MEMORY_TURNS :: 8
 
-// ─── Light-gated detection (D1, feature-flagged) ──────────────────────────────
-// When LIGHT_AFFECTS_DETECTION is on, sight detection reaches full
-// detection_radius only inside the player's emitted light; outside the light a
-// player is detected only within DETECTION_HEARING_RADIUS. Default on → light is
-// the core survival mechanic; override with -define:LIGHT_AFFECTS_DETECTION=false
-// to fall back to plain Manhattan distance (legacy behaviour).
-LIGHT_AFFECTS_DETECTION :: #config(LIGHT_AFFECTS_DETECTION, true)
+// ─── Light-gated detection (D1) ───────────────────────────────────────────────
+// Sight detection reaches the full detection_radius only inside the player's
+// emitted light; outside the light a player is detected only within
+// DETECTION_HEARING_RADIUS. Light is the core survival mechanic.
 DETECTION_HEARING_RADIUS :: 3
 
 MIN_LIGHT_RADIUS_DEFAULT :: 3
