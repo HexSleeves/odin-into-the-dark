@@ -189,13 +189,6 @@ ITD_LOG_LEVEL=debug ITD_LOG_CHANNELS=perf just run   # per-system timings (enemy
 
 ### Backlog / Under Consideration
 
-ta packs
-
-- [ ] Performance profiling pass
-- [ ] CI/CD pipeline with automated test runs
-
-### Backlog / Under Consideration
-
 - Multiplayer co-op (shared mine, split resources)
 - Steam release with Steamworks integration
 - Mobile port (touch controls)

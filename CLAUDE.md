@@ -93,11 +93,6 @@ Web target uses karl2d backend: `bash scripts/build_karl2d_web.sh`, serve `build
 
 ### Formatting
 
-\_~600 tokens/session saved_d*
-Web target uses karl2d backend: `bash scripts/build_karl2d_web.sh`, serve `build/web` (e.g. `python3 -m http.server`). First web/spike build needs STB libs compiled: `make -C "$(odin root)/vendor/stb/src"`. Engine backends are split per-platform (`*\_raylib.odin` files); engine layer keeps zero raylib imports for headless tests.
-
-### Formatting
-
 _~600 tokens/session saved_
 `odin fmt` is NOT a valid subcommand. Use `just fmt` (wraps the `odinfmt` binary from the ols build, e.g. `~/Developer/games/ols/odinfmt`). Run before committing.
 
