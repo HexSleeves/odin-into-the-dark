@@ -6,213 +6,31 @@ import "core:hash"
 import "core:mem"
 import "core:testing"
 
-// ─── Legacy migration tests ────────────────────────────────────────────────────
+// ─── v11 layout invariants ──────────────────────────────────────────────────────
 
 @(test)
-v7_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
-	old := new(Save_Data_V7)
-	defer free(old)
-	old.depth = 3
-	old.kills = 11
-	old.poison_turns = 6
-	old.burning_turns = 2
-	old.frozen_turns = 1
-	// web_stuck_turns not in V7 — will be zero-init in migrated data
+v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
+	// The v11 diet removed the dead Tile vis/explored/light fields and instead
+	// appends a dedicated tile_states array. Net: the per-cell tile-state bytes
+	// moved out of every Tile grid and into a single trailing array. The payload
+	// must still be exactly Save_Header + Save_Data on disk, and the tile_states
+	// field is the LAST member so future appends do not disturb earlier offsets.
+	// tile_states is the final field: its size equals the trailing bytes of the
+	// struct, i.e. total size minus the field's offset. The same array type is
+	// the last field of Save_Floor, so the trailing-byte count must match.
+	data_tile_states_size := size_of(Save_Data) - int(offset_of(Save_Data, tile_states))
+	floor_tile_states_size := size_of(Save_Floor) - int(offset_of(Save_Floor, tile_states))
+	testing.expect_value(t, data_tile_states_size, floor_tile_states_size)
 
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V7))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V7,
-	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V7))
-
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V7,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "V7 migration must succeed")
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.depth, 3)
-	testing.expect_value(t, data.kills, 11)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 6)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 2)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 1)
-	// V7 has no web_stuck_turns field — must arrive zero.
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 0)
-	// Dialogue state (v8 addition) must be zero-init.
-	testing.expect_value(t, data.seen_conv_count, 0)
-	testing.expect_value(t, data.dlg_flag_count, 0)
-	// Enemy/floor status (v9 addition) must be zero-init.
-	zero: gcore.Status_Turns
-	testing.expect_value(t, data.enemy_status[0], zero)
+	// Each tile-state cell carries (visible, explored, light_level) for every map
+	// cell; the array must be non-empty (the diet did not delete the carrier).
+	testing.expect(t, data_tile_states_size > 0, "tile_states array must carry the engine layer")
 }
 
-@(test)
-v6_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
-	old := new(Save_Data_V6)
-	defer free(old)
-	old.depth = 5
-	old.turn_count = 100
-	old.poison_turns = 3
-	old.burning_turns = 7
-	old.frozen_turns = 0
-
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V6))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V6,
-	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V6))
-
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V6,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "V6 migration must succeed")
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.depth, 5)
-	testing.expect_value(t, data.turn_count, 100)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 3)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 7)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 0)
-	// V6 has no web_stuck_turns field — must arrive zero.
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 0)
-	// Floor stack (v7 addition) must be zero-init.
-	testing.expect_value(t, data.visited_floor_present[0], false)
-	// Dialogue state (v8 addition) must be zero-init.
-	testing.expect_value(t, data.seen_conv_count, 0)
-}
+// ─── v11 round-trip tests ───────────────────────────────────────────────────────
 
 @(test)
-v4_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
-	old := new(Save_Data_V4)
-	defer free(old)
-	old.depth = 2
-	old.kills = 5
-	old.items_found = 8
-	// V4 has no poison_turns/burning_turns/frozen_turns/web_stuck_turns —
-	// all status kinds must arrive zero after migration.
-
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V4))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V4,
-	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V4))
-
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V4,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "V4 migration must succeed")
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.depth, 2)
-	testing.expect_value(t, data.kills, 5)
-	testing.expect_value(t, data.items_found, 8)
-	// Status timers are v5 additions — all must zero after folding zero scalars.
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 0)
-	// Quest (v6 addition) must be zero-init.
-	zero_quest: Quest_State
-	testing.expect_value(t, data.quest, zero_quest)
-}
-
-@(test)
-v3_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
-	old := new(Save_Data_V3)
-	defer free(old)
-	old.depth = 1
-	old.seed = 0xDEADBEEF
-	// V3 has no items_found, no status timers.
-
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V3))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V3,
-	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V3))
-
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V3,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "V3 migration must succeed")
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.depth, 1)
-	testing.expect_value(t, data.seed, u64(0xDEADBEEF))
-	// items_found (v4 addition) must be zero.
-	testing.expect_value(t, data.items_found, 0)
-	// All status timers (v5 addition) must be zero.
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 0)
-}
-
-@(test)
-v2_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
-	old := new(Save_Data_V2)
-	defer free(old)
-	old.depth = 4
-	old.kills = 9
-	old.pickaxe_durability = 99 // must be dropped; not present in migrated struct
-	old.pickaxe_max_dur = 100 // must be dropped
-
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V2))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V2,
-	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V2))
-
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V2,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "V2 migration must succeed")
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.depth, 4)
-	testing.expect_value(t, data.kills, 9)
-	// Migration copies only Save_Data_V3-sized prefix — pickaxe fields are outside
-	// that prefix and must NOT bleed into items_found or status timers.
-	testing.expect_value(t, data.items_found, 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 0)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 0)
-}
-
-// ─── v10 round-trip tests ──────────────────────────────────────────────────────
-
-@(test)
-v10_save_data_round_trips_correctly :: proc(t: ^testing.T) {
+v11_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 8
@@ -220,6 +38,10 @@ v10_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	payload.enemy_count = 3
 	payload.item_count = 2
 	payload.player_status[gcore.Status_Kind.Poison] = 5
+	idx := 5 * MAP_WIDTH + 7
+	payload.tile_states[idx].visible = true
+	payload.tile_states[idx].explored = true
+	payload.tile_states[idx].light_level = 0.5
 
 	buf := make([]u8, size_of(Save_Header) + size_of(Save_Data))
 	defer delete(buf)
@@ -236,7 +58,7 @@ v10_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 
 	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "v10 round-trip must succeed")
+	testing.expect(t, ok, "v11 round-trip must succeed")
 	if data == nil {return}
 	defer free(data)
 
@@ -245,10 +67,13 @@ v10_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	testing.expect_value(t, data.enemy_count, 3)
 	testing.expect_value(t, data.item_count, 2)
 	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 5)
+	testing.expect(t, data.tile_states[idx].visible, "tile-state visibility must round-trip")
+	testing.expect(t, data.tile_states[idx].explored, "tile-state exploration must round-trip")
+	testing.expect_value(t, data.tile_states[idx].light_level, f32(0.5))
 }
 
 @(test)
-v10_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
+v11_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 2
@@ -275,7 +100,7 @@ v10_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T)
 }
 
 @(test)
-v10_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
+v11_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -301,7 +126,7 @@ v10_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 }
 
 @(test)
-v10_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
+v11_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -325,7 +150,7 @@ v10_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 }
 
 @(test)
-v10_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
+v11_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	// Set counts above their fixed-array capacities.

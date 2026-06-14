@@ -100,7 +100,7 @@ save_current_floor :: proc(game: ^Game) -> bool {
 	if floor == nil {return false}
 	saved_floor_destroy(floor)
 	floor.tiles = game.tiles
-	tile_states_export_to_tiles(game, floor.tiles[:])
+	tile_state_manager_export(game, floor.tile_states[:])
 	eng.bool_grid_manager_export(game.web_tiles, floor.web_tiles[:])
 	floor.ore_veins = game.ore_veins
 	floor.player_pos = game.player.pos
@@ -138,7 +138,7 @@ restore_saved_floor :: proc(game: ^Game, depth: int) -> bool {
 	floor := game.visited_floors[depth]
 	if floor == nil {return false}
 	game.tiles = floor.tiles
-	tile_states_import_from_tiles(game, floor.tiles[:])
+	tile_state_manager_import(game, floor.tile_states[:])
 	eng.bool_grid_manager_import(&game.web_tiles, floor.web_tiles[:])
 	game.ore_veins = floor.ore_veins
 	game.player.pos = floor.player_pos

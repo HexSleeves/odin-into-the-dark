@@ -88,27 +88,16 @@ tile_states_clear_visibility :: proc(game: ^Game) {
 	eng.tile_state_clear_visibility(&game.tile_states)
 }
 
-tile_states_import_from_tiles :: proc(game: ^Game, tiles: []Tile) {
+// Serialize the live engine tile-state layer into a flat array (save/snapshot).
+tile_state_manager_export :: proc(game: ^Game, states: []eng.Tile_State) {
 	if game == nil {return}
-	for i in 0 ..< min(len(tiles), eng.tile_state_manager_cell_count(game.tile_states)) {
-		_ = eng.tile_state_set_idx(
-			&game.tile_states,
-			i,
-			tiles[i].visible,
-			tiles[i].explored,
-			tiles[i].light_level,
-		)
-	}
+	eng.tile_state_manager_export(game.tile_states, states)
 }
 
-tile_states_export_to_tiles :: proc(game: ^Game, tiles: []Tile) {
+// Restore the engine tile-state layer from a flat array (load/snapshot restore).
+tile_state_manager_import :: proc(game: ^Game, states: []eng.Tile_State) {
 	if game == nil {return}
-	for i in 0 ..< min(len(tiles), eng.tile_state_manager_cell_count(game.tile_states)) {
-		state := eng.tile_state_at_idx(game.tile_states, i)
-		tiles[i].visible = state.visible
-		tiles[i].explored = state.explored
-		tiles[i].light_level = state.light_level
-	}
+	eng.tile_state_manager_import(&game.tile_states, states)
 }
 
 is_walkable :: proc(game: ^Game, x, y: int) -> bool {

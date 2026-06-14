@@ -31,9 +31,11 @@ save_load_preserves_engine_tile_state_layer :: proc(t: ^testing.T) {
 	if data_ok {
 		defer free(data)
 		idx := pos_to_idx(2, 1)
-		testing.expect(t, data.tiles[idx].visible)
-		testing.expect(t, data.tiles[idx].explored)
-		testing.expect_value(t, data.tiles[idx].light_level, f32(0.75))
+		// v11 serializes the engine tile-state layer via a dedicated array, not
+		// via mirrored Tile fields (which no longer exist).
+		testing.expect(t, data.tile_states[idx].visible)
+		testing.expect(t, data.tile_states[idx].explored)
+		testing.expect_value(t, data.tile_states[idx].light_level, f32(0.75))
 	}
 
 	content := content_manager_make()
@@ -49,4 +51,26 @@ save_load_preserves_engine_tile_state_layer :: proc(t: ^testing.T) {
 		load_game_from_path(&content, &loaded_turns, &camera, &vfx, &ui, &messages, &loaded, path),
 	)
 	testing.expect(t, tile_explored_at(&loaded, 2, 1))
+}
+
+@(test)
+tile_struct_shrank_to_terrain_type_only :: proc(t: ^testing.T) {
+	// The data-model diet dropped Tile.visible/explored/light_level; Tile now
+	// carries only its terrain Tile_Type. Guard against the dead fields creeping
+	// back in (which would re-inflate the ~32 KB tile grids on Game).
+	testing.expect_value(t, size_of(Tile), size_of(Tile_Type))
+}
+
+@(test)
+game_struct_shrank_after_tile_diet :: proc(t: ^testing.T) {
+	// Game holds a full Tile grid plus the visited-floor stack (each with its own
+	// Tile grid). Removing 3 dead Tile fields halved Tile (16->8 B) and shrank
+	// every one of those grids; the engine Tile_State_Manager remains the single
+	// live carrier of vis/light. Measured ~222 KB post-diet, down from ~253 KB.
+	// Guard with headroom for later trailing-field appends.
+	testing.expect(
+		t,
+		size_of(Game) < 240 * 1024,
+		"Game struct must stay under 240 KB after the tile diet",
+	)
 }

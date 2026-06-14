@@ -83,8 +83,8 @@ pos_to_idx :: gcore.pos_to_idx
 tile_at :: gcore.tile_at
 tile_state_at_idx :: gcore.tile_state_at_idx
 tile_state_set_idx :: gcore.tile_state_set_idx
-tile_states_import_from_tiles :: gcore.tile_states_import_from_tiles
-tile_states_export_to_tiles :: gcore.tile_states_export_to_tiles
+tile_state_manager_import :: gcore.tile_state_manager_import
+tile_state_manager_export :: gcore.tile_state_manager_export
 tile_visible_at :: gcore.tile_visible_at
 is_walkable :: gcore.is_walkable
 web_tile_at_idx :: gcore.web_tile_at_idx

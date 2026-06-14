@@ -47,8 +47,8 @@ content_manager_item_def :: gcore.content_manager_item_def
 content_manager_player_def :: gcore.content_manager_player_def
 content_manager_enemy_def :: gcore.content_manager_enemy_def
 item_display_name :: gcore.item_display_name
-tile_states_import_from_tiles :: gcore.tile_states_import_from_tiles
-tile_states_export_to_tiles :: gcore.tile_states_export_to_tiles
+tile_state_manager_import :: gcore.tile_state_manager_import
+tile_state_manager_export :: gcore.tile_state_manager_export
 game_init_world :: gcore.game_init_world
 game_camera_update :: gcore.game_camera_update
 palette_for_depth :: gcore.palette_for_depth

@@ -173,6 +173,7 @@ save_to_item :: proc(content: ^Content_Manager, si: ^Save_Item) -> Item {
 floor_to_save :: proc(floor: ^Saved_Floor, result: ^Save_Floor) {
 	if floor == nil || result == nil {return}
 	result.tiles = floor.tiles
+	result.tile_states = floor.tile_states
 	result.web_tiles = floor.web_tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		result.ore_veins[i] = Save_Ore_Vein {
@@ -212,6 +213,7 @@ save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Sav
 	}
 
 	floor.tiles = saved.tiles
+	floor.tile_states = saved.tile_states
 	floor.web_tiles = saved.web_tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		floor.ore_veins[i] = Ore_Vein {

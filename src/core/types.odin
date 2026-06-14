@@ -41,11 +41,11 @@ Tile_Type :: enum {
 	Merchant,
 }
 
+// Visibility/exploration/light live in the engine Tile_State_Manager (the live
+// source of truth) and are serialized via a dedicated [N]eng.Tile_State array on
+// the save structs — NOT mirrored back onto Tile. Tile carries only terrain type.
 Tile :: struct {
-	type:        Tile_Type,
-	visible:     bool,
-	explored:    bool,
-	light_level: f32,
+	type: Tile_Type,
 }
 
 // ─── Player ───────────────────────────────────────────────────────────────────
@@ -241,6 +241,8 @@ Saved_Floor :: struct {
 	event_used:    bool,
 	npcs:          [MAX_NPCS]NPC,
 	npc_count:     int,
+	// Engine tile-state layer (visibility/exploration/light). LAST field.
+	tile_states:   [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
 }
 
 Game_State :: enum {

@@ -33,7 +33,7 @@ save_game_to_storage :: proc(
 
 	// ── Copy fixed arrays and scalars ──
 	data.tiles = game.tiles
-	tile_states_export_to_tiles(game, data.tiles[:])
+	tile_state_manager_export(game, data.tile_states[:])
 	eng.bool_grid_manager_export(game.web_tiles, data.web_tiles[:])
 	data.player = game.player
 	data.depth = game.depth

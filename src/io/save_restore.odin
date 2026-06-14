@@ -17,27 +17,14 @@ read_and_decode_save :: proc(storage: ^eng.Storage_Manager, path: string) -> ^Sa
 	if !read_ok {return nil}
 	defer delete(buf, read_allocator)
 
-	if len(buf) < size_of(Save_Header_Legacy) {return nil}
+	if len(buf) < size_of(Save_Header) {return nil}
 
 	// ── Validate header ──
-	// Read the legacy 8-byte header first to detect the version, then upgrade
-	// to the full 12-byte header for v10+ saves which include a CRC32 field.
-	legacy: Save_Header_Legacy
-	mem.copy(&legacy, &buf[0], size_of(Save_Header_Legacy))
-
+	// v11 is the only supported format: a full 12-byte header (magic + version + crc32).
 	header: Save_Header
-	if legacy.version >= SAVE_VERSION {
-		// v10+: full header present; require at least 12 bytes.
-		if len(buf) < size_of(Save_Header) {return nil}
-		mem.copy(&header, &buf[0], size_of(Save_Header))
-	} else {
-		// v2–v9: header is only 8 bytes; crc32 field stays zero (not on disk).
-		header.magic = legacy.magic
-		header.version = legacy.version
-		header.crc32 = 0
-	}
+	mem.copy(&header, &buf[0], size_of(Save_Header))
 
-	// ── Deserialize current save data, or migrate supported legacy layouts ──
+	// ── Deserialize current (v11) save data ──
 	data, data_ok := load_save_data(header, buf)
 	if !data_ok {return nil}
 	return data
@@ -108,7 +95,7 @@ load_game_from_storage :: proc(
 	// ── Restore fixed fields ──
 	game.tiles = data.tiles
 	game_init_world(game)
-	tile_states_import_from_tiles(game, data.tiles[:])
+	tile_state_manager_import(game, data.tile_states[:])
 	eng.bool_grid_manager_import(&game.web_tiles, data.web_tiles[:])
 	game.player = data.player
 	// Reconstruct energy system fields from content (not persisted — derived from player_def)

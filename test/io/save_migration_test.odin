@@ -1,48 +1,36 @@
 #+build !js
 package gameio
 
-import gcore "../core"
+import "core:hash"
 import "core:mem"
 import "core:testing"
 
+// Legacy v2–v10 read support was intentionally dropped (pre-release; no shipped
+// save contract). Any non-v11 version must be rejected cleanly rather than
+// migrated, so a stale save can never be mem.copy'd into the current layout.
 @(test)
-v8_save_data_migrates_legacy_status_fields_into_player_status :: proc(t: ^testing.T) {
-	old := new(Save_Data_V8)
-	defer free(old)
-	old.poison_turns = 5
-	old.burning_turns = 4
-	old.frozen_turns = 3
-	old.web_stuck_turns = 2
-	old.depth = 7
+load_save_data_rejects_unsupported_legacy_versions :: proc(t: ^testing.T) {
+	for old_version in u32(0) ..= u32(10) {
+		// Build a v11-sized buffer with a valid CRC, then stamp an old version.
+		payload := new(Save_Data)
+		defer free(payload)
+		payload.depth = 3
 
-	// A real v8 save on disk used the 8-byte legacy header (no CRC32).
-	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V8))
-	defer delete(buf)
-	legacy_header := Save_Header_Legacy {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V8,
+		buf := make([]u8, size_of(Save_Header) + size_of(Save_Data))
+		defer delete(buf)
+
+		mem.copy(&buf[size_of(Save_Header)], payload, size_of(Save_Data))
+		crc := hash.crc32(buf[size_of(Save_Header):])
+
+		header := Save_Header {
+			magic   = SAVE_MAGIC,
+			version = old_version,
+			crc32   = crc,
+		}
+		mem.copy(&buf[0], &header, size_of(Save_Header))
+
+		data, ok := load_save_data(header, buf)
+		testing.expect(t, !ok, "an unsupported legacy version must be rejected")
+		testing.expect(t, data == nil, "no data must be returned for an unsupported version")
 	}
-	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
-	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V8))
-
-	// load_save_data branches on the parsed header's version field.
-	header := Save_Header {
-		magic   = SAVE_MAGIC,
-		version = SAVE_VERSION_V8,
-	}
-	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok)
-	if data == nil {return}
-	defer free(data)
-
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Poison], 5)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Burning], 4)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Frozen], 3)
-	testing.expect_value(t, data.player_status[gcore.Status_Kind.Webbed], 2)
-	testing.expect_value(t, data.depth, 7)
-
-	// Enemy statuses did not exist pre-v9 — they must arrive zeroed.
-	zero: gcore.Status_Turns
-	testing.expect_value(t, data.enemy_status[0], zero)
-	testing.expect_value(t, data.floor_enemy_status[0][0], zero)
 }
