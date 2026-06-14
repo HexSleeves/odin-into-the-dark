@@ -1,6 +1,7 @@
 package gameplay
 
 import eng "../engine"
+import gameio "../io"
 import "base:runtime"
 import "core:fmt"
 
@@ -264,8 +265,12 @@ advance_turn :: proc(
 	particles: ^eng.Particle_Manager = nil,
 ) {
 	eng.turn_manager_advance(turns)
-	process_enemy_turns(messages, game)
-	process_enemy_abilities(messages, game)
+	{
+		_pt := gameio.perf_begin("process_enemy_turns")
+		process_enemy_turns(messages, game)
+		process_enemy_abilities(messages, game)
+		gameio.perf_end(_pt)
+	}
 	remove_dead_enemies(messages, game, particles, game_camera_x(camera), game_camera_y(camera))
 	tick_timed_effects(messages, game)
 	compute_fov(game)

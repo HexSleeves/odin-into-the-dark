@@ -19,6 +19,7 @@ Game_Log_Channel :: enum {
 	Audio,
 	Input,
 	Save,
+	Perf,
 }
 
 Game_Log_Channels :: bit_set[Game_Log_Channel]
@@ -197,6 +198,7 @@ logger_parse_channels :: proc(value: string) -> Game_Log_Channels {
 			.Audio,
 			.Input,
 			.Save,
+			.Perf,
 		}
 	}
 
@@ -240,6 +242,10 @@ logger_channel_from_string :: proc(value: string) -> (channel: Game_Log_Channel,
 	if logger_ascii_equal_fold(trimmed, "save") || logger_ascii_equal_fold(trimmed, "saveload") {
 		return .Save, true
 	}
+	if logger_ascii_equal_fold(trimmed, "perf") ||
+	   logger_ascii_equal_fold(trimmed, "performance") {
+		return .Perf, true
+	}
 	return .App, false
 }
 
@@ -269,6 +275,8 @@ logger_channel_label :: proc(channel: Game_Log_Channel) -> string {
 		return "input"
 	case .Save:
 		return "save"
+	case .Perf:
+		return "perf"
 	}
 	return "app"
 }

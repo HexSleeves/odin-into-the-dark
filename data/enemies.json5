@@ -312,8 +312,8 @@
         { id: "cave_bat", weight: 12 },
         { id: "cave_crawler", weight: 22 },
         { id: "cave_spider", weight: 15 },
-        { id: "grasping_root", weight: 10 },
-        { id: "flesh_brute", weight: 6 },
+        // grasping_root (pull) and flesh_brute (slam) moved to depth 5+ so the
+        // early floors are pure skirmishers — softens the early difficulty wall.
         { id: "toxic_spore", weight: 10 },
         { id: "stone_thrower", weight: 10 },
       ],

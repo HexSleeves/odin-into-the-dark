@@ -36,6 +36,9 @@ DURABILITY_WARN_THRESHOLD :: 5
 
 BOSS_CAMERA_ZOOM :: f32(1.16)
 
+// ─── Kill progression ─────────────────────────────────────────────────────────
+KILLS_PER_MILESTONE :: 8 // kills between permanent buff awards
+
 // ─── Floor events ─────────────────────────────────────────────────────────────
 EVENT_SPAWN_CHANCE :: 40 // percent chance per floor (depth >= 2)
 EVENT_MIN_DEPTH :: 2 // no events on depth 1

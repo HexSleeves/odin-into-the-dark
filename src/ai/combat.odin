@@ -89,6 +89,9 @@ resolve_attack_player_on_enemy :: proc(
 			game.kills,
 		)
 		game.kills += 1
+		if milestone_msg := apply_kill_milestone_buff(game); milestone_msg != "" {
+			add_message(messages, game, milestone_msg, eng.Engine_Color{255, 220, 80, 255})
+		}
 		if enemy.is_boss {
 			game.boss_killed_this_turn = true
 			play_sfx(.Boss_Kill)

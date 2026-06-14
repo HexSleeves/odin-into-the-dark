@@ -179,12 +179,21 @@ clay_render_hud :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				for &e in game.enemies {
 					if e.alive {alive_count += 1}
 				}
+				kills_progress := game.kills % gcore.KILLS_PER_MILESTONE
 				clay_row(
 					"hud-kills-row",
 					fmt.tprintf("KILLS  %d", i32(game.kills)),
 					fmt.tprintf("NEAR %d", alive_count),
 					CLAY_HUD_ROW_FONT,
 					ui_pkg.SB_TEXT,
+					ui_pkg.SB_DIM,
+				)
+				clay_row(
+					"hud-power-row",
+					fmt.tprintf("POWER  %d", i32(game.kills_milestone)),
+					fmt.tprintf("%d/%d next", i32(kills_progress), i32(gcore.KILLS_PER_MILESTONE)),
+					CLAY_HUD_ROW_FONT,
+					ui_pkg.SB_OIL,
 					ui_pkg.SB_DIM,
 				)
 				if game.light_boost_turns > 0 {

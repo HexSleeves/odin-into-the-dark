@@ -23,6 +23,13 @@ GAME_ENGINE_SERVICE_TURNS :: gcore.GAME_ENGINE_SERVICE_TURNS
 GAME_ENGINE_SERVICE_VFX :: gcore.GAME_ENGINE_SERVICE_VFX
 GAME_ENGINE_SERVICE_UI :: gcore.GAME_ENGINE_SERVICE_UI
 
+// Progression milestone re-exports (single source: src/core/gameplay_tuning.odin + game_utils.odin).
+KILLS_PER_MILESTONE :: gcore.KILLS_PER_MILESTONE
+SHRINE_BUFF_MAX_HP :: gcore.SHRINE_BUFF_MAX_HP
+SHRINE_BUFF_ATTACK :: gcore.SHRINE_BUFF_ATTACK
+SHRINE_BUFF_LIGHT :: gcore.SHRINE_BUFF_LIGHT
+apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
+
 Into_The_Depths_App_State :: struct {
 	game:              ^gcore.Game,
 	scene_descriptors: [GAME_SCENE_COUNT]eng.Engine_Scene,

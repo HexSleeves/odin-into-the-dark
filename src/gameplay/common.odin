@@ -57,6 +57,7 @@ EQUIPMENT_SLOT_HELMET :: gcore.EQUIPMENT_SLOT_HELMET
 ITEM_ID_RUSTY_PICKAXE :: gcore.ITEM_ID_RUSTY_PICKAXE
 ITEM_ID_TORCH :: gcore.ITEM_ID_TORCH
 ITEM_ID_BANDAGE :: gcore.ITEM_ID_BANDAGE
+ITEM_ID_LEATHER_VEST :: gcore.ITEM_ID_LEATHER_VEST
 ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
 ITEM_ID_ANCIENT_TREASURE :: gcore.ITEM_ID_ANCIENT_TREASURE
 ITEM_EFFECT_HEAL :: gcore.ITEM_EFFECT_HEAL
@@ -98,6 +99,11 @@ item_make_from_def :: gcore.item_make_from_def
 game_camera_update :: gcore.game_camera_update
 game_equipment_slot :: gcore.game_equipment_slot
 effective_attack :: gcore.effective_attack
+apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
+KILLS_PER_MILESTONE :: gcore.KILLS_PER_MILESTONE
+SHRINE_BUFF_MAX_HP :: gcore.SHRINE_BUFF_MAX_HP
+SHRINE_BUFF_ATTACK :: gcore.SHRINE_BUFF_ATTACK
+SHRINE_BUFF_LIGHT :: gcore.SHRINE_BUFF_LIGHT
 effective_defense :: gcore.effective_defense
 effective_attack_cost :: gcore.effective_attack_cost
 effective_light_bonus :: gcore.effective_light_bonus

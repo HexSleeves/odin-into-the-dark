@@ -57,6 +57,7 @@ logger_debugf :: gameio.logger_debugf
 Game_Log_Channel :: gameio.Game_Log_Channel
 
 effective_attack :: gcore.effective_attack
+apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
 effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
 

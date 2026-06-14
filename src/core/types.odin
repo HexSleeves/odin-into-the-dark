@@ -272,6 +272,7 @@ Game :: struct {
 	light_sources:          [dynamic]Light_Source,
 	depth:                  int,
 	kills:                  int,
+	kills_milestone:        int, // count of kill-progression milestones already awarded
 	seed:                   u64,
 	state:                  Game_State,
 	// Timed light boost (from lantern oil)

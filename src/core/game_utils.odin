@@ -1,6 +1,7 @@
 package core
 
 import eng "../engine"
+import "core:fmt"
 import "core:math/rand"
 
 pos_to_idx :: proc(x, y: int) -> int {
@@ -277,4 +278,38 @@ victory_boss_status_text :: proc(game: ^Game) -> cstring {
 		return "Defeated"
 	}
 	return "Not defeated"
+}
+
+// ─── Kill-progression milestones ──────────────────────────────────────────────
+
+// apply_kill_milestone_buff checks whether game.kills has crossed the next
+// milestone threshold. If so, it increments kills_milestone, applies a small
+// permanent buff to the player, and returns a non-empty message string for the
+// caller to display. Returns "" when no milestone was reached.
+// Buff type cycles: Max_HP → Attack → Light (repeating).
+apply_kill_milestone_buff :: proc(game: ^Game) -> string {
+	if game == nil {return ""}
+	next_threshold := (game.kills_milestone + 1) * KILLS_PER_MILESTONE
+	if game.kills < next_threshold {return ""}
+
+	// Cycle buff type by milestone index (0=HP, 1=Attack, 2=Light, repeat)
+	buff_index := game.kills_milestone % 3
+	game.kills_milestone += 1
+
+	switch buff_index {
+	case 0:
+		// Max HP
+		game.player.max_hp += SHRINE_BUFF_MAX_HP
+		game.player.hp += SHRINE_BUFF_MAX_HP
+		return fmt.tprintf("You grow stronger! (+%d Max HP)", SHRINE_BUFF_MAX_HP)
+	case 1:
+		// Attack
+		game.player.attack += SHRINE_BUFF_ATTACK
+		return fmt.tprintf("Your strikes sharpen! (+%d Attack)", SHRINE_BUFF_ATTACK)
+	case 2:
+		// Light
+		game.player.light_radius += SHRINE_BUFF_LIGHT
+		return fmt.tprintf("Your vision expands! (+%d Light Radius)", SHRINE_BUFF_LIGHT)
+	}
+	return ""
 }

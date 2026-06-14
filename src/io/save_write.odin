@@ -23,6 +23,9 @@ save_game_to_storage :: proc(
 	storage: ^eng.Storage_Manager,
 	path: string,
 ) -> bool {
+	_pt := perf_begin("save_game")
+	defer perf_end(_pt)
+
 	// Heap-allocate — Save_Data is large (~600KB+)
 	data := new(Save_Data)
 	if data == nil {return false}

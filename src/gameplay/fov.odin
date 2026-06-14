@@ -5,6 +5,8 @@ import gameio "../io"
 import "core:log"
 
 compute_fov :: proc(game: ^Game) {
+	_pt := gameio.perf_begin("compute_fov")
+	defer gameio.perf_end(_pt)
 	gcore.compute_fov(game)
 	if gameio.logger_should_log(gameio.logger_state(), log.Level.Debug, .Fov) {
 		visible_count := 0

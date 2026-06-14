@@ -286,6 +286,18 @@ give_starter_gear :: proc(content: ^Content_Manager, game: ^Game) {
 		band.picked_up = true
 		inventory_put_slot(game, 1, band, 2)
 	}
+
+	// Starter armor: gives effective_defense 1 from turn one so the early floors
+	// are not a flat damage race against spike abilities.
+	vest_def := content_manager_item_def(content, ITEM_ID_LEATHER_VEST)
+	if vest_def != nil {
+		vest := item_make_from_def(vest_def, Vec2{0, 0})
+		vest.picked_up = true
+		game.equipped_armor = Equipment {
+			occupied = true,
+			item     = vest,
+		}
+	}
 }
 
 equip_item :: proc(messages: ^Message_Manager, game: ^Game, slot_index: int) -> bool {

@@ -137,7 +137,7 @@ When launched through `just`, variables can live in `.env` (via `set dotenv-load
 | `ITD_LOG_FILE_PATH`     | `into_the_depths.log` | Log file path (append mode)                                                                                               |
 | `ITD_LOG_CONSOLE_LEVEL` | `ITD_LOG_LEVEL`       | Console-specific minimum level                                                                                            |
 | `ITD_LOG_FILE_LEVEL`    | `ITD_LOG_LEVEL`       | File-specific minimum level                                                                                               |
-| `ITD_LOG_CHANNELS`      | `all`                 | Comma-separated channel filter: `app`, `init`, `data`, `gen`, `fov`, `enemy`, `items`, `input`, `save`, `audio`, or `all` |
+| `ITD_LOG_CHANNELS`      | `all`                 | Comma-separated channel filter: `app`, `init`, `data`, `gen`, `fov`, `enemy`, `items`, `input`, `save`, `audio`, `perf`, or `all` |
 | `ITD_LOG_SOURCE`        | `1`                   | Include source file and line in output                                                                                    |
 | `ITD_LOG_FLUSH`         | `1`                   | Flush file logs after each write                                                                                          |
 
@@ -146,6 +146,7 @@ When launched through `just`, variables can live in `.env` (via `set dotenv-load
 ITD_LOG_LEVEL=debug just run
 ITD_LOG_LEVEL=debug ITD_LOG_CHANNELS=data,gen just run
 ITD_LOG_CONSOLE=0 ITD_LOG_FILE=1 just run
+ITD_LOG_LEVEL=debug ITD_LOG_CHANNELS=perf just run   # per-system timings (enemy turns, FOV, save)
 ```
 
 ---
