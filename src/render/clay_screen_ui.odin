@@ -43,6 +43,9 @@ clay_render_screen_ui :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		case .Viewing_Cheats:
 			clay_render_gameplay_ui(engine, game)
 			clay_render_cheats_overlay(engine, game)
+		case .Pause:
+			clay_render_gameplay_ui(engine, game)
+			clay_render_pause_overlay(engine, game)
 		case .Viewing_Help:
 			clay_render_help_overlay(engine, game)
 		case .Viewing_Scores:

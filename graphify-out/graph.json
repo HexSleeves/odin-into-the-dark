@@ -904,7 +904,7 @@
       "label": "results",
       "file_type": "code",
       "source_file": "scripts/apply_workflow.js",
-      "source_location": "L98",
+      "source_location": "L84",
       "_origin": "ast",
       "id": "scripts_apply_workflow_results",
       "community": 420,
@@ -26640,9 +26640,9 @@
       "source_file": "docs/audit-2026-06-13.md",
       "source_location": "L317",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_audit_2026_06_13_into_the_depths_engine_game_audit",
-      "target": "docs_audit_2026_06_13_implementation_status_2026_06_13_same_session_all_changes_just_verify_green",
-      "confidence_score": 1.0
+      "target": "docs_audit_2026_06_13_implementation_status_2026_06_13_same_session_all_changes_just_verify_green"
     },
     {
       "relation": "contains",
@@ -27310,9 +27310,9 @@
       "source_file": "docs/audit-2026-06-13.md",
       "source_location": "L351",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_audit_2026_06_13_implementation_status_2026_06_13_same_session_all_changes_just_verify_green",
-      "target": "docs_audit_2026_06_13_deferred_with_rationale",
-      "confidence_score": 1.0
+      "target": "docs_audit_2026_06_13_deferred_with_rationale"
     },
     {
       "relation": "contains",
@@ -27320,9 +27320,9 @@
       "source_file": "docs/audit-2026-06-13.md",
       "source_location": "L321",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "docs_audit_2026_06_13_implementation_status_2026_06_13_same_session_all_changes_just_verify_green",
-      "target": "docs_audit_2026_06_13_landed",
-      "confidence_score": 1.0
+      "target": "docs_audit_2026_06_13_landed"
     },
     {
       "relation": "contains",
@@ -28760,9 +28760,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch"
     },
     {
       "relation": "contains",
@@ -28770,9 +28770,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L96",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_commands_you_will_need",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_commands_you_will_need"
     },
     {
       "relation": "contains",
@@ -28780,9 +28780,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_current_state",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_current_state"
     },
     {
       "relation": "contains",
@@ -28790,9 +28790,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_done_criteria",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_done_criteria"
     },
     {
       "relation": "contains",
@@ -28800,9 +28800,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_git_workflow",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_git_workflow"
     },
     {
       "relation": "contains",
@@ -28810,9 +28810,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L214",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_maintenance_notes",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_maintenance_notes"
     },
     {
       "relation": "contains",
@@ -28820,9 +28820,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_scope",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_scope"
     },
     {
       "relation": "contains",
@@ -28830,9 +28830,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_status",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_status"
     },
     {
       "relation": "contains",
@@ -28840,9 +28840,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L135",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_steps",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_steps"
     },
     {
       "relation": "contains",
@@ -28850,9 +28850,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L201",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_stop_conditions",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_stop_conditions"
     },
     {
       "relation": "contains",
@@ -28860,9 +28860,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L179",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_test_plan",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_test_plan"
     },
     {
       "relation": "contains",
@@ -28870,9 +28870,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_plan_001_finish_and_clean_the_atomic_save_bak_recovery_batch",
-      "target": "plans_001_finish_save_recovery_batch_why_this_matters",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_why_this_matters"
     },
     {
       "relation": "contains",
@@ -28880,9 +28880,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L137",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_steps",
-      "target": "plans_001_finish_save_recovery_batch_step_1_remove_the_dead_debug_wrapper_from_production_source",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_step_1_remove_the_dead_debug_wrapper_from_production_source"
     },
     {
       "relation": "contains",
@@ -28890,9 +28890,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L148",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_steps",
-      "target": "plans_001_finish_save_recovery_batch_step_2_delete_the_scratch_debug_test",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_step_2_delete_the_scratch_debug_test"
     },
     {
       "relation": "contains",
@@ -28900,9 +28900,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_steps",
-      "target": "plans_001_finish_save_recovery_batch_step_3_format",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_step_3_format"
     },
     {
       "relation": "contains",
@@ -28910,9 +28910,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L163",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_steps",
-      "target": "plans_001_finish_save_recovery_batch_step_4_run_the_full_gate",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_step_4_run_the_full_gate"
     },
     {
       "relation": "contains",
@@ -28920,9 +28920,9 @@
       "source_file": "plans/001-finish-save-recovery-batch.md",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_001_finish_save_recovery_batch_steps",
-      "target": "plans_001_finish_save_recovery_batch_step_5_report_commit_ready",
-      "confidence_score": 1.0
+      "target": "plans_001_finish_save_recovery_batch_step_5_report_commit_ready"
     },
     {
       "relation": "contains",
@@ -28930,9 +28930,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet",
-      "target": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly"
     },
     {
       "relation": "contains",
@@ -28940,9 +28940,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_commands_you_will_need",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_commands_you_will_need"
     },
     {
       "relation": "contains",
@@ -28950,9 +28950,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L62",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_current_state",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_current_state"
     },
     {
       "relation": "contains",
@@ -28960,9 +28960,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_decision_gate_operator_must_choose_before_step_1",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_decision_gate_operator_must_choose_before_step_1"
     },
     {
       "relation": "contains",
@@ -28970,9 +28970,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L311",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_done_criteria",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_done_criteria"
     },
     {
       "relation": "contains",
@@ -28980,9 +28980,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L182",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_git_workflow",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_git_workflow"
     },
     {
       "relation": "contains",
@@ -28990,9 +28990,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L344",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_maintenance_notes",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_maintenance_notes"
     },
     {
       "relation": "contains",
@@ -29000,9 +29000,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L145",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_scope",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_scope"
     },
     {
       "relation": "contains",
@@ -29010,9 +29010,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_status",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_status"
     },
     {
       "relation": "contains",
@@ -29020,9 +29020,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L190",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_steps",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_steps"
     },
     {
       "relation": "contains",
@@ -29030,9 +29030,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L327",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_stop_conditions",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_stop_conditions"
     },
     {
       "relation": "contains",
@@ -29040,9 +29040,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_suggested_executor_toolkit",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_suggested_executor_toolkit"
     },
     {
       "relation": "contains",
@@ -29050,9 +29050,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L289",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_test_plan",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_test_plan"
     },
     {
       "relation": "contains",
@@ -29060,9 +29060,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_plan_002_shrink_the_save_data_model_drop_dead_tile_fields_carry_tile_state_directly",
-      "target": "plans_002_save_data_model_diet_why_this_matters",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_why_this_matters"
     },
     {
       "relation": "contains",
@@ -29070,9 +29070,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L196",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_1_add_the_tile_state_export_import_helpers_in_gcore",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_1_add_the_tile_state_export_import_helpers_in_gcore"
     },
     {
       "relation": "contains",
@@ -29080,9 +29080,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L213",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_2_add_the_tile_states_array_to_the_save_carriers",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_2_add_the_tile_states_array_to_the_save_carriers"
     },
     {
       "relation": "contains",
@@ -29090,9 +29090,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L228",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_3_populate_tile_states_on_write_restore_from_it_on_read",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_3_populate_tile_states_on_write_restore_from_it_on_read"
     },
     {
       "relation": "contains",
@@ -29100,9 +29100,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L246",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_4_set_the_migration_policy",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_4_set_the_migration_policy"
     },
     {
       "relation": "contains",
@@ -29110,9 +29110,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L263",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_5_drop_the_dead_tile_fields",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_5_drop_the_dead_tile_fields"
     },
     {
       "relation": "contains",
@@ -29120,9 +29120,9 @@
       "source_file": "plans/002-save-data-model-diet.md",
       "source_location": "L283",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_002_save_data_model_diet_steps",
-      "target": "plans_002_save_data_model_diet_step_6_format_and_full_gate",
-      "confidence_score": 1.0
+      "target": "plans_002_save_data_model_diet_step_6_format_and_full_gate"
     },
     {
       "relation": "contains",
@@ -29130,9 +29130,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated"
     },
     {
       "relation": "contains",
@@ -29140,9 +29140,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L105",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_commands_you_will_need",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_commands_you_will_need"
     },
     {
       "relation": "contains",
@@ -29150,9 +29150,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L42",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_current_state",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_current_state"
     },
     {
       "relation": "contains",
@@ -29160,9 +29160,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L261",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_done_criteria",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_done_criteria"
     },
     {
       "relation": "contains",
@@ -29170,9 +29170,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_git_workflow",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_git_workflow"
     },
     {
       "relation": "contains",
@@ -29180,9 +29180,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L291",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_maintenance_notes",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_maintenance_notes"
     },
     {
       "relation": "contains",
@@ -29190,9 +29190,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_scope",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_scope"
     },
     {
       "relation": "contains",
@@ -29200,9 +29200,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_status",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_status"
     },
     {
       "relation": "contains",
@@ -29210,9 +29210,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L157",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_steps"
     },
     {
       "relation": "contains",
@@ -29220,9 +29220,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_stop_conditions",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_stop_conditions"
     },
     {
       "relation": "contains",
@@ -29230,9 +29230,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L240",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_test_plan",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_test_plan"
     },
     {
       "relation": "contains",
@@ -29240,9 +29240,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_plan_003_enemy_occupancy_grid_p9_dijkstra_flow_field_cache_p7_profile_gated",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_why_this_matters",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_why_this_matters"
     },
     {
       "relation": "contains",
@@ -29250,9 +29250,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L159",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_0_establish_a_baseline_gate",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_0_establish_a_baseline_gate"
     },
     {
       "relation": "contains",
@@ -29260,9 +29260,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L172",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_1_expose_the_unchecked_distance_map_accessors",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_1_expose_the_unchecked_distance_map_accessors"
     },
     {
       "relation": "contains",
@@ -29270,9 +29270,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L182",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_2_hoist_validation_use_unchecked_accessors_in_the_bfs",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_2_hoist_validation_use_unchecked_accessors_in_the_bfs"
     },
     {
       "relation": "contains",
@@ -29280,9 +29280,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_3_add_dijkstra_dirty_gate_recompute",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_3_add_dijkstra_dirty_gate_recompute"
     },
     {
       "relation": "contains",
@@ -29290,9 +29290,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L208",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_4_add_the_enemy_occupancy_grid_p9",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_4_add_the_enemy_occupancy_grid_p9"
     },
     {
       "relation": "contains",
@@ -29300,9 +29300,9 @@
       "source_file": "plans/003-enemy-occupancy-and-flowfield-cache.md",
       "source_location": "L232",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_003_enemy_occupancy_and_flowfield_cache_steps",
-      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_5_format_full_gate_compare_to_baseline",
-      "confidence_score": 1.0
+      "target": "plans_003_enemy_occupancy_and_flowfield_cache_step_5_format_full_gate_compare_to_baseline"
     },
     {
       "relation": "contains",
@@ -29310,9 +29310,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend",
-      "target": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build"
     },
     {
       "relation": "contains",
@@ -29320,9 +29320,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L119",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_commands_you_will_need",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_commands_you_will_need"
     },
     {
       "relation": "contains",
@@ -29330,9 +29330,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_current_state",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_current_state"
     },
     {
       "relation": "contains",
@@ -29340,9 +29340,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L238",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_done_criteria",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_done_criteria"
     },
     {
       "relation": "contains",
@@ -29350,9 +29350,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_git_workflow",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_git_workflow"
     },
     {
       "relation": "contains",
@@ -29360,9 +29360,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L270",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_maintenance_notes",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_maintenance_notes"
     },
     {
       "relation": "contains",
@@ -29370,9 +29370,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_scope",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_scope"
     },
     {
       "relation": "contains",
@@ -29380,9 +29380,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L14",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_status",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_status"
     },
     {
       "relation": "contains",
@@ -29390,9 +29390,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L173",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_steps",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_steps"
     },
     {
       "relation": "contains",
@@ -29400,9 +29400,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L253",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_stop_conditions",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_stop_conditions"
     },
     {
       "relation": "contains",
@@ -29410,9 +29410,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L130",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_suggested_executor_toolkit",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_suggested_executor_toolkit"
     },
     {
       "relation": "contains",
@@ -29420,9 +29420,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L226",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_test_plan",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_test_plan"
     },
     {
       "relation": "contains",
@@ -29430,9 +29430,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_plan_004_web_wasm_save_backend_stop_saves_silently_no_opping_on_the_web_build",
-      "target": "plans_004_web_save_filesystem_backend_why_this_matters",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_why_this_matters"
     },
     {
       "relation": "contains",
@@ -29440,9 +29440,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L175",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_steps",
-      "target": "plans_004_web_save_filesystem_backend_step_1_find_the_existing_js_interop_mechanism",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_step_1_find_the_existing_js_interop_mechanism"
     },
     {
       "relation": "contains",
@@ -29450,9 +29450,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L185",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_steps",
-      "target": "plans_004_web_save_filesystem_backend_step_2_implement_the_localstorage_backend",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_step_2_implement_the_localstorage_backend"
     },
     {
       "relation": "contains",
@@ -29460,9 +29460,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L201",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_steps",
-      "target": "plans_004_web_save_filesystem_backend_step_3_wire_it_into_the_web_config",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_step_3_wire_it_into_the_web_config"
     },
     {
       "relation": "contains",
@@ -29470,9 +29470,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L209",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_steps",
-      "target": "plans_004_web_save_filesystem_backend_step_4_manual_web_smoke_test",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_step_4_manual_web_smoke_test"
     },
     {
       "relation": "contains",
@@ -29480,9 +29480,9 @@
       "source_file": "plans/004-web-save-filesystem-backend.md",
       "source_location": "L219",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_004_web_save_filesystem_backend_steps",
-      "target": "plans_004_web_save_filesystem_backend_step_5_format_desktop_gate",
-      "confidence_score": 1.0
+      "target": "plans_004_web_save_filesystem_backend_step_5_format_desktop_gate"
     },
     {
       "relation": "contains",
@@ -29490,9 +29490,9 @@
       "source_file": "plans/README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme",
-      "target": "plans_readme_implementation_plans",
-      "confidence_score": 1.0
+      "target": "plans_readme_implementation_plans"
     },
     {
       "relation": "contains",
@@ -29500,9 +29500,9 @@
       "source_file": "plans/README.md",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme_implementation_plans",
-      "target": "plans_readme_dependency_notes",
-      "confidence_score": 1.0
+      "target": "plans_readme_dependency_notes"
     },
     {
       "relation": "contains",
@@ -29510,9 +29510,9 @@
       "source_file": "plans/README.md",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme_implementation_plans",
-      "target": "plans_readme_execution_order_status",
-      "confidence_score": 1.0
+      "target": "plans_readme_execution_order_status"
     },
     {
       "relation": "contains",
@@ -29520,9 +29520,9 @@
       "source_file": "plans/README.md",
       "source_location": "L44",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme_implementation_plans",
-      "target": "plans_readme_findings_considered_and_not_turned_into_plans",
-      "confidence_score": 1.0
+      "target": "plans_readme_findings_considered_and_not_turned_into_plans"
     },
     {
       "relation": "contains",
@@ -29530,9 +29530,9 @@
       "source_file": "plans/README.md",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme_implementation_plans",
-      "target": "plans_readme_provenance",
-      "confidence_score": 1.0
+      "target": "plans_readme_provenance"
     },
     {
       "relation": "contains",
@@ -29540,9 +29540,9 @@
       "source_file": "plans/README.md",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "plans_readme_implementation_plans",
-      "target": "plans_readme_recommended_order",
-      "confidence_score": 1.0
+      "target": "plans_readme_recommended_order"
     },
     {
       "relation": "calls",
@@ -36801,5 +36801,5 @@
       "source_file": "test/render/sprite_manager_test.odin"
     }
   ],
-  "built_at_commit": "5959cad89b29ee002e425049cf407d23b196efa5"
+  "built_at_commit": "b07ed37949cf033af021771135269bc81280863f"
 }

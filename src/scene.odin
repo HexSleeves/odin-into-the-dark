@@ -7,7 +7,7 @@ import renderer "./render"
 
 // ─── Game scene boundary ─────────────────────────────────────────────────────
 
-GAME_SCENE_COUNT :: 9
+GAME_SCENE_COUNT :: 10
 
 Game_Scene :: enum {
 	Title,
@@ -19,6 +19,7 @@ Game_Scene :: enum {
 	Help,
 	Scores,
 	Cheats,
+	Pause,
 }
 
 scene_for_state :: proc(state: gcore.Game_State) -> Game_Scene {
@@ -41,6 +42,8 @@ scene_for_state :: proc(state: gcore.Game_State) -> Game_Scene {
 		return .Scores
 	case .Viewing_Cheats:
 		return .Cheats
+	case .Pause:
+		return .Pause
 	case .Viewing_Shrine, .Viewing_Chest, .Viewing_Merchant, .Viewing_Dialogue:
 		return .Gameplay
 	}
@@ -114,6 +117,12 @@ game_scene_manager_init :: proc(
 		id     = game_scene_id(.Cheats),
 		ctx    = rawptr(game),
 		update = game_scene_cheats_update,
+		render = game_scene_render,
+	}
+	scenes[9] = eng.Engine_Scene {
+		id     = game_scene_id(.Pause),
+		ctx    = rawptr(game),
+		update = game_scene_pause_update,
 		render = game_scene_render,
 	}
 
@@ -222,6 +231,11 @@ game_scene_scores_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^gcore.Game)ctx
 	gameinput.update_viewing_scores(game, game_engine_input_manager(engine))
 	return false
+}
+
+game_scene_pause_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
+	game := cast(^gcore.Game)ctx
+	return gameinput.update_pause(engine, game, game_engine_input_manager(engine))
 }
 
 game_scene_cheats_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {

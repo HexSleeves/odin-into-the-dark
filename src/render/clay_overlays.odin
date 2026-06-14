@@ -355,6 +355,24 @@ clay_render_cheats_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	}
 }
 
+clay_render_pause_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
+	_ = game
+	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
+	choice := 0
+	if ui != nil {choice = ui.pause_choice}
+	options := ui_pkg.UI_PAUSE_OPTIONS
+	if clay.UI(clay.ID("pause-backdrop"))(clay_menu_backdrop_decl(floating = true)) {
+		if clay.UI(clay.ID("pause-card"))(clay_menu_card_decl()) {
+			clay_menu_title(ui_pkg.UI_PAUSE_TITLE)
+			clay_menu_subtitle(ui_pkg.UI_PAUSE_HELP)
+			clay_menu_accent_rule("pause-rule")
+			for label, idx in options {
+				clay_menu_item(fmt.tprintf("pause-item-%d", idx), label, "", idx == choice)
+			}
+		}
+	}
+}
+
 clay_title_text :: proc(text: string, size: u16, color: eng.Engine_Color) {
 	clay_overlay_text(text, size, color, CLAY_FONT_ID_DISPLAY)
 }

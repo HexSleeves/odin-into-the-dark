@@ -96,7 +96,6 @@ handle_playing_hotkeys :: proc(
 		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 		if cur != nil && cur.type == .Anvil {
 			reset_repeats(im)
-			quit_armed = false
 			game.state = .Viewing_Crafting
 			return true
 		}
@@ -169,7 +168,6 @@ handle_playing_hotkeys :: proc(
 
 	if action_pressed(im, .Inventory) {
 		reset_repeats(im)
-		quit_armed = false
 		game.state = .Viewing_Inventory
 		ui.inspect_slot = 0
 		return true
@@ -177,7 +175,6 @@ handle_playing_hotkeys :: proc(
 
 	if action_pressed(im, .Help) {
 		reset_repeats(im)
-		quit_armed = false
 		ui.return_to_title = false
 		game.state = .Viewing_Help
 		return true

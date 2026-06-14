@@ -10,7 +10,6 @@ Input_Result :: enum {
 	Descended,
 	Ascended,
 	Waited,
-	Quit,
 }
 
 read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
@@ -33,26 +32,6 @@ handle_input :: proc(
 	im: ^Input_Manager,
 	engine: ^eng.Engine = nil,
 ) -> Input_Result {
-	// Escape requires a double-press to quit during play (permadeath safety).
-	// First press arms the flag and posts a warning; second press quits.
-	// Any other key input clears the armed state.
-	if action_pressed(im, .Quit) {
-		if quit_armed {
-			quit_armed = false
-			return .Quit
-		}
-		quit_armed = true
-		add_message(
-			messages,
-			game,
-			"Press Escape again to quit.",
-			eng.Engine_Color{255, 180, 50, 255},
-		)
-		return .None
-	} else {
-		quit_armed = false
-	}
-
 	if action_pressed(im, .Wait) {
 		game.player.energy -= BASE_ACTION_COST
 		add_message(messages, game, "You wait...", eng.Engine_Color{180, 180, 180, 255})

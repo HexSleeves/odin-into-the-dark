@@ -192,6 +192,7 @@ UI_State :: struct {
 	title_choice:    int, // selected title menu option
 	return_to_title: bool, // modal overlays should return to title instead of gameplay
 	cheat_choice:    int, // highlighted cheat menu row; only used in CHEATS builds
+	pause_choice:    int, // highlighted pause menu row (Resume / Quit to Title)
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────
@@ -256,6 +257,7 @@ Game_State :: enum {
 	Viewing_Chest,
 	Viewing_Merchant,
 	Viewing_Dialogue,
+	Pause,
 }
 
 Game :: struct {

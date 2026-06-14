@@ -15,8 +15,54 @@ update_playing :: proc(
 	if cheat_open_if_requested(game_engine_ui_manager(engine), game, im) {return false}
 	if handle_forced_turn(engine, game) {return}
 	if handle_mining_input(engine, game, im) {return}
+	// Escape opens the pause menu (Resume / Quit to Title) instead of quitting
+	// the process outright; permadeath stays intact because the run is not lost.
+	if action_pressed(im, .Quit) {
+		reset_repeats(im)
+		ui := ui_manager_state(game_engine_ui_manager(engine))
+		if ui != nil {ui.pause_choice = PAUSE_RESUME}
+		game.state = .Pause
+		return false
+	}
 	if handle_playing_hotkeys(engine, game, im, config) {return}
 	return handle_player_action(engine, game)
+}
+
+// ─── Pause ──────────────────────────────────────────────────────────────────────
+
+update_pause :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) -> (quit: bool) {
+	ui := ui_manager_state(game_engine_ui_manager(engine))
+	choice := 0
+	if ui != nil {choice = ui.pause_choice}
+
+	// Escape resumes play.
+	if action_pressed(im, .Quit) || action_pressed(im, .Menu_Back) {
+		reset_repeats(im)
+		game.state = .Playing
+		return false
+	}
+
+	if action_pressed(im, .Menu_Up) {
+		choice = (choice + PAUSE_OPTION_COUNT - 1) % PAUSE_OPTION_COUNT
+	}
+	if action_pressed(im, .Menu_Down) {
+		choice = (choice + 1) % PAUSE_OPTION_COUNT
+	}
+	if ui != nil {ui.pause_choice = choice}
+
+	if action_pressed(im, .Menu_Confirm) {
+		switch choice {
+		case PAUSE_RESUME:
+			reset_repeats(im)
+			game.state = .Playing
+		case PAUSE_QUIT_TO_TITLE:
+			// Return to the title screen; the process stays alive (no exit).
+			reset_repeats(im)
+			game.state = .Title_Screen
+		}
+	}
+
+	return false
 }
 
 handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
@@ -34,8 +80,6 @@ handle_player_action :: proc(engine: ^eng.Engine, game: ^Game) -> (quit: bool) {
 	)
 
 	switch result {
-	case .Quit:
-		return true
 	case .Moved:
 		handle_player_moved(engine, game, kills_before)
 		trigger_enemy_rounds(engine, game)

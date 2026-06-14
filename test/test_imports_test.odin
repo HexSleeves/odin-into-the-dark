@@ -182,6 +182,10 @@ update_title_screen :: gameinput.update_title_screen
 activate_title_choice :: gameinput.activate_title_choice
 handle_global_input :: gameinput.handle_global_input
 update_playing :: gameinput.update_playing
+update_pause :: gameinput.update_pause
+PAUSE_OPTION_COUNT :: gcore.PAUSE_OPTION_COUNT
+PAUSE_RESUME :: gcore.PAUSE_RESUME
+PAUSE_QUIT_TO_TITLE :: gcore.PAUSE_QUIT_TO_TITLE
 
 // ─── Gameplay procs ───────────────────────────────────────────────────────────
 game_init :: gp.game_init

@@ -1655,8 +1655,8 @@
     "semantic_hash": ""
   },
   "scripts/apply_workflow.js": {
-    "mtime": 1781404282.9737864,
-    "ast_hash": "a71867a3d27964ba7f79154c1c332fdf",
+    "mtime": 1781406061.0191479,
+    "ast_hash": "da58a0e1f32e6002c17c15603690dbf5",
     "semantic_hash": ""
   },
   "skills-lock.json": {
@@ -1695,13 +1695,38 @@
     "semantic_hash": ""
   },
   "docs/audit-2026-06-13.md": {
-    "mtime": 1781399755.8905852,
-    "ast_hash": "6195b5f853706ef6d59cc59d53821fb3",
+    "mtime": 1781405585.918987,
+    "ast_hash": "6ba60f454bcdd9f520df0f702bc2419d",
     "semantic_hash": ""
   },
   "docs/impl-plan-2026-06-13.md": {
     "mtime": 1781403686.8226295,
     "ast_hash": "f3dc6c41108234c1f73e024612c66eb4",
+    "semantic_hash": ""
+  },
+  "plans/001-finish-save-recovery-batch.md": {
+    "mtime": 1781407090.427667,
+    "ast_hash": "f7225f513433bbc36a18e54d51c69209",
+    "semantic_hash": ""
+  },
+  "plans/002-save-data-model-diet.md": {
+    "mtime": 1781407040.6878898,
+    "ast_hash": "8824c028c3702bff15036d67c47355ac",
+    "semantic_hash": ""
+  },
+  "plans/003-enemy-occupancy-and-flowfield-cache.md": {
+    "mtime": 1781407135.2388668,
+    "ast_hash": "26095b38ccd4137d930c38a924f88ea1",
+    "semantic_hash": ""
+  },
+  "plans/004-web-save-filesystem-backend.md": {
+    "mtime": 1781407192.8226216,
+    "ast_hash": "e8350ac5177b900b37084d8b5f05b314",
+    "semantic_hash": ""
+  },
+  "plans/README.md": {
+    "mtime": 1781407456.8126059,
+    "ast_hash": "cf74f1a618200f6b605c299ba51f3cb4",
     "semantic_hash": ""
   }
 }
