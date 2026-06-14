@@ -1,16 +1,16 @@
-# Graph Report - odin-into-the-dark  (2026-06-10)
+# Graph Report - odin-into-the-dark  (2026-06-13)
 
 ## Corpus Check
-- 75 files · ~123,367 words
+- 85 files · ~142,428 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1581 nodes · 1261 edges · 417 communities (144 shown, 273 thin omitted)
-- Extraction: 83% EXTRACTED · 17% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
+- 1728 nodes · 1402 edges · 423 communities (151 shown, 272 thin omitted)
+- Extraction: 84% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5b989aa3`
+- Built from commit: `ce19c205`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -430,18 +430,23 @@
 - [[_COMMUNITY_Community 414|Community 414]]
 - [[_COMMUNITY_Community 415|Community 415]]
 - [[_COMMUNITY_Community 416|Community 416]]
+- [[_COMMUNITY_Community 417|Community 417]]
+- [[_COMMUNITY_Community 418|Community 418]]
+- [[_COMMUNITY_Community 419|Community 419]]
+- [[_COMMUNITY_Community 420|Community 420]]
+- [[_COMMUNITY_Community 421|Community 421]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `generate_map` - 17 edges
-2. `Into the Depths — UI/HUD Redesign` - 14 edges
-3. `Coding Style` - 14 edges
-4. `Game` - 14 edges
-5. `Repository Guidelines` - 13 edges
-6. `clay_render_screen_ui` - 13 edges
-7. `Into the Depths` - 12 edges
-8. `Into the Depths UI Redesign — Implementation Plan` - 12 edges
-9. `render_game` - 12 edges
-10. `/design-shotgun: Visual Design Exploration` - 11 edges
+1. `Per-item detail` - 25 edges
+2. `generate_map` - 17 edges
+3. `Into the Depths — UI/HUD Redesign` - 14 edges
+4. `Coding Style` - 14 edges
+5. `Game` - 14 edges
+6. `Repository Guidelines` - 13 edges
+7. `Into the Depths — Engine & Game Audit` - 13 edges
+8. `clay_render_screen_ui` - 13 edges
+9. `Audit Playbook` - 12 edges
+10. `Into the Depths` - 12 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `skip_title_flag_controls_initial_state` --semantically_similar_to--> `game_engine_frame_manager`  [INFERRED] [semantically similar]
@@ -498,15 +503,15 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (417 total, 273 thin omitted)
+## Communities (423 total, 272 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
 Cohesion: 0.22
 Nodes (10): Camera_Manager, Engine, Engine_Config, Engine_Event, Engine_Event_Type, Event_Manager, Frame_Manager, frame_manager_allocator (+2 more)
 
 ### Community 1 - "Game Init & World Generation"
-Cohesion: 0.20
-Nodes (14): place_ancient_treasure, count_wall_neighbors, find_farthest_floor, find_nearest_floor, flood_fill_count, flood_fill_mark, generate_cave, generate_mixed (+6 more)
+Cohesion: 0.06
+Nodes (44): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, can_place_item, generate_map, place_ancient_treasure (+36 more)
 
 ### Community 2 - "Combat, Audio & Content Loading"
 Cohesion: 0.06
@@ -525,8 +530,8 @@ Cohesion: 0.08
 Nodes (29): Content_Manager, content_manager_destroy, content_manager_enemy_def, content_manager_enemy_def_for_depth, content_manager_item_def, content_manager_pick_item_def, content_manager_pick_item_def_for_depth, Conversation_Def (+21 more)
 
 ### Community 6 - "Field of View & Lifecycle Cleanup"
-Cohesion: 0.15
-Nodes (14): item_make, cheat_add_item_to_inventory, cheat_apply, cheat_explore_map, cheat_find_descent, cheat_open_if_requested, update_viewing_cheats, handle_global_input (+6 more)
+Cohesion: 0.08
+Nodes (28): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, game_cleanup, game_destroy, restart_game, clear_visited_floors (+20 more)
 
 ### Community 7 - "Enemy AI & Pathfinding (tests)"
 Cohesion: 0.09
@@ -869,8 +874,8 @@ Cohesion: 0.29
 Nodes (7): clay_bar, clay_bar_segmented, clay_render_hud, clay_row, clay_text, bar_segment_fill_count, clay_panel_begin
 
 ### Community 352 - "Community 352"
-Cohesion: 0.33
-Nodes (5): env, ECC_DISABLED_HOOKS, ECC_GATEGUARD, permissions, allow
+Cohesion: 0.05
+Nodes (40): `already-fixed` items (production code already in working tree; deliver test/commit only), Batch 1 — `fix: harden save persistence (atomic + clamp)`, Batch 2 — `refactor: delete dead engine + content code`, Batch 3 — `refactor: de-duplicate FOV and floor-snapshot helpers into gcore`, Batch 4 — `perf: grid + cache hot-path optimizations`, Batch 5 — `feat(input): route Escape to a pause/confirm menu`, Batch 6 — `refactor: shrink save data model (Tile diet + tile-state carrier)`, Batch 7 — `feat(gameplay): early-game tuning, combat feedback, progression, scoring` (+32 more)
 
 ### Community 353 - "Community 353"
 Cohesion: 0.33
@@ -956,6 +961,14 @@ Nodes (4): clay_color_to_engine, clay_render_border, clay_render_commands, clay_
 Cohesion: 0.50
 Nodes (4): base_tile_color, dim_color, get_tile_color, render_map
 
+### Community 374 - "Community 374"
+Cohesion: 0.15
+Nodes (12): 1. Correctness / Bugs, 2. Security, 3. Performance, 4. Test Coverage, 5. Tech Debt & Architecture, 6. Dependencies & Migrations, 7. DX & Tooling, 8. Docs (+4 more)
+
+### Community 377 - "Community 377"
+Cohesion: 0.17
+Nodes (12): R10 — Held movement keys produce diagonal moves in a cardinal-only roguelike · **Medium** · _verifier confirmed_, R11 — Escape hard-quits the process during play with no confirmation · **Medium**, R1 — (= C2) Unclamped deserialized counts · **High**., R2 — Load deletes the save before the restored game is validated · **Medium**, R3 — Migration size gate uses exact-equality on a fixed layout · **Medium**, R4 — NPC string pointers serialized raw into `Save_Floor` · **Medium (latent)**, R5 — Web build has no filesystem; saves/loads/autosaves silently no-op · **Medium** · _auditor said High; verifier downgraded (secondary target, graceful)_, R6 — Silent error swallowing · **Medium (cluster)** (+4 more)
+
 ### Community 380 - "Community 380"
 Cohesion: 0.67
 Nodes (3): Action_Input_Manager, Engine_Key_Binding, Engine_Repeat_State
@@ -1038,35 +1051,51 @@ Nodes (4): action_input_binding_pressed, action_input_pressed, action_input_rele
 
 ### Community 409 - "Community 409"
 Cohesion: 0.18
-Nodes (11): can_place_item, generate_map, spawn_items, mine_wall, mineable_tile_type, spawn_anvil, spawn_boss, spawn_fountain (+3 more)
+Nodes (11): P10 — Sprite mode does per-tile string-keyed hashmap lookups in the render inner loop · **Low**, P1 — `context.temp_allocator` is never reset → session-long growth · **Medium** · _auditor said High; verifier downgraded (slow, bounded, no corruption)_, P2 — Floating minimap: O(tiles × entities) + 4050 Clay elements every frame when toggled · **Medium** · _auditor said High; verifier downgraded (toggle-gated, NPCs capped at 8)_, P3 — Scores overlay reads + JSON-parses `scores.json` from disk **every render frame** · **Medium**, P4 — `render_map` recomputes every visible tile color from scratch each frame, with duplicated color math · **Medium**, P5 — `Tile` duplicates visibility/light already owned by `Tile_State_Manager` · **Medium** (also a data-model finding, see M1), P6 — Fixed-grid managers recompute validity (and `cell_count` = a w×h multiply) on every single access · **Medium**, P7 — `trigger_enemy_rounds` recomputes the full Dijkstra BFS once per enemy round · **Medium** (+3 more)
 
 ### Community 410 - "Community 410"
-Cohesion: 0.28
-Nodes (9): game_cleanup, game_destroy, restart_game, clear_visited_floors, ensure_floor_snapshot, restore_dynamic_array, restore_saved_floor, save_current_floor (+1 more)
+Cohesion: 0.20
+Nodes (10): Docs drift · **Medium**, Reliability of the safety net (tooling/CI), T1 — CI runs a strictly weaker subset than `just verify`; green CI ≠ verify passes · **High** · _verifier sharpened: CI runs ~0 tests_, T2 — Save-migration is data-loss-critical but 1 of 6 branches is tested · **High** · _auditor said Critical; verifier tempered to High (dev-stage formats)_, T3 — No profiling/benchmark/debug-visualization despite `just profile` · **Medium** (= P8)., T4 — Test runner recompiles everything from scratch each run (copytree wipes incremental state) · **Medium** — slow feedback loop., T5 — `odinfmt` path hardcoded to a personal absolute path · **Medium** — breaks for any other contributor/CI. Resolve from `$PATH` or an env var., T6 — Five src sub-packages (~7.7K LOC) never run as their own `odin test` target · **Medium**. (+2 more)
 
 ### Community 411 - "Community 411"
-Cohesion: 0.47
-Nodes (6): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, give_starter_gear
+Cohesion: 0.20
+Nodes (9): Hard Rules, Improve, Invocation variants, Phase 1 — Recon (always), Phase 2 — Audit (parallel), Phase 3 — Vet, prioritize, confirm, Phase 4 — Write the plans, Tone of the output (+1 more)
 
 ### Community 412 - "Community 412"
-Cohesion: 0.40
-Nodes (6): find_vault_door_position, room_contains_point, room_perimeter_contains_point, seal_room_perimeter_for_vault, spawn_treasure_vault, vault_loot_def
+Cohesion: 0.22
+Nodes (8): C1 — Save writes are non-atomic; a crash mid-write destroys the only save · **Critical** · _verifier confirmed, severity reinforced_, C2 — Corrupt/tampered save counts used as loop bounds without clamping → OOB read · **High** · _verifier confirmed; held at High_, Critical risks and blockers, Executive summary, Into the Depths — Engine & Game Audit, Module-by-module health (verified overviews), Refuted / corrected by verification (do **not** treat as bugs), Top 10 highest-impact recommendations
 
 ### Community 413 - "Community 413"
 Cohesion: 0.40
 Nodes (4): Algorithms, Depth Profiles, Map Generation, Source Notes
 
 ### Community 414 - "Community 414"
-Cohesion: 0.50
-Nodes (5): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, cheat_set_depth
+Cohesion: 0.22
+Nodes (9): D1 — The marketed central pillar (light = survival) has no effect on danger · **Medium (design-Critical)** · _verifier confirmed_, D2 — Brutal early-game wall · **Medium** · _verifier confirmed data, tempered "spike-damage" wording_, D3 — Progression is shallow · **Medium** · _verifier confirmed_, D4 — No first-run onboarding · **Medium**, D5 — Crafting + materials economy is thin and partly bypassed · **Medium**, D6 — Merchant currency is broken/placeholder · **Medium** (impl bug, see also B-list), D7 — Quest/victory payoff is purely cosmetic · **Medium**, D8 — Combat lacks damage-state telegraphing / floating numbers · **Medium**; **`poison_cloud` ability has no effect** · several abilities are sprite-mapped without distinct AI · **Medium**. (+1 more)
 
 ### Community 415 - "Community 415"
-Cohesion: 0.50
-Nodes (4): carve_building, generate_town, set_wall, carve_rect
+Cohesion: 0.22
+Nodes (9): G1 — Service locator is type-unsafe by design · **Medium** · _auditor said High; verifier downgraded (latent, no active bug)_, G2 — Service-ID table defined three times, consumed split-brain · **Medium** · _verifier sharpened: it's THREE places, not two_, G3 — The ~374 re-export aliases form a distributed god-namespace and have already caused divergence · **Medium**, G4 — FOV shadowcasting fully duplicated between `io` and `gameplay` · **Medium** · _verifier confirmed line-for-line copy_, G5 — Floor-snapshot lifecycle helpers defined twice · **Medium**, G6 — `g_data` global content registry is dead · **Medium**, G7 — The three "save" managers are NOT duplication · _resolved, no action_, G8 — Map-generation ownership split across three packages with no orchestrator · **Low** (+1 more)
 
 ### Community 416 - "Community 416"
-Cohesion: 0.67
-Nodes (3): can_place_event, pick_event_type, spawn_floor_event
+Cohesion: 0.22
+Nodes (8): Closing the Loop — execute, reconcile, issues, Dispatch, `execute <plan>` — dispatch and review, `--issues` — publish plans as GitHub issues, Preconditions (check all before dispatching), `reconcile` — keep `plans/` alive, Review (the advisor's real job here), Verdict
+
+### Community 417 - "Community 417"
+Cohesion: 0.25
+Nodes (8): E1 — `Tile_State_Manager` / `Bool_Grid_Manager` passed **by value** in per-cell read accessors · **Medium** · _auditor said High; verifier downgraded_, E2 — `Engine_Config.target_fps` silently ignored on the shipping (karl2d) path · **Medium**, E3 — Platform vs app init failure indistinguishable; karl2d init always reports success · **Medium** · _auditor said High; verifier downgraded (diagnosability, not a crash)_, E4 — Dead / aspirational engine code · **Medium → Low**, E5 — `Engine_State` holds self-referential pointers that break on copy · **Medium**, E6 — Fixed inline grid caps (8192) waste ~50%+ at the real map size (80×50 = 4000) · **Medium**, E7 — "Manager-soup": Engine embeds 11 managers by value with parallel boilerplate accessors · **Low**, Engine architecture findings
+
+### Community 418 - "Community 418"
+Cohesion: 0.40
+Nodes (5): Immediate (this week — cheap, high blast radius), Long-term direction, Medium-term refactors (1–2 months), Prioritized action plan, Short-term (next 2–4 weeks)
+
+### Community 419 - "Community 419"
+Cohesion: 0.40
+Nodes (4): Handoff Plan Template, Index file: `plans/README.md`, Quality bar — check before finishing each plan, Template
+
+### Community 420 - "Community 420"
+Cohesion: 0.40
+Nodes (4): BATCHES, meta, RESULT_SCHEMA, results
 
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
@@ -1075,9 +1104,9 @@ Nodes (3): can_place_event, pick_event_type, spawn_floor_event
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1089 isolated node(s):** `PreToolUse`, `allow`, `ECC_GATEGUARD`, `ECC_DISABLED_HOOKS`, `meta` (+1084 more)
+- **1215 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1210 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **273 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
@@ -1086,13 +1115,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `render_game` connect `Clay Renderer & Particles` to `Community 373`, `Community 372`, `Clay UI Overlays & HUD`?**
+- **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `clay_render_screen_ui` connect `Clay UI Overlays & HUD` to `Community 345`, `Clay Renderer & Particles`, `Community 371`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `Engine_Config` connect `Engine Core & Input Services` to `Community 344`, `Config & File System`?**
-  _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **What connects `PreToolUse`, `allow`, `ECC_GATEGUARD` to the rest of the system?**
-  _1089 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **What connects `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA` to the rest of the system?**
+  _1215 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Game Init & World Generation` be split into smaller, more focused modules?**
+  _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
 - **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
   _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._
+- **Should `Game State & Title/Game-Over Flow` be split into smaller, more focused modules?**
+  _Cohesion score 0.06090808416389812 - nodes in this community are weakly interconnected._

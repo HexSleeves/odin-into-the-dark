@@ -63,3 +63,5 @@ scores.json
 # Graphify local cache
 graphify-out/cache/
 graphify-out/.graphify_*
+savegame.dat.bak
+savegame.dat.tmp

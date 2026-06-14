@@ -54,16 +54,6 @@ HARD RULES:
 Return the structured result. THIS BATCH:\n`
 
 const BATCHES = [
-  { id:'B0', title:'Commit green baseline', phase:'Baseline', task:
-`Baseline commit of the CURRENT uncommitted working tree (it is already green: just verify passes). Do NOT write new code — only commit what exists, grouped into clean Conventional Commits.
-Inspect \`git status\` + \`git diff\`/\`git diff --cached\`. The uncommitted set is the FOV/floor-snapshot consolidation (G4: src/core/fov.odin + gameplay/fov.odin wrapper + save_common alias; G5: src/core/floor.odin + removed dupes in save_common.odin/generation.odin; aliases in gameplay/common.odin), dead-code cleanup (G6: src/data.odin/content_manager.odin/test; E4: turn_manager.odin), plus the plan doc and any small staged prior-session tweaks.
-Group sensibly, e.g.:
-  1) refactor: consolidate FOV + floor-snapshot helpers into gcore   (G4, G5: core/fov.odin, core/floor.odin, gameplay/fov.odin, gameplay/common.odin, gameplay/generation.odin, io/save_common.odin, related tests)
-  2) refactor: delete dead engine + content code   (E4, G6: turn_manager.odin, data.odin, content_manager.odin, content_manager_test.odin, etc.)
-  3) docs: add audit implementation plan   (docs/impl-plan-2026-06-13.md)
-Put any unrelated staged tweaks (justfile/audio/input/save_roundtrip_test) into the most fitting commit or a small chore/fix commit — do not drop them.
-Run \`just fmt\` then \`just verify\` (must be green) BEFORE committing. After committing, \`git status\` must be clean. No push.` },
-
   { id:'B1', title:'Finish criticals + regression tests', phase:'Finish-criticals', task:
 `Items C1 (finish), C2/T2 (tests), P1/R10/D6 (already-fixed -> add regression tests). See plan per-item detail for C1, C2-R1-save-deser-clamp, P1, R10, D6, T2.
 - C1: production atomic-write/CRC is already in tree+committed. ADD the load-side .bak fallback in load_game_from_storage (src/io/save_restore.odin per plan) — wrap read/header-validate/migrate in a retry over {path, path+".bak"}; on success remove path+".bak" and path+".tmp". Add the 4 C1 tests.

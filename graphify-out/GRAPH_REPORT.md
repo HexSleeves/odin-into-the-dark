@@ -1,16 +1,16 @@
 # Graph Report - odin-into-the-dark  (2026-06-13)
 
 ## Corpus Check
-- 85 files · ~142,428 words
+- 90 files · ~151,115 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1728 nodes · 1402 edges · 423 communities (151 shown, 272 thin omitted)
-- Extraction: 84% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
+- 1815 nodes · 1484 edges · 428 communities (156 shown, 272 thin omitted)
+- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ce19c205`
+- Built from commit: `5959cad8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -435,18 +435,23 @@
 - [[_COMMUNITY_Community 419|Community 419]]
 - [[_COMMUNITY_Community 420|Community 420]]
 - [[_COMMUNITY_Community 421|Community 421]]
+- [[_COMMUNITY_Community 423|Community 423]]
+- [[_COMMUNITY_Community 424|Community 424]]
+- [[_COMMUNITY_Community 425|Community 425]]
+- [[_COMMUNITY_Community 426|Community 426]]
+- [[_COMMUNITY_Community 427|Community 427]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Per-item detail` - 25 edges
 2. `generate_map` - 17 edges
-3. `Into the Depths — UI/HUD Redesign` - 14 edges
-4. `Coding Style` - 14 edges
-5. `Game` - 14 edges
-6. `Repository Guidelines` - 13 edges
-7. `Into the Depths — Engine & Game Audit` - 13 edges
-8. `clay_render_screen_ui` - 13 edges
-9. `Audit Playbook` - 12 edges
-10. `Into the Depths` - 12 edges
+3. `Into the Depths — Engine & Game Audit` - 14 edges
+4. `Into the Depths — UI/HUD Redesign` - 14 edges
+5. `Coding Style` - 14 edges
+6. `Plan 002: Shrink the save/data model — drop dead `Tile` fields, carry tile-state directly` - 14 edges
+7. `Game` - 14 edges
+8. `Repository Guidelines` - 13 edges
+9. `Plan 004: Web (WASM) save backend — stop saves silently no-opping on the web build` - 13 edges
+10. `clay_render_screen_ui` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `skip_title_flag_controls_initial_state` --semantically_similar_to--> `game_engine_frame_manager`  [INFERRED] [semantically similar]
@@ -503,7 +508,7 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (423 total, 272 thin omitted)
+## Communities (428 total, 272 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
 Cohesion: 0.22
@@ -1062,8 +1067,8 @@ Cohesion: 0.20
 Nodes (9): Hard Rules, Improve, Invocation variants, Phase 1 — Recon (always), Phase 2 — Audit (parallel), Phase 3 — Vet, prioritize, confirm, Phase 4 — Write the plans, Tone of the output (+1 more)
 
 ### Community 412 - "Community 412"
-Cohesion: 0.22
-Nodes (8): C1 — Save writes are non-atomic; a crash mid-write destroys the only save · **Critical** · _verifier confirmed, severity reinforced_, C2 — Corrupt/tampered save counts used as loop bounds without clamping → OOB read · **High** · _verifier confirmed; held at High_, Critical risks and blockers, Executive summary, Into the Depths — Engine & Game Audit, Module-by-module health (verified overviews), Refuted / corrected by verification (do **not** treat as bugs), Top 10 highest-impact recommendations
+Cohesion: 0.17
+Nodes (11): C1 — Save writes are non-atomic; a crash mid-write destroys the only save · **Critical** · _verifier confirmed, severity reinforced_, C2 — Corrupt/tampered save counts used as loop bounds without clamping → OOB read · **High** · _verifier confirmed; held at High_, Critical risks and blockers, Deferred (with rationale) ⏸, Executive summary, Implementation status — 2026-06-13 (same session, all changes `just verify`-green), Into the Depths — Engine & Game Audit, Landed ✅ (+3 more)
 
 ### Community 413 - "Community 413"
 Cohesion: 0.40
@@ -1097,6 +1102,26 @@ Nodes (4): Handoff Plan Template, Index file: `plans/README.md`, Quality bar —
 Cohesion: 0.40
 Nodes (4): BATCHES, meta, RESULT_SCHEMA, results
 
+### Community 423 - "Community 423"
+Cohesion: 0.10
+Nodes (20): Commands you will need, Current state, Decision gate (operator must choose before Step 1), Done criteria, Git workflow, Maintenance notes, Plan 002: Shrink the save/data model — drop dead `Tile` fields, carry tile-state directly, Scope (+12 more)
+
+### Community 424 - "Community 424"
+Cohesion: 0.11
+Nodes (18): Commands you will need, Current state, Done criteria, Git workflow, Maintenance notes, Plan 003: Enemy occupancy grid (P9) + Dijkstra flow-field cache (P7), profile-gated, Scope, Status (+10 more)
+
+### Community 425 - "Community 425"
+Cohesion: 0.11
+Nodes (18): Commands you will need, Current state, Done criteria, Git workflow, Maintenance notes, Plan 004: Web (WASM) save backend — stop saves silently no-opping on the web build, Scope, Status (+10 more)
+
+### Community 426 - "Community 426"
+Cohesion: 0.11
+Nodes (17): Commands you will need, Current state, Done criteria, Git workflow, Maintenance notes, Plan 001: Finish and clean the atomic-save `.bak` recovery batch, Scope, Status (+9 more)
+
+### Community 427 - "Community 427"
+Cohesion: 0.29
+Nodes (6): Dependency notes, Execution order & status, Findings considered and NOT turned into plans, Implementation Plans, Provenance, Recommended order
+
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
   src/scene.odin · relation: references
@@ -1104,7 +1129,7 @@ Nodes (4): BATCHES, meta, RESULT_SCHEMA, results
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1215 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1210 more)
+- **1287 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1282 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1116,12 +1141,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
+  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+- **Why does `cheat_set_depth` connect `Field of View & Lifecycle Cleanup` to `Game Init & World Generation`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA` to the rest of the system?**
-  _1215 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1287 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Game Init & World Generation` be split into smaller, more focused modules?**
   _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
 - **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
   _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._
-- **Should `Game State & Title/Game-Over Flow` be split into smaller, more focused modules?**
-  _Cohesion score 0.06090808416389812 - nodes in this community are weakly interconnected._
