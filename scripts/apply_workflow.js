@@ -54,23 +54,9 @@ HARD RULES:
 Return the structured result. THIS BATCH:\n`
 
 const BATCHES = [
-  { id:'B1', title:'Finish criticals + regression tests', phase:'Finish-criticals', task:
-`Items C1 (finish), C2/T2 (tests), P1/R10/D6 (already-fixed -> add regression tests). See plan per-item detail for C1, C2-R1-save-deser-clamp, P1, R10, D6, T2.
-- C1: production atomic-write/CRC is already in tree+committed. ADD the load-side .bak fallback in load_game_from_storage (src/io/save_restore.odin per plan) — wrap read/header-validate/migrate in a retry over {path, path+".bak"}; on success remove path+".bak" and path+".tmp". Add the 4 C1 tests.
-- Add regression tests (current behavior already correct, lock it in): P1 temp_allocator-at-frame-arena test; R10 cardinal-movement collapse test; D6 depth-merchant currency test; C2 clamp + a save->load round-trip test.
-- T2: the plan flags a wrong V4 assertion in test/io/save_roundtrip_test.odin (items_found should be 0 not 8). If that test currently passes (verify is green) it may already be correct — only change it if it is actually wrong; do not break green.
-All new tests MUST pass. Commit e.g. "feat(io): recover save from backup when primary is corrupt" + "test: lock in clamp/temp-allocator/cardinal-move/merchant-currency behavior".` },
-
-  { id:'B4', title:'Perf hot-path optimizations', phase:'Optimize', task:
-`Items P3, P2, P4, P6-P7. See plan per-item detail.
-- P3: cache parsed scores.json on Score_Manager with write-through invalidation; load returns an owned clone. Tests assert single disk read across loads.
-- P2: minimap scratch index buffers ([N]i32 enemy/npc) built once per render, O(1) per cell; first-match semantics; equivalence test vs linear scan.
-- P4: DEDUP ONLY — replace render_map inline tint block with get_tile_color(...); delete dead render_last_cam_x/y (and render_map_dirty if truly dead per plan). DEFER the color cache. Dedup-lock test.
-- P6-P7: expose unchecked distance_map accessors + validate-once in compute_dijkstra_map (P6); add dijkstra_dirty to Game, recompute only when dirty, mark dirty on player input, clear on recompute (P7). CRITICAL: update every direct process_enemy_turns test caller to set dijkstra_dirty=true or movement assertions break.
-Commit "perf: grid + cache hot-path optimizations" (or split P2/P3/P4/P67).` },
-
+  // B1 (criticals+tests) and B4 (perf) already landed green in commits b78a46a, aa0d2d1, 5959cad — removed.
   { id:'B5', title:'Pause/confirm menu', phase:'Pause-menu', task:
-`Item R11. See plan per-item detail. Replace the in-tree double-Escape quit_armed (which kills the process) with a real Pause scene: new .Pause Game_State + Game_Scene + scene mapping + registration + update_pause (Resume / Quit-to-Title) + clay_render_pause_overlay. update_playing intercepts .Quit before handle_player_action; Quit-to-Title sets .Title_Screen (process stays alive). Remove quit_armed from state_shared.odin and the quit block in playing_action.odin. APPEND the new Game_State variant at the END of the enum (avoid reorder churn). Do NOT bool-wrap clay.UI (closes at calling scope — see project memory). Add the 5 pause tests. Commit "feat(input): route Escape to a pause/confirm menu".` },
+`Item R11. See plan per-item detail. The user chose the PAUSE-MENU design over the double-press-quit feature (that rejected feature has been stashed). The committed tree still has a basic \`quit_armed\` double-Escape global — REMOVE it and replace with a real Pause scene: new .Pause Game_State + Game_Scene + scene mapping + registration + update_pause (Resume / Quit-to-Title) + clay_render_pause_overlay. update_playing intercepts .Quit before handle_player_action; Quit-to-Title sets .Title_Screen (process stays alive). Remove quit_armed from state_shared.odin and the quit block in playing_action.odin (also check playing_state.odin which references quit_armed). APPEND the new Game_State variant at the END of the enum (avoid reorder churn). GAME_SCENE_COUNT increments. Do NOT bool-wrap clay.UI (closes at calling scope — see project memory). Add the 5 pause tests. The tree is clean and single-owner now — no concurrent writer. Commit "feat(input): route Escape to a pause/confirm menu".` },
 
   { id:'B6', title:'Save data-model diet (drop legacy)', phase:'Save-diet', task:
 `Item M1-P5. See plan per-item detail. DECISION (locked): DROP legacy v2-v10 save read support entirely — delete those migration branches and DO NOT create the Tile_V10/Save_Data_V10 freeze. This collapses the item to LOW risk.
