@@ -11,13 +11,11 @@ import "core:testing"
 @(test)
 v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
 	// The v11 diet removed the dead Tile vis/explored/light fields and instead
-	// appends a dedicated tile_states array. D4 then appended tutorial_flags as the
-	// new trailing field of BOTH Save_Data and Save_Floor. tutorial_flags is now
-	// the final member: its trailing-byte span (total size minus its offset) must
-	// match between the two structs so the symmetric layout holds.
+	// appends a dedicated tile_states array. D4 appended tutorial_flags (game-global
+	// onboarding hints) as Save_Data's trailing field, immediately after tile_states.
+	// (The dead per-floor Save_Floor.tutorial_flags symmetry field was removed; its
+	// trailing field is now tile_states itself.)
 	data_tail_size := size_of(Save_Data) - int(offset_of(Save_Data, tutorial_flags))
-	floor_tail_size := size_of(Save_Floor) - int(offset_of(Save_Floor, tutorial_flags))
-	testing.expect_value(t, data_tail_size, floor_tail_size)
 
 	// tutorial_flags is a bit_set[Tutorial_Hint; u8]; the trailing span is at least
 	// the field size (the struct may pad to its alignment after the last field).
@@ -28,10 +26,14 @@ v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) 
 	)
 
 	// The tile-state array still carries the engine layer (the diet did not delete
-	// the carrier); it sits immediately before the trailing tutorial_flags byte.
+	// the carrier); in Save_Data it sits immediately before the trailing tutorial_flags.
 	data_tile_states_size :=
 		int(offset_of(Save_Data, tutorial_flags)) - int(offset_of(Save_Data, tile_states))
 	testing.expect(t, data_tile_states_size > 0, "tile_states array must carry the engine layer")
+
+	// Save_Floor's trailing field is now tile_states (no per-floor tutorial_flags copy).
+	floor_tile_tail := size_of(Save_Floor) - int(offset_of(Save_Floor, tile_states))
+	testing.expect(t, floor_tile_tail > 0, "Save_Floor tile_states must carry the trailing engine layer")
 }
 
 // ─── v11 round-trip tests ───────────────────────────────────────────────────────

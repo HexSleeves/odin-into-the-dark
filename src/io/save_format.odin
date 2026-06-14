@@ -94,12 +94,8 @@ Save_Floor :: struct {
 	event_used:         bool,
 	npcs:               [gcore.MAX_NPCS]gcore.NPC,
 	npc_count:          int,
-	// Engine tile-state layer (visibility/exploration/light).
+	// Engine tile-state layer (visibility/exploration/light). LAST field.
 	tile_states:        [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
-	// D4: onboarding hints. Per-floor copy is unused (hints are game-global, stored
-	// in Save_Data.tutorial_flags); present only to keep Save_Floor's trailing
-	// layout symmetric with Save_Data. LAST field.
-	tutorial_flags:     gcore.Tutorial_Flags,
 }
 // ─── File layout ──────────────────────────────────────────────────────────────
 
