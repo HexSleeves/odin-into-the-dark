@@ -113,9 +113,7 @@ Save_Header :: struct {
 
 // Current save format (v11). v11 drops the dead Tile visibility/light fields and
 // instead serializes the engine tile-state layer through a dedicated trailing
-// tile_states array. The legacy scalar status fields (poison_turns/burning_turns/
-// frozen_turns/web_stuck_turns) are retained mid-struct and mirrored into
-// player_status on write; restore reads only player_status.
+// tile_states array. Per-entity status effects live in player_status/enemy_status.
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
 	tiles:                 [MAP_WIDTH * MAP_HEIGHT]Tile,
@@ -142,14 +140,9 @@ Save_Data :: struct {
 	seed:                  u64,
 	light_boost_bonus:     int,
 	light_boost_turns:     int,
-	web_stuck_turns:       int,
 	water_slow_active:     bool,
 	// v4 additions
 	items_found:           int,
-	// v5 additions
-	poison_turns:          int,
-	burning_turns:         int,
-	frozen_turns:          int,
 	// v6 additions
 	quest:                 Quest_State,
 	// v7 additions

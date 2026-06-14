@@ -48,11 +48,6 @@ save_game_to_storage :: proc(
 	data.floor_entry_pos = game.floor_entry_pos
 	data.player_status = game.player_status
 	data.tutorial_flags = game.tutorial_flags
-	// Legacy mirrors — kept so the v8 prefix region stays meaningful.
-	data.poison_turns = game.player_status[gcore.Status_Kind.Poison]
-	data.burning_turns = game.player_status[gcore.Status_Kind.Burning]
-	data.frozen_turns = game.player_status[gcore.Status_Kind.Frozen]
-	data.web_stuck_turns = game.player_status[gcore.Status_Kind.Webbed]
 
 	// ── Convert ore veins (string → Save_String) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
