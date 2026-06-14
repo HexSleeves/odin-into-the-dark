@@ -247,6 +247,67 @@ buying_from_shopkeeper_consumes_material_and_marks_offer_sold :: proc(t: ^testin
 }
 
 @(test)
+depth_merchant_uses_inventory_currency_and_buy_consumes_it :: proc(t: ^testing.T) {
+	// Regression lock for D6: the depth merchant must price its stock in an item
+	// that lives in the inventory (iron_ore), not an equip-only weapon that
+	// inventory_count_item_type can never see. A buy must consume that currency.
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+	testing.expect(t, content_manager_load_all(&content))
+
+	game := game_init(&content)
+	defer game_destroy(game)
+	game.inventory = {}
+	game.depth = 1
+	generate_merchant_stock(&content, game)
+
+	// Every priced offer must charge an inventory-visible currency, not a weapon.
+	for i in 0 ..< MERCHANT_OFFER_COUNT {
+		if game.merchant_stock[i].item_id == "" {continue}
+		testing.expect_value(t, game.merchant_stock[i].cost_id, "iron_ore")
+		testing.expect(t, game.merchant_stock[i].cost_qty > 0)
+	}
+
+	// Pick an offer that does NOT sell iron_ore itself, so consuming the currency
+	// and receiving the purchase are independently observable.
+	offer_idx := -1
+	for i in 0 ..< MERCHANT_OFFER_COUNT {
+		if game.merchant_stock[i].item_id != "" && game.merchant_stock[i].item_id != "iron_ore" {
+			offer_idx = i
+			break
+		}
+	}
+	testing.expect(t, offer_idx >= 0, "merchant must stock a non-currency offer")
+	if offer_idx < 0 {return}
+	offer := game.merchant_stock[offer_idx]
+
+	// Stock exactly enough iron_ore to afford the first offer.
+	iron_def := content_manager_item_def(&content, "iron_ore")
+	testing.expect(t, iron_def != nil)
+	iron := item_make_from_def(iron_def, game.player.pos)
+	iron.picked_up = true
+	testing.expect(t, inventory_put_slot(game, 0, iron, offer.cost_qty))
+	testing.expect_value(t, inventory_count_item_type(game, "iron_ore"), offer.cost_qty)
+
+	services := engine_services_make(engine_services_default_config())
+	defer engine_services_destroy(&services)
+	engine: Engine
+	engine.services = &services
+	engine.message_manager = message_manager_make()
+	testing.expect(t, engine_services_register(&services, GAME_ENGINE_SERVICE_CONTENT, &content))
+	testing.expect(
+		t,
+		engine_services_register(&services, GAME_ENGINE_SERVICE_MESSAGES, &engine.message_manager),
+	)
+
+	testing.expect(t, merchant_buy(&engine, game, offer_idx))
+	testing.expect(t, game.merchant_stock[offer_idx].sold)
+	// Currency consumed; the purchased item now occupies an inventory slot.
+	testing.expect_value(t, inventory_count_item_type(game, "iron_ore"), 0)
+	testing.expect_value(t, inventory_count_item_type(game, offer.item_id), 1)
+}
+
+@(test)
 descending_then_ascending_restores_previous_floor_entities_and_items :: proc(t: ^testing.T) {
 	content := content_manager_make()
 	defer content_manager_destroy(&content)
