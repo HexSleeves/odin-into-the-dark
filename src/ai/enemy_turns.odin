@@ -60,9 +60,15 @@ enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -
 }
 
 // enemy_update_awareness manages detection and memory decay.
-// - If within detection range AND has LOS (or within hearing radius) → become aware
-// - If already aware but out of range → decay memory timer
-// - If memory timer hits 0 → forget and return to wandering
+//
+// Detection model:
+//   Sight (LOS required): enemy detects player if it has LOS AND
+//     dist <= max(player_light_radius, 2).
+//     A brighter torch expands the sight-detection window (risk/reward).
+//     The floor of 2 keeps melee-range detection even in pitch darkness.
+//   Hearing (no LOS): dist <= max(1, detection_radius/3) — enemies are
+//     never fully blind but cannot hunt from afar without light.
+//   detection_radius <= 0: always aware (legacy enemies, unaffected).
 @(private = "file")
 enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 	// detection_radius 0 = always aware (legacy / hand-built enemies)
@@ -72,24 +78,28 @@ enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 	}
 
 	dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
-	in_range := dist <= enemy.detection_radius
 
-	if in_range {
-		// Fix 3: require LOS for sight-based detection to prevent seeing through walls.
-		// Allow a small no-LOS "hearing" radius so enemies aren't completely deaf.
-		// TODO(light): factor in tile light level for sight detection threshold.
-		hearing_radius := max(1, enemy.detection_radius / 3)
-		has_los := enemy_has_los_to_player(game, enemy.pos)
-		if has_los || dist <= hearing_radius {
-			enemy.aware = true
-			enemy.aware_turns_left = enemy.memory_turns
-		}
+	// Compute the player's effective emitted light radius (mirrors compute_fov formula).
+	// Includes boost, debuff, and helmet bonus — all transient fields on Game/Player.
+	helmet_bonus := 0
+	if game.equipped_helmet.occupied {helmet_bonus = game.equipped_helmet.item.stat_bonus}
+	player_light_radius :=
+		game.player.light_radius + game.light_boost_bonus + game.light_debuff_bonus + helmet_bonus
+
+	// Sight detection: LOS + within lit area (floor at 2 for close-range regardless).
+	sight_range := max(player_light_radius, 2)
+	hearing_radius := max(1, enemy.detection_radius / 3)
+	has_los := enemy_has_los_to_player(game, enemy.pos)
+
+	if (has_los && dist <= sight_range) || dist <= hearing_radius {
+		enemy.aware = true
+		enemy.aware_turns_left = enemy.memory_turns
 		return
 	}
 
 	if !enemy.aware {return}
 
-	// Out of detection range — decay memory
+	// Out of detectable range — decay memory
 	enemy.aware_turns_left -= 1
 	if enemy.aware_turns_left <= 0 {
 		enemy.aware = false

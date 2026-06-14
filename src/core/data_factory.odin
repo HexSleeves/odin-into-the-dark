@@ -1,10 +1,12 @@
 package core
 
+import "core:unicode/utf8"
 
 enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 	g: rune = '?'
 	if len(def.glyph) > 0 {
-		g = rune(def.glyph[0])
+		// Decode the first full UTF-8 rune, not just the first byte.
+		g, _ = utf8.decode_rune_in_string(def.glyph)
 	}
 	det := DEFAULT_ENEMY_DETECTION_RADIUS
 	if def.detection_radius > 0 {det = def.detection_radius}
@@ -38,7 +40,8 @@ enemy_make_from_def :: proc(def: ^Enemy_Def, pos: Vec2) -> Enemy {
 item_make_from_def :: proc(def: ^Item_Def, pos: Vec2) -> Item {
 	g: rune = '?'
 	if len(def.glyph) > 0 {
-		g = rune(def.glyph[0])
+		// Decode the first full UTF-8 rune, not just the first byte.
+		g, _ = utf8.decode_rune_in_string(def.glyph)
 	}
 	return Item {
 		pos = pos,

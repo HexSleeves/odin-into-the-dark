@@ -150,23 +150,6 @@ game_scene_manager_render :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	eng.scene_manager_render(manager, engine)
 }
 
-scene_update :: proc(game: ^gcore.Game) -> bool {
-	if game == nil {
-		return true
-	}
-
-	scenes: [GAME_SCENE_COUNT]eng.Engine_Scene
-	services := eng.engine_services_make(eng.engine_services_default_config())
-	engine := eng.Engine {
-		services = &services,
-	}
-	game_engine_register_app_services(&engine)
-	if !game_scene_manager_init(scenes[:], &engine, game) {
-		return true
-	}
-	return game_scene_manager_update(&engine, game)
-}
-
 game_scene_title_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 	game := cast(^gcore.Game)ctx
 	return gameinput.update_title_screen(engine, game, game_engine_input_manager(engine))
