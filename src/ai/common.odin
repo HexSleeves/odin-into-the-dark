@@ -84,7 +84,7 @@ can_place_enemy :: proc(game: ^Game, x, y: int) -> bool {
 }
 
 // is_sight_blocking returns true if tile (x,y) blocks line-of-sight.
-// Matches the FOV opaque check in save_is_opaque: Wall and Locked_Door.
+// Matches the FOV opaque check in gcore.fov_is_opaque: Wall and Locked_Door.
 @(private = "package")
 is_sight_blocking :: proc(game: ^Game, x, y: int) -> bool {
 	t := tile_at(game, x, y)

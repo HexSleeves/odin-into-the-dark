@@ -156,6 +156,8 @@ logger_debugf :: gameio.logger_debugf
 logger_warnf :: gameio.logger_warnf
 Game_Log_Channel :: gameio.Game_Log_Channel
 rand_room_interior :: gcore.rand_room_interior
+saved_floor_destroy :: gcore.saved_floor_destroy
+clear_visited_floors :: gcore.clear_visited_floors
 
 // ─── Gen package ──────────────────────────────────────────────────────────────
 generate_rooms :: genpkg.generate_rooms
