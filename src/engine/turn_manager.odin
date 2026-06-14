@@ -33,4 +33,3 @@ turn_manager_set :: proc(turns: ^Turn_Manager, count: int) {
 turn_manager_reset :: proc(turns: ^Turn_Manager) {
 	turn_manager_set(turns, 0)
 }
-

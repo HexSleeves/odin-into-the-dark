@@ -63,18 +63,8 @@ content_manager_reload_releases_previous_registry_allocations :: proc(t: ^testin
 }
 
 @(test)
-content_manager_load_all_with_instance_does_not_alias_global_registry :: proc(t: ^testing.T) {
-	data_registry_destroy(&g_data)
-	defer data_registry_destroy(&g_data)
-	content := content_manager_make()
-	defer content_manager_destroy(&content)
-
-	loaded := content_manager_load_all(&content)
-
-	testing.expect(t, loaded)
-	testing.expect(t, content.loaded)
-	testing.expect(t, content.registry.loaded)
-	testing.expect(t, !g_data.loaded)
+content_manager_load_all_returns_false_for_nil :: proc(t: ^testing.T) {
+	testing.expect(t, !content_manager_load_all(nil))
 }
 
 @(test)

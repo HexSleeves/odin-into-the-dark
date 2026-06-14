@@ -5,8 +5,6 @@ import "core:encoding/json"
 import gcore "./core"
 import gameio "./io"
 
-g_data: gcore.Data_Registry
-
 // ─── Loader ───────────────────────────────────────────────────────────────────
 
 @(private = "file")
@@ -17,10 +15,6 @@ EMBEDDED_ITEMS :: #load("../data/items.json5")
 EMBEDDED_PLAYER :: #load("../data/player.json5")
 @(private = "file")
 EMBEDDED_DIALOGUE :: #load("../data/dialogue.json5")
-
-data_load_all :: proc() -> bool {
-	return data_load_all_into(&g_data)
-}
 
 data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 	if registry == nil {
