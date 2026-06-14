@@ -63,6 +63,13 @@ mine_wall :: proc(
 			ore_item := item_make_from_def(def, Vec2{tx, ty})
 			append(&game.items, ore_item)
 			add_message(messages, game, fmt.tprintf("You found %s!", def.name), vein.color)
+			tutorial_hint_once(
+				messages,
+				game,
+				.First_Ore,
+				"Ore drops to the ground where you mined. Step onto it and press G to pick it up.",
+				eng.Engine_Color{255, 220, 130, 255},
+			)
 		} else {
 			add_message(
 				messages,

@@ -165,6 +165,7 @@ descend :: proc(
 		if t != nil {t.type = .Ascent}
 	}
 	compute_fov(game)
+	check_visibility_onboarding(messages, game)
 	game_camera_update(camera, game, true)
 
 	if game.depth == SURFACE_DEPTH + 1 {
@@ -207,6 +208,7 @@ ascend :: proc(
 		generate_map(content, game)
 	}
 	compute_fov(game)
+	check_visibility_onboarding(messages, game)
 	game_camera_update(camera, game, true)
 
 	if game.depth == SURFACE_DEPTH {
@@ -280,6 +282,9 @@ advance_turn :: proc(
 	remove_dead_enemies(messages, game, particles, game_camera_x(camera), game_camera_y(camera))
 	tick_timed_effects(messages, game)
 	compute_fov(game)
+	// First-encounter hints (post-FOV so enemy visibility is current).
+	check_visibility_onboarding(messages, game)
+	check_status_onboarding(messages, game)
 	game_camera_update(camera, game)
 	if game.player.hp < hp_before {
 		eng.vfx_manager_flash(vfx, eng.Engine_Color{255, 0, 0, 255}, 0.3)

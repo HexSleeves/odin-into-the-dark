@@ -238,6 +238,13 @@ descend :: gp.descend
 save_current_floor :: gp.save_current_floor
 advance_turn :: gp.advance_turn
 
+// ─── Onboarding (D4) ──────────────────────────────────────────────────────────
+Tutorial_Hint :: gcore.Tutorial_Hint
+Tutorial_Flags :: gcore.Tutorial_Flags
+tutorial_hint_once :: gp.tutorial_hint_once
+check_visibility_onboarding :: gp.check_visibility_onboarding
+check_status_onboarding :: gp.check_status_onboarding
+
 // ─── AI procs ─────────────────────────────────────────────────────────────────
 resolve_attack_player_on_enemy :: aipkg.resolve_attack_player_on_enemy
 resolve_attack_enemy_on_player :: aipkg.resolve_attack_enemy_on_player

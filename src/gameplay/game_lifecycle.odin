@@ -89,6 +89,8 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	init_player_from_content(content, game)
 	game.player_level = gcore.levelup_level_for_kills(0)
 	game.pending_level_ups = 0
+	// Onboarding hints re-teach the basics each fresh run.
+	game.tutorial_flags = {}
 
 	game.rooms = make([dynamic]gcore.Room)
 	game.enemies = make([dynamic]Enemy)

@@ -23,6 +23,13 @@ check_event_tile :: proc(engine: ^eng.Engine, game: ^Game) {
 			"You stand before a glowing shrine...",
 			eng.Engine_Color{100, 200, 255, 255},
 		)
+		tutorial_hint_once(
+			messages,
+			game,
+			.First_Shrine,
+			"A shrine offers power at a price. Choose a boon, but each costs some health.",
+			eng.Engine_Color{255, 220, 130, 255},
+		)
 	case .Chest:
 		open_chest(engine, game)
 	case .Merchant:

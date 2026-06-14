@@ -97,6 +97,15 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 		fmt.tprintf("Picked up %s.", item_display_name(it)),
 		eng.Engine_Color{100, 255, 100, 255},
 	)
+	if itype == ITEM_ID_TORCH {
+		tutorial_hint_once(
+			messages,
+			game,
+			.First_Torch,
+			"A torch lights your way. Use it from your inventory to extend your light radius.",
+			eng.Engine_Color{255, 220, 130, 255},
+		)
+	}
 	return true
 }
 

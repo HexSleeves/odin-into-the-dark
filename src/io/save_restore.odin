@@ -124,6 +124,7 @@ load_game_from_storage :: proc(
 	game.player_status = data.player_status
 	game.quest = data.quest
 	game.floor_entry_pos = data.floor_entry_pos
+	game.tutorial_flags = data.tutorial_flags
 	game.active_npc = -1
 	game.active_conv_idx = -1
 	game.active_node_idx = -1

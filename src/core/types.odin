@@ -84,6 +84,22 @@ status_active :: proc(s: ^Status_Turns, kind: Status_Kind) -> bool {
 	return s[kind] > 0
 }
 
+// ─── Onboarding hints ─────────────────────────────────────────────────────────
+
+// One-time first-encounter tutorial hints. Each variant fires its message at
+// most once per run; the set is persisted in the save and survives descent, but
+// is cleared on game reinit/restart. Append new variants at the END (the bit_set
+// is serialized as a trailing u8 in the save format).
+Tutorial_Hint :: enum u8 {
+	First_Enemy,
+	First_Ore,
+	First_Torch,
+	First_Status,
+	First_Shrine,
+}
+
+Tutorial_Flags :: bit_set[Tutorial_Hint;u8]
+
 // ─── Enemies ──────────────────────────────────────────────────────────────────
 
 Enemy :: struct {
@@ -343,4 +359,7 @@ Game :: struct {
 	player_level:           int,
 	pending_level_ups:      int,
 	level_choice:           int,
+	// First-encounter onboarding hints (D4). One bit per Tutorial_Hint; each hint
+	// fires once per run. Persisted (survives descent), cleared on reinit/restart.
+	tutorial_flags:         Tutorial_Flags,
 }

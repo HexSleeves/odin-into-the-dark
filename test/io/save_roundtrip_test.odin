@@ -11,19 +11,26 @@ import "core:testing"
 @(test)
 v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
 	// The v11 diet removed the dead Tile vis/explored/light fields and instead
-	// appends a dedicated tile_states array. Net: the per-cell tile-state bytes
-	// moved out of every Tile grid and into a single trailing array. The payload
-	// must still be exactly Save_Header + Save_Data on disk, and the tile_states
-	// field is the LAST member so future appends do not disturb earlier offsets.
-	// tile_states is the final field: its size equals the trailing bytes of the
-	// struct, i.e. total size minus the field's offset. The same array type is
-	// the last field of Save_Floor, so the trailing-byte count must match.
-	data_tile_states_size := size_of(Save_Data) - int(offset_of(Save_Data, tile_states))
-	floor_tile_states_size := size_of(Save_Floor) - int(offset_of(Save_Floor, tile_states))
-	testing.expect_value(t, data_tile_states_size, floor_tile_states_size)
+	// appends a dedicated tile_states array. D4 then appended tutorial_flags as the
+	// new trailing field of BOTH Save_Data and Save_Floor. tutorial_flags is now
+	// the final member: its trailing-byte span (total size minus its offset) must
+	// match between the two structs so the symmetric layout holds.
+	data_tail_size := size_of(Save_Data) - int(offset_of(Save_Data, tutorial_flags))
+	floor_tail_size := size_of(Save_Floor) - int(offset_of(Save_Floor, tutorial_flags))
+	testing.expect_value(t, data_tail_size, floor_tail_size)
 
-	// Each tile-state cell carries (visible, explored, light_level) for every map
-	// cell; the array must be non-empty (the diet did not delete the carrier).
+	// tutorial_flags is a bit_set[Tutorial_Hint; u8]; the trailing span is at least
+	// the field size (the struct may pad to its alignment after the last field).
+	testing.expect(
+		t,
+		data_tail_size >= size_of(gcore.Tutorial_Flags),
+		"trailing span must cover the tutorial_flags field",
+	)
+
+	// The tile-state array still carries the engine layer (the diet did not delete
+	// the carrier); it sits immediately before the trailing tutorial_flags byte.
+	data_tile_states_size :=
+		int(offset_of(Save_Data, tutorial_flags)) - int(offset_of(Save_Data, tile_states))
 	testing.expect(t, data_tile_states_size > 0, "tile_states array must carry the engine layer")
 }
 
@@ -70,6 +77,41 @@ v11_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	testing.expect(t, data.tile_states[idx].visible, "tile-state visibility must round-trip")
 	testing.expect(t, data.tile_states[idx].explored, "tile-state exploration must round-trip")
 	testing.expect_value(t, data.tile_states[idx].light_level, f32(0.5))
+}
+
+@(test)
+tutorial_flags_survive_a_v11_save_and_restore_roundtrip :: proc(t: ^testing.T) {
+	payload := new(Save_Data)
+	defer free(payload)
+	payload.depth = 4
+	payload.tutorial_flags = {.First_Enemy, .First_Ore, .First_Shrine}
+
+	buf := make([]u8, size_of(Save_Header) + size_of(Save_Data))
+	defer delete(buf)
+
+	mem.copy(&buf[size_of(Save_Header)], payload, size_of(Save_Data))
+	crc := hash.crc32(buf[size_of(Save_Header):])
+	header := Save_Header {
+		magic   = SAVE_MAGIC,
+		version = SAVE_VERSION,
+		crc32   = crc,
+	}
+	mem.copy(&buf[0], &header, size_of(Save_Header))
+
+	data, ok := load_save_data(header, buf)
+	testing.expect(t, ok, "v11 round-trip must succeed")
+	if data == nil {return}
+	defer free(data)
+
+	testing.expect(t, .First_Enemy in data.tutorial_flags, "First_Enemy hint must round-trip")
+	testing.expect(t, .First_Ore in data.tutorial_flags, "First_Ore hint must round-trip")
+	testing.expect(t, .First_Shrine in data.tutorial_flags, "First_Shrine hint must round-trip")
+	testing.expect(
+		t,
+		.First_Torch not_in data.tutorial_flags,
+		"unset hints must stay unset across the round-trip",
+	)
+	testing.expect(t, .First_Status not_in data.tutorial_flags, "unset hints must stay unset")
 }
 
 @(test)

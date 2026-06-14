@@ -94,8 +94,12 @@ Save_Floor :: struct {
 	event_used:         bool,
 	npcs:               [gcore.MAX_NPCS]gcore.NPC,
 	npc_count:          int,
-	// Engine tile-state layer (visibility/exploration/light). LAST field.
+	// Engine tile-state layer (visibility/exploration/light).
 	tile_states:        [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
+	// D4: onboarding hints. Per-floor copy is unused (hints are game-global, stored
+	// in Save_Data.tutorial_flags); present only to keep Save_Floor's trailing
+	// layout symmetric with Save_Data. LAST field.
+	tutorial_flags:     gcore.Tutorial_Flags,
 }
 // ─── File layout ──────────────────────────────────────────────────────────────
 
@@ -163,7 +167,10 @@ Save_Data :: struct {
 	player_status:         gcore.Status_Turns,
 	enemy_status:          [MAX_SAVE_ENEMIES]gcore.Status_Turns,
 	floor_enemy_status:    [gcore.MAX_DEPTH + 1][MAX_SAVE_ENEMIES]gcore.Status_Turns,
-	// v11 additions — engine tile-state layer (visibility/exploration/light). LAST field.
+	// v11 additions — engine tile-state layer (visibility/exploration/light).
 	tile_states:           [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
+	// D4 additions — first-encounter onboarding hints (game-global). Appended as
+	// the final field of the v11 layout; survives descent, cleared on reinit. LAST.
+	tutorial_flags:        gcore.Tutorial_Flags,
 }
 // ─── String conversion helpers ────────────────────────────────────────────────
