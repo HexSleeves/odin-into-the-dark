@@ -278,6 +278,9 @@ Game :: struct {
 	light_boost_bonus:      int,
 	light_boost_turns:      int,
 	light_drain_timer:      int, // counts rounds until next light drain
+	// Timed light debuff (from enemy darkness abilities). Negative bonus, independent of boost.
+	light_debuff_bonus:     int, // negative value; net effect = light_boost_bonus + light_debuff_bonus
+	light_debuff_turns:     int,
 	// Web tiles (Cave Crawler ability)
 	web_tiles:              eng.Bool_Grid_Manager,
 	tile_states:            eng.Tile_State_Manager,

@@ -151,8 +151,9 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 		} else if enemy.ability_type == ENEMY_ABILITY_DARKNESS {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist <= enemy.ability_range {
-				game.light_boost_bonus = max(game.light_boost_bonus - 2, -3)
-				game.light_boost_turns = max(game.light_boost_turns, 5)
+				// Write to debuff fields (negative bonus) — never clobbers the oil boost.
+				game.light_debuff_bonus = max(game.light_debuff_bonus - 2, -3)
+				game.light_debuff_turns = max(game.light_debuff_turns, 5)
 				enemy.ability_cooldown = enemy.ability_max_cd
 				enemy.energy -= ability_cost
 				add_message(

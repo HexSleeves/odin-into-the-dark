@@ -200,9 +200,13 @@ effective_attack_cost :: proc(game: ^Game) -> int {
 	return BASE_ACTION_COST
 }
 
+// effective_light_bonus returns the combined non-base light modifier:
+// helmet equipment bonus plus any active debuff (light_debuff_bonus is negative).
+// All FOV radius computations go through here so callers need not know the breakdown.
 effective_light_bonus :: proc(game: ^Game) -> int {
-	if game.equipped_helmet.occupied {return game.equipped_helmet.item.stat_bonus}
-	return 0
+	helmet_bonus := 0
+	if game.equipped_helmet.occupied {helmet_bonus = game.equipped_helmet.item.stat_bonus}
+	return helmet_bonus + game.light_debuff_bonus
 }
 
 item_display_name :: proc(item: ^Item) -> string {

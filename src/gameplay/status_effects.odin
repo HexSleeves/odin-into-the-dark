@@ -26,6 +26,13 @@ tick_timed_effects :: proc(messages: ^Message_Manager, game: ^Game) {
 		}
 	}
 
+	if game.light_debuff_turns > 0 {
+		game.light_debuff_turns -= 1
+		if game.light_debuff_turns <= 0 {
+			game.light_debuff_bonus = 0
+		}
+	}
+
 	tick_player_statuses(messages, game)
 	if game.state == .Game_Over {return}
 	tick_enemy_statuses(messages, game)
