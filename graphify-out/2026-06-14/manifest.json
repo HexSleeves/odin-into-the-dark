@@ -1300,8 +1300,8 @@
     "semantic_hash": ""
   },
   ".github/workflows/ci.yml": {
-    "mtime": 1781411450.1578631,
-    "ast_hash": "54c98945830df958f2e020a6ac250456",
+    "mtime": 1781400073.8999434,
+    "ast_hash": "a582c71bc2c3f60810f06287b6caaae3",
     "semantic_hash": ""
   },
   ".github/workflows/release.yml": {
@@ -1325,8 +1325,8 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1781411664.2596233,
-    "ast_hash": "a5e8c4a751857fbd4a82ac56384191fb",
+    "mtime": 1781400046.755823,
+    "ast_hash": "e6044aee55de90851fd66f7ddea3711d",
     "semantic_hash": ""
   },
   "CONTEXT.md": {
@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1781411456.9544837,
-    "ast_hash": "36543a481110032303cbbfcc2937dfb5",
+    "mtime": 1781405355.9894066,
+    "ast_hash": "83eaa12f0dc058493f2e2a5f525d5d83",
     "semantic_hash": ""
   },
   "assets/fonts/LICENSE-SourceCodePro.md": {
