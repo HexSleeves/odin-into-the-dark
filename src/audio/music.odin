@@ -17,14 +17,15 @@ MUSIC_SAMPLE_RATE :: u32(44100)
 MUSIC_LOOP_SECS :: f32(4.0) // all frequencies chosen to complete integer cycles in 4s
 
 Music_Manager :: struct {
-	tracks:        [Music_Tier]eng.Engine_Music_Handle,
-	wav_data:      [Music_Tier][]u8, // raw WAV bytes kept alive — backend streams from this pointer
-	active:        Music_Tier,
-	pending:       Music_Tier,
-	volume:        f32,
-	target_volume: f32,
-	enabled:       bool,
-	initialized:   bool,
+	tracks:         [Music_Tier]eng.Engine_Music_Handle,
+	wav_data:       [Music_Tier][]u8, // raw WAV bytes kept alive — backend streams from this pointer
+	active:         Music_Tier,
+	pending:        Music_Tier,
+	volume:         f32,
+	target_volume:  f32,
+	config_volume:  f32, // set from g_game_config.music_volume; 0 means use MUSIC_MASTER_VOLUME
+	enabled:        bool,
+	initialized:    bool,
 }
 
 g_music: Music_Manager
@@ -144,6 +145,27 @@ music_cleanup :: proc() {
 	g_music = {}
 }
 
+// music_master_volume returns the effective master volume, preferring the
+// config-supplied value over the hardcoded constant.
+@(private = "file")
+music_master_volume :: proc() -> f32 {
+	if g_music.config_volume > 0 {return g_music.config_volume}
+	return MUSIC_MASTER_VOLUME
+}
+
+// music_set_config_volume wires a runtime config value (e.g. g_game_config.music_volume)
+// into the music system. Call once after music_init. A value of 0 reverts to
+// MUSIC_MASTER_VOLUME.
+music_set_config_volume :: proc(volume: f32) {
+	g_music.config_volume = clamp(volume, 0, 1)
+	// If already playing, adjust target to the new ceiling immediately.
+	if g_music.initialized && g_music.enabled {
+		if g_music.target_volume > 0 {
+			g_music.target_volume = music_master_volume()
+		}
+	}
+}
+
 // music_update must be called once per frame.
 music_update :: proc(game: ^gcore.Game) {
 	if !g_music.initialized || !g_music.enabled {return}
@@ -155,7 +177,7 @@ music_update :: proc(game: ^gcore.Game) {
 	if desired != g_music.pending {
 		g_music.pending = desired
 		if desired == g_music.active {
-			g_music.target_volume = MUSIC_MASTER_VOLUME
+			g_music.target_volume = music_master_volume()
 		} else {
 			g_music.target_volume = 0
 		}
@@ -174,7 +196,7 @@ music_update :: proc(game: ^gcore.Game) {
 	if g_music.volume <= 0 && g_music.pending != g_music.active {
 		eng.engine_audio_backend_stop_music(backend, g_music.tracks[g_music.active])
 		g_music.active = g_music.pending
-		g_music.target_volume = MUSIC_MASTER_VOLUME
+		g_music.target_volume = music_master_volume()
 		eng.engine_audio_backend_play_music(backend, g_music.tracks[g_music.active])
 	}
 
@@ -186,12 +208,14 @@ music_update :: proc(game: ^gcore.Game) {
 	eng.engine_audio_backend_update_music(backend, g_music.tracks[g_music.active])
 }
 
+// music_toggle syncs music playback to the audio-manager enabled state (g_audio.enabled),
+// which is the single source of truth. Call this immediately after audio_manager_toggle.
 music_toggle :: proc() {
 	if !g_music.initialized {return}
 	backend := g_audio.backend
-	g_music.enabled = !g_music.enabled
+	g_music.enabled = g_audio.enabled // mirror the authoritative flag
 	if g_music.enabled {
-		g_music.target_volume = MUSIC_MASTER_VOLUME
+		g_music.target_volume = music_master_volume()
 		eng.engine_audio_backend_resume_music(backend, g_music.tracks[g_music.active])
 	} else {
 		eng.engine_audio_backend_pause_music(backend, g_music.tracks[g_music.active])

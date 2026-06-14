@@ -125,6 +125,7 @@ update_viewing_inventory :: proc(
 ) {
 	ui := ui_manager_state(ui_mgr)
 	if action_pressed(im, .Inventory) || action_pressed(im, .Menu_Back) {
+		reset_repeats(im)
 		game.state = .Playing
 		ui.dropping = false
 		ui.equipping = false
@@ -186,6 +187,7 @@ update_viewing_crafting :: proc(
 	im: ^Input_Manager,
 ) {
 	if action_pressed(im, .Menu_Back) || action_pressed(im, .Crafting) {
+		reset_repeats(im)
 		game.state = .Playing
 	}
 	if action_pressed(im, .Craft_1) {try_craft(content, messages, game, 0)}

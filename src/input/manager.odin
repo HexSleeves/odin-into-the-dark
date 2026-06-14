@@ -80,7 +80,9 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Save, {primary = .F5})
 	input_set_binding(im, .Load, {primary = .F9})
 	input_set_binding(im, .Toggle_Audio, {primary = .F1})
-	input_set_binding(im, .Cheat_Menu, {primary = .Grave})
+	when CHEATS_ENABLED {
+		input_set_binding(im, .Cheat_Menu, {primary = .Grave})
+	}
 	input_set_binding(im, .Toggle_Sprites, {primary = .F2})
 	input_set_binding(im, .Menu_Up, {primary = .W, alt = .Up})
 	input_set_binding(im, .Menu_Down, {primary = .S, alt = .Down})
@@ -111,11 +113,6 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 
 input_set_binding :: proc(im: ^Input_Manager, action: Game_Action, binding: Key_Binding) -> bool {
 	return eng.action_input_manager_set_binding(im, int(action), binding)
-}
-
-input_tick :: proc(im: ^Input_Manager, backend: eng.Engine_Input_Backend) {
-	if im == nil {return}
-	im.backend = backend
 }
 
 action_pressed :: proc(im: ^Input_Manager, action: Game_Action) -> bool {

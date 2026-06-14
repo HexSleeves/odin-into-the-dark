@@ -80,11 +80,3 @@ camera_manager_update :: proc(
 	camera.x += step_x
 	camera.y += step_y
 }
-
-@(private = "file")
-camera_manager_abs :: proc(v: int) -> int {
-	if v < 0 {
-		return -v
-	}
-	return v
-}

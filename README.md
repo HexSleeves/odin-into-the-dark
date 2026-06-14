@@ -94,46 +94,17 @@ just fmt
 
 ```
 src/
-├── main.odin               # Entry point and game loop
-├── constants.odin          # All game constants and layout values
-├── types.odin              # Struct and enum definitions
-├── map_utils.odin          # Tile access helpers
-├── game.odin               # Game init/reinit, camera, cleanup
-├── game_app.odin           # Application shell and engine integration
-├── input.odin              # Player input and descent logic
-├── logger.odin             # Runtime diagnostics logger
-├── combat.odin             # Attack resolution
-├── enemy.odin              # Enemy AI (A*, Dijkstra, chase, wander, abilities)
-├── fov.odin                # Field of view (recursive shadowcasting)
-├── items.odin              # Item factory, pickup, drop, use, spawn
-├── equipment.odin          # Equip/unequip, effective stats, starter gear
-├── mining.odin             # Wall mining, crafting recipes, material management
-├── generation.odin         # Map generation dispatch, rooms, hazards, ore veins
-├── mapgen_cave.odin        # Cellular automata cave/mixed generators
-├── data.odin               # JSON5 data loading, enemy/item factories
-├── messages.odin           # Message log ring buffer
-├── particles.odin          # Particle effect system
-├── render.odin             # Top-level render orchestrator
-├── render_map.odin         # Map tiles, entities, palettes, tooltip
-├── render_hud.odin         # HUD bar (HP, stats, pickaxe, equipment)
-├── render_ui.odin          # Overlay screens (inventory, crafting, help, game over)
-├── render_minimap.odin     # Minimap overlay
-├── saveload.odin           # Save/load serialization
-└── scores.odin             # High score tracking
-engine/
-├── engine.odin             # Engine bootstrap and service registry
-├── engine_services.odin    # Pluggable backend interface definitions
-├── game_app.odin           # Application lifecycle management
-├── input_manager.odin      # Unified input with action mapping
-├── audio_manager.odin      # Audio playback management
-├── sprite_manager.odin     # Sprite atlas and frame management
-├── scene_manager.odin      # Scene push/pop stack
-├── content_manager.odin    # Asset content loading
-├── message_manager.odin    # Typed in-engine event messages
-├── particle_manager.odin   # Particle pool and update
-├── camera_manager.odin     # Camera transform management
-├── config_manager.odin     # Runtime config and env vars
-└── ...                     # Additional managers and backends
+├── main.odin / game_app_*.odin / scene.odin / …   # package main — app wiring, service registration, scene routing
+├── core/          # package gcore   — Game/Enemy/Item types, constants, combat rolls, recipes, palette, save schema
+├── engine/        # package engine  — backend-agnostic managers: scenes, turns, grids, tile-state, storage, particles, cameras; render/audio/input backends as vtable structs (zero Raylib imports)
+├── render/        # package renderer — map, HUD, minimap, UI overlays, Clay UI layout, sprite manager, score display
+├── audio/         # package audio   — sound/music playback; Raylib and karl2d backends
+├── io/            # package gameio  — diagnostics logger, save/load serialization and migrations, web asset loader
+├── ui/            # package ui      — message log, UI text helpers, theme constants
+├── input/         # package input   — player input dispatch for each game state, cheat menu
+├── ai/            # package ai      — enemy AI: pathfinding (A*, Dijkstra), abilities, spawn, combat, cleanup
+├── gameplay/      # package gameplay — player actions, FOV, item use, mining, generation dispatch, status effects, restart
+└── gen/           # package gen     — map generators: rooms, caves, vaults, town, ore veins, hazards
 data/
 ├── enemies.json5           # Enemy definitions and spawn tables
 ├── items.json5             # Item definitions and spawn weights

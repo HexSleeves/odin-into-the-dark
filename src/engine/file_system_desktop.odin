@@ -6,10 +6,11 @@ import "core:os"
 
 engine_file_system_default :: proc() -> Engine_File_System {
 	return Engine_File_System {
-		read_entire_file = os_read_entire_file,
+		read_entire_file  = os_read_entire_file,
 		write_entire_file = os_write_entire_file,
-		exists = os_exists,
-		remove = os_remove,
+		exists            = os_exists,
+		remove            = os_remove,
+		rename            = os_rename,
 	}
 }
 
@@ -43,5 +44,11 @@ os_exists :: proc(ctx: rawptr, path: string) -> bool {
 @(private = "file")
 os_remove :: proc(ctx: rawptr, path: string) -> bool {
 	err := os.remove(path)
+	return err == nil
+}
+
+@(private = "file")
+os_rename :: proc(ctx: rawptr, old_path, new_path: string) -> bool {
+	err := os.rename(old_path, new_path)
 	return err == nil
 }

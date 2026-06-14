@@ -163,6 +163,55 @@ visible_tile_bounds :: proc(camera: ^eng.Camera_Manager) -> (x0, y0, x1, y1: int
 	return
 }
 
+// ─── Tile-color cache ─────────────────────────────────────────────────────────
+// Rebuilt only when game.render_map_dirty == true OR the light-glow tint
+// changes (light_boost_turns changes). This converts the per-frame O(visible
+// tiles × color math) cost to a one-time rebuild per game-state mutation.
+
+@(private = "file")
+Tile_Color_Cache :: struct {
+	colors:           [gcore.MAP_WIDTH * gcore.MAP_HEIGHT]eng.Engine_Color,
+	ore_tints:        [gcore.MAP_WIDTH * gcore.MAP_HEIGHT]eng.Engine_Color,
+	last_boost_turns: int,
+	last_depth:       int,
+	valid:            bool,
+}
+
+@(private = "file")
+g_tile_color_cache: Tile_Color_Cache
+
+@(private = "file")
+rebuild_tile_color_cache :: proc(game: ^gcore.Game) {
+	palette := gcore.palette_for_depth(game.depth)
+	glow := light_glow_tint(int(game.light_boost_turns))
+	for y in 0 ..< gcore.MAP_HEIGHT {
+		for x in 0 ..< gcore.MAP_WIDTH {
+			idx := gcore.pos_to_idx(x, y)
+			tile := game.tiles[idx]
+			state := gcore.tile_state_at_idx(game, idx)
+			g_tile_color_cache.colors[idx] = get_tile_color(tile, state, palette, glow)
+			// Ore tint (only relevant for walls)
+			if tile.type == .Wall {
+				vein := game.ore_veins[idx]
+				if vein.ore_type != "" {
+					if state.visible {
+						g_tile_color_cache.ore_tints[idx] = vein.color
+					} else {
+						g_tile_color_cache.ore_tints[idx] = dim_color(vein.color, EXPLORED_DIM)
+					}
+				} else {
+					g_tile_color_cache.ore_tints[idx] = {}
+				}
+			} else {
+				g_tile_color_cache.ore_tints[idx] = {}
+			}
+		}
+	}
+	g_tile_color_cache.last_boost_turns = int(game.light_boost_turns)
+	g_tile_color_cache.last_depth = game.depth
+	g_tile_color_cache.valid = true
+}
+
 // ─── Map rendering (with camera offset) ───────────────────────────────────────
 
 render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
@@ -174,9 +223,18 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 	sprites := game_engine_sprite_manager(engine)
 	ui := ui_pkg.ui_manager_state(game_engine_ui_manager(engine))
-	palette := gcore.palette_for_depth(game.depth)
 
-	glow := light_glow_tint(int(game.light_boost_turns))
+	// Rebuild tile-color cache when the game signals a dirty map, the light
+	// level changed, or the depth (palette) changed.
+	cache_stale :=
+		!g_tile_color_cache.valid ||
+		game.render_map_dirty ||
+		int(game.light_boost_turns) != g_tile_color_cache.last_boost_turns ||
+		game.depth != g_tile_color_cache.last_depth
+	if cache_stale {
+		rebuild_tile_color_cache(game)
+		game.render_map_dirty = false
+	}
 
 	x0, y0, x1, y1 := visible_tile_bounds(camera)
 	for y in y0 ..= y1 {
@@ -195,26 +253,7 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			if !state.visible && !state.explored {
 				render_draw_rectangle(engine, sx, sy, tile_size, tile_size, UNSEEN_COLOR)
 			} else {
-				base := base_tile_color(tile.type, palette)
-				tint: eng.Engine_Color
-				if state.visible {
-					lit := mul_color(base, glow)
-					brightness := max(state.light_level, 0.5)
-					tint = eng.Engine_Color {
-						u8(f32(lit.r) * brightness),
-						u8(f32(lit.g) * brightness),
-						u8(f32(lit.b) * brightness),
-						255,
-					}
-				} else {
-					dim := f32(EXPLORED_DIM)
-					tint = eng.Engine_Color {
-						u8(f32(base.r) * dim),
-						u8(f32(base.g) * dim),
-						u8(f32(base.b) * dim),
-						255,
-					}
-				}
+				tint := g_tile_color_cache.colors[idx]
 
 				if ui.use_sprites {
 					spr := sprite_manager_tile(sprites, tile.type)
@@ -226,12 +265,8 @@ render_map :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 				// Ore vein overlay on walls
 				if tile.type == .Wall {
-					vein := game.ore_veins[idx]
-					if vein.ore_type != "" {
-						ore_tint := vein.color
-						if !state.visible {
-							ore_tint = dim_color(vein.color, EXPLORED_DIM)
-						}
+					ore_tint := g_tile_color_cache.ore_tints[idx]
+					if ore_tint.a != 0 {
 						if ui.use_sprites {
 							spr := sprite_manager_named(sprites, "tile", "ore_vein")
 							sprite_manager_draw(engine, sprites, spr, sx, sy, ore_tint, tile_size)

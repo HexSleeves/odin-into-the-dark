@@ -97,6 +97,16 @@ update_light_for_depth :: proc(content: ^Content_Manager, game: ^Game) {
 		game.player.light_radius = max(player_def.light_radius - game.depth + 1, min_light)
 	}
 	game.light_drain_timer = 0
+
+	// Clear transient per-floor status effects on every floor change.
+	// Roguelike convention: Poison/Burning/Frozen/Webbed are short-lived
+	// environmental hazards that should not carry across floor boundaries.
+	// Persistent state (HP, inventory, equipment, kills) is intentionally kept.
+	game.player_status[.Poison] = 0
+	game.player_status[.Burning] = 0
+	game.player_status[.Frozen] = 0
+	game.player_status[.Webbed] = 0
+	game.water_slow_active = false
 }
 
 descend_allowed :: proc(game: ^Game) -> bool {

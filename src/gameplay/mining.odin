@@ -109,6 +109,9 @@ mine_wall :: proc(
 		}
 	}
 
+	// Recompute FOV so newly-opened space is immediately visible.
+	compute_fov(game)
+
 	return true
 }
 

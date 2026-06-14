@@ -82,3 +82,57 @@ can_place_enemy :: proc(game: ^Game, x, y: int) -> bool {
 	if t := tile_at(game, x, y); t != nil && t.type == .Descent {return false}
 	return true
 }
+
+// is_sight_blocking returns true if tile (x,y) blocks line-of-sight.
+// Matches the FOV opaque check in save_is_opaque: Wall and Locked_Door.
+@(private = "package")
+is_sight_blocking :: proc(game: ^Game, x, y: int) -> bool {
+	t := tile_at(game, x, y)
+	if t == nil {return true}
+	#partial switch t.type {
+	case .Wall, .Locked_Door:
+		return true
+	}
+	return false
+}
+
+// enemy_has_los_to_player walks a Bresenham line from `from` to the player
+// position and returns false if any intermediate tile blocks sight.
+// The origin tile and destination tile are not checked (an enemy in a wall
+// is an invalid state; destination is the player, not a wall).
+@(private = "package")
+enemy_has_los_to_player :: proc(game: ^Game, from: Vec2) -> bool {
+	x0, y0 := from.x, from.y
+	x1, y1 := game.player.pos.x, game.player.pos.y
+
+	dx := x1 - x0
+	dy := y1 - y0
+	if dx < 0 {dx = -dx}
+	if dy < 0 {dy = -dy}
+
+	sx := 1 if x0 < x1 else -1
+	sy := 1 if y0 < y1 else -1
+
+	err := dx - dy
+
+	cx, cy := x0, y0
+	for {
+		// Reached the player tile — LOS is clear.
+		if cx == x1 && cy == y1 {return true}
+
+		// Check intermediate tiles only (skip origin).
+		if !(cx == x0 && cy == y0) {
+			if is_sight_blocking(game, cx, cy) {return false}
+		}
+
+		e2 := 2 * err
+		if e2 > -dy {
+			err -= dy
+			cx += sx
+		}
+		if e2 < dx {
+			err += dx
+			cy += sy
+		}
+	}
+}

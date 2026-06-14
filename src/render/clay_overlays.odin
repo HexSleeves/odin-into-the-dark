@@ -258,8 +258,7 @@ clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = game
-	table := score_manager_load(game_engine_score_manager(engine))
-	defer score_table_destroy(&table)
+	table := score_cache_get(game_engine_score_manager(engine))
 	if clay.UI(clay.ID("scores-backdrop"))(clay_menu_backdrop_decl()) {
 		if clay.UI(clay.ID("scores-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_SCORES_TITLE)

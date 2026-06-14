@@ -7,6 +7,41 @@ import "core:encoding/json"
 
 // ─── High Score Table ─────────────────────────────────────────────────────────
 
+// ─── Render-owned score cache ─────────────────────────────────────────────────
+// Loaded once on first call to score_cache_get; stays valid until
+// render_scores_invalidate() is called (should be called by the score-write
+// path after score_manager_save).
+
+@(private = "file")
+Score_Cache :: struct {
+	table:  Score_Table,
+	loaded: bool,
+}
+
+@(private = "file")
+g_score_cache: Score_Cache
+
+// Invalidate the cache so the next render of the scores overlay re-reads disk.
+// CONDUCTOR WIRE-UP: call render_scores_invalidate() in gameplay/restart.odin
+// immediately after score_manager_save(scores, &table) at line 35.
+render_scores_invalidate :: proc() {
+	if g_score_cache.loaded {
+		score_table_destroy(&g_score_cache.table)
+		g_score_cache.loaded = false
+	}
+}
+
+// Return a pointer to the cached table, loading from disk on first access.
+// Package-visible: the scores overlay in clay_overlays.odin reads through this.
+@(private)
+score_cache_get :: proc(scores: ^Score_Manager) -> ^Score_Table {
+	if !g_score_cache.loaded {
+		g_score_cache.table = score_manager_load(scores)
+		g_score_cache.loaded = true
+	}
+	return &g_score_cache.table
+}
+
 MAX_SCORES :: 10
 SCORES_FILE :: "scores.json"
 

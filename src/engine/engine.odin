@@ -183,6 +183,10 @@ engine_frame_allocator :: proc(engine: ^Engine) -> runtime.Allocator {
 
 // ─── Split lifecycle for web (init/step/shutdown) ─────────────────────────────
 
+// Engine_State must NOT be copied or moved after engine_init completes.
+// engine_init stores self-referential pointers into this struct (e.g.
+// engine.services → &services, message_manager turn-pointer → &engine.turn_manager).
+// Moving the value after init silently corrupts those pointers.
 Engine_State :: struct {
 	engine:              Engine,
 	services:            Engine_Services,
@@ -248,6 +252,10 @@ engine_init :: proc(
 
 // engine_step runs one frame. Returns false when the game should exit.
 engine_step :: proc(state: ^Engine_State) -> bool {
+	assert(
+		state.engine.services == &state.services,
+		"Engine_State moved after init: self-referential pointers are invalid",
+	)
 	if state.platform.window_should_close(state.platform.ctx) {
 		return false
 	}
@@ -261,6 +269,7 @@ engine_step :: proc(state: ^Engine_State) -> bool {
 	if state.app.update != nil {
 		old_context := context
 		context.allocator = engine_frame_allocator(&state.engine)
+		context.temp_allocator = engine_frame_allocator(&state.engine)
 		quit = state.app.update(&state.engine, state.app)
 		context = old_context
 	}
@@ -271,6 +280,7 @@ engine_step :: proc(state: ^Engine_State) -> bool {
 	if state.app.render != nil {
 		old_context := context
 		context.allocator = engine_frame_allocator(&state.engine)
+		context.temp_allocator = engine_frame_allocator(&state.engine)
 		state.app.render(&state.engine, state.app)
 		context = old_context
 	}

@@ -19,6 +19,14 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			continue
 		}
 
+		// Fix 1: abilities respect the same awareness contract as movement.
+		// detection_radius <= 0 means always-aware (legacy enemies) — let them fire.
+		if enemy.detection_radius > 0 && !enemy.aware {continue}
+
+		// Fix 4: Frozen doubles the AP cost of using an ability, mirroring movement.
+		ability_cost := BASE_ACTION_COST
+		if status_active(&enemy.status, .Frozen) {ability_cost *= 2}
+
 		if enemy.ability_type == ENEMY_ABILITY_WEB {
 			// Web: place web on a floor tile adjacent to enemy if player is nearby
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
@@ -31,6 +39,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					if is_walkable(game, wx, wy) && !web_tile_at(game, wx, wy) {
 						web_tile_set(game, wx, wy, true)
 						enemy.ability_cooldown = enemy.ability_max_cd
+						enemy.energy -= ability_cost
 						add_message(
 							messages,
 							game,
@@ -45,7 +54,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 			// Pull: if player is in LOS within range but not adjacent, pull 1 tile closer
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 2 && dist <= enemy.ability_range {
-				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+				if enemy_has_los_to_player(game, enemy.pos) {
 					// Pull player 1 tile toward enemy along the longer axis
 					pull_dx := 0
 					pull_dy := 0
@@ -74,6 +83,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						game.player.pos.x = new_x
 						game.player.pos.y = new_y
 						enemy.ability_cooldown = enemy.ability_max_cd
+						enemy.energy -= ability_cost
 						add_message(
 							messages,
 							game,
@@ -86,7 +96,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 		} else if enemy.ability_type == ENEMY_ABILITY_TELEPORT {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 3 && dist <= enemy.ability_range {
-				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+				if enemy_has_los_to_player(game, enemy.pos) {
 					dx := CARDINAL_DX
 					dy := CARDINAL_DY
 					for dir in 0 ..< 4 {
@@ -95,6 +105,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						if is_walkable(game, tx, ty) && enemy_at(game, tx, ty) == nil {
 							enemy.pos = Vec2{tx, ty}
 							enemy.ability_cooldown = enemy.ability_max_cd
+							enemy.energy -= ability_cost
 							add_message(
 								messages,
 								game,
@@ -135,6 +146,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					}
 				}
 				enemy.ability_cooldown = enemy.ability_max_cd
+				enemy.energy -= ability_cost
 			}
 		} else if enemy.ability_type == ENEMY_ABILITY_DARKNESS {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
@@ -142,6 +154,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 				game.light_boost_bonus = max(game.light_boost_bonus - 2, -3)
 				game.light_boost_turns = max(game.light_boost_turns, 5)
 				enemy.ability_cooldown = enemy.ability_max_cd
+				enemy.energy -= ability_cost
 				add_message(
 					messages,
 					game,
@@ -152,11 +165,12 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 		} else if enemy.ability_type == ENEMY_ABILITY_RANGED_SHOOT {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist >= 2 && dist <= enemy.ability_range {
-				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+				if enemy_has_los_to_player(game, enemy.pos) {
 					base := enemy.ability_damage if enemy.ability_damage > 0 else enemy.attack
 					dmg := max(damage_roll(base) - effective_defense(game), 1)
 					game.player.hp = max(game.player.hp - dmg, 0)
 					enemy.ability_cooldown = enemy.ability_max_cd
+					enemy.energy -= ability_cost
 					add_message(
 						messages,
 						game,
@@ -179,9 +193,10 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 		} else if enemy.ability_type == ENEMY_ABILITY_FREEZE {
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 			if dist <= enemy.ability_range {
-				if tile_visible_at(game, enemy.pos.x, enemy.pos.y) {
+				if enemy_has_los_to_player(game, enemy.pos) {
 					status_apply(&game.player_status, .Frozen, 3)
 					enemy.ability_cooldown = enemy.ability_max_cd
+					enemy.energy -= ability_cost
 					add_message(
 						messages,
 						game,

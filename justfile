@@ -75,7 +75,7 @@ profile:
 
 # ─── Formatting ────────────────────────────────────────────────────────────────
 
-odinfmt := "/Users/lecoqjacob/Developer/games/ols/odinfmt"
+odinfmt := env_var_or_default("ODINFMT", "odinfmt")
 
 # Format all Odin source files
 fmt:

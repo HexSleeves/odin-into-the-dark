@@ -56,21 +56,28 @@ pickup_item :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 		for i in 0 ..< MAX_INVENTORY {
 			slot := &game.inventory[i]
 			if slot.occupied && slot.item.item_type == itype && slot.item.quantity < stack_limit {
-				slot.item.quantity += 1
-				it.picked_up = true
-				game.items_found += 1
-				add_message(
-					messages,
-					game,
-					fmt.tprintf(
-						"Picked up %s (%d/%d).",
-						item_display_name(it),
-						slot.item.quantity,
-						stack_limit,
-					),
-					eng.Engine_Color{100, 255, 100, 255},
-				)
-				return true
+				// Transfer as much of the ground item's quantity as fits.
+				// Remainder (if any) falls through to the next stack/empty slot.
+				room := stack_limit - slot.item.quantity
+				moved := min(room, it.quantity)
+				slot.item.quantity += moved
+				it.quantity -= moved
+				if it.quantity <= 0 {
+					it.picked_up = true
+					game.items_found += 1
+					add_message(
+						messages,
+						game,
+						fmt.tprintf(
+							"Picked up %s (%d/%d).",
+							item_display_name(it),
+							slot.item.quantity,
+							stack_limit,
+						),
+						eng.Engine_Color{100, 255, 100, 255},
+					)
+					return true
+				}
 			}
 		}
 	}
@@ -203,6 +210,9 @@ apply_item_effect :: proc(messages: ^Message_Manager, game: ^Game, def: ^gcore.I
 	} else if eff.type == ITEM_EFFECT_TIMED_LIGHT_BOOST {
 		game.light_boost_bonus = eff.value
 		game.light_boost_turns = eff.duration
+		// Reset the drain timer so the boost starts from a clean interval —
+		// prevents light from draining the same turn the oil wears off.
+		game.light_drain_timer = 0
 		add_message(
 			messages,
 			game,

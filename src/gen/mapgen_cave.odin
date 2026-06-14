@@ -173,7 +173,6 @@ flood_fill_count :: proc(game: ^Game, sx, sy: int, visited: ^[MAP_WIDTH * MAP_HE
 
 // ─── Flood fill mark helper ──────────────────────────────────────────────────
 
-@(private = "file")
 flood_fill_mark :: proc(game: ^Game, sx, sy: int, marked: ^[MAP_WIDTH * MAP_HEIGHT]bool) {
 	if sx < 0 || sx >= MAP_WIDTH || sy < 0 || sy >= MAP_HEIGHT {return}
 

@@ -19,6 +19,9 @@ Engine_File_System :: struct {
 	write_entire_file: proc(ctx: rawptr, path: string, data: []u8) -> bool,
 	exists:            proc(ctx: rawptr, path: string) -> bool,
 	remove:            proc(ctx: rawptr, path: string) -> bool,
+	// rename atomically moves old_path to new_path. nil on platforms that do
+	// not support it (e.g. WASM); callers must fall back to direct write.
+	rename:            proc(ctx: rawptr, old_path, new_path: string) -> bool,
 }
 
 engine_file_system_is_valid :: proc(fs: Engine_File_System) -> bool {

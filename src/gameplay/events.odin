@@ -184,7 +184,7 @@ generate_merchant_stock :: proc(content: ^Content_Manager, game: ^Game) {
 			cost_qty := 2 + game.depth / 3
 			game.merchant_stock[i] = gcore.Merchant_Offer {
 				item_id  = def.id,
-				cost_id  = gcore.ITEM_ID_RUSTY_PICKAXE, // placeholder — use iron_ore when available
+				cost_id  = "iron_ore",
 				cost_qty = cost_qty,
 				sold     = false,
 			}

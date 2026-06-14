@@ -15,15 +15,21 @@ v8_save_data_migrates_legacy_status_fields_into_player_status :: proc(t: ^testin
 	old.web_stuck_turns = 2
 	old.depth = 7
 
-	buf := make([]u8, size_of(Save_Header) + size_of(Save_Data_V8))
+	// A real v8 save on disk used the 8-byte legacy header (no CRC32).
+	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V8))
 	defer delete(buf)
+	legacy_header := Save_Header_Legacy {
+		magic   = SAVE_MAGIC,
+		version = SAVE_VERSION_V8,
+	}
+	mem.copy(&buf[0], &legacy_header, size_of(Save_Header_Legacy))
+	mem.copy(&buf[size_of(Save_Header_Legacy)], old, size_of(Save_Data_V8))
+
+	// load_save_data branches on the parsed header's version field.
 	header := Save_Header {
 		magic   = SAVE_MAGIC,
 		version = SAVE_VERSION_V8,
 	}
-	mem.copy(&buf[0], &header, size_of(Save_Header))
-	mem.copy(&buf[size_of(Save_Header)], old, size_of(Save_Data_V8))
-
 	data, ok := load_save_data(header, buf)
 	testing.expect(t, ok)
 	if data == nil {return}

@@ -67,3 +67,13 @@ storage_manager_remove :: proc(storage: ^Storage_Manager, path: string) -> bool 
 	}
 	return file_system.remove(file_system.ctx, path)
 }
+
+// storage_manager_rename atomically moves old_path to new_path.
+// Returns false if the underlying filesystem does not support rename (e.g. WASM).
+storage_manager_rename :: proc(storage: ^Storage_Manager, old_path, new_path: string) -> bool {
+	file_system := storage_manager_file_system(storage)
+	if file_system.rename == nil {
+		return false
+	}
+	return file_system.rename(file_system.ctx, old_path, new_path)
+}

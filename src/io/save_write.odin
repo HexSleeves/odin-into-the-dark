@@ -1,5 +1,7 @@
 package gameio
+import "core:hash"
 import "core:mem"
+import "core:strings"
 
 
 import gcore "../core"
@@ -122,16 +124,44 @@ save_game_to_storage :: proc(
 	}
 
 	// ── Serialize header + data as raw bytes ──
+	// v10: header is Save_Header (12 bytes: magic + version + crc32).
 	total_size := size_of(Save_Header) + size_of(Save_Data)
 	buf := make([]u8, total_size)
 	defer delete(buf)
 
+	// Copy payload first so we can checksum it.
+	mem.copy(&buf[size_of(Save_Header)], data, size_of(Save_Data))
+	payload_bytes := buf[size_of(Save_Header):]
+	checksum := hash.crc32(payload_bytes)
+
 	header := Save_Header {
 		magic   = SAVE_MAGIC,
 		version = SAVE_VERSION,
+		crc32   = checksum,
 	}
 	mem.copy(&buf[0], &header, size_of(Save_Header))
-	mem.copy(&buf[size_of(Save_Header)], data, size_of(Save_Data))
 
+	// ── Atomic write: write to .tmp, backup existing, rename into place ──
+	// If rename is unavailable (e.g. WASM), fall back to a direct write.
+	fs := eng.storage_manager_file_system(storage)
+	if fs.rename != nil {
+		tmp_path := strings.concatenate([]string{path, ".tmp"})
+		defer delete(tmp_path)
+
+		// Write to .tmp
+		if !eng.storage_manager_write(storage, tmp_path, buf) {
+			return false
+		}
+		// Best-effort backup of existing save to .bak
+		if eng.storage_manager_exists(storage, path) {
+			bak_path := strings.concatenate([]string{path, ".bak"})
+			defer delete(bak_path)
+			_ = eng.storage_manager_rename(storage, path, bak_path) // ignore failure
+		}
+		// Atomic rename .tmp → final path
+		return eng.storage_manager_rename(storage, tmp_path, path)
+	}
+
+	// Fallback: direct write (web/WASM or any platform without rename)
 	return eng.storage_manager_write(storage, path, buf)
 }

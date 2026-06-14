@@ -45,3 +45,19 @@ engine_distance_map_set :: proc(dmap: ^Engine_Distance_Map, x, y, distance: int)
 	dmap.values[engine_grid_2d_index(dmap.grid, x, y)] = distance
 	return true
 }
+
+// ─── Unchecked accessors for hot inner loops ──────────────────────────────────
+//
+// These skip the per-call engine_distance_map_is_valid / engine_grid_2d_cell_count
+// recomputation. Callers MUST validate the map once with engine_distance_map_is_valid
+// and bounds-check (x,y) independently before calling these.
+
+@(private = "file")
+_distance_map_get_unchecked :: proc(dmap: ^Engine_Distance_Map, x, y: int) -> int {
+	return dmap.values[engine_grid_2d_index(dmap.grid, x, y)]
+}
+
+@(private = "file")
+_distance_map_set_unchecked :: proc(dmap: ^Engine_Distance_Map, x, y, distance: int) {
+	dmap.values[engine_grid_2d_index(dmap.grid, x, y)] = distance
+}

@@ -18,6 +18,8 @@ read_cardinal_press :: proc(im: ^Input_Manager) -> (dx, dy: int) {
 	if action_pressed(im, .Move_South) {dy = 1}
 	if action_pressed(im, .Move_East) {dx = 1}
 	if action_pressed(im, .Move_West) {dx = -1}
+	// Force cardinal: prefer horizontal when both axes are set.
+	if dx != 0 && dy != 0 {dy = 0}
 	return
 }
 
@@ -31,8 +33,19 @@ handle_input :: proc(
 	im: ^Input_Manager,
 	engine: ^eng.Engine = nil,
 ) -> Input_Result {
+	// Escape requires a double-press to quit during play (permadeath safety).
+	// First press arms the flag and posts a warning; second press quits.
+	// Any other key input clears the armed state.
 	if action_pressed(im, .Quit) {
-		return .Quit
+		if quit_armed {
+			quit_armed = false
+			return .Quit
+		}
+		quit_armed = true
+		add_message(messages, game, "Press Escape again to quit.", eng.Engine_Color{255, 180, 50, 255})
+		return .None
+	} else {
+		quit_armed = false
 	}
 
 	if action_pressed(im, .Wait) {
@@ -51,6 +64,8 @@ handle_input :: proc(
 	if fired_s {dy = 1}
 	if fired_e {dx = 1}
 	if fired_w {dx = -1}
+	// Force cardinal: prefer horizontal when both axes are held simultaneously.
+	if dx != 0 && dy != 0 {dy = 0}
 
 	if dx == 0 && dy == 0 {
 		return .None

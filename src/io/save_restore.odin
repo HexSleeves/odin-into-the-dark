@@ -48,11 +48,25 @@ load_game_from_storage :: proc(
 	if !read_ok {return false}
 	defer delete(buf, read_allocator)
 
-	if len(buf) < size_of(Save_Header) {return false}
+	if len(buf) < size_of(Save_Header_Legacy) {return false}
 
 	// ── Validate header ──
+	// Read the legacy 8-byte header first to detect the version, then upgrade
+	// to the full 12-byte header for v10+ saves which include a CRC32 field.
+	legacy: Save_Header_Legacy
+	mem.copy(&legacy, &buf[0], size_of(Save_Header_Legacy))
+
 	header: Save_Header
-	mem.copy(&header, &buf[0], size_of(Save_Header))
+	if legacy.version >= SAVE_VERSION {
+		// v10+: full header present; require at least 12 bytes.
+		if len(buf) < size_of(Save_Header) {return false}
+		mem.copy(&header, &buf[0], size_of(Save_Header))
+	} else {
+		// v2–v9: header is only 8 bytes; crc32 field stays zero (not on disk).
+		header.magic = legacy.magic
+		header.version = legacy.version
+		header.crc32 = 0
+	}
 
 	// ── Deserialize current save data, or migrate supported legacy layouts ──
 	data, data_ok := load_save_data(header, buf)

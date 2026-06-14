@@ -1,5 +1,6 @@
 package gameinput
 
+import gameaudio "../audio"
 import eng "../engine"
 import "core:fmt"
 
@@ -94,6 +95,8 @@ handle_playing_hotkeys :: proc(
 	if action_pressed(im, .Crafting) {
 		cur := tile_at(game, game.player.pos.x, game.player.pos.y)
 		if cur != nil && cur.type == .Anvil {
+			reset_repeats(im)
+			quit_armed = false
 			game.state = .Viewing_Crafting
 			return true
 		}
@@ -118,6 +121,7 @@ handle_playing_hotkeys :: proc(
 		if action_pressed(im, .Toggle_Audio) {
 			audio := game_engine_audio_manager(engine)
 			enabled := audio_manager_toggle(audio)
+			gameaudio.music_toggle() // sync music to the new enabled state
 			if enabled {
 				add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
 			} else {
@@ -166,12 +170,16 @@ handle_playing_hotkeys :: proc(
 	}
 
 	if action_pressed(im, .Inventory) {
+		reset_repeats(im)
+		quit_armed = false
 		game.state = .Viewing_Inventory
 		ui.inspect_slot = 0
 		return true
 	}
 
 	if action_pressed(im, .Help) {
+		reset_repeats(im)
+		quit_armed = false
 		ui.return_to_title = false
 		game.state = .Viewing_Help
 		return true

@@ -68,6 +68,7 @@ game_runtime_assets_init :: proc() {
 	when !NO_AUDIO {
 		gameaudio.audio_init(gameaudio.game_audio_backend(gameaudio.audio_state()))
 		gameaudio.music_init()
+		gameaudio.music_set_config_volume(g_game_config.music_volume)
 	}
 }
 

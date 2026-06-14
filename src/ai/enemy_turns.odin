@@ -60,7 +60,7 @@ enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -
 }
 
 // enemy_update_awareness manages detection and memory decay.
-// - If within detection range → become aware, reset memory timer
+// - If within detection range AND has LOS (or within hearing radius) → become aware
 // - If already aware but out of range → decay memory timer
 // - If memory timer hits 0 → forget and return to wandering
 @(private = "file")
@@ -75,8 +75,15 @@ enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 	in_range := dist <= enemy.detection_radius
 
 	if in_range {
-		enemy.aware = true
-		enemy.aware_turns_left = enemy.memory_turns
+		// Fix 3: require LOS for sight-based detection to prevent seeing through walls.
+		// Allow a small no-LOS "hearing" radius so enemies aren't completely deaf.
+		// TODO(light): factor in tile light level for sight detection threshold.
+		hearing_radius := max(1, enemy.detection_radius / 3)
+		has_los := enemy_has_los_to_player(game, enemy.pos)
+		if has_los || dist <= hearing_radius {
+			enemy.aware = true
+			enemy.aware_turns_left = enemy.memory_turns
+		}
 		return
 	}
 

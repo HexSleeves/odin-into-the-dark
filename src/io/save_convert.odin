@@ -220,20 +220,27 @@ save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Sav
 		}
 	}
 	floor.player_pos = saved.player_pos
+
+	// Clamp file-controlled counts to fixed-array capacities before iterating.
+	room_count := clamp(saved.room_count, 0, MAX_SAVE_ROOMS)
+	enemy_count := clamp(saved.enemy_count, 0, MAX_SAVE_ENEMIES)
+	item_count := clamp(saved.item_count, 0, MAX_SAVE_ITEMS)
+	light_count := clamp(saved.light_source_count, 0, MAX_SAVE_LIGHTS)
+
 	floor.rooms = make([dynamic]Room)
-	for i in 0 ..< saved.room_count {
+	for i in 0 ..< room_count {
 		append(&floor.rooms, saved.rooms[i])
 	}
 	floor.enemies = make([dynamic]Enemy)
-	for i in 0 ..< saved.enemy_count {
+	for i in 0 ..< enemy_count {
 		append(&floor.enemies, save_to_enemy(content, &saved.enemies[i]))
 	}
 	floor.items = make([dynamic]Item)
-	for i in 0 ..< saved.item_count {
+	for i in 0 ..< item_count {
 		append(&floor.items, save_to_item(content, &saved.items[i]))
 	}
 	floor.light_sources = make([dynamic]Light_Source)
-	for i in 0 ..< saved.light_source_count {
+	for i in 0 ..< light_count {
 		append(&floor.light_sources, saved.light_sources[i])
 	}
 	floor.palette = saved.palette

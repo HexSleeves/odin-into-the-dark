@@ -6,7 +6,8 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-SAVE_VERSION :: u32(9)
+SAVE_VERSION :: u32(10)
+SAVE_VERSION_V9 :: u32(9)
 SAVE_VERSION_V8 :: u32(8)
 SAVE_VERSION_V7 :: u32(7)
 SAVE_VERSION_V6 :: u32(6)
@@ -101,12 +102,22 @@ Save_Floor :: struct {
 }
 // ─── File layout ──────────────────────────────────────────────────────────────
 
-Save_Header :: struct {
+// Save_Header_Legacy is the on-disk header for v2–v9 saves (8 bytes: magic + version).
+// Do NOT add fields here — it must stay byte-for-byte identical to the old layout.
+Save_Header_Legacy :: struct {
 	magic:   u32,
 	version: u32,
 }
 
-// Current save format (v9) — v8 is a strict prefix of this struct.
+// Save_Header is the on-disk header for v10+ saves (12 bytes: magic + version + crc32).
+// crc32 covers the Save_Data payload bytes only (not the header itself).
+Save_Header :: struct {
+	magic:   u32,
+	version: u32,
+	crc32:   u32,
+}
+
+// Current save format (v10) — same Save_Data payload as v9; v10 adds CRC32 to the header.
 // The legacy scalar status fields (poison_turns/burning_turns/frozen_turns/
 // web_stuck_turns) are retained mid-struct for layout compatibility and
 // mirrored into player_status on write; restore reads only player_status.

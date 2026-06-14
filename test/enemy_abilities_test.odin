@@ -182,9 +182,13 @@ ranged_shoot_deals_damage_when_in_range_and_visible :: proc(t: ^testing.T) {
 	g := make_ability_test_game(20)
 	msgs := make_ability_test_messages()
 
-	// dist = 3, within range 5, tile visible.
+	// dist = 3, within range 5, clear line of sight (carve the column to floor).
 	g.player.pos = Vec2{5, 5}
 	enemy := make_ability_test_enemy(5, 8, ENEMY_ABILITY_RANGED_SHOOT, 3, 5, 4)
+	make_floor(&g, 5, 5)
+	make_floor(&g, 5, 6)
+	make_floor(&g, 5, 7)
+	make_floor(&g, 5, 8)
 	_ = tile_state_set(&g, 5, 8, true, true, 1.0)
 
 	append(&g.enemies, enemy)
@@ -206,13 +210,18 @@ ranged_shoot_deals_damage_when_in_range_and_visible :: proc(t: ^testing.T) {
 }
 
 @(test)
-ranged_shoot_does_not_fire_when_tile_not_visible :: proc(t: ^testing.T) {
+ranged_shoot_does_not_fire_when_line_of_sight_is_blocked :: proc(t: ^testing.T) {
 	g := make_ability_test_game(20)
 	msgs := make_ability_test_messages()
 
+	// In range, but a wall at (5,7) blocks line of sight to the player.
 	g.player.pos = Vec2{5, 5}
 	enemy := make_ability_test_enemy(5, 8, ENEMY_ABILITY_RANGED_SHOOT, 3, 5, 4)
-	// Leave tile NOT visible (default false).
+	make_floor(&g, 5, 5)
+	make_floor(&g, 5, 6)
+	make_floor(&g, 5, 8)
+	// (5,7) is left as the default wall, blocking LOS.
+	_ = tile_state_set(&g, 5, 8, true, true, 1.0)
 
 	append(&g.enemies, enemy)
 	defer delete(g.enemies)
