@@ -42,7 +42,12 @@ handle_input :: proc(
 			return .Quit
 		}
 		quit_armed = true
-		add_message(messages, game, "Press Escape again to quit.", eng.Engine_Color{255, 180, 50, 255})
+		add_message(
+			messages,
+			game,
+			"Press Escape again to quit.",
+			eng.Engine_Color{255, 180, 50, 255},
+		)
 		return .None
 	} else {
 		quit_armed = false

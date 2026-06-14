@@ -17,15 +17,15 @@ MUSIC_SAMPLE_RATE :: u32(44100)
 MUSIC_LOOP_SECS :: f32(4.0) // all frequencies chosen to complete integer cycles in 4s
 
 Music_Manager :: struct {
-	tracks:         [Music_Tier]eng.Engine_Music_Handle,
-	wav_data:       [Music_Tier][]u8, // raw WAV bytes kept alive — backend streams from this pointer
-	active:         Music_Tier,
-	pending:        Music_Tier,
-	volume:         f32,
-	target_volume:  f32,
-	config_volume:  f32, // set from g_game_config.music_volume; 0 means use MUSIC_MASTER_VOLUME
-	enabled:        bool,
-	initialized:    bool,
+	tracks:        [Music_Tier]eng.Engine_Music_Handle,
+	wav_data:      [Music_Tier][]u8, // raw WAV bytes kept alive — backend streams from this pointer
+	active:        Music_Tier,
+	pending:       Music_Tier,
+	volume:        f32,
+	target_volume: f32,
+	config_volume: f32, // set from g_game_config.music_volume; 0 means use MUSIC_MASTER_VOLUME
+	enabled:       bool,
+	initialized:   bool,
 }
 
 g_music: Music_Manager

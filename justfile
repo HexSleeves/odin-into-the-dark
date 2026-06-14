@@ -2,22 +2,21 @@ set dotenv-load
 
 src := "src/"
 test := "test/"
-engine_src := "src/engine"
 binary := "into_the_depths"
 # Dev builds enable the cheat menu (Shift+C) by default. Disable with CHEATS=false.
 # Release recipes use release_defines (no cheat_define), so cheats never ship.
-cheat_define := if env_var_or_default("CHEATS", "true") == "false" { "" } else { "-define:CHEATS=true" }
-sprite_define := if env_var_or_default("SPRITES", "false") == "true" { "-define:SPRITES=true" } else { "" }
-no_audio_define := if env_var_or_default("NO_AUDIO", "false") == "true" { "-define:NO_AUDIO=true" } else { "" }
-no_sprites_define := if env_var_or_default("NO_SPRITES", "false") == "true" { "-define:NO_SPRITES=true" } else { "" }
-skip_title_define := if env_var_or_default("SKIP_TITLE", "false") == "true" { "-define:SKIP_TITLE=true" } else { "" }
-fixed_seed_value := env_var_or_default("FIXED_SEED", "")
+cheat_define := if env("CHEATS", "true") == "false" { "" } else { "-define:CHEATS=true" }
+sprite_define := if env("SPRITES", "false") == "true" { "-define:SPRITES=true" } else { "" }
+no_audio_define := if env("NO_AUDIO", "false") == "true" { "-define:NO_AUDIO=true" } else { "" }
+no_sprites_define := if env("NO_SPRITES", "false") == "true" { "-define:NO_SPRITES=true" } else { "" }
+skip_title_define := if env("SKIP_TITLE", "false") == "true" { "-define:SKIP_TITLE=true" } else { "" }
+fixed_seed_value := env("FIXED_SEED", "")
 fixed_seed_define := if fixed_seed_value != "" { "-define:FIXED_SEED=" + fixed_seed_value } else { "" }
 vendor_collection := "-collection:libs=vendor/"
 build_defines := cheat_define + " " + sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " " + fixed_seed_define
 compile_defines := build_defines
 release_defines := sprite_define + " " + no_audio_define + " " + no_sprites_define + " " + skip_title_define + " -define:PUBLIC_BUILD=true"
-copy_assets := if env_var_or_default("NO_SPRITES", "false") == "true" { "false" } else { "true" }
+copy_assets := if env("NO_SPRITES", "false") == "true" { "false" } else { "true" }
 
 default:
     @just --list
@@ -75,7 +74,7 @@ profile:
 
 # ─── Formatting ────────────────────────────────────────────────────────────────
 
-odinfmt := env_var_or_default("ODINFMT", "odinfmt")
+odinfmt := env("ODINFMT", "odinfmt")
 
 # Format all Odin source files
 fmt:

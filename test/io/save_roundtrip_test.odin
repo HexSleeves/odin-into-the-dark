@@ -178,7 +178,7 @@ v2_save_data_migrates_into_current_layout :: proc(t: ^testing.T) {
 	old.depth = 4
 	old.kills = 9
 	old.pickaxe_durability = 99 // must be dropped; not present in migrated struct
-	old.pickaxe_max_dur = 100   // must be dropped
+	old.pickaxe_max_dur = 100 // must be dropped
 
 	buf := make([]u8, size_of(Save_Header_Legacy) + size_of(Save_Data_V2))
 	defer delete(buf)
@@ -311,7 +311,7 @@ v10_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 	defer delete(buf)
 
 	mem.copy(&buf[size_of(Save_Header)], payload, size_of(Save_Data))
-	crc := hash.crc32(buf[size_of(Save_Header) : size_of(Save_Header) + size_of(Save_Data)])
+	crc := hash.crc32(buf[size_of(Save_Header):size_of(Save_Header) + size_of(Save_Data)])
 	header := Save_Header {
 		magic   = SAVE_MAGIC,
 		version = SAVE_VERSION,

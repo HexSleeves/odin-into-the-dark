@@ -117,16 +117,14 @@ handle_playing_hotkeys :: proc(
 		ui.show_minimap = !ui.show_minimap
 	}
 
-	when !NO_AUDIO {
-		if action_pressed(im, .Toggle_Audio) {
-			audio := game_engine_audio_manager(engine)
-			enabled := audio_manager_toggle(audio)
-			gameaudio.music_toggle() // sync music to the new enabled state
-			if enabled {
-				add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
-			} else {
-				add_message(messages, game, "Sound: OFF", eng.Engine_Color{180, 180, 180, 255})
-			}
+	if action_pressed(im, .Toggle_Audio) {
+		audio := game_engine_audio_manager(engine)
+		enabled := audio_manager_toggle(audio)
+		gameaudio.music_toggle() // sync music to the new enabled state
+		if enabled {
+			add_message(messages, game, "Sound: ON", eng.Engine_Color{180, 180, 180, 255})
+		} else {
+			add_message(messages, game, "Sound: OFF", eng.Engine_Color{180, 180, 180, 255})
 		}
 	}
 
