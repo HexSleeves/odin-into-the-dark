@@ -62,7 +62,7 @@ Test files are in `test/` using `package main`. The Python runner merges them in
 ## Key invariants
 
 - Engine layer (`src/engine/`) has zero Raylib imports — engine tests run headlessly.
-- `Game` struct (~253 KB) must be heap-allocated via `new(Game)` in production; stack allocation is fine in tests for short-lived game state.
+- `Game` struct (~222 KB) must be heap-allocated via `new(Game)` in production; stack allocation is fine in tests for short-lived game state.
 - `just verify` must pass before any task is considered complete.
 
 ## Rules
