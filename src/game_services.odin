@@ -8,18 +8,20 @@ import gameio "./io"
 import renderer "./render"
 import gameui "./ui"
 
-GAME_ENGINE_SERVICE_CONTENT :: eng.Engine_Service_Id(1)
-GAME_ENGINE_SERVICE_SAVES :: eng.Engine_Service_Id(2)
-GAME_ENGINE_SERVICE_AUDIO :: eng.Engine_Service_Id(3)
-GAME_ENGINE_SERVICE_SPRITES :: eng.Engine_Service_Id(4)
-GAME_ENGINE_SERVICE_PARTICLES :: eng.Engine_Service_Id(5)
-GAME_ENGINE_SERVICE_SCORES :: eng.Engine_Service_Id(6)
-GAME_ENGINE_SERVICE_INPUT :: eng.Engine_Service_Id(7)
-GAME_ENGINE_SERVICE_MESSAGES :: eng.Engine_Service_Id(8)
-GAME_ENGINE_SERVICE_CAMERA :: eng.Engine_Service_Id(9)
-GAME_ENGINE_SERVICE_TURNS :: eng.Engine_Service_Id(10)
-GAME_ENGINE_SERVICE_VFX :: eng.Engine_Service_Id(11)
-GAME_ENGINE_SERVICE_UI :: eng.Engine_Service_Id(12)
+// Bare re-exports of the canonical service ids (single source: src/core/service_ids.odin).
+// These are aliases, not redefinitions — the value lives only in gcore.
+GAME_ENGINE_SERVICE_CONTENT :: gcore.GAME_ENGINE_SERVICE_CONTENT
+GAME_ENGINE_SERVICE_SAVES :: gcore.GAME_ENGINE_SERVICE_SAVES
+GAME_ENGINE_SERVICE_AUDIO :: gcore.GAME_ENGINE_SERVICE_AUDIO
+GAME_ENGINE_SERVICE_SPRITES :: gcore.GAME_ENGINE_SERVICE_SPRITES
+GAME_ENGINE_SERVICE_PARTICLES :: gcore.GAME_ENGINE_SERVICE_PARTICLES
+GAME_ENGINE_SERVICE_SCORES :: gcore.GAME_ENGINE_SERVICE_SCORES
+GAME_ENGINE_SERVICE_INPUT :: gcore.GAME_ENGINE_SERVICE_INPUT
+GAME_ENGINE_SERVICE_MESSAGES :: gcore.GAME_ENGINE_SERVICE_MESSAGES
+GAME_ENGINE_SERVICE_CAMERA :: gcore.GAME_ENGINE_SERVICE_CAMERA
+GAME_ENGINE_SERVICE_TURNS :: gcore.GAME_ENGINE_SERVICE_TURNS
+GAME_ENGINE_SERVICE_VFX :: gcore.GAME_ENGINE_SERVICE_VFX
+GAME_ENGINE_SERVICE_UI :: gcore.GAME_ENGINE_SERVICE_UI
 
 Into_The_Depths_App_State :: struct {
 	game:              ^gcore.Game,
@@ -39,72 +41,72 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 	input := gameinput.input_manager_make()
 	input.backend = eng.engine_input_backend(engine)
 	ui := gameui.ui_manager_make(DEFAULT_USE_SPRITES)
+	// content, saves, input use engine_service_register_typed to capture typeid for
+	// safe retrieval via engine_service_get_typed.
+	// TODO: route remaining register_value sites through engine_service_register_typed
 	return(
-		eng.engine_services_register_value(
+		eng.engine_service_register_typed(
 			engine.services,
-			GAME_ENGINE_SERVICE_CONTENT,
+			gcore.GAME_ENGINE_SERVICE_CONTENT,
 			&content,
-			size_of(gcore.Content_Manager),
 		) !=
 			nil &&
-		eng.engine_services_register_value(
+		eng.engine_service_register_typed(
 			engine.services,
-			GAME_ENGINE_SERVICE_SAVES,
+			gcore.GAME_ENGINE_SERVICE_SAVES,
 			&saves,
-			size_of(gcore.Save_Manager),
 		) !=
 			nil &&
 		eng.engine_services_register_value(
 			engine.services,
-			GAME_ENGINE_SERVICE_SPRITES,
+			gcore.GAME_ENGINE_SERVICE_SPRITES,
 			&sprites,
 			size_of(renderer.Sprite_Manager),
 		) !=
 			nil &&
 		eng.engine_services_register_value(
 			engine.services,
-			GAME_ENGINE_SERVICE_SCORES,
+			gcore.GAME_ENGINE_SERVICE_SCORES,
 			&scores,
 			size_of(renderer.Score_Manager),
 		) !=
 			nil &&
-		eng.engine_services_register_value(
+		eng.engine_service_register_typed(
 			engine.services,
-			GAME_ENGINE_SERVICE_INPUT,
+			gcore.GAME_ENGINE_SERVICE_INPUT,
 			&input,
-			size_of(gameinput.Input_Manager),
 		) !=
 			nil &&
 		eng.engine_services_register_value(
 			engine.services,
-			GAME_ENGINE_SERVICE_UI,
+			gcore.GAME_ENGINE_SERVICE_UI,
 			&ui,
 			size_of(gameui.UI_Manager),
 		) !=
 			nil &&
 		eng.engine_services_register(
 			engine.services,
-			GAME_ENGINE_SERVICE_TURNS,
+			gcore.GAME_ENGINE_SERVICE_TURNS,
 			&engine.turn_manager,
 		) &&
 		eng.engine_services_register(
 			engine.services,
-			GAME_ENGINE_SERVICE_CAMERA,
+			gcore.GAME_ENGINE_SERVICE_CAMERA,
 			&engine.camera_manager,
 		) &&
 		eng.engine_services_register(
 			engine.services,
-			GAME_ENGINE_SERVICE_VFX,
+			gcore.GAME_ENGINE_SERVICE_VFX,
 			&engine.vfx_manager,
 		) &&
 		eng.engine_services_register(
 			engine.services,
-			GAME_ENGINE_SERVICE_MESSAGES,
+			gcore.GAME_ENGINE_SERVICE_MESSAGES,
 			&engine.message_manager,
 		) &&
 		eng.engine_services_register(
 			engine.services,
-			GAME_ENGINE_SERVICE_PARTICLES,
+			gcore.GAME_ENGINE_SERVICE_PARTICLES,
 			&engine.particle_manager,
 		) \
 	)
@@ -114,11 +116,10 @@ game_engine_content_manager :: proc(engine: ^eng.Engine) -> ^gcore.Content_Manag
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return(
-		cast(^gcore.Content_Manager)eng.engine_services_get(
-			engine.services,
-			GAME_ENGINE_SERVICE_CONTENT,
-		) \
+	return eng.engine_service_get_typed(
+		engine.services,
+		gcore.GAME_ENGINE_SERVICE_CONTENT,
+		gcore.Content_Manager,
 	)
 }
 
@@ -126,11 +127,10 @@ game_engine_save_manager :: proc(engine: ^eng.Engine) -> ^gcore.Save_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return(
-		cast(^gcore.Save_Manager)eng.engine_services_get(
-			engine.services,
-			GAME_ENGINE_SERVICE_SAVES,
-		) \
+	return eng.engine_service_get_typed(
+		engine.services,
+		gcore.GAME_ENGINE_SERVICE_SAVES,
+		gcore.Save_Manager,
 	)
 }
 
@@ -145,7 +145,7 @@ game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^renderer.Sprite_Mana
 	return(
 		cast(^renderer.Sprite_Manager)eng.engine_services_get(
 			engine.services,
-			GAME_ENGINE_SERVICE_SPRITES,
+			gcore.GAME_ENGINE_SERVICE_SPRITES,
 		) \
 	)
 }
@@ -161,7 +161,7 @@ game_engine_score_manager :: proc(engine: ^eng.Engine) -> ^renderer.Score_Manage
 	return(
 		cast(^renderer.Score_Manager)eng.engine_services_get(
 			engine.services,
-			GAME_ENGINE_SERVICE_SCORES,
+			gcore.GAME_ENGINE_SERVICE_SCORES,
 		) \
 	)
 }
@@ -170,12 +170,12 @@ game_engine_input_manager :: proc(engine: ^eng.Engine) -> ^gameinput.Input_Manag
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return(
-		cast(^gameinput.Input_Manager)eng.engine_services_get(
-			engine.services,
-			GAME_ENGINE_SERVICE_INPUT,
-		) \
+	return eng.engine_service_get_typed(
+		engine.services,
+		gcore.GAME_ENGINE_SERVICE_INPUT,
+		gameinput.Input_Manager,
 	)
+	// TODO: route remaining accessors through engine_service_get_typed
 }
 
 game_engine_message_manager :: proc(engine: ^eng.Engine) -> ^eng.Message_Manager {
@@ -202,5 +202,10 @@ game_engine_ui_manager :: proc(engine: ^eng.Engine) -> ^gameui.UI_Manager {
 	if engine == nil || engine.services == nil {
 		return nil
 	}
-	return cast(^gameui.UI_Manager)eng.engine_services_get(engine.services, GAME_ENGINE_SERVICE_UI)
+	return(
+		cast(^gameui.UI_Manager)eng.engine_services_get(
+			engine.services,
+			gcore.GAME_ENGINE_SERVICE_UI,
+		) \
+	)
 }

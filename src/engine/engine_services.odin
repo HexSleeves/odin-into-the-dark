@@ -16,6 +16,7 @@ Engine_Service_Registration :: struct {
 	ctx:   rawptr,
 	size:  int,
 	owned: bool,
+	type:  typeid, // zero value (nil) means untagged; checked by engine_service_get_typed
 }
 
 Engine_Services_Config :: struct {
@@ -172,6 +173,41 @@ engine_services_get :: proc(services: ^Engine_Services, id: Engine_Service_Id) -
 		return nil
 	}
 	return services.services[index].ctx
+}
+
+// engine_service_register_typed stores a copy of value and records its typeid so that
+// engine_service_get_typed can assert the type on retrieval.  Prefer this over the
+// rawptr overload for new registration sites.
+engine_service_register_typed :: proc(
+	services: ^Engine_Services,
+	id: Engine_Service_Id,
+	value: ^$T,
+) -> ^T {
+	ctx := engine_services_register_value(services, id, value, size_of(T))
+	if ctx == nil {
+		return nil
+	}
+	index, found := engine_services_find_index(services, id)
+	if found {
+		services.services[index].type = typeid_of(T)
+	}
+	return cast(^T)ctx
+}
+
+// engine_service_get_typed retrieves a service and asserts the stored typeid matches T.
+// The assert compiles out under -disable-assert (zero release cost).
+engine_service_get_typed :: proc(
+	services: ^Engine_Services,
+	id: Engine_Service_Id,
+	$T: typeid,
+) -> ^T {
+	index, found := engine_services_find_index(services, id)
+	if !found {
+		return nil
+	}
+	reg := &services.services[index]
+	assert(reg.type == nil || reg.type == typeid_of(T), "engine_service_get_typed: type mismatch")
+	return cast(^T)reg.ctx
 }
 
 @(private = "file")
