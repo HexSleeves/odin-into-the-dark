@@ -46,16 +46,48 @@ engine_exposes_owned_storage_manager :: proc(t: ^testing.T) {
 	testing.expect(t, manager == &engine.storage_manager)
 }
 
+@(test)
+storage_manager_rename_delegates_to_configured_file_system :: proc(t: ^testing.T) {
+	state := Storage_Test_File_System_State {
+		rename_result = true,
+	}
+	fs := Engine_File_System {
+		ctx               = &state,
+		read_entire_file  = storage_test_read_entire_file,
+		write_entire_file = storage_test_write_entire_file,
+		exists            = storage_test_exists,
+		remove            = storage_test_remove,
+		rename            = storage_test_rename,
+	}
+	storage := storage_manager_make(fs)
+
+	testing.expect(t, storage_manager_rename(&storage, "save.dat.tmp", "save.dat"))
+	testing.expect_value(t, state.rename_count, 1)
+	testing.expect_value(t, state.last_rename_old, "save.dat.tmp")
+	testing.expect_value(t, state.last_rename_new, "save.dat")
+}
+
+@(test)
+storage_manager_rename_reports_failure_when_filesystem_has_no_rename :: proc(t: ^testing.T) {
+	// A filesystem without a rename hook (e.g. WASM) must report failure, not trap.
+	storage := storage_manager_make(Engine_File_System{})
+	testing.expect(t, !storage_manager_rename(&storage, "a", "b"))
+}
+
 Storage_Test_File_System_State :: struct {
-	read_content:   string,
-	last_path:      string,
-	last_write_len: int,
-	read_count:     int,
-	write_count:    int,
-	exists_count:   int,
-	remove_count:   int,
-	exists_result:  bool,
-	remove_result:  bool,
+	read_content:    string,
+	last_path:       string,
+	last_write_len:  int,
+	read_count:      int,
+	write_count:     int,
+	exists_count:    int,
+	remove_count:    int,
+	rename_count:    int,
+	last_rename_old: string,
+	last_rename_new: string,
+	exists_result:   bool,
+	remove_result:   bool,
+	rename_result:   bool,
 }
 
 storage_test_read_entire_file :: proc(
@@ -96,4 +128,12 @@ storage_test_remove :: proc(ctx: rawptr, path: string) -> bool {
 	state.remove_count += 1
 	state.last_path = path
 	return state.remove_result
+}
+
+storage_test_rename :: proc(ctx: rawptr, old_path, new_path: string) -> bool {
+	state := cast(^Storage_Test_File_System_State)ctx
+	state.rename_count += 1
+	state.last_rename_old = old_path
+	state.last_rename_new = new_path
+	return state.rename_result
 }

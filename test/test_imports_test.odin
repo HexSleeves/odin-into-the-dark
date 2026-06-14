@@ -159,6 +159,7 @@ save_manager_make :: gameio.save_manager_make
 save_game_to_path :: gameio.save_game_to_path
 load_game_from_path :: gameio.load_game_from_path
 check_repeat :: gameinput.check_repeat
+read_cardinal_press :: gameinput.read_cardinal_press
 score_manager_make :: renderer.score_manager_make
 score_manager_load :: renderer.score_manager_load
 score_manager_save :: renderer.score_manager_save
@@ -233,6 +234,8 @@ apply_shrine_buff :: gp.apply_shrine_buff
 merchant_buy :: gp.merchant_buy
 merchant_leave :: gp.merchant_leave
 generate_shopkeeper_stock :: gp.generate_shopkeeper_stock
+generate_merchant_stock :: gp.generate_merchant_stock
+MERCHANT_OFFER_COUNT :: gp.MERCHANT_OFFER_COUNT
 merchant_leave_shop :: gp.merchant_leave_shop
 update_viewing_shrine :: gameinput.update_viewing_shrine
 update_viewing_merchant :: gameinput.update_viewing_merchant

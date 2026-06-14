@@ -1,10 +1,47 @@
 package gameio
 import "base:runtime"
 import "core:mem"
+import "core:strings"
 
 
 import gcore "../core"
 import eng "../engine"
+
+// read_and_decode_save reads one candidate path, validates its header, and
+// migrates/deserializes the payload into a freshly allocated Save_Data.
+// Returns nil on any failure so the caller can fall back to the next candidate.
+@(private = "file")
+read_and_decode_save :: proc(storage: ^eng.Storage_Manager, path: string) -> ^Save_Data {
+	read_allocator := context.allocator
+	buf, read_ok := eng.storage_manager_read(storage, path, read_allocator)
+	if !read_ok {return nil}
+	defer delete(buf, read_allocator)
+
+	if len(buf) < size_of(Save_Header_Legacy) {return nil}
+
+	// ── Validate header ──
+	// Read the legacy 8-byte header first to detect the version, then upgrade
+	// to the full 12-byte header for v10+ saves which include a CRC32 field.
+	legacy: Save_Header_Legacy
+	mem.copy(&legacy, &buf[0], size_of(Save_Header_Legacy))
+
+	header: Save_Header
+	if legacy.version >= SAVE_VERSION {
+		// v10+: full header present; require at least 12 bytes.
+		if len(buf) < size_of(Save_Header) {return nil}
+		mem.copy(&header, &buf[0], size_of(Save_Header))
+	} else {
+		// v2–v9: header is only 8 bytes; crc32 field stays zero (not on disk).
+		header.magic = legacy.magic
+		header.version = legacy.version
+		header.crc32 = 0
+	}
+
+	// ── Deserialize current save data, or migrate supported legacy layouts ──
+	data, data_ok := load_save_data(header, buf)
+	if !data_ok {return nil}
+	return data
+}
 
 load_game :: proc(
 	content: ^Content_Manager,
@@ -43,34 +80,21 @@ load_game_from_storage :: proc(
 	storage: ^eng.Storage_Manager,
 	path: string,
 ) -> bool {
-	read_allocator := context.allocator
-	buf, read_ok := eng.storage_manager_read(storage, path, read_allocator)
-	if !read_ok {return false}
-	defer delete(buf, read_allocator)
+	// ── Read + validate + migrate, recovering from the rolling backup ──
+	// The atomic writer leaves a one-deep `.bak` of the previous save. If the
+	// primary save is missing or corrupt (truncated/CRC mismatch/torn write),
+	// fall back to the backup so a half-completed write cannot brick a run.
+	bak_path := strings.concatenate([]string{path, ".bak"})
+	defer delete(bak_path)
+	tmp_path := strings.concatenate([]string{path, ".tmp"})
+	defer delete(tmp_path)
 
-	if len(buf) < size_of(Save_Header_Legacy) {return false}
-
-	// ── Validate header ──
-	// Read the legacy 8-byte header first to detect the version, then upgrade
-	// to the full 12-byte header for v10+ saves which include a CRC32 field.
-	legacy: Save_Header_Legacy
-	mem.copy(&legacy, &buf[0], size_of(Save_Header_Legacy))
-
-	header: Save_Header
-	if legacy.version >= SAVE_VERSION {
-		// v10+: full header present; require at least 12 bytes.
-		if len(buf) < size_of(Save_Header) {return false}
-		mem.copy(&header, &buf[0], size_of(Save_Header))
-	} else {
-		// v2–v9: header is only 8 bytes; crc32 field stays zero (not on disk).
-		header.magic = legacy.magic
-		header.version = legacy.version
-		header.crc32 = 0
+	data: ^Save_Data
+	for candidate in ([]string{path, bak_path}) {
+		data = read_and_decode_save(storage, candidate)
+		if data != nil {break}
 	}
-
-	// ── Deserialize current save data, or migrate supported legacy layouts ──
-	data, data_ok := load_save_data(header, buf)
-	if !data_ok {return false}
+	if data == nil {return false}
 	defer free(data)
 	old_context := context
 	context.allocator = runtime.default_allocator()
@@ -250,8 +274,12 @@ load_game_from_storage :: proc(
 	// Reset transient VFX.
 	eng.vfx_manager_reset(vfx)
 
-	// ── Delete save file (roguelike: one load per save) ──
+	// ── Delete save artifacts (roguelike: one load per save) ──
+	// Remove the primary plus any rolling backup / leftover temp so a recovered
+	// run cannot be reloaded from a stale backup on the next launch.
 	eng.storage_manager_remove(storage, path)
+	eng.storage_manager_remove(storage, bak_path)
+	eng.storage_manager_remove(storage, tmp_path)
 
 	return true
 }
