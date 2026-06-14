@@ -110,6 +110,12 @@ load_game_from_storage :: proc(
 	game.depth = data.depth
 	eng.turn_manager_set(turns, data.turn_count)
 	game.kills = data.kills
+	// D3: derive level from persisted kills (no save-format bump). Setting it to the
+	// kills-derived level means the next check_level_up is a no-op, so a reload does
+	// not re-open the level-up menu for levels already earned. pending_level_ups is
+	// intentionally left at 0 — unspent boons are not persisted.
+	game.player_level = gcore.levelup_level_for_kills(data.kills)
+	game.pending_level_ups = 0
 	game.seed = data.seed
 	game.light_boost_bonus = data.light_boost_bonus
 	game.light_boost_turns = data.light_boost_turns

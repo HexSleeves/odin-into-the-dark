@@ -11,12 +11,33 @@ import "core:encoding/json"
 MAX_SCORES :: 10
 SCORES_FILE :: "scores.json"
 
+// Scoring weights for compute_run_score. Placeholder tuning — see D7 follow-ups.
+SCORE_PER_DEPTH :: 100
+SCORE_PER_KILL :: 10
+SCORE_PER_ITEM :: 5
+VICTORY_MULTIPLIER :: 2 // victory runs double their pre-bonus score
+VICTORY_BONUS :: 500 // flat bonus added after the multiplier on a victory
+
 Score_Entry :: struct {
 	depth:       int,
 	kills:       int,
 	turns:       int,
 	items_found: int,
 	cause:       string,
+	// score/victory are appended last. json.unmarshal tolerates their absence in
+	// legacy scores.json (missing keys → zero value), so no migration is needed.
+	score:       int,
+	victory:     bool,
+}
+
+// compute_run_score is a pure function of run stats. A victory doubles the
+// base (depth/kills/items) score and adds a flat bonus; a death keeps the base.
+compute_run_score :: proc(depth, kills, items_found: int, victory: bool) -> int {
+	base := depth * SCORE_PER_DEPTH + kills * SCORE_PER_KILL + items_found * SCORE_PER_ITEM
+	if victory {
+		return base * VICTORY_MULTIPLIER + VICTORY_BONUS
+	}
+	return base
 }
 
 Score_Table :: struct {
@@ -171,17 +192,22 @@ score_manager_save :: proc(scores: ^Score_Manager, table: ^Score_Table) {
 	}
 }
 
-// ─── Insert (sorted: depth desc, kills desc, turns asc) ──────────────────────
+// ─── Insert (sorted: score desc, then depth desc, kills desc, turns asc) ─────
 
 // Returns 0-based rank of the inserted entry, or -1 if it didn't make the table.
 insert_score :: proc(table: ^Score_Table, entry: Score_Entry) -> int {
-	// Find insertion position
+	// Find insertion position. Numeric score is the primary key; depth/kills/turns
+	// break ties so legacy entries (score 0) still order sensibly among themselves.
 	insert_pos := table.count
 	for i in 0 ..< table.count {
 		s := table.scores[i]
-		if entry.depth > s.depth ||
-		   (entry.depth == s.depth && entry.kills > s.kills) ||
-		   (entry.depth == s.depth && entry.kills == s.kills && entry.turns < s.turns) {
+		if entry.score > s.score ||
+		   (entry.score == s.score && entry.depth > s.depth) ||
+		   (entry.score == s.score && entry.depth == s.depth && entry.kills > s.kills) ||
+		   (entry.score == s.score &&
+				   entry.depth == s.depth &&
+				   entry.kills == s.kills &&
+				   entry.turns < s.turns) {
 			insert_pos = i
 			break
 		}

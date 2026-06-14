@@ -231,3 +231,52 @@ ranged_shoot_does_not_fire_when_line_of_sight_is_blocked :: proc(t: ^testing.T) 
 
 	testing.expect_value(t, g.player.hp, hp_before)
 }
+
+// ─── Poison cloud (D8) ──────────────────────────────────────────────────────
+
+@(test)
+poison_cloud_ability_stamps_a_gas_vent_tile_adjacent_to_the_enemy_when_player_is_in_range :: proc(
+	t: ^testing.T,
+) {
+	g := make_ability_test_game(20)
+	msgs := make_ability_test_messages()
+
+	// Player within range (Manhattan 2 <= range 4).
+	g.player.pos = Vec2{5, 7}
+	enemy := make_ability_test_enemy(5, 5, ENEMY_ABILITY_POISON_CLOUD, 4, 4)
+	// Provide an adjacent Floor tile for the gas to vent onto.
+	make_floor(&g, 5, 6)
+
+	append(&g.enemies, enemy)
+	defer delete(g.enemies)
+
+	process_enemy_abilities(&msgs, &g)
+
+	// The adjacent floor tile became a Gas_Vent and the ability went on cooldown.
+	venting := tile_at(&g, 5, 6)
+	testing.expect(t, venting != nil)
+	testing.expect_value(t, venting.type, Tile_Type.Gas_Vent)
+	testing.expect_value(t, g.enemies[0].ability_cooldown, 4)
+}
+
+@(test)
+poison_cloud_ability_does_nothing_when_player_is_out_of_range :: proc(t: ^testing.T) {
+	g := make_ability_test_game(20)
+	msgs := make_ability_test_messages()
+
+	// Player far away (Manhattan > range 4).
+	g.player.pos = Vec2{20, 20}
+	enemy := make_ability_test_enemy(5, 5, ENEMY_ABILITY_POISON_CLOUD, 4, 4)
+	make_floor(&g, 5, 6)
+
+	append(&g.enemies, enemy)
+	defer delete(g.enemies)
+
+	process_enemy_abilities(&msgs, &g)
+
+	// No gas vented; cooldown untouched (decrement-only path also leaves it at 0).
+	venting := tile_at(&g, 5, 6)
+	testing.expect(t, venting != nil)
+	testing.expect_value(t, venting.type, Tile_Type.Floor)
+	testing.expect_value(t, g.enemies[0].ability_cooldown, 0)
+}

@@ -65,14 +65,12 @@ enemy_act_once :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) -
 
 // enemy_update_awareness manages detection and memory decay.
 //
-// Detection model:
-//   Sight (LOS required): enemy detects player if it has LOS AND
-//     dist <= max(player_light_radius, 2).
-//     A brighter torch expands the sight-detection window (risk/reward).
-//     The floor of 2 keeps melee-range detection even in pitch darkness.
-//   Hearing (no LOS): dist <= max(1, detection_radius/3) — enemies are
-//     never fully blind but cannot hunt from afar without light.
-//   detection_radius <= 0: always aware (legacy enemies, unaffected).
+// Default (LIGHT_AFFECTS_DETECTION off): plain Manhattan distance — the player
+//   is detected within detection_radius regardless of light or LOS.
+// Flag on: sight reaches the full detection_radius only while the player stands
+//   inside their own emitted light; outside the light, detection clamps to the
+//   small DETECTION_HEARING_RADIUS. This turns torches into genuine risk/reward.
+// detection_radius <= 0: always aware (legacy / hand-built enemies, unaffected).
 @(private = "file")
 enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 	// detection_radius 0 = always aware (legacy / hand-built enemies)
@@ -83,19 +81,20 @@ enemy_update_awareness :: proc(game: ^Game, enemy: ^Enemy) {
 
 	dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
 
-	// Compute the player's effective emitted light radius (mirrors compute_fov formula).
-	// Includes boost, debuff, and helmet bonus — all transient fields on Game/Player.
-	helmet_bonus := 0
-	if game.equipped_helmet.occupied {helmet_bonus = game.equipped_helmet.item.stat_bonus}
-	player_light_radius :=
-		game.player.light_radius + game.light_boost_bonus + game.light_debuff_bonus + helmet_bonus
+	detected := false
+	when LIGHT_AFFECTS_DETECTION {
+		// Sight reaches the full radius only if the player is lit (their emitted
+		// light covers the gap to the enemy); otherwise fall back to hearing.
+		light_radius := player_effective_light_radius(game)
+		in_light := dist <= light_radius
+		sight_range := enemy.detection_radius if in_light else DETECTION_HEARING_RADIUS
+		detected = dist <= sight_range
+	} else {
+		// Legacy: pure Manhattan detection radius.
+		detected = dist <= enemy.detection_radius
+	}
 
-	// Sight detection: LOS + within lit area (floor at 2 for close-range regardless).
-	sight_range := max(player_light_radius, 2)
-	hearing_radius := max(1, enemy.detection_radius / 3)
-	has_los := enemy_has_los_to_player(game, enemy.pos)
-
-	if (has_los && dist <= sight_range) || dist <= hearing_radius {
+	if detected {
 		enemy.aware = true
 		enemy.aware_turns_left = enemy.memory_turns
 		return

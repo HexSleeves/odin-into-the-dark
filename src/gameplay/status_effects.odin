@@ -157,8 +157,12 @@ damage_enemy_with_status :: proc(
 			fmt.tprintf("The %s %s!", enemy_display_name(enemy), death_verb),
 			eng.Engine_Color{0, 255, 0, 255},
 		)
-		if milestone_msg := apply_kill_milestone_buff(game); milestone_msg != "" {
-			add_message(messages, game, milestone_msg, eng.Engine_Color{255, 220, 80, 255})
+		// D3: when level-ups are on, the move-driven check_level_up handles
+		// progression via the menu; skip the auto-applied milestone buff.
+		if !gcore.LEVELUP_ENABLED {
+			if milestone_msg := apply_kill_milestone_buff(game); milestone_msg != "" {
+				add_message(messages, game, milestone_msg, eng.Engine_Color{255, 220, 80, 255})
+			}
 		}
 	}
 }

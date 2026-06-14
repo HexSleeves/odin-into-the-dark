@@ -53,6 +53,7 @@ add_message :: gameui.add_message
 clear_messages :: gameui.clear_messages
 play_sfx :: gameaudio.play_sfx
 game_engine_vfx_manager :: renderer.game_engine_vfx_manager
+game_engine_floating_text_manager :: renderer.game_engine_floating_text_manager
 logger_debugf :: gameio.logger_debugf
 Game_Log_Channel :: gameio.Game_Log_Channel
 
@@ -60,6 +61,10 @@ effective_attack :: gcore.effective_attack
 apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
 effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
+player_effective_light_radius :: gcore.player_effective_light_radius
+LIGHT_AFFECTS_DETECTION :: gcore.LIGHT_AFFECTS_DETECTION
+DETECTION_HEARING_RADIUS :: gcore.DETECTION_HEARING_RADIUS
+LEVELUP_ENABLED :: gcore.LEVELUP_ENABLED
 
 damage_roll :: gcore.damage_roll
 crit_roll :: gcore.crit_roll

@@ -116,6 +116,79 @@ apply_shrine_buff :: proc(engine: ^eng.Engine, game: ^Game, buff: Shrine_Buff) {
 	game.state = .Playing
 }
 
+// ─── Milestone level-ups (D3) ─────────────────────────────────────────────────
+
+// check_level_up reconciles game.player_level with the kills-derived level. For
+// every level newly reached it queues a level-up menu and opens it. No-op when
+// LEVELUP_ENABLED is off. Pure-derivation procs live in gcore.
+check_level_up :: proc(engine: ^eng.Engine, game: ^Game) {
+	if !gcore.LEVELUP_ENABLED || game == nil {return}
+	derived := gcore.levelup_level_for_kills(game.kills)
+	if derived <= game.player_level {return}
+
+	gained := derived - game.player_level
+	game.player_level = derived
+	game.pending_level_ups += gained
+
+	messages := game_engine_message_manager(engine)
+	add_message(
+		messages,
+		game,
+		fmt.tprintf("You reached level %d! Choose a boon.", derived),
+		eng.Engine_Color{255, 220, 80, 255},
+	)
+	if game.state == .Playing {
+		game.level_choice = 0
+		game.state = .Viewing_Level_Up
+	}
+}
+
+// apply_levelup_buff applies one level-up reward (no HP cost — unlike a shrine),
+// decrements the pending count, and either re-opens the menu for the next queued
+// level-up or returns to play. Mirrors the Shrine_Buff cases.
+apply_levelup_buff :: proc(engine: ^eng.Engine, game: ^Game, buff: Shrine_Buff) {
+	if game == nil {return}
+	messages := game_engine_message_manager(engine)
+
+	switch buff {
+	case .Max_HP:
+		game.player.max_hp += gcore.LEVELUP_BUFF_MAX_HP
+		game.player.hp += gcore.LEVELUP_BUFF_MAX_HP
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("You feel hardier! +%d Max HP", gcore.LEVELUP_BUFF_MAX_HP),
+			eng.Engine_Color{255, 220, 80, 255},
+		)
+	case .Attack:
+		game.player.attack += gcore.LEVELUP_BUFF_ATTACK
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("Your strikes sharpen! +%d Attack", gcore.LEVELUP_BUFF_ATTACK),
+			eng.Engine_Color{255, 220, 80, 255},
+		)
+	case .Light:
+		game.player.light_radius += gcore.LEVELUP_BUFF_LIGHT
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("Your sight sharpens! +%d Light Radius", gcore.LEVELUP_BUFF_LIGHT),
+			eng.Engine_Color{255, 220, 80, 255},
+		)
+	}
+
+	if game.pending_level_ups > 0 {game.pending_level_ups -= 1}
+
+	if game.pending_level_ups > 0 {
+		// More queued — keep the menu open for the next choice.
+		game.level_choice = 0
+		game.state = .Viewing_Level_Up
+	} else {
+		game.state = .Playing
+	}
+}
+
 // ─── Chest ───────────────────────────────────────────────────────────────────
 
 open_chest :: proc(engine: ^eng.Engine, game: ^Game) {

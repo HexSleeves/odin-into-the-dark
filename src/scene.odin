@@ -44,7 +44,7 @@ scene_for_state :: proc(state: gcore.Game_State) -> Game_Scene {
 		return .Cheats
 	case .Pause:
 		return .Pause
-	case .Viewing_Shrine, .Viewing_Chest, .Viewing_Merchant, .Viewing_Dialogue:
+	case .Viewing_Shrine, .Viewing_Chest, .Viewing_Merchant, .Viewing_Dialogue, .Viewing_Level_Up:
 		return .Gameplay
 	}
 
@@ -177,6 +177,9 @@ game_scene_gameplay_update :: proc(engine: ^eng.Engine, ctx: rawptr) -> bool {
 		return false
 	case .Viewing_Dialogue:
 		gameinput.update_viewing_dialogue(engine, game, im)
+		return false
+	case .Viewing_Level_Up:
+		gameinput.update_viewing_level_up(engine, game, im)
 		return false
 	case:
 		return gameinput.update_playing(engine, game, im, &g_game_config)

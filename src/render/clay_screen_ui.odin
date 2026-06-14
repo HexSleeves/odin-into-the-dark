@@ -65,6 +65,9 @@ clay_render_screen_ui :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 		case .Viewing_Dialogue:
 			clay_render_gameplay_ui(engine, game)
 			clay_render_dialogue_overlay(engine, game)
+		case .Viewing_Level_Up:
+			clay_render_gameplay_ui(engine, game)
+			clay_render_level_up_overlay(engine, game)
 		}
 	}
 }

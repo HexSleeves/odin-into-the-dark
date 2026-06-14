@@ -40,6 +40,12 @@ handle_player_moved :: proc(engine: ^eng.Engine, game: ^Game, kills_before: int)
 	apply_current_tile_effects(engine, game)
 	collapse_unstable_previous_tile(messages, game)
 	check_event_tile(engine, game)
+	// A move that scored kills may have crossed a level threshold (D3). Skip if a
+	// tile event already grabbed the state (shrine/merchant) — the level-up menu
+	// will open after that overlay closes via the next move.
+	if game.kills > kills_before && game.state == .Playing {
+		check_level_up(engine, game)
+	}
 }
 
 handle_player_descended :: proc(engine: ^eng.Engine, game: ^Game) {

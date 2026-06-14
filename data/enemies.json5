@@ -82,7 +82,7 @@
       move_speed: 120,
       detection_radius: 5,
       memory_turns: 2,       // mindless — reacts only to proximity
-      ability: { type: "poison_cloud", cooldown: 0, range: 0 },
+      ability: { type: "poison_cloud", cooldown: 4, range: 4 },
     },
     {
       id: "shadow_stalker",

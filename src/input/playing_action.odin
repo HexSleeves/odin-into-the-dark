@@ -97,7 +97,7 @@ handle_input :: proc(
 
 	target_enemy := enemy_at(game, target_x, target_y)
 	if target_enemy != nil {
-		resolve_attack_player_on_enemy(messages, game, target_enemy)
+		resolve_attack_player_on_enemy(messages, game, target_enemy, engine)
 		game.player.energy -= effective_attack_cost(game)
 		return .Acted
 	}

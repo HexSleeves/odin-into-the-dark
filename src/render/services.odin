@@ -58,6 +58,10 @@ game_engine_frame_manager :: proc(engine: ^eng.Engine) -> ^eng.Frame_Manager {
 	return eng.engine_frame_manager(engine)
 }
 
+game_engine_floating_text_manager :: proc(engine: ^eng.Engine) -> ^eng.Floating_Text_Manager {
+	return eng.engine_floating_text_manager(engine)
+}
+
 game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^Sprite_Manager {
 	if engine == nil || engine.services == nil {return nil}
 	return(

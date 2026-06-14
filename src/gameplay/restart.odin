@@ -21,12 +21,15 @@ save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^
 			cause = cloned
 		}
 	}
+	victory := game.state == .Victory
 	entry := Score_Entry {
 		depth       = game.depth,
 		kills       = game.kills,
 		turns       = eng.turn_manager_current(turns),
 		items_found = game.items_found,
 		cause       = cause,
+		victory     = victory,
+		score       = compute_run_score(game.depth, game.kills, game.items_found, victory),
 	}
 	game.last_score_rank = insert_score(&table, entry)
 	if game.last_score_rank < 0 && len(cause) > 0 {

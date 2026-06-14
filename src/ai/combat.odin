@@ -6,6 +6,28 @@ import eng "../engine"
 
 // ─── Combat resolution ──────────────────────────────────────────────────────
 
+// Floating damage-number colors: hits on the player read red; hits on enemies
+// read white; crits in either direction read gold.
+@(private = "file")
+FLOATING_DMG_ENEMY := eng.Engine_Color{235, 235, 235, 255}
+@(private = "file")
+FLOATING_DMG_PLAYER := eng.Engine_Color{255, 90, 90, 255}
+@(private = "file")
+FLOATING_DMG_CRIT := eng.Engine_Color{255, 220, 80, 255}
+
+floating_text_spawn_damage :: proc(
+	ft: ^eng.Floating_Text_Manager,
+	tile_x, tile_y, damage: int,
+	crit: bool,
+	on_player: bool,
+) {
+	if ft == nil {return}
+	color := FLOATING_DMG_PLAYER if on_player else FLOATING_DMG_ENEMY
+	if crit {color = FLOATING_DMG_CRIT}
+	text := fmt.tprintf("%d!", damage) if crit else fmt.tprintf("%d", damage)
+	eng.floating_text_manager_spawn(ft, tile_x, tile_y, text, color)
+}
+
 game_set_death_cause :: proc(game: ^Game, cause: string) {
 	if game == nil {return}
 
@@ -47,6 +69,16 @@ resolve_attack_player_on_enemy :: proc(
 	}
 	enemy.hp -= damage
 	play_sfx(.Hit)
+	if engine != nil {
+		floating_text_spawn_damage(
+			game_engine_floating_text_manager(engine),
+			enemy.pos.x,
+			enemy.pos.y,
+			damage,
+			crit,
+			false,
+		)
+	}
 	if crit {
 		add_message(
 			messages,
@@ -89,8 +121,12 @@ resolve_attack_player_on_enemy :: proc(
 			game.kills,
 		)
 		game.kills += 1
-		if milestone_msg := apply_kill_milestone_buff(game); milestone_msg != "" {
-			add_message(messages, game, milestone_msg, eng.Engine_Color{255, 220, 80, 255})
+		// When milestone level-ups (D3) are enabled, the player chooses boons via
+		// the level-up menu instead of the auto-applied milestone buff.
+		if !LEVELUP_ENABLED {
+			if milestone_msg := apply_kill_milestone_buff(game); milestone_msg != "" {
+				add_message(messages, game, milestone_msg, eng.Engine_Color{255, 220, 80, 255})
+			}
 		}
 		if enemy.is_boss {
 			game.boss_killed_this_turn = true
@@ -118,7 +154,12 @@ resolve_attack_player_on_enemy :: proc(
 }
 
 // Enemy attacks player
-resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, enemy: ^Enemy) {
+resolve_attack_enemy_on_player :: proc(
+	messages: ^Message_Manager,
+	game: ^Game,
+	enemy: ^Enemy,
+	engine: ^eng.Engine = nil,
+) {
 	raw_damage := damage_roll(enemy.attack)
 	crit := crit_roll(enemy.crit_chance)
 	if crit {
@@ -126,6 +167,16 @@ resolve_attack_enemy_on_player :: proc(messages: ^Message_Manager, game: ^Game, 
 	}
 	damage := max(raw_damage - effective_defense(game), 1)
 	game.player.hp = max(game.player.hp - damage, 0)
+	if engine != nil {
+		floating_text_spawn_damage(
+			game_engine_floating_text_manager(engine),
+			game.player.pos.x,
+			game.player.pos.y,
+			damage,
+			crit,
+			true,
+		)
+	}
 	if crit {
 		add_message(
 			messages,

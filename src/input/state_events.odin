@@ -62,3 +62,35 @@ update_viewing_merchant :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Man
 	if action_pressed(im, .Inv_Slot_2) {gp.merchant_buy(engine, game, 1)}
 	if action_pressed(im, .Inv_Slot_3) {gp.merchant_buy(engine, game, 2)}
 }
+
+// ─── Level-up input (D3) ───────────────────────────────────────────────────────
+// Non-dismissable: the player MUST pick a boon (no Menu_Back). Mirrors the shrine
+// menu's three Shrine_Buff choices but applies them with no HP cost.
+update_viewing_level_up :: proc(engine: ^eng.Engine, game: ^Game, im: ^Input_Manager) {
+	if action_pressed(im, .Menu_Up) {
+		game.level_choice = (game.level_choice + gp.SHRINE_BUFF_COUNT - 1) % gp.SHRINE_BUFF_COUNT
+	}
+	if action_pressed(im, .Menu_Down) {
+		game.level_choice = (game.level_choice + 1) % gp.SHRINE_BUFF_COUNT
+	}
+
+	if action_pressed(im, .Inv_Slot_1) {
+		gp.apply_levelup_buff(engine, game, .Max_HP)
+		return
+	}
+	if action_pressed(im, .Inv_Slot_2) {
+		gp.apply_levelup_buff(engine, game, .Attack)
+		return
+	}
+	if action_pressed(im, .Inv_Slot_3) {
+		gp.apply_levelup_buff(engine, game, .Light)
+		return
+	}
+
+	if action_pressed(im, .Menu_Confirm) {
+		buffs := [3]gp.Shrine_Buff{.Max_HP, .Attack, .Light}
+		if game.level_choice >= 0 && game.level_choice < len(buffs) {
+			gp.apply_levelup_buff(engine, game, buffs[game.level_choice])
+		}
+	}
+}

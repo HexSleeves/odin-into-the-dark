@@ -44,6 +44,10 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 	game.state = game_initial_state()
 
 	init_player_from_content(content, game)
+	// Start at level 1 (0 kills → derived level 1), so check_level_up does not
+	// fire a spurious menu on the first move of a fresh run.
+	game.player_level = gcore.levelup_level_for_kills(0)
+	game.pending_level_ups = 0
 
 	game.rooms = make([dynamic]gcore.Room)
 	game.enemies = make([dynamic]Enemy)
@@ -83,6 +87,8 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 	game.state = .Playing
 
 	init_player_from_content(content, game)
+	game.player_level = gcore.levelup_level_for_kills(0)
+	game.pending_level_ups = 0
 
 	game.rooms = make([dynamic]gcore.Room)
 	game.enemies = make([dynamic]Enemy)

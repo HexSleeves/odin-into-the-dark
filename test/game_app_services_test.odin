@@ -87,8 +87,10 @@ game_app_registers_current_engine_services :: proc(t: ^testing.T) {
 	testing.expect(t, game_engine_vfx_manager(&engine) == &engine.vfx_manager)
 	testing.expect(t, game_engine_ui_manager(&engine) != nil)
 	testing.expect(t, !ui_manager_state(game_engine_ui_manager(&engine)).use_sprites)
-	// 6 app-level (owned copies) + 5 engine-level (non-owned pointers)
-	testing.expect_value(t, services.service_count, 11)
+	testing.expect(t, game_engine_floating_text_manager(&engine) != nil)
+	testing.expect(t, game_engine_floating_text_manager(&engine) == &engine.floating_text)
+	// 6 app-level (owned copies) + 6 engine-level (non-owned pointers, incl. floating text)
+	testing.expect_value(t, services.service_count, 12)
 	for i in 0 ..< services.service_count {
 		owned_expected := services.services[i].size > 0
 		testing.expect(t, services.services[i].owned == owned_expected)

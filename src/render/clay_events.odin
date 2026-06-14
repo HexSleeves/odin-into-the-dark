@@ -46,6 +46,46 @@ clay_render_shrine_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	}
 }
 
+// ─── Level-up overlay (D3) ─────────────────────────────────────────────────────
+
+LEVELUP_BUFF_LABELS :: [3]string{"Max HP", "Attack", "Light Radius"}
+
+LEVELUP_BUFF_VALUES :: [3]int {
+	gcore.LEVELUP_BUFF_MAX_HP,
+	gcore.LEVELUP_BUFF_ATTACK,
+	gcore.LEVELUP_BUFF_LIGHT,
+}
+
+clay_render_level_up_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
+	if clay.UI(clay.ID("levelup-overlay"))(
+		clay_menu_backdrop_decl(eng.Engine_Color{6, 5, 9, 140}, floating = true),
+	) {
+		if clay.UI(clay.ID("levelup-card"))(clay_menu_card_decl(560)) {
+			clay_menu_title(fmt.tprintf("LEVEL %d", game.player_level))
+			clay_menu_accent_rule("levelup-rule")
+			clay_menu_subtitle("Choose a permanent boon (no cost)", ui_pkg.SB_HEADER)
+
+			labels := LEVELUP_BUFF_LABELS
+			values := LEVELUP_BUFF_VALUES
+			for i in 0 ..< 3 {
+				clay_menu_item(
+					fmt.tprintf("levelup-item-%d", i),
+					fmt.tprintf("+%d %s", values[i], labels[i]),
+					fmt.tprintf("[%d]", i + 1),
+					i == game.level_choice,
+				)
+			}
+
+			if game.pending_level_ups > 1 {
+				clay_menu_footer(
+					"levelup-footer",
+					fmt.tprintf("%d more level-ups pending", game.pending_level_ups - 1),
+				)
+			}
+		}
+	}
+}
+
 // ─── Merchant overlay ────────────────────────────────────────────────────────
 
 clay_render_merchant_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {

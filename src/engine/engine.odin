@@ -31,6 +31,7 @@ Engine :: struct {
 	vfx_manager:      Vfx_Manager,
 	message_manager:  Message_Manager,
 	particle_manager: Particle_Manager,
+	floating_text:    Floating_Text_Manager,
 	file_system:      Engine_File_System,
 	audio:            Engine_Audio_Backend,
 	input:            Engine_Input_Backend,
@@ -139,6 +140,13 @@ engine_particle_manager :: proc(engine: ^Engine) -> ^Particle_Manager {
 	return &engine.particle_manager
 }
 
+engine_floating_text_manager :: proc(engine: ^Engine) -> ^Floating_Text_Manager {
+	if engine == nil {
+		return nil
+	}
+	return &engine.floating_text
+}
+
 engine_file_system :: proc(engine: ^Engine) -> Engine_File_System {
 	if engine == nil {
 		return engine_file_system_default()
@@ -226,6 +234,7 @@ engine_init :: proc(
 	state.engine.message_manager = message_manager_make()
 	message_manager_bind_turns(&state.engine.message_manager, &state.engine.turn_manager)
 	state.engine.particle_manager = particle_manager_make()
+	state.engine.floating_text = floating_text_manager_make()
 
 	state.platform = engine_platform_backend_or_default(config.platform)
 

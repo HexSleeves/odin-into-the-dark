@@ -22,6 +22,7 @@ GAME_ENGINE_SERVICE_CAMERA :: gcore.GAME_ENGINE_SERVICE_CAMERA
 GAME_ENGINE_SERVICE_TURNS :: gcore.GAME_ENGINE_SERVICE_TURNS
 GAME_ENGINE_SERVICE_VFX :: gcore.GAME_ENGINE_SERVICE_VFX
 GAME_ENGINE_SERVICE_UI :: gcore.GAME_ENGINE_SERVICE_UI
+GAME_ENGINE_SERVICE_FLOATING_TEXT :: gcore.GAME_ENGINE_SERVICE_FLOATING_TEXT
 
 // Progression milestone re-exports (single source: src/core/gameplay_tuning.odin + game_utils.odin).
 KILLS_PER_MILESTONE :: gcore.KILLS_PER_MILESTONE
@@ -115,6 +116,11 @@ game_engine_register_app_services :: proc(engine: ^eng.Engine) -> bool {
 			engine.services,
 			gcore.GAME_ENGINE_SERVICE_PARTICLES,
 			&engine.particle_manager,
+		) &&
+		eng.engine_services_register(
+			engine.services,
+			gcore.GAME_ENGINE_SERVICE_FLOATING_TEXT,
+			&engine.floating_text,
 		) \
 	)
 }
@@ -159,6 +165,10 @@ game_engine_sprite_manager :: proc(engine: ^eng.Engine) -> ^renderer.Sprite_Mana
 
 game_engine_particle_manager :: proc(engine: ^eng.Engine) -> ^eng.Particle_Manager {
 	return eng.engine_particle_manager(engine)
+}
+
+game_engine_floating_text_manager :: proc(engine: ^eng.Engine) -> ^eng.Floating_Text_Manager {
+	return eng.engine_floating_text_manager(engine)
 }
 
 game_engine_score_manager :: proc(engine: ^eng.Engine) -> ^renderer.Score_Manager {

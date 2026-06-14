@@ -9,6 +9,7 @@ import eng "../engine"
 render_game :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	particles := game_engine_particle_manager(engine)
 	update_particles(particles)
+	eng.floating_text_manager_update(game_engine_floating_text_manager(engine))
 
 	eng.engine_render_begin_frame(engine)
 	eng.engine_render_clear(engine, eng.engine_color_make(0, 0, 0, 255))
@@ -28,6 +29,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	render_npcs(engine, game)
 	render_player(engine, game)
 	render_particles(engine, particles)
+	render_floating_text(engine, game)
 	eng.engine_render_end_scissor(engine)
 
 	clay_ui_begin_frame(engine)

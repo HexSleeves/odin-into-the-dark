@@ -199,6 +199,16 @@ effective_light_bonus :: proc(game: ^Game) -> int {
 	return helmet_bonus + game.light_debuff_bonus
 }
 
+// player_effective_light_radius returns the player's net emitted light radius:
+// base radius + active oil boost + the combined helmet/debuff modifier. This
+// mirrors the FOV radius formula so light-gated detection (D1) agrees with what
+// the player can actually see by torchlight. Clamped at 0.
+player_effective_light_radius :: proc(game: ^Game) -> int {
+	if game == nil {return 0}
+	r := game.player.light_radius + game.light_boost_bonus + effective_light_bonus(game)
+	return max(r, 0)
+}
+
 item_display_name :: proc(item: ^Item) -> string {
 	if len(item.name) > 0 {return item.name}
 	if len(item.item_type) > 0 {return item.item_type}
@@ -267,6 +277,22 @@ victory_boss_status_text :: proc(game: ^Game) -> cstring {
 		return "Defeated"
 	}
 	return "Not defeated"
+}
+
+// ─── Milestone level-up derivation (D3) ───────────────────────────────────────
+
+// levelup_level_for_kills derives the player's level (1-based) from a kill count.
+// Level 1 = 0 kills; each KILLS_PER_LEVEL kills grants one level. Pure function.
+levelup_level_for_kills :: proc(kills: int) -> int {
+	if kills < 0 {return 1}
+	return kills / KILLS_PER_LEVEL + 1
+}
+
+// levelup_kills_for_level returns the kill count at which `level` (1-based) is
+// first reached. Inverse of levelup_level_for_kills. Pure function.
+levelup_kills_for_level :: proc(level: int) -> int {
+	if level <= 1 {return 0}
+	return (level - 1) * KILLS_PER_LEVEL
 }
 
 // ─── Kill-progression milestones ──────────────────────────────────────────────

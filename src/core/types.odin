@@ -260,6 +260,7 @@ Game_State :: enum {
 	Viewing_Merchant,
 	Viewing_Dialogue,
 	Pause,
+	Viewing_Level_Up,
 }
 
 Game :: struct {
@@ -336,4 +337,10 @@ Game :: struct {
 	dlg_flag_lens:          [MAX_DLG_FLAGS]int,
 	visited_floors:         [MAX_DEPTH + 1]^Saved_Floor,
 	floor_entry_pos:        Vec2,
+	// Milestone level-ups (D3). player_level is derived from kills on load; it is
+	// not persisted directly. pending_level_ups counts queued level-up menus the
+	// player has yet to resolve; level_choice is the highlighted menu row.
+	player_level:           int,
+	pending_level_ups:      int,
+	level_choice:           int,
 }

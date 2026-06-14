@@ -28,6 +28,14 @@ WEB_STUCK_TURNS :: 3
 DEFAULT_ENEMY_DETECTION_RADIUS :: 10
 DEFAULT_ENEMY_MEMORY_TURNS :: 8
 
+// ─── Light-gated detection (D1, feature-flagged) ──────────────────────────────
+// When LIGHT_AFFECTS_DETECTION is on, sight detection reaches full
+// detection_radius only inside the player's emitted light; outside the light a
+// player is detected only within DETECTION_HEARING_RADIUS. Default off → the
+// detection model is plain Manhattan distance (byte-identical to legacy).
+LIGHT_AFFECTS_DETECTION :: #config(LIGHT_AFFECTS_DETECTION, false)
+DETECTION_HEARING_RADIUS :: 3
+
 MIN_LIGHT_RADIUS_DEFAULT :: 3
 MIN_LIGHT_RADIUS_DEEP :: 2
 MIN_LIGHT_DEPTH :: 8
@@ -38,6 +46,17 @@ BOSS_CAMERA_ZOOM :: f32(1.16)
 
 // ─── Kill progression ─────────────────────────────────────────────────────────
 KILLS_PER_MILESTONE :: 8 // kills between permanent buff awards
+
+// ─── Milestone level-ups (D3, feature-flagged) ────────────────────────────────
+// When LEVELUP_ENABLED is on (default), crossing a KILLS_PER_LEVEL threshold
+// queues a level-up the player resolves via a menu (no HP cost). player_level is
+// derived from persisted kills, so it needs no extra save field. Runtime `if`
+// gating (NOT `when`) so the flag matrix stays a single build.
+LEVELUP_ENABLED :: #config(LEVELUP_ENABLED, true)
+KILLS_PER_LEVEL :: 8 // kills required to advance one level
+LEVELUP_BUFF_MAX_HP :: 5
+LEVELUP_BUFF_ATTACK :: 2
+LEVELUP_BUFF_LIGHT :: 1
 
 // ─── Floor events ─────────────────────────────────────────────────────────────
 EVENT_SPAWN_CHANCE :: 40 // percent chance per floor (depth >= 2)

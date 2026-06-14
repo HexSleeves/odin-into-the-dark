@@ -50,6 +50,34 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 					}
 				}
 			}
+		} else if enemy.ability_type == ENEMY_ABILITY_POISON_CLOUD {
+			// Poison cloud: vent toxic gas onto a floor tile adjacent to the enemy
+			// when the player is within range, creating a lingering Gas_Vent hazard.
+			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)
+			if dist <= enemy.ability_range {
+				dx := CARDINAL_DX
+				dy := CARDINAL_DY
+				for dir in 0 ..< 4 {
+					gx := enemy.pos.x + dx[dir]
+					gy := enemy.pos.y + dy[dir]
+					t := tile_at(game, gx, gy)
+					if t != nil && t.type == .Floor {
+						t.type = .Gas_Vent
+						enemy.ability_cooldown = enemy.ability_max_cd
+						enemy.energy -= ability_cost
+						add_message(
+							messages,
+							game,
+							fmt.tprintf(
+								"The %s belches a cloud of toxic spores!",
+								enemy_display_name(&enemy),
+							),
+							eng.Engine_Color{120, 200, 40, 255},
+						)
+						break
+					}
+				}
+			}
 		} else if enemy.ability_type == ENEMY_ABILITY_PULL {
 			// Pull: if player is in LOS within range but not adjacent, pull 1 tile closer
 			dist := abs(enemy.pos.x - game.player.pos.x) + abs(enemy.pos.y - game.player.pos.y)

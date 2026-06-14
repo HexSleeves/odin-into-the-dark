@@ -155,6 +155,7 @@ score_manager_load :: renderer.score_manager_load
 score_manager_save :: renderer.score_manager_save
 score_table_destroy :: renderer.score_table_destroy
 insert_score :: renderer.insert_score
+compute_run_score :: renderer.compute_run_score
 
 // ─── IO helpers ───────────────────────────────────────────────────────────────
 logger_debugf :: gameio.logger_debugf

@@ -326,6 +326,14 @@ clay_render_victory_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 				"Turns Survived",
 				fmt.tprintf("%d", eng.turn_manager_current(turns)),
 			)
+			clay_menu_kv(
+				"victory-score",
+				"Final Score",
+				fmt.tprintf(
+					"%d",
+					compute_run_score(game.depth, game.kills, game.items_found, true),
+				),
+			)
 			clay_menu_footer("victory-footer", ui_pkg.UI_VICTORY_FOOTER)
 		}
 	}
