@@ -29,6 +29,65 @@ dijkstra_map_treats_locked_doors_as_unreachable_barriers :: proc(t: ^testing.T) 
 }
 
 @(test)
+dijkstra_map_is_only_recomputed_when_marked_dirty :: proc(t: ^testing.T) {
+	game: Game
+	path_test_fill_tiles(&game)
+	game.player.pos = Vec2{1, 1}
+	game.player.hp = 20
+	game.player.max_hp = 20
+	game.enemies = make([dynamic]Enemy)
+	defer delete(game.enemies)
+
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(&game), DMAP_UNREACHABLE)
+
+	// Poison the flow field with a sentinel the BFS would never produce at (1,1).
+	SENTINEL :: 7777
+	_ = eng.engine_distance_map_set(&dmap, 1, 1, SENTINEL)
+
+	// dirty == false → process_enemy_turns must NOT recompute; sentinel survives.
+	game.dijkstra_dirty = false
+	messages := message_manager_make()
+	process_enemy_turns(&messages, &game)
+	testing.expect_value(t, eng.engine_distance_map_get(&dmap, 1, 1), SENTINEL)
+
+	// dirty == true → recompute; player tile resets to 0 and the flag clears.
+	game.dijkstra_dirty = true
+	process_enemy_turns(&messages, &game)
+	testing.expect_value(t, eng.engine_distance_map_get(&dmap, 1, 1), 0)
+	testing.expect_value(t, game.dijkstra_dirty, false)
+}
+
+@(test)
+trigger_enemy_rounds_recomputes_flow_field_once_then_reuses_it_across_slow_player_rounds :: proc(
+	t: ^testing.T,
+) {
+	// compute_dijkstra_map clears dijkstra_dirty. So after one recompute within a
+	// burst of enemy rounds, the flag stays false and later rounds reuse the field.
+	game: Game
+	path_test_fill_tiles(&game)
+	game.player.pos = Vec2{1, 1}
+	game.player.hp = 20
+	game.player.max_hp = 20
+	game.enemies = make([dynamic]Enemy)
+	defer delete(game.enemies)
+
+	// First recompute (simulating the first enemy round of a player input).
+	game.dijkstra_dirty = true
+	compute_dijkstra_map(&game)
+	testing.expect_value(t, game.dijkstra_dirty, false)
+
+	// Poison the field; if a later round reused it (dirty still false) the sentinel
+	// survives, proving no redundant recompute happened.
+	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(&game), DMAP_UNREACHABLE)
+	SENTINEL :: 5555
+	_ = eng.engine_distance_map_set(&dmap, 1, 1, SENTINEL)
+
+	messages := message_manager_make()
+	process_enemy_turns(&messages, &game) // dirty == false → no recompute
+	testing.expect_value(t, eng.engine_distance_map_get(&dmap, 1, 1), SENTINEL)
+}
+
+@(test)
 visible_enemy_moves_downhill_toward_player :: proc(t: ^testing.T) {
 	game: Game
 	path_test_fill_tiles(&game)
@@ -52,6 +111,7 @@ visible_enemy_moves_downhill_toward_player :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 4, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, Vec2{3, 1})
@@ -93,6 +153,7 @@ visible_enemy_does_not_enter_occupied_tile_while_chasing :: proc(t: ^testing.T) 
 	_ = tile_state_set(&game, 4, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, Vec2{4, 1})
@@ -124,6 +185,7 @@ adjacent_visible_enemy_attacks_instead_of_moving :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 2, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, Vec2{2, 1})
@@ -175,6 +237,7 @@ enemy_turns_stop_after_player_death_and_preserve_first_death_cause :: proc(t: ^t
 	_ = tile_state_set(&game, 1, 2, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.state, Game_State.Game_Over)
@@ -210,6 +273,7 @@ visible_unreachable_enemy_stops_instead_of_random_wandering :: proc(t: ^testing.
 	_ = tile_state_set(&game, 5, 5, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, Vec2{5, 5})

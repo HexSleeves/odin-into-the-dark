@@ -258,7 +258,10 @@ clay_render_help_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 clay_render_scores_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 	_ = game
-	table := score_cache_get(game_engine_score_manager(engine))
+	// Cache-backed: reads disk only on the first call after a save; otherwise
+	// serves the cached parse. The returned clone is owned and consumed in-frame.
+	table := score_manager_load(game_engine_score_manager(engine))
+	defer score_table_destroy(&table)
 	if clay.UI(clay.ID("scores-backdrop"))(clay_menu_backdrop_decl()) {
 		if clay.UI(clay.ID("scores-card"))(clay_menu_card_decl()) {
 			clay_menu_title(ui_pkg.UI_SCORES_TITLE)

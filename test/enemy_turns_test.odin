@@ -39,6 +39,7 @@ enemy_with_positive_energy_acts_when_visible :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 3, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	// Energy was positive, so the enemy must have moved closer.
@@ -67,6 +68,7 @@ enemy_energy_is_deducted_after_moving :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 5, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	// After one move the AP must be <= 0 (exactly 0 when move_speed == 100).
@@ -99,6 +101,7 @@ enemy_with_no_energy_does_not_move :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 4, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, start_pos)
@@ -146,6 +149,7 @@ energy_granted_equals_quickness_times_ten :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 2, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	// AP granted = 50 * 10 = 500. Attack cost = BASE_ACTION_COST = 1000.
@@ -179,6 +183,7 @@ quickness_100_grants_one_thousand_ap_per_round :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 2, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].energy, 0)
@@ -209,6 +214,7 @@ lurker_not_visible_to_player_drains_energy_to_zero :: proc(t: ^testing.T) {
 	// Do NOT set tile visible — lurker should stay completely still.
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, start_pos)
@@ -240,6 +246,7 @@ lurker_visible_but_not_adjacent_stays_still :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 5, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	testing.expect_value(t, game.enemies[0].pos, start_pos)
@@ -270,6 +277,7 @@ lurker_visible_and_adjacent_attacks_player :: proc(t: ^testing.T) {
 	_ = tile_state_set(&game, 2, 1, true, true, 1)
 	messages := message_manager_make()
 
+	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
 	// Lurker attacked — player HP reduced, lurker did not move.

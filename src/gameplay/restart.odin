@@ -32,7 +32,7 @@ save_run_score :: proc(scores: ^Score_Manager, turns: ^eng.Turn_Manager, game: ^
 	if game.last_score_rank < 0 && len(cause) > 0 {
 		delete(cause, context.allocator)
 	}
+	// score_manager_save refreshes the manager's write-through cache, so the next
+	// scores overlay sees this entry without re-reading disk.
 	score_manager_save(scores, &table)
-	// Drop the render-side score cache so the next scores overlay re-reads disk.
-	render_scores_invalidate()
 }

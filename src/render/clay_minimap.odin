@@ -31,45 +31,53 @@ minimap_should_draw_enemy_dot :: proc(game: ^gcore.Game, enemy: ^gcore.Enemy) ->
 // pass over enemies + NPCs before the cell loop and stamp their colors into a
 // flat array, so each cell lookup is O(1).
 
-@(private = "file")
 Minimap_Entity_Kind :: enum u8 {
 	None,
 	Enemy,
 	NPC,
 }
 
-@(private = "file")
-Minimap_Cell_Entity :: struct {
-	kind: Minimap_Entity_Kind,
+// Caller-owned scratch buffer. Built once per minimap render, read O(1) per cell.
+// A value type (no global mutable state) so it is render-call-local and test-safe.
+Minimap_Entity_Scratch :: struct {
+	kinds: [gcore.MAP_WIDTH * gcore.MAP_HEIGHT]Minimap_Entity_Kind,
 }
 
-@(private = "file")
-g_minimap_entity_scratch: [gcore.MAP_WIDTH * gcore.MAP_HEIGHT]Minimap_Cell_Entity
-
-@(private = "file")
-minimap_build_entity_scratch :: proc(game: ^gcore.Game) {
-	// Zero out previous frame's stamps
-	for &cell in g_minimap_entity_scratch {
-		cell = {}
+// Read the kind stamped for a cell.
+minimap_scratch_kind_at :: proc(
+	scratch: ^Minimap_Entity_Scratch,
+	x, y: int,
+) -> Minimap_Entity_Kind {
+	idx := gcore.pos_to_idx(x, y)
+	if scratch == nil || idx < 0 || idx >= len(scratch.kinds) {
+		return .None
 	}
+	return scratch.kinds[idx]
+}
+
+// Stamp enemy/npc dots into the scratch in one pass (first-match wins).
+minimap_build_entity_scratch :: proc(game: ^gcore.Game, scratch: ^Minimap_Entity_Scratch) {
+	scratch^ = {}
 	// Stamp enemies (alive + should draw)
 	for &enemy in game.enemies {
 		if !enemy.alive {continue}
 		if !minimap_should_draw_enemy_dot(game, &enemy) {continue}
 		idx := gcore.pos_to_idx(enemy.pos.x, enemy.pos.y)
-		if idx >= 0 && idx < len(g_minimap_entity_scratch) {
-			g_minimap_entity_scratch[idx].kind = .Enemy
+		if idx >= 0 && idx < len(scratch.kinds) {
+			// First-match: don't overwrite an earlier enemy stamp on the same tile.
+			if scratch.kinds[idx] == .None {
+				scratch.kinds[idx] = .Enemy
+			}
 		}
 	}
-	// Stamp NPCs (explored tile)
+	// Stamp NPCs (explored tile); never overwrite an enemy stamp
 	for i in 0 ..< game.npc_count {
 		npc := &game.npcs[i]
 		if !gcore.tile_explored_at(game, npc.pos.x, npc.pos.y) {continue}
 		idx := gcore.pos_to_idx(npc.pos.x, npc.pos.y)
-		if idx >= 0 && idx < len(g_minimap_entity_scratch) {
-			// Don't overwrite an enemy stamp
-			if g_minimap_entity_scratch[idx].kind == .None {
-				g_minimap_entity_scratch[idx].kind = .NPC
+		if idx >= 0 && idx < len(scratch.kinds) {
+			if scratch.kinds[idx] == .None {
+				scratch.kinds[idx] = .NPC
 			}
 		}
 	}
@@ -81,7 +89,8 @@ clay_render_minimap :: proc(game: ^gcore.Game) {
 	}
 
 	// Build entity scratch once per minimap render (not once per cell)
-	minimap_build_entity_scratch(game)
+	scratch: Minimap_Entity_Scratch
+	minimap_build_entity_scratch(game, &scratch)
 
 	if clay.UI(clay.ID("minimap-floating"))(
 	clay.ElementDeclaration {
@@ -135,7 +144,9 @@ clay_render_minimap :: proc(game: ^gcore.Game) {
 								height = clay.SizingFixed(f32(MINIMAP_TILE_SIZE)),
 							},
 						},
-						backgroundColor = clay_color(clay_minimap_cell_color(game, x, y)),
+						backgroundColor = clay_color(
+							clay_minimap_cell_color(game, &scratch, x, y),
+						),
 					},
 					) {}
 				}
@@ -145,15 +156,18 @@ clay_render_minimap :: proc(game: ^gcore.Game) {
 }
 
 @(private = "file")
-clay_minimap_cell_color :: proc(game: ^gcore.Game, x, y: int) -> eng.Engine_Color {
+clay_minimap_cell_color :: proc(
+	game: ^gcore.Game,
+	scratch: ^Minimap_Entity_Scratch,
+	x, y: int,
+) -> eng.Engine_Color {
 	if game.player.pos.x == x && game.player.pos.y == y {
 		return ui_pkg.SB_TITLE // player — gold
 	}
 
 	// O(1) entity lookup via scratch buffer (built once before this loop)
 	idx := gcore.pos_to_idx(x, y)
-	entity := g_minimap_entity_scratch[idx]
-	switch entity.kind {
+	switch minimap_scratch_kind_at(scratch, x, y) {
 	case .Enemy:
 		return ui_pkg.SB_BOSS // enemy / boss
 	case .NPC:

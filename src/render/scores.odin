@@ -3,44 +3,10 @@ package renderer
 import gameio "../io"
 
 import eng "../engine"
+import "base:runtime"
 import "core:encoding/json"
 
 // ─── High Score Table ─────────────────────────────────────────────────────────
-
-// ─── Render-owned score cache ─────────────────────────────────────────────────
-// Loaded once on first call to score_cache_get; stays valid until
-// render_scores_invalidate() is called (should be called by the score-write
-// path after score_manager_save).
-
-@(private = "file")
-Score_Cache :: struct {
-	table:  Score_Table,
-	loaded: bool,
-}
-
-@(private = "file")
-g_score_cache: Score_Cache
-
-// Invalidate the cache so the next render of the scores overlay re-reads disk.
-// CONDUCTOR WIRE-UP: call render_scores_invalidate() in gameplay/restart.odin
-// immediately after score_manager_save(scores, &table) at line 35.
-render_scores_invalidate :: proc() {
-	if g_score_cache.loaded {
-		score_table_destroy(&g_score_cache.table)
-		g_score_cache.loaded = false
-	}
-}
-
-// Return a pointer to the cached table, loading from disk on first access.
-// Package-visible: the scores overlay in clay_overlays.odin reads through this.
-@(private)
-score_cache_get :: proc(scores: ^Score_Manager) -> ^Score_Table {
-	if !g_score_cache.loaded {
-		g_score_cache.table = score_manager_load(scores)
-		g_score_cache.loaded = true
-	}
-	return &g_score_cache.table
-}
 
 MAX_SCORES :: 10
 SCORES_FILE :: "scores.json"
@@ -59,8 +25,14 @@ Score_Table :: struct {
 }
 
 Score_Manager :: struct {
-	file_path: string,
-	storage:   eng.Storage_Manager,
+	file_path:    string,
+	storage:      eng.Storage_Manager,
+	// Parsed-scores cache. The only in-process writer is score_manager_save, so a
+	// write-through cache stays coherent without re-reading disk every frame.
+	// Cached cause strings live on runtime.default_allocator (stable across
+	// frames); score_manager_load hands back an owned clone on context.allocator.
+	cached:       Score_Table,
+	cache_loaded: bool,
 }
 
 score_manager_make :: proc() -> Score_Manager {
@@ -86,9 +58,51 @@ score_table_destroy :: proc(table: ^Score_Table) {
 	table^ = {}
 }
 
+// Deep-copy a Score_Table, cloning each cause string onto `allocator` so the copy
+// owns its own storage (callers free with score_table_destroy / the matching delete).
+score_table_clone :: proc(src: ^Score_Table, allocator := context.allocator) -> Score_Table {
+	out: Score_Table
+	if src == nil {
+		return out
+	}
+	out.count = src.count
+	for i in 0 ..< src.count {
+		out.scores[i] = src.scores[i]
+		if len(src.scores[i].cause) > 0 {
+			out.scores[i].cause = clone_score_string(src.scores[i].cause, allocator)
+		}
+	}
+	return out
+}
+
+@(private = "file")
+clone_score_string :: proc(s: string, allocator: runtime.Allocator) -> string {
+	buf := make([]u8, len(s), allocator)
+	copy(buf, s)
+	return string(buf)
+}
+
+// Free the cached table's owned strings (on runtime.default_allocator). Cache
+// strings otherwise leak once at exit, which is harmless (no shutdown hook).
+score_manager_cache_destroy :: proc(scores: ^Score_Manager) {
+	if scores == nil || !scores.cache_loaded {
+		return
+	}
+	for i in 0 ..< scores.cached.count {
+		if len(scores.cached.scores[i].cause) > 0 {
+			delete(scores.cached.scores[i].cause, runtime.default_allocator())
+		}
+	}
+	scores.cached = {}
+	scores.cache_loaded = false
+}
+
 // ─── Load / Save ──────────────────────────────────────────────────────────────
 
-score_manager_load :: proc(scores: ^Score_Manager) -> Score_Table {
+// Read scores.json from disk (no caching). Returns a table whose cause strings
+// live on `allocator`.
+@(private = "file")
+score_read_from_disk :: proc(scores: ^Score_Manager, allocator: runtime.Allocator) -> Score_Table {
 	result: Score_Table
 	path := score_manager_path(scores)
 
@@ -98,18 +112,36 @@ score_manager_load :: proc(scores: ^Score_Manager) -> Score_Table {
 	}
 	data, read_ok := eng.storage_manager_read(storage, path, context.allocator)
 	if !read_ok {
-		// No file yet — return empty table
+		// No file yet — empty table
 		return result
 	}
 	defer delete(data, context.allocator)
 
-	parse_err := json.unmarshal(data, &result)
+	context.allocator = allocator
+	parse_err := json.unmarshal(data, &result, allocator = allocator)
 	if parse_err != nil {
 		gameio.logger_warnf(.Scores, "parse failed for %s: %v", path, parse_err)
 		return {}
 	}
 
 	return result
+}
+
+// Load the high-score table. Reads disk only on the first call (or after a
+// score_manager_save); subsequent calls serve the cached parse. Returns an OWNED
+// clone the caller must free with score_table_destroy.
+score_manager_load :: proc(scores: ^Score_Manager) -> Score_Table {
+	if scores == nil {
+		// No manager to cache on — read straight from disk on context.allocator.
+		return score_read_from_disk(scores, context.allocator)
+	}
+
+	if !scores.cache_loaded {
+		scores.cached = score_read_from_disk(scores, runtime.default_allocator())
+		scores.cache_loaded = true
+	}
+
+	return score_table_clone(&scores.cached, context.allocator)
 }
 
 score_manager_save :: proc(scores: ^Score_Manager, table: ^Score_Table) {
@@ -127,6 +159,15 @@ score_manager_save :: proc(scores: ^Score_Manager, table: ^Score_Table) {
 	}
 	if !eng.storage_manager_write(storage, path, data) {
 		gameio.logger_errorf(.Scores, "write failed for %s", path)
+		return
+	}
+
+	// Write-through: refresh the cache from the just-saved table so the next
+	// load sees the new entry without re-reading disk.
+	if scores != nil {
+		score_manager_cache_destroy(scores)
+		scores.cached = score_table_clone(table, runtime.default_allocator())
+		scores.cache_loaded = true
 	}
 }
 

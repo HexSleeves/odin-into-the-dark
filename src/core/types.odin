@@ -302,8 +302,9 @@ Game :: struct {
 	score_saved:            bool,
 	last_score_rank:        int,
 	render_map_dirty:       bool,
-	render_last_cam_x:      int,
-	render_last_cam_y:      int,
+	// Dijkstra flow field is recomputed only when this is set (once per player
+	// input); cleared by compute_dijkstra_map. Need not persist in saves.
+	dijkstra_dirty:         bool,
 	// Player status effects (Poison/Burning/Frozen/Webbed turns remaining)
 	player_status:          Status_Turns,
 	boss_killed_this_turn:  bool,

@@ -289,6 +289,9 @@ advance_turn :: proc(
 }
 
 trigger_enemy_rounds :: proc(engine: ^eng.Engine, game: ^Game) {
+	// Mark the flow field dirty once per player input; the first enemy round
+	// recomputes it and clears the flag, later rounds reuse it.
+	game.dijkstra_dirty = true
 	for game.player.energy <= 0 {
 		if game.state != .Playing {break}
 		hp_before := game.player.hp

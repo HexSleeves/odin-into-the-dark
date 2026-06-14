@@ -46,6 +46,7 @@ Game_Action :: gameinput.Game_Action
 Input_Result :: gameinput.Input_Result
 Score_Manager :: renderer.Score_Manager
 Score_Table :: renderer.Score_Table
+Score_Entry :: renderer.Score_Entry
 Audio_Manager :: gameaudio.Audio_Manager
 Engine :: eng.Engine
 Engine_Services :: eng.Engine_Services
@@ -164,6 +165,9 @@ score_manager_make :: renderer.score_manager_make
 score_manager_load :: renderer.score_manager_load
 score_manager_save :: renderer.score_manager_save
 score_table_destroy :: renderer.score_table_destroy
+score_manager_cache_destroy :: renderer.score_manager_cache_destroy
+score_table_clone :: renderer.score_table_clone
+insert_score :: renderer.insert_score
 input_manager_make :: gameinput.input_manager_make
 action_pressed :: gameinput.action_pressed
 audio_manager_make :: gameaudio.audio_manager_make

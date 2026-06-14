@@ -8,8 +8,12 @@ import eng "../engine"
 process_enemy_turns :: proc(messages: ^Message_Manager, game: ^Game) {
 	if game.state == .Game_Over {return}
 
-	// Recompute dijkstra map so enemies have fresh pathfinding
-	compute_dijkstra_map(game)
+	// Recompute the dijkstra flow field only when it has been marked dirty
+	// (once per player input). Slow players generate multiple enemy rounds per
+	// input; those reuse the field computed on the first round.
+	if game.dijkstra_dirty {
+		compute_dijkstra_map(game)
+	}
 
 	for &enemy in game.enemies {
 		if game.state == .Game_Over {return}

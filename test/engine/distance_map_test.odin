@@ -19,6 +19,21 @@ engine_distance_map_resets_and_reads_distances_by_grid_position :: proc(t: ^test
 }
 
 @(test)
+engine_distance_map_unchecked_accessors_read_and_write_without_validation :: proc(t: ^testing.T) {
+	values: [12]int
+	grid := engine_grid_2d_make(4, 3)
+	dmap := engine_distance_map_make(values[:], grid, 9999)
+	engine_distance_map_reset(&dmap)
+
+	// Caller is responsible for having validated the map + bounds once.
+	engine_distance_map_set_unchecked(&dmap, 3, 2, 42)
+	testing.expect_value(t, engine_distance_map_get_unchecked(&dmap, 3, 2), 42)
+	// Unchecked write lands in the same backing slot the checked path uses.
+	testing.expect_value(t, values[engine_grid_2d_index(grid, 3, 2)], 42)
+	testing.expect_value(t, engine_distance_map_get(&dmap, 3, 2), 42)
+}
+
+@(test)
 engine_distance_map_rejects_out_of_bounds_and_invalid_storage :: proc(t: ^testing.T) {
 	values: [4]int
 	grid := engine_grid_2d_make(2, 2)

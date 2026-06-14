@@ -30,7 +30,6 @@ Input_Manager :: eng.Action_Input_Manager
 Score_Manager :: renderer.Score_Manager
 Score_Entry :: renderer.Score_Entry
 Score_Table :: renderer.Score_Table
-render_scores_invalidate :: renderer.render_scores_invalidate
 Audio_Manager :: gameaudio.Audio_Manager
 Sound_Type :: gameaudio.Sound_Type
 Particle_Manager :: eng.Particle_Manager
