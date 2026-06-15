@@ -347,9 +347,9 @@ test_run_app_render :: proc(engine: ^Engine, app: ^Game_App) {
 	engine_render_draw_texture_region(
 		engine,
 		state.texture,
-		engine_rect_make(1, 2, 3, 4),
-		engine_rect_make(5, 6, 7, 8),
-		engine_vec2_make(0, 0),
+		Engine_Rect{1, 2, 3, 4},
+		Engine_Rect{5, 6, 7, 8},
+		Engine_Vec2{0, 0},
 		0,
 		engine_color_make(25, 26, 27, 28),
 	)

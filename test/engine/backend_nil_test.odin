@@ -36,9 +36,9 @@ nil_render_backend_is_valid_and_safe_to_call :: proc(t: ^testing.T) {
 	engine_render_draw_texture_region(
 		&engine,
 		Engine_Texture{},
-		engine_rect_make(0, 0, 1, 1),
-		engine_rect_make(0, 0, 1, 1),
-		engine_vec2_make(0, 0),
+		Engine_Rect{0, 0, 1, 1},
+		Engine_Rect{0, 0, 1, 1},
+		Engine_Vec2{0, 0},
 		0,
 		engine_color_make(255, 255, 255, 255),
 	)

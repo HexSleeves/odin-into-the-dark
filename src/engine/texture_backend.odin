@@ -53,14 +53,6 @@ engine_texture_load :: proc(engine: ^Engine, path: string) -> Engine_Texture {
 	return texture.load(texture.ctx, path)
 }
 
-engine_texture_load_bytes :: proc(engine: ^Engine, name: string, data: []u8) -> Engine_Texture {
-	texture := engine_texture_backend(engine)
-	if texture.load_bytes == nil {
-		return {}
-	}
-	return texture.load_bytes(texture.ctx, name, data)
-}
-
 engine_texture_unload :: proc(engine: ^Engine, texture: ^Engine_Texture) {
 	if texture == nil || texture.handle == nil {
 		return

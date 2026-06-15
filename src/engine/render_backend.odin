@@ -52,14 +52,6 @@ engine_color_make :: proc(r, g, b, a: u8) -> Engine_Color {
 	return Engine_Color{r = r, g = g, b = b, a = a}
 }
 
-engine_rect_make :: proc(x, y, width, height: f32) -> Engine_Rect {
-	return Engine_Rect{x = x, y = y, width = width, height = height}
-}
-
-engine_vec2_make :: proc(x, y: f32) -> Engine_Vec2 {
-	return Engine_Vec2{x = x, y = y}
-}
-
 engine_render_backend_is_valid :: proc(render: Engine_Render_Backend) -> bool {
 	return(
 		render.begin_frame != nil &&

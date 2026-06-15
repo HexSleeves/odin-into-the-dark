@@ -177,12 +177,6 @@ engine_audio_backend_play_looped :: proc(audio: Engine_Audio_Backend, sound_id: 
 	backend.play_looped(backend.ctx, sound_id)
 }
 
-engine_audio_backend_is_playing :: proc(audio: Engine_Audio_Backend, sound_id: int) -> bool {
-	backend := engine_audio_backend_or_default(audio)
-	if backend.is_playing == nil {return false}
-	return backend.is_playing(backend.ctx, sound_id)
-}
-
 engine_audio_backend_update :: proc(audio: Engine_Audio_Backend) {
 	backend := engine_audio_backend_or_default(audio)
 	if backend.update == nil {
