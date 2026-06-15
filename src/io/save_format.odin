@@ -6,10 +6,12 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-// v12 is the only supported on-disk format. Legacy v2–v11 read support was
+// v13 is the only supported on-disk format. Legacy v2–v12 read support was
 // intentionally dropped (pre-release; no shipped save contract to honor).
 // v12 dropped the never-populated per-floor Light_Source array from the layout.
-SAVE_VERSION :: u32(12)
+// v13 replaced per-cell Save_Ore_Vein{ore_type:Save_String, color} with a single
+// Ore_Kind byte (item ID + tint are derived from the kind).
+SAVE_VERSION :: u32(13)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
 MAX_SAVE_ENEMIES :: 64
@@ -62,8 +64,7 @@ Save_Item :: struct {
 }
 
 Save_Ore_Vein :: struct {
-	ore_type: Save_String,
-	color:    eng.Engine_Color,
+	kind: gcore.Ore_Kind,
 }
 
 Save_Inventory_Slot :: struct {

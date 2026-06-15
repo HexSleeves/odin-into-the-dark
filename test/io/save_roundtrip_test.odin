@@ -6,10 +6,12 @@ import "core:hash"
 import "core:mem"
 import "core:testing"
 
-// ─── v12 layout invariants ──────────────────────────────────────────────────────
+// ─── v13 layout invariants ──────────────────────────────────────────────────────
 
 @(test)
-v12_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
+v13_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
+	// v13 replaced per-cell Save_Ore_Vein{ore_type:Save_String, color} with a single
+	// Ore_Kind byte (item ID + tint derived on load), shrinking each ore_veins entry.
 	// v12 dropped the never-populated per-floor Light_Source array (light_source_count
 	// + light_sources) from Save_Floor, shifting the binary layout. The v11 diet had
 	// removed the dead Tile vis/explored/light fields and instead appends a dedicated
@@ -17,6 +19,10 @@ v12_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) 
 	// Save_Data's trailing field, immediately after tile_states. (The dead per-floor
 	// Save_Floor.tutorial_flags symmetry field was removed; its trailing field is now
 	// tile_states itself.)
+
+	// v13 ore-vein entries are a single Ore_Kind byte (no Save_String + color).
+	testing.expect_value(t, size_of(Save_Ore_Vein), size_of(gcore.Ore_Kind))
+
 	data_tail_size := size_of(Save_Data) - int(offset_of(Save_Data, tutorial_flags))
 
 	// tutorial_flags is a bit_set[Tutorial_Hint; u8]; the trailing span is at least
@@ -41,16 +47,16 @@ v12_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) 
 		"Save_Floor tile_states must carry the trailing engine layer",
 	)
 
-	// v12: the per-floor Light_Source array is gone, so palette now sits immediately
+	// the per-floor Light_Source array is gone, so palette now sits immediately
 	// after the rooms array with no light_source_count/light_sources gap between them.
 	rooms_to_palette := int(offset_of(Save_Floor, palette)) - int(offset_of(Save_Floor, rooms))
 	testing.expect_value(t, rooms_to_palette, size_of([MAX_SAVE_ROOMS]Room))
 }
 
-// ─── v12 round-trip tests ───────────────────────────────────────────────────────
+// ─── v13 round-trip tests ───────────────────────────────────────────────────────
 
 @(test)
-v12_save_data_round_trips_correctly :: proc(t: ^testing.T) {
+v13_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 8
@@ -62,6 +68,8 @@ v12_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	payload.tile_states[idx].visible = true
 	payload.tile_states[idx].explored = true
 	payload.tile_states[idx].light_level = 0.5
+	ore_idx := 9 * MAP_WIDTH + 3
+	payload.ore_veins[ore_idx].kind = .Gold
 
 	buf := make([]u8, size_of(Save_Header) + size_of(Save_Data))
 	defer delete(buf)
@@ -78,7 +86,7 @@ v12_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 
 	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "v12 round-trip must succeed")
+	testing.expect(t, ok, "v13 round-trip must succeed")
 	if data == nil {return}
 	defer free(data)
 
@@ -90,10 +98,11 @@ v12_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	testing.expect(t, data.tile_states[idx].visible, "tile-state visibility must round-trip")
 	testing.expect(t, data.tile_states[idx].explored, "tile-state exploration must round-trip")
 	testing.expect_value(t, data.tile_states[idx].light_level, f32(0.5))
+	testing.expect_value(t, data.ore_veins[ore_idx].kind, gcore.Ore_Kind.Gold)
 }
 
 @(test)
-tutorial_flags_survive_a_v12_save_and_restore_roundtrip :: proc(t: ^testing.T) {
+tutorial_flags_survive_a_v13_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 4
@@ -112,7 +121,7 @@ tutorial_flags_survive_a_v12_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 
 	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "v12 round-trip must succeed")
+	testing.expect(t, ok, "v13 round-trip must succeed")
 	if data == nil {return}
 	defer free(data)
 
@@ -128,7 +137,7 @@ tutorial_flags_survive_a_v12_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 }
 
 @(test)
-v12_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
+v13_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 2
@@ -155,7 +164,7 @@ v12_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T)
 }
 
 @(test)
-v12_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
+v13_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -181,7 +190,7 @@ v12_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 }
 
 @(test)
-v12_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
+v13_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -205,7 +214,7 @@ v12_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 }
 
 @(test)
-v12_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
+v13_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	// Set counts above their fixed-array capacities.

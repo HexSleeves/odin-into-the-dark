@@ -184,9 +184,53 @@ Floor_Palette :: struct {
 
 // ─── Mining ───────────────────────────────────────────────────────────────────
 
+// Ore variant for a wall cell. None = plain wall (no vein). The content item ID
+// and visual tint are derived from the kind (see ore_kind_item_id / ore_kind_color)
+// rather than stored per cell, so Ore_Vein is a single byte.
+Ore_Kind :: enum u8 {
+	None,
+	Iron,
+	Copper,
+	Crystal,
+	Gold,
+}
+
 Ore_Vein :: struct {
-	ore_type: string, // "iron_ore", "copper_ore", "crystal_shard", "gold_nugget", or ""
-	color:    eng.Engine_Color, // visual tint for the wall
+	kind: Ore_Kind,
+}
+
+// Content item ID dropped when mining this ore kind. "" for None.
+ore_kind_item_id :: proc(kind: Ore_Kind) -> string {
+	switch kind {
+	case .Iron:
+		return "iron_ore"
+	case .Copper:
+		return "copper_ore"
+	case .Crystal:
+		return "crystal_shard"
+	case .Gold:
+		return "gold_nugget"
+	case .None:
+		return ""
+	}
+	return ""
+}
+
+// Wall tint for this ore kind. None returns transparent (no tint).
+ore_kind_color :: proc(kind: Ore_Kind) -> eng.Engine_Color {
+	switch kind {
+	case .Iron:
+		return eng.Engine_Color{200, 120, 50, 255}
+	case .Copper:
+		return eng.Engine_Color{80, 180, 80, 255}
+	case .Crystal:
+		return eng.Engine_Color{100, 150, 255, 255}
+	case .Gold:
+		return eng.Engine_Color{255, 215, 0, 255}
+	case .None:
+		return eng.Engine_Color{0, 0, 0, 0}
+	}
+	return eng.Engine_Color{0, 0, 0, 0}
 }
 
 // ─── UI State ─────────────────────────────────────────────────────────────────
@@ -275,7 +319,7 @@ Game_State :: enum {
 
 Game :: struct {
 	tiles:                  [MAP_WIDTH * MAP_HEIGHT]Tile,
-	dijkstra_map:           [MAP_WIDTH * MAP_HEIGHT]int,
+	dijkstra_map:           [MAP_WIDTH * MAP_HEIGHT]i32,
 	world:                  eng.World_Manager,
 	map_width:              int,
 	map_height:             int,

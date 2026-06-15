@@ -13,6 +13,7 @@ Tile_Type :: gcore.Tile_Type
 Enemy :: gcore.Enemy
 Item_Def :: gcore.Item_Def
 Ore_Vein :: gcore.Ore_Vein
+Ore_Kind :: gcore.Ore_Kind
 Vec2 :: gcore.Vec2
 Engine_Color :: eng.Engine_Color
 MAP_WIDTH :: gcore.MAP_WIDTH

@@ -23,6 +23,8 @@ Equipment :: gcore.Equipment
 Vec2 :: gcore.Vec2
 Tile :: gcore.Tile
 Tile_Type :: gcore.Tile_Type
+Ore_Vein :: gcore.Ore_Vein
+Ore_Kind :: gcore.Ore_Kind
 Room :: gcore.Room
 Inventory_Slot :: gcore.Inventory_Slot
 Light_Source :: gcore.Light_Source

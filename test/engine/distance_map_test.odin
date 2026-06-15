@@ -5,7 +5,7 @@ import "core:testing"
 
 @(test)
 engine_distance_map_resets_and_reads_distances_by_grid_position :: proc(t: ^testing.T) {
-	values: [12]int
+	values: [12]i32
 	grid := engine_grid_2d_make(4, 3)
 	dmap := engine_distance_map_make(values[:], grid, 9999)
 
@@ -20,7 +20,7 @@ engine_distance_map_resets_and_reads_distances_by_grid_position :: proc(t: ^test
 
 @(test)
 engine_distance_map_unchecked_accessors_read_and_write_without_validation :: proc(t: ^testing.T) {
-	values: [12]int
+	values: [12]i32
 	grid := engine_grid_2d_make(4, 3)
 	dmap := engine_distance_map_make(values[:], grid, 9999)
 	engine_distance_map_reset(&dmap)
@@ -35,7 +35,7 @@ engine_distance_map_unchecked_accessors_read_and_write_without_validation :: pro
 
 @(test)
 engine_distance_map_rejects_out_of_bounds_and_invalid_storage :: proc(t: ^testing.T) {
-	values: [4]int
+	values: [4]i32
 	grid := engine_grid_2d_make(2, 2)
 	dmap := engine_distance_map_make(values[:], grid, 123)
 	short_map := engine_distance_map_make(values[:3], grid, 123)

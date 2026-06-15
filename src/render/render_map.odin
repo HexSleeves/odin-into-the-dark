@@ -193,11 +193,12 @@ rebuild_tile_color_cache :: proc(game: ^gcore.Game) {
 			// Ore tint (only relevant for walls)
 			if tile.type == .Wall {
 				vein := game.ore_veins[idx]
-				if vein.ore_type != "" {
+				if vein.kind != .None {
+					tint := gcore.ore_kind_color(vein.kind)
 					if state.visible {
-						g_tile_color_cache.ore_tints[idx] = vein.color
+						g_tile_color_cache.ore_tints[idx] = tint
 					} else {
-						g_tile_color_cache.ore_tints[idx] = dim_color(vein.color, EXPLORED_DIM)
+						g_tile_color_cache.ore_tints[idx] = dim_color(tint, EXPLORED_DIM)
 					}
 				} else {
 					g_tile_color_cache.ore_tints[idx] = {}

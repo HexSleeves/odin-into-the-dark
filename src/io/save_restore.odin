@@ -163,8 +163,7 @@ load_game_from_storage :: proc(
 	// ── Restore ore veins ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		game.ore_veins[i] = Ore_Vein {
-			ore_type = save_to_string(content, &data.ore_veins[i].ore_type),
-			color    = data.ore_veins[i].color,
+			kind = data.ore_veins[i].kind,
 		}
 	}
 

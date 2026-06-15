@@ -63,14 +63,24 @@ tile_struct_shrank_to_terrain_type_only :: proc(t: ^testing.T) {
 
 @(test)
 game_struct_shrank_after_tile_diet :: proc(t: ^testing.T) {
-	// Game holds a full Tile grid plus the visited-floor stack (each with its own
-	// Tile grid). Removing 3 dead Tile fields halved Tile (16->8 B) and shrank
-	// every one of those grids; the engine Tile_State_Manager remains the single
-	// live carrier of vis/light. Measured ~222 KB post-diet, down from ~253 KB.
-	// Guard with headroom for later trailing-field appends.
+	// Game holds a full Tile grid plus per-cell ore + dijkstra grids. The tile diet
+	// halved Tile (16->8 B); the data-model diet then (a) shrank each ore_veins entry
+	// from a Save_String+color (24 B) to a single Ore_Kind byte — color/item ID are
+	// derived from the kind — and (b) changed dijkstra_map from int (8 B) to i32 (4 B)
+	// per cell. Together these cut the grid arrays by ~108 KB. Measured ~132 KB,
+	// down from ~222 KB. Guard with headroom for later trailing-field appends.
 	testing.expect(
 		t,
-		size_of(Game) < 240 * 1024,
-		"Game struct must stay under 240 KB after the tile diet",
+		size_of(Game) < 160 * 1024,
+		"Game struct must stay under 160 KB after the data-model diet",
 	)
+}
+
+@(test)
+ore_vein_is_a_single_kind_byte :: proc(t: ^testing.T) {
+	// The data-model diet replaced Ore_Vein{ore_type:string, color} (24 B) with a
+	// single Ore_Kind enum byte; the dropped per-cell string/color buffers were the
+	// largest single contributor to Game's grid bloat. Guard against re-inflation.
+	testing.expect_value(t, size_of(Ore_Vein), size_of(Ore_Kind))
+	testing.expect_value(t, size_of(Ore_Vein), 1)
 }

@@ -177,8 +177,7 @@ floor_to_save :: proc(floor: ^Saved_Floor, result: ^Save_Floor) {
 	result.web_tiles = floor.web_tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		result.ore_veins[i] = Save_Ore_Vein {
-			ore_type = string_to_save(floor.ore_veins[i].ore_type),
-			color    = floor.ore_veins[i].color,
+			kind = floor.ore_veins[i].kind,
 		}
 	}
 	result.player_pos = floor.player_pos
@@ -213,8 +212,7 @@ save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Sav
 	floor.web_tiles = saved.web_tiles
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		floor.ore_veins[i] = Ore_Vein {
-			ore_type = save_to_string(content, &saved.ore_veins[i].ore_type),
-			color    = saved.ore_veins[i].color,
+			kind = saved.ore_veins[i].kind,
 		}
 	}
 	floor.player_pos = saved.player_pos

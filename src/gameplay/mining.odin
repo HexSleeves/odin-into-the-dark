@@ -57,12 +57,17 @@ mine_wall :: proc(
 	vein := game.ore_veins[idx]
 	t.type = .Rubble
 
-	if vein.ore_type != "" {
-		def := content_manager_item_def(content, vein.ore_type)
+	if vein.kind != .None {
+		def := content_manager_item_def(content, gcore.ore_kind_item_id(vein.kind))
 		if def != nil {
 			ore_item := item_make_from_def(def, Vec2{tx, ty})
 			append(&game.items, ore_item)
-			add_message(messages, game, fmt.tprintf("You found %s!", def.name), vein.color)
+			add_message(
+				messages,
+				game,
+				fmt.tprintf("You found %s!", def.name),
+				gcore.ore_kind_color(vein.kind),
+			)
 			tutorial_hint_once(
 				messages,
 				game,

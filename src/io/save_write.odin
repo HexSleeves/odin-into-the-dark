@@ -49,11 +49,10 @@ save_game_to_storage :: proc(
 	data.player_status = game.player_status
 	data.tutorial_flags = game.tutorial_flags
 
-	// ── Convert ore veins (string → Save_String) ──
+	// ── Convert ore veins (kind enum, item ID + tint derived on load) ──
 	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
 		data.ore_veins[i] = Save_Ore_Vein {
-			ore_type = string_to_save(game.ore_veins[i].ore_type),
-			color    = game.ore_veins[i].color,
+			kind = game.ore_veins[i].kind,
 		}
 	}
 
