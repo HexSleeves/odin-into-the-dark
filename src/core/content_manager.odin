@@ -37,6 +37,13 @@ content_manager_player_def :: proc(content: ^Content_Manager) -> ^Player_Def {
 	return &content.registry.player
 }
 
+// content_manager_recipes returns the loaded crafting recipes (data-driven, from
+// data/recipes.json5). Empty slice if content is nil/unloaded.
+content_manager_recipes :: proc(content: ^Content_Manager) -> []Recipe_Def {
+	if content == nil {return nil}
+	return content.registry.recipes.recipes
+}
+
 content_manager_enemy_def_for_depth :: proc(content: ^Content_Manager, depth: int) -> ^Enemy_Def {
 	if content == nil {return nil}
 	for &table in content.registry.enemies.spawn_tables {

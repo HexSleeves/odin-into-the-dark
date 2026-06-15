@@ -144,6 +144,7 @@ content_manager_is_loaded :: gcore.content_manager_is_loaded
 content_manager_item_def :: gcore.content_manager_item_def
 content_manager_enemy_def :: gcore.content_manager_enemy_def
 content_manager_player_def :: gcore.content_manager_player_def
+content_manager_recipes :: gcore.content_manager_recipes
 content_manager_enemy_def_for_depth :: gcore.content_manager_enemy_def_for_depth
 content_manager_pick_item_def_for_depth :: gcore.content_manager_pick_item_def_for_depth
 content_manager_room_item_chance :: gcore.content_manager_room_item_chance

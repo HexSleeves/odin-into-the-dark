@@ -24,6 +24,29 @@ compute_run_score_awards_victory_multiplier_and_bonus :: proc(t: ^testing.T) {
 }
 
 @(test)
+score_weights_are_tuned_depth_dominant :: proc(t: ^testing.T) {
+	// D7: tuned weights. Depth is the dominant scoring axis — one extra floor must
+	// outweigh both a single kill and a single picked-up item by a wide margin.
+	testing.expect(t, SCORE_PER_DEPTH > SCORE_PER_KILL)
+	testing.expect(t, SCORE_PER_KILL >= SCORE_PER_ITEM)
+	testing.expect(t, SCORE_PER_DEPTH >= SCORE_PER_KILL * 10)
+
+	// One floor deeper is worth more than a whole inventory of items (12 slots).
+	one_floor := compute_run_score(2, 0, 0, false) - compute_run_score(1, 0, 0, false)
+	full_inventory := compute_run_score(1, 0, 12, false) - compute_run_score(1, 0, 0, false)
+	testing.expect_value(t, one_floor, SCORE_PER_DEPTH)
+	testing.expect(t, one_floor > full_inventory)
+
+	// Victory on the same run stats must beat the death score by more than just the
+	// flat bonus (the multiplier matters), and all weights stay positive.
+	stats_depth, stats_kills, stats_items := 8, 10, 5
+	death := compute_run_score(stats_depth, stats_kills, stats_items, false)
+	win := compute_run_score(stats_depth, stats_kills, stats_items, true)
+	testing.expect(t, death > 0)
+	testing.expect(t, win > death + VICTORY_BONUS)
+}
+
+@(test)
 insert_score_ranks_victory_run_above_deeper_death :: proc(t: ^testing.T) {
 	table: Score_Table
 

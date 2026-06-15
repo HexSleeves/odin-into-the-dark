@@ -27,6 +27,44 @@ content_manager_load_all_uses_embedded_data :: proc(t: ^testing.T) {
 }
 
 @(test)
+content_manager_loads_data_driven_recipes :: proc(t: ^testing.T) {
+	// D5: recipes are now data-driven (data/recipes.json5), loaded like items/enemies.
+	content := content_manager_make()
+	defer content_manager_destroy(&content)
+
+	testing.expect(t, content_manager_load_all(&content))
+
+	recipes := content_manager_recipes(&content)
+	testing.expect(t, len(recipes) > 0)
+
+	// Every recipe must name a material; non-repair recipes must produce a real
+	// item def, repair recipes must leave result_id blank.
+	saw_repair := false
+	saw_craft := false
+	for r in recipes {
+		testing.expect(t, len(r.material_id) > 0)
+		testing.expect(t, r.material_qty > 0)
+		if r.is_repair {
+			saw_repair = true
+			testing.expect_value(t, r.result_id, "")
+		} else {
+			saw_craft = true
+			testing.expect(t, len(r.result_id) > 0)
+			def := content_manager_item_def(&content, r.result_id)
+			testing.expect(t, def != nil)
+		}
+	}
+	// Economy should have both a repair recipe and several craft recipes.
+	testing.expect(t, saw_repair)
+	testing.expect(t, saw_craft)
+}
+
+@(test)
+content_manager_recipes_nil_safe :: proc(t: ^testing.T) {
+	testing.expect_value(t, len(content_manager_recipes(nil)), 0)
+}
+
+@(test)
 content_manager_destroy_releases_json_owned_registry_allocations :: proc(t: ^testing.T) {
 	track: mem.Tracking_Allocator
 	previous_allocator := context.allocator

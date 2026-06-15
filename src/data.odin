@@ -12,6 +12,8 @@ EMBEDDED_ENEMIES :: #load("../data/enemies.json5")
 @(private = "file")
 EMBEDDED_ITEMS :: #load("../data/items.json5")
 @(private = "file")
+EMBEDDED_RECIPES :: #load("../data/recipes.json5")
+@(private = "file")
 EMBEDDED_PLAYER :: #load("../data/player.json5")
 @(private = "file")
 EMBEDDED_DIALOGUE :: #load("../data/dialogue.json5")
@@ -34,6 +36,13 @@ data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 	}
 	next.items = items
 
+	recipes, recipes_ok := load_json5_from_bytes(gcore.Recipe_Data, EMBEDDED_RECIPES)
+	if !recipes_ok {
+		gcore.data_registry_destroy(&next)
+		return false
+	}
+	next.recipes = recipes
+
 	player, player_ok := load_json5_from_bytes(gcore.Player_Def, EMBEDDED_PLAYER)
 	if !player_ok {
 		gcore.data_registry_destroy(&next)
@@ -54,10 +63,11 @@ data_load_all_into :: proc(registry: ^gcore.Data_Registry) -> bool {
 
 	gameio.logger_debugf(
 		.Data,
-		"loaded %v enemies, %v spawn tables, %v items",
+		"loaded %v enemies, %v spawn tables, %v items, %v recipes",
 		len(registry.enemies.enemies),
 		len(registry.enemies.spawn_tables),
 		len(registry.items.items),
+		len(registry.recipes.recipes),
 	)
 
 	return true

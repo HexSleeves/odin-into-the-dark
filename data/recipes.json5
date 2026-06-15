@@ -1,0 +1,76 @@
+// Crafting recipes for Into the Depths
+// Each recipe consumes `material_qty` of `material_id` (mined ore) to either
+// repair the equipped weapon (is_repair) or craft `result_id` (an item def in
+// items.json5). Recipe order is the crafting-menu order; keep cheap/early
+// recipes first. Single material per recipe by design.
+{
+  recipes: [
+    // ── Iron: repair + sturdy gear ──
+    {
+      name: "Repair Pickaxe",
+      material_id: "iron_ore",
+      material_qty: 3,
+      result_id: "",
+      is_repair: true,
+    },
+    {
+      name: "Iron Helm",
+      material_id: "iron_ore",
+      material_qty: 4,
+      result_id: "iron_helm",
+      is_repair: false,
+    },
+    {
+      name: "Steel Plating",
+      material_id: "iron_ore",
+      material_qty: 6,
+      result_id: "steel_plating",
+      is_repair: false,
+    },
+    // ── Copper: defence + light ──
+    {
+      name: "Copper Shield",
+      material_id: "copper_ore",
+      material_qty: 2,
+      result_id: "copper_shield",
+      is_repair: false,
+    },
+    {
+      name: "Copper Lantern",
+      material_id: "copper_ore",
+      material_qty: 3,
+      result_id: "copper_lantern",
+      is_repair: false,
+    },
+    // ── Crystal: light gear ──
+    {
+      name: "Crystal Torch",
+      material_id: "crystal_shard",
+      material_qty: 2,
+      result_id: "crystal_torch",
+      is_repair: false,
+    },
+    {
+      name: "Crystal Lamp",
+      material_id: "crystal_shard",
+      material_qty: 4,
+      result_id: "crystal_lamp",
+      is_repair: false,
+    },
+    // ── Gold: precious relics ──
+    {
+      name: "Golden Amulet",
+      material_id: "gold_nugget",
+      material_qty: 1,
+      result_id: "golden_amulet",
+      is_repair: false,
+    },
+    {
+      name: "Gilded Charm",
+      material_id: "gold_nugget",
+      material_qty: 2,
+      result_id: "gilded_charm",
+      is_repair: false,
+    },
+  ],
+}

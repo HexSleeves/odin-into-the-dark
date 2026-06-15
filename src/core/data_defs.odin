@@ -92,6 +92,20 @@ Item_Data :: struct {
 	room_item_chance:  int,
 }
 
+// ── Crafting recipe data ──
+
+Recipe_Def :: struct {
+	name:         string,
+	material_id:  string,
+	material_qty: int,
+	result_id:    string,
+	is_repair:    bool,
+}
+
+Recipe_Data :: struct {
+	recipes: []Recipe_Def,
+}
+
 // ── Player data ──
 
 Player_Def :: struct {
@@ -157,6 +171,7 @@ Dialogue_Data :: struct {
 Data_Registry :: struct {
 	enemies:  Enemy_Data,
 	items:    Item_Data,
+	recipes:  Recipe_Data,
 	player:   Player_Def,
 	dialogue: Dialogue_Data,
 	loaded:   bool,
@@ -194,6 +209,12 @@ data_registry_destroy :: proc(registry: ^Data_Registry) {
 		delete(t.weights)
 	}
 	delete(registry.items.item_spawn_tables)
+	for &r in registry.recipes.recipes {
+		delete(r.name)
+		delete(r.material_id)
+		delete(r.result_id)
+	}
+	delete(registry.recipes.recipes)
 	delete(registry.player.glyph)
 	for &conv in registry.dialogue.conversations {
 		delete(conv.id)

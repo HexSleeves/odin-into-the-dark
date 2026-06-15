@@ -11,12 +11,17 @@ import "core:encoding/json"
 MAX_SCORES :: 10
 SCORES_FILE :: "scores.json"
 
-// Scoring weights for compute_run_score. Placeholder tuning — see D7 follow-ups.
-SCORE_PER_DEPTH :: 100
-SCORE_PER_KILL :: 10
-SCORE_PER_ITEM :: 5
+// Scoring weights for compute_run_score (D7-tuned). Depth is the dominant axis —
+// descending is the core objective, so one floor is worth ~16 kills or ~31 items.
+// Kills reward aggression, items reward thorough exploration but stay minor so a
+// hoarding run can't out-score a deeper, riskier dive. Victory both doubles the
+// pre-bonus score and adds a large flat bonus, so a full clear decisively tops
+// any death run of comparable depth.
+SCORE_PER_DEPTH :: 250
+SCORE_PER_KILL :: 15
+SCORE_PER_ITEM :: 8
 VICTORY_MULTIPLIER :: 2 // victory runs double their pre-bonus score
-VICTORY_BONUS :: 500 // flat bonus added after the multiplier on a victory
+VICTORY_BONUS :: 1000 // flat bonus added after the multiplier on a victory
 
 Score_Entry :: struct {
 	depth:       int,

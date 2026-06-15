@@ -4,8 +4,7 @@ import gcore "../core"
 import eng "../engine"
 import "core:fmt"
 
-Recipe :: gcore.Recipe
-RECIPES :: gcore.RECIPES
+Recipe :: gcore.Recipe_Def
 
 mineable_tile_type :: proc(tile_type: Tile_Type) -> bool {
 	#partial switch tile_type {
@@ -133,9 +132,9 @@ try_craft :: proc(
 	game: ^Game,
 	recipe_index: int,
 ) {
-	if recipe_index < 0 || recipe_index >= len(RECIPES) {return}
+	recipes := gcore.content_manager_recipes(content)
+	if recipe_index < 0 || recipe_index >= len(recipes) {return}
 
-	recipes := RECIPES
 	recipe := recipes[recipe_index]
 	have := count_material(game, recipe.material_id)
 

@@ -215,7 +215,7 @@ clay_render_crafting_overlay :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 			clay_menu_title(ui_pkg.UI_CRAFTING_TITLE)
 			clay_menu_subtitle(ui_pkg.UI_CRAFTING_HELP)
 			clay_menu_accent_rule("crafting-rule")
-			recipes := gcore.RECIPES
+			recipes := gcore.content_manager_recipes(content)
 			for idx in 0 ..< len(recipes) {
 				recipe := recipes[idx]
 				have := gcore.count_material(game, recipe.material_id)
