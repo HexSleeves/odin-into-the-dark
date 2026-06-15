@@ -1,16 +1,16 @@
 # Graph Report - odin-into-the-dark  (2026-06-14)
 
 ## Corpus Check
-- 90 files · ~150,794 words
+- 94 files · ~156,636 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1813 nodes · 1482 edges · 428 communities (156 shown, 272 thin omitted)
-- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
+- 1868 nodes · 1533 edges · 432 communities (160 shown, 272 thin omitted)
+- Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `f129404b`
+- Built from commit: `1cb32c8d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -440,18 +440,22 @@
 - [[_COMMUNITY_Community 425|Community 425]]
 - [[_COMMUNITY_Community 426|Community 426]]
 - [[_COMMUNITY_Community 427|Community 427]]
+- [[_COMMUNITY_Community 428|Community 428]]
+- [[_COMMUNITY_Community 429|Community 429]]
+- [[_COMMUNITY_Community 430|Community 430]]
+- [[_COMMUNITY_Community 431|Community 431]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Per-item detail` - 25 edges
-2. `generate_map` - 17 edges
-3. `Into the Depths — Engine & Game Audit` - 14 edges
-4. `Into the Depths — UI/HUD Redesign` - 14 edges
-5. `Coding Style` - 14 edges
-6. `Plan 002: Shrink the save/data model — drop dead `Tile` fields, carry tile-state directly` - 14 edges
-7. `Game` - 14 edges
-8. `Repository Guidelines` - 13 edges
-9. `Plan 004: Web (WASM) save backend — stop saves silently no-opping on the web build` - 13 edges
-10. `clay_render_screen_ui` - 13 edges
+2. `4. Per-item detail (confirmed removes)` - 19 edges
+3. `generate_map` - 17 edges
+4. `Into the Depths — Engine & Game Audit` - 14 edges
+5. `Into the Depths — UI/HUD Redesign` - 14 edges
+6. `Coding Style` - 14 edges
+7. `Plan 002: Shrink the save/data model — drop dead `Tile` fields, carry tile-state directly` - 14 edges
+8. `Game` - 14 edges
+9. `Repository Guidelines` - 13 edges
+10. `Plan 004: Web (WASM) save backend — stop saves silently no-opping on the web build` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `skip_title_flag_controls_initial_state` --semantically_similar_to--> `game_engine_frame_manager`  [INFERRED] [semantically similar]
@@ -508,7 +512,7 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (428 total, 272 thin omitted)
+## Communities (432 total, 272 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
 Cohesion: 0.22
@@ -1122,6 +1126,22 @@ Nodes (17): Commands you will need, Current state, Done criteria, Git workflow, 
 Cohesion: 0.29
 Nodes (6): Dependency notes, Execution order & status, Findings considered and NOT turned into plans, Implementation Plans, Provenance, Recommended order
 
+### Community 428 - "Community 428"
+Cohesion: 0.06
+Nodes (34): 1. CALLOUTS (read first), 1a. Conflict resolution — `*_import_anchor` procs (two audits disagree), 1b. needs_decision items (not scheduled for removal), 1c. Demotions applied (remove → needs_decision), 1d. Risk note on save-format, 2. Summary table, 3. Removal batch plan, 4. Per-item detail (confirmed removes) (+26 more)
+
+### Community 429 - "Community 429"
+Cohesion: 0.25
+Nodes (7): decide, DISCOVER_SCHEMA, keep, meta, REMOVE_SCHEMA, results, toRemove
+
+### Community 430 - "Community 430"
+Cohesion: 0.29
+Nodes (6): allFindings, audits, counts, DOMAINS, FINDINGS_SCHEMA, meta
+
+### Community 431 - "Community 431"
+Cohesion: 0.40
+Nodes (4): BATCHES, meta, RESULT_SCHEMA, results
+
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
   src/scene.odin · relation: references
@@ -1129,7 +1149,7 @@ Nodes (6): Dependency notes, Execution order & status, Findings considered and N
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1285 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1280 more)
+- **1332 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1327 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1141,12 +1161,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
-  _High betweenness centrality (0.002) - this node is a cross-community bridge._
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `clay_render_screen_ui` connect `Clay UI Overlays & HUD` to `Community 345`, `Clay Renderer & Particles`, `Community 371`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **Why does `cheat_set_depth` connect `Field of View & Lifecycle Cleanup` to `Game Init & World Generation`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA` to the rest of the system?**
-  _1285 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1332 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Game Init & World Generation` be split into smaller, more focused modules?**
   _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
-- **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
-  _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._

@@ -224,11 +224,6 @@
     "ast_hash": "d2307c273923f430c137995f8980cf6c",
     "semantic_hash": "d2307c273923f430c137995f8980cf6c"
   },
-  "src/engine/event_manager.odin": {
-    "mtime": 1780891197.777931,
-    "ast_hash": "29366f36f24bc929ce51eb609e8202bb",
-    "semantic_hash": "29366f36f24bc929ce51eb609e8202bb"
-  },
   "src/engine/file_system.odin": {
     "mtime": 1780891197.769492,
     "ast_hash": "741f6454be4d92b3014ffe24fcf27eb2",
@@ -564,11 +559,6 @@
     "ast_hash": "85347a90f02da017087ae2c606f24669",
     "semantic_hash": "85347a90f02da017087ae2c606f24669"
   },
-  "src/io/save_query.odin": {
-    "mtime": 1780891197.7345824,
-    "ast_hash": "d8fd1bdfe7f2fd5a2e125496b0a6824b",
-    "semantic_hash": "d8fd1bdfe7f2fd5a2e125496b0a6824b"
-  },
   "src/io/save_restore.odin": {
     "mtime": 1780966505.3408136,
     "ast_hash": "4eec770dc9f4c7dd71f642972c6e2c37",
@@ -679,11 +669,6 @@
     "ast_hash": "d45034b334d24c0f354b0a0ba2a37c27",
     "semantic_hash": "d45034b334d24c0f354b0a0ba2a37c27"
   },
-  "src/render/render_hud.odin": {
-    "mtime": 1780891197.7509694,
-    "ast_hash": "7178928219a170dec746aff30e3dad01",
-    "semantic_hash": "7178928219a170dec746aff30e3dad01"
-  },
   "src/render/render_items.odin": {
     "mtime": 1780891197.7394063,
     "ast_hash": "9e3ce4d410ba28747609a61d7d540a47",
@@ -693,21 +678,6 @@
     "mtime": 1780891197.7473474,
     "ast_hash": "f69a89874ca1d733aaba521c7fc47213",
     "semantic_hash": "f69a89874ca1d733aaba521c7fc47213"
-  },
-  "src/render/render_minimap.odin": {
-    "mtime": 1780891197.750325,
-    "ast_hash": "7178928219a170dec746aff30e3dad01",
-    "semantic_hash": "7178928219a170dec746aff30e3dad01"
-  },
-  "src/render/render_title_fx.odin": {
-    "mtime": 1780891197.7480159,
-    "ast_hash": "adee53c3716114b9d21ee6e730f03cf1",
-    "semantic_hash": "adee53c3716114b9d21ee6e730f03cf1"
-  },
-  "src/render/render_ui.odin": {
-    "mtime": 1780891197.7428656,
-    "ast_hash": "7178928219a170dec746aff30e3dad01",
-    "semantic_hash": "7178928219a170dec746aff30e3dad01"
   },
   "src/render/render_world.odin": {
     "mtime": 1780891197.7476401,
@@ -873,11 +843,6 @@
     "mtime": 1780891197.808926,
     "ast_hash": "144d4c7cb2ad6874ace5751c84595b3b",
     "semantic_hash": "144d4c7cb2ad6874ace5751c84595b3b"
-  },
-  "test/engine/event_manager_test.odin": {
-    "mtime": 1780891197.8105133,
-    "ast_hash": "984c74da5f7ce31329e440f7d0c21b3b",
-    "semantic_hash": "984c74da5f7ce31329e440f7d0c21b3b"
   },
   "test/engine/frame_manager_test.odin": {
     "mtime": 1780891197.8072371,
@@ -1727,6 +1692,26 @@
   "plans/README.md": {
     "mtime": 1781407456.8126059,
     "ast_hash": "cf74f1a618200f6b605c299ba51f3cb4",
+    "semantic_hash": ""
+  },
+  "scripts/legacy_audit_workflow.js": {
+    "mtime": 1781482933.4016497,
+    "ast_hash": "e98846c430945b7d98091a63bfef5543",
+    "semantic_hash": ""
+  },
+  "scripts/remove_legacy_full.js": {
+    "mtime": 1781488230.9868243,
+    "ast_hash": "7e44cd3703c214c9db9aff0637205caa",
+    "semantic_hash": ""
+  },
+  "scripts/remove_legacy_workflow.js": {
+    "mtime": 1781460796.8845277,
+    "ast_hash": "716349be332b263e5f27f621be6091f0",
+    "semantic_hash": ""
+  },
+  "docs/legacy-removal-plan-2026-06-14.md": {
+    "mtime": 1781483470.0591686,
+    "ast_hash": "2bba684b9903909049d70341a719c647",
     "semantic_hash": ""
   }
 }

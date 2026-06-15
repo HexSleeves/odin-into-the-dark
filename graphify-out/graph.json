@@ -967,6 +967,206 @@
       "norm_label": "bundle_macos.sh script"
     },
     {
+      "label": "legacy_audit_workflow.js",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow",
+      "community": 430,
+      "norm_label": "legacy_audit_workflow.js"
+    },
+    {
+      "label": "meta",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_meta",
+      "community": 430,
+      "norm_label": "meta"
+    },
+    {
+      "label": "FINDINGS_SCHEMA",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_findings_schema",
+      "community": 430,
+      "norm_label": "findings_schema"
+    },
+    {
+      "label": "DOMAINS",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_domains",
+      "community": 430,
+      "norm_label": "domains"
+    },
+    {
+      "label": "audits",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L54",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_audits",
+      "community": 430,
+      "norm_label": "audits"
+    },
+    {
+      "label": "allFindings",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_allfindings",
+      "community": 430,
+      "norm_label": "allfindings"
+    },
+    {
+      "label": "counts",
+      "file_type": "code",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L59",
+      "_origin": "ast",
+      "id": "scripts_legacy_audit_workflow_counts",
+      "community": 430,
+      "norm_label": "counts"
+    },
+    {
+      "label": "remove_legacy_full.js",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_full",
+      "community": 431,
+      "norm_label": "remove_legacy_full.js"
+    },
+    {
+      "label": "meta",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_full_meta",
+      "community": 431,
+      "norm_label": "meta"
+    },
+    {
+      "label": "RESULT_SCHEMA",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L15",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_full_result_schema",
+      "community": 431,
+      "norm_label": "result_schema"
+    },
+    {
+      "label": "BATCHES",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L43",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_full_batches",
+      "community": 431,
+      "norm_label": "batches"
+    },
+    {
+      "label": "results",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L65",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_full_results",
+      "community": 431,
+      "norm_label": "results"
+    },
+    {
+      "label": "remove_legacy_workflow.js",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow",
+      "community": 429,
+      "norm_label": "remove_legacy_workflow.js"
+    },
+    {
+      "label": "meta",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_meta",
+      "community": 429,
+      "norm_label": "meta"
+    },
+    {
+      "label": "DISCOVER_SCHEMA",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_discover_schema",
+      "community": 429,
+      "norm_label": "discover_schema"
+    },
+    {
+      "label": "REMOVE_SCHEMA",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L35",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_remove_schema",
+      "community": 429,
+      "norm_label": "remove_schema"
+    },
+    {
+      "label": "toRemove",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L75",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_toremove",
+      "community": 429,
+      "norm_label": "toremove"
+    },
+    {
+      "label": "decide",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L76",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_decide",
+      "community": 429,
+      "norm_label": "decide"
+    },
+    {
+      "label": "keep",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L77",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_keep",
+      "community": 429,
+      "norm_label": "keep"
+    },
+    {
+      "label": "results",
+      "file_type": "code",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "scripts_remove_legacy_workflow_results",
+      "community": 429,
+      "norm_label": "results"
+    },
+    {
       "label": "run_odin_tests.py",
       "file_type": "code",
       "source_file": "scripts/run_odin_tests.py",
@@ -7455,6 +7655,356 @@
       "id": "docs_impl_plan_2026_06_13_t2_save_migration_regression_tests_fix_one_wrong_v4_assertion",
       "community": 352,
       "norm_label": "t2 \u2014 save-migration regression tests: fix one wrong v4 assertion"
+    },
+    {
+      "label": "legacy-removal-plan-2026-06-14.md",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14",
+      "community": 428,
+      "norm_label": "legacy-removal-plan-2026-06-14.md"
+    },
+    {
+      "label": "Legacy Removal Plan \u2014 2026-06-14",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "community": 428,
+      "norm_label": "legacy removal plan \u2014 2026-06-14"
+    },
+    {
+      "label": "1. CALLOUTS (read first)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "community": 428,
+      "norm_label": "1. callouts (read first)"
+    },
+    {
+      "label": "1a. Conflict resolution \u2014 `*_import_anchor` procs (two audits disagree)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_1a_conflict_resolution_import_anchor_procs_two_audits_disagree",
+      "community": 428,
+      "norm_label": "1a. conflict resolution \u2014 `*_import_anchor` procs (two audits disagree)"
+    },
+    {
+      "label": "1b. needs_decision items (not scheduled for removal)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L27",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_1b_needs_decision_items_not_scheduled_for_removal",
+      "community": 428,
+      "norm_label": "1b. needs_decision items (not scheduled for removal)"
+    },
+    {
+      "label": "1c. Demotions applied (remove \u2192 needs_decision)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L47",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_1c_demotions_applied_remove_needs_decision",
+      "community": 428,
+      "norm_label": "1c. demotions applied (remove \u2192 needs_decision)"
+    },
+    {
+      "label": "1d. Risk note on save-format",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L52",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_1d_risk_note_on_save_format",
+      "community": 428,
+      "norm_label": "1d. risk note on save-format"
+    },
+    {
+      "label": "2. Summary table",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L58",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_2_summary_table",
+      "community": 428,
+      "norm_label": "2. summary table"
+    },
+    {
+      "label": "3. Removal batch plan",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L101",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "community": 428,
+      "norm_label": "3. removal batch plan"
+    },
+    {
+      "label": "Batch 1 \u2014 `refactor(core): remove dead constants, enum, and accessor`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L107",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_1_refactor_core_remove_dead_constants_enum_and_accessor",
+      "community": 428,
+      "norm_label": "batch 1 \u2014 `refactor(core): remove dead constants, enum, and accessor`"
+    },
+    {
+      "label": "Batch 2 \u2014 `refactor(io): delete orphaned save_exists query module`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L112",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_2_refactor_io_delete_orphaned_save_exists_query_module",
+      "community": 428,
+      "norm_label": "batch 2 \u2014 `refactor(io): delete orphaned save_exists query module`"
+    },
+    {
+      "label": "Batch 3 \u2014 `refactor(render): drop superseded title-fx, color wrappers, and empty stubs`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L117",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_3_refactor_render_drop_superseded_title_fx_color_wrappers_and_empty_stubs",
+      "community": 428,
+      "norm_label": "batch 3 \u2014 `refactor(render): drop superseded title-fx, color wrappers, and empty stubs`"
+    },
+    {
+      "label": "Batch 4 \u2014 `refactor(gameplay,gen,input): remove orphaned helpers`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L122",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_4_refactor_gameplay_gen_input_remove_orphaned_helpers",
+      "community": 428,
+      "norm_label": "batch 4 \u2014 `refactor(gameplay,gen,input): remove orphaned helpers`"
+    },
+    {
+      "label": "Batch 5 \u2014 `refactor(engine): remove bypassed Tile_State single-field accessors`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L127",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_5_refactor_engine_remove_bypassed_tile_state_single_field_accessors",
+      "community": 428,
+      "norm_label": "batch 5 \u2014 `refactor(engine): remove bypassed tile_state single-field accessors`"
+    },
+    {
+      "label": "Batch 6 \u2014 `refactor: prune dead per-package re-export aliases`",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L132",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_batch_6_refactor_prune_dead_per_package_re_export_aliases",
+      "community": 428,
+      "norm_label": "batch 6 \u2014 `refactor: prune dead per-package re-export aliases`"
+    },
+    {
+      "label": "4. Per-item detail (confirmed removes)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L141",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "community": 428,
+      "norm_label": "4. per-item detail (confirmed removes)"
+    },
+    {
+      "label": "L-save-1 \u2014 dead save_exists trio",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L143",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_save_1_dead_save_exists_trio",
+      "community": 428,
+      "norm_label": "l-save-1 \u2014 dead save_exists trio"
+    },
+    {
+      "label": "L-core-1 \u2014 ITEM_ID_WEB_TILE",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L147",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_core_1_item_id_web_tile",
+      "community": 428,
+      "norm_label": "l-core-1 \u2014 item_id_web_tile"
+    },
+    {
+      "label": "L-core-2 \u2014 CARDINAL_DIRS",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L151",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_core_2_cardinal_dirs",
+      "community": 428,
+      "norm_label": "l-core-2 \u2014 cardinal_dirs"
+    },
+    {
+      "label": "L-core-3 \u2014 tile_light_level_idx",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L155",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_core_3_tile_light_level_idx",
+      "community": 428,
+      "norm_label": "l-core-3 \u2014 tile_light_level_idx"
+    },
+    {
+      "label": "L-core-4 \u2014 Equipment_Slot enum",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L159",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_core_4_equipment_slot_enum",
+      "community": 428,
+      "norm_label": "l-core-4 \u2014 equipment_slot enum"
+    },
+    {
+      "label": "L-gameplay-1 \u2014 shrine_buff_label",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L163",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_gameplay_1_shrine_buff_label",
+      "community": 428,
+      "norm_label": "l-gameplay-1 \u2014 shrine_buff_label"
+    },
+    {
+      "label": "L-input-1 \u2014 action_binding_ptr",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L167",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_input_1_action_binding_ptr",
+      "community": 428,
+      "norm_label": "l-input-1 \u2014 action_binding_ptr"
+    },
+    {
+      "label": "L-gen-1 \u2014 mapgen_floor_count",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L171",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_gen_1_mapgen_floor_count",
+      "community": 428,
+      "norm_label": "l-gen-1 \u2014 mapgen_floor_count"
+    },
+    {
+      "label": "ER-titlefx-1 \u2014 render_title_fx.odin",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L175",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_er_titlefx_1_render_title_fx_odin",
+      "community": 428,
+      "norm_label": "er-titlefx-1 \u2014 render_title_fx.odin"
+    },
+    {
+      "label": "ER-rendercolor-1 \u2014 render_color wrappers",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L179",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_er_rendercolor_1_render_color_wrappers",
+      "community": 428,
+      "norm_label": "er-rendercolor-1 \u2014 render_color wrappers"
+    },
+    {
+      "label": "ER-stubs-1 \u2014 empty render stubs",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L183",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_er_stubs_1_empty_render_stubs",
+      "community": 428,
+      "norm_label": "er-stubs-1 \u2014 empty render stubs"
+    },
+    {
+      "label": "ER-tilestate-accessors-1 \u2014 Tile_State single-field accessors",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L187",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_er_tilestate_accessors_1_tile_state_single_field_accessors",
+      "community": 428,
+      "norm_label": "er-tilestate-accessors-1 \u2014 tile_state single-field accessors"
+    },
+    {
+      "label": "L-alias-ai-1 \u2014 dead ai aliases",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L191",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_ai_1_dead_ai_aliases",
+      "community": 428,
+      "norm_label": "l-alias-ai-1 \u2014 dead ai aliases"
+    },
+    {
+      "label": "L-alias-gameplay-1 \u2014 dead gameplay aliases (28)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L195",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_gameplay_1_dead_gameplay_aliases_28",
+      "community": 428,
+      "norm_label": "l-alias-gameplay-1 \u2014 dead gameplay aliases (28)"
+    },
+    {
+      "label": "L-alias-gen-1 \u2014 dead gen aliases (5)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L199",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_gen_1_dead_gen_aliases_5",
+      "community": 428,
+      "norm_label": "l-alias-gen-1 \u2014 dead gen aliases (5)"
+    },
+    {
+      "label": "L-alias-input-1 \u2014 dead gameinput aliases (18)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L203",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_input_1_dead_gameinput_aliases_18",
+      "community": 428,
+      "norm_label": "l-alias-input-1 \u2014 dead gameinput aliases (18)"
+    },
+    {
+      "label": "L-alias-input-2 \u2014 dead NO_AUDIO redeclaration in input",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L207",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_input_2_dead_no_audio_redeclaration_in_input",
+      "community": 428,
+      "norm_label": "l-alias-input-2 \u2014 dead no_audio redeclaration in input"
+    },
+    {
+      "label": "L-alias-io-1 \u2014 dead gameio aliases (5)",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L211",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_l_alias_io_1_dead_gameio_aliases_5",
+      "community": 428,
+      "norm_label": "l-alias-io-1 \u2014 dead gameio aliases (5)"
+    },
+    {
+      "label": "5. KEEP_DEFENSIVE \u2014 do NOT touch",
+      "file_type": "document",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L217",
+      "_origin": "ast",
+      "id": "docs_legacy_removal_plan_2026_06_14_5_keep_defensive_do_not_touch",
+      "community": 428,
+      "norm_label": "5. keep_defensive \u2014 do not touch"
     },
     {
       "label": "2026-06-06-ui-redesign.md",
@@ -21803,6 +22353,176 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_allfindings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_audits",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_counts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_domains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_findings_schema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/legacy_audit_workflow.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "scripts_legacy_audit_workflow",
+      "target": "scripts_legacy_audit_workflow_meta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_full",
+      "target": "scripts_remove_legacy_full_batches",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_full",
+      "target": "scripts_remove_legacy_full_meta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_full",
+      "target": "scripts_remove_legacy_full_result_schema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_full.js",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_full",
+      "target": "scripts_remove_legacy_full_results",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L76",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_decide",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_discover_schema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L77",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_keep",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_meta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_remove_schema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_results",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/remove_legacy_workflow.js",
+      "source_location": "L75",
+      "weight": 1.0,
+      "source": "scripts_remove_legacy_workflow",
+      "target": "scripts_remove_legacy_workflow_toremove",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "scripts/run_odin_tests.py",
       "source_location": "L24",
       "weight": 1.0,
@@ -27683,6 +28403,346 @@
       "confidence_score": 1.0,
       "source": "docs_impl_plan_2026_06_13_per_item_detail",
       "target": "docs_impl_plan_2026_06_13_t2_save_migration_regression_tests_fix_one_wrong_v4_assertion"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_2_summary_table",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L217",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_legacy_removal_plan_2026_06_14",
+      "target": "docs_legacy_removal_plan_2026_06_14_5_keep_defensive_do_not_touch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "target": "docs_legacy_removal_plan_2026_06_14_1a_conflict_resolution_import_anchor_procs_two_audits_disagree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "target": "docs_legacy_removal_plan_2026_06_14_1b_needs_decision_items_not_scheduled_for_removal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L47",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "target": "docs_legacy_removal_plan_2026_06_14_1c_demotions_applied_remove_needs_decision",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L52",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_1_callouts_read_first",
+      "target": "docs_legacy_removal_plan_2026_06_14_1d_risk_note_on_save_format",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L107",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_1_refactor_core_remove_dead_constants_enum_and_accessor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L112",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_2_refactor_io_delete_orphaned_save_exists_query_module",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_3_refactor_render_drop_superseded_title_fx_color_wrappers_and_empty_stubs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_4_refactor_gameplay_gen_input_remove_orphaned_helpers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_5_refactor_engine_remove_bypassed_tile_state_single_field_accessors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L132",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_3_removal_batch_plan",
+      "target": "docs_legacy_removal_plan_2026_06_14_batch_6_refactor_prune_dead_per_package_re_export_aliases",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_er_rendercolor_1_render_color_wrappers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L183",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_er_stubs_1_empty_render_stubs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L187",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_er_tilestate_accessors_1_tile_state_single_field_accessors",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_er_titlefx_1_render_title_fx_odin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L191",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_ai_1_dead_ai_aliases",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L195",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_gameplay_1_dead_gameplay_aliases_28",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L199",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_gen_1_dead_gen_aliases_5",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_input_1_dead_gameinput_aliases_18",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L207",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_input_2_dead_no_audio_redeclaration_in_input",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L211",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_alias_io_1_dead_gameio_aliases_5",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L147",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_core_1_item_id_web_tile",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L151",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_core_2_cardinal_dirs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_core_3_tile_light_level_idx",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_core_4_equipment_slot_enum",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L163",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_gameplay_1_shrine_buff_label",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L171",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_gen_1_mapgen_floor_count",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L167",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_input_1_action_binding_ptr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/legacy-removal-plan-2026-06-14.md",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "docs_legacy_removal_plan_2026_06_14_4_per_item_detail_confirmed_removes",
+      "target": "docs_legacy_removal_plan_2026_06_14_l_save_1_dead_save_exists_trio",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -36761,5 +37821,5 @@
       "source_file": "test/render/sprite_manager_test.odin"
     }
   ],
-  "built_at_commit": "f129404bd1e06670a659aa10fade7e432f04a5fa"
+  "built_at_commit": "1cb32c8d70fbad6945f5e9c25729fb1b14c52e0c"
 }

@@ -1,16 +1,16 @@
-# Graph Report - odin-into-the-dark  (2026-06-13)
+# Graph Report - odin-into-the-dark  (2026-06-14)
 
 ## Corpus Check
-- 90 files · ~150,867 words
+- 90 files · ~150,794 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1815 nodes · 1484 edges · 428 communities (156 shown, 272 thin omitted)
+- 1813 nodes · 1482 edges · 428 communities (156 shown, 272 thin omitted)
 - Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b07ed379`
+- Built from commit: `f129404b`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -779,8 +779,8 @@ Cohesion: 0.08
 Nodes (23): For /graphify add and --watch, For /graphify query, For the commit hook and native CLAUDE.md integration, For --update and --cluster-only, /graphify, Honesty Rules, Interpreter guard for subcommands, Part A - Structural extraction for code files (+15 more)
 
 ### Community 327 - "Community 327"
-Cohesion: 0.09
-Nodes (21): Architecture, Backlog / Under Consideration, Backlog / Under Consideration, Build & Run, Contributing, Controls, Data-Driven Design, Development (+13 more)
+Cohesion: 0.10
+Nodes (20): Architecture, Backlog / Under Consideration, Build & Run, Contributing, Controls, Data-Driven Design, Development, Diagnostics Logging (+12 more)
 
 ### Community 328 - "Community 328"
 Cohesion: 0.12
@@ -791,8 +791,8 @@ Cohesion: 0.13
 Nodes (12): allFindings, auditTasks, confirmed, FINDINGS_SCHEMA, GROUPS, lowFindings, meta, needsContext (+4 more)
 
 ### Community 330 - "Community 330"
-Cohesion: 0.13
-Nodes (13): Architecture, Build / Vendor Collection, Commands, File Locations (post-reorg), Formatting, Formatting, graphify, Headroom Learned Patterns (+5 more)
+Cohesion: 0.14
+Nodes (12): Architecture, Build / Vendor Collection, Commands, File Locations (post-reorg), Formatting, graphify, Headroom Learned Patterns, Key invariants (+4 more)
 
 ### Community 331 - "Community 331"
 Cohesion: 0.15
@@ -1129,7 +1129,7 @@ Nodes (6): Dependency notes, Execution order & status, Findings considered and N
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1287 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1282 more)
+- **1285 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1280 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1145,7 +1145,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Why does `cheat_set_depth` connect `Field of View & Lifecycle Cleanup` to `Game Init & World Generation`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA` to the rest of the system?**
-  _1287 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1285 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Game Init & World Generation` be split into smaller, more focused modules?**
   _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._
 - **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**

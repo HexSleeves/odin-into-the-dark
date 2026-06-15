@@ -5497,20 +5497,10 @@
       "norm_label": "formatting"
     },
     {
-      "label": "Formatting",
-      "file_type": "document",
-      "source_file": "CLAUDE.md",
-      "source_location": "L99",
-      "_origin": "ast",
-      "id": "claude_formatting_99",
-      "community": 330,
-      "norm_label": "formatting"
-    },
-    {
       "label": "graphify",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "source_location": "L106",
+      "source_location": "L101",
       "_origin": "ast",
       "id": "claude_graphify",
       "community": 330,
@@ -5520,7 +5510,7 @@
       "label": "Skill routing",
       "file_type": "document",
       "source_file": "CLAUDE.md",
-      "source_location": "L117",
+      "source_location": "L112",
       "_origin": "ast",
       "id": "claude_skill_routing",
       "community": 330,
@@ -5827,20 +5817,10 @@
       "norm_label": "backlog / under consideration"
     },
     {
-      "label": "Backlog / Under Consideration",
-      "file_type": "document",
-      "source_file": "README.md",
-      "source_location": "L197",
-      "_origin": "ast",
-      "id": "readme_backlog_under_consideration_197",
-      "community": 327,
-      "norm_label": "backlog / under consideration"
-    },
-    {
       "label": "Development",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L206",
+      "source_location": "L199",
       "_origin": "ast",
       "id": "readme_development",
       "community": 327,
@@ -5850,7 +5830,7 @@
       "label": "Contributing",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L223",
+      "source_location": "L216",
       "_origin": "ast",
       "id": "readme_contributing",
       "community": 327,
@@ -5860,7 +5840,7 @@
       "label": "License",
       "file_type": "document",
       "source_file": "README.md",
-      "source_location": "L234",
+      "source_location": "L227",
       "_origin": "ast",
       "id": "readme_license",
       "community": 327,
@@ -25878,16 +25858,6 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "CLAUDE.md",
-      "source_location": "L99",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "claude_headroom_learned_patterns",
-      "target": "claude_formatting_99"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "CLAUDE.md",
       "source_location": "L89",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -26153,16 +26123,6 @@
       "confidence_score": 1.0,
       "source": "readme_roadmap",
       "target": "readme_backlog_under_consideration"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "README.md",
-      "source_location": "L197",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "readme_roadmap",
-      "target": "readme_backlog_under_consideration_197"
     },
     {
       "relation": "contains",
@@ -36801,5 +36761,5 @@
       "source_file": "test/render/sprite_manager_test.odin"
     }
   ],
-  "built_at_commit": "b07ed37949cf033af021771135269bc81280863f"
+  "built_at_commit": "f129404bd1e06670a659aa10fade7e432f04a5fa"
 }
