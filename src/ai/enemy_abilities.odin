@@ -132,6 +132,7 @@ process_enemy_abilities :: proc(messages: ^Message_Manager, game: ^Game) {
 						ty := game.player.pos.y + dy[dir]
 						if is_walkable(game, tx, ty) && enemy_at(game, tx, ty) == nil {
 							enemy.pos = Vec2{tx, ty}
+							enemy_occupancy_mark_dirty(game)
 							enemy.ability_cooldown = enemy.ability_max_cd
 							enemy.energy -= ability_cost
 							add_message(

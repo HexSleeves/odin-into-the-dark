@@ -152,6 +152,7 @@ restore_saved_floor :: proc(game: ^Game, depth: int) -> bool {
 	}
 	restore_dynamic_array(Room, &game.rooms, floor.rooms)
 	restore_dynamic_array(Enemy, &game.enemies, floor.enemies)
+	enemy_occupancy_mark_dirty(game)
 	restore_dynamic_array(Item, &game.items, floor.items)
 	restore_dynamic_array(Light_Source, &game.light_sources, floor.light_sources)
 	saved_floor_destroy(floor)

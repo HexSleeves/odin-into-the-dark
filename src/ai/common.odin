@@ -71,6 +71,8 @@ enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
 	return gcore.enemy_at(game, x, y)
 }
 
+enemy_occupancy_mark_dirty :: gcore.enemy_occupancy_mark_dirty
+
 can_place_enemy :: proc(game: ^Game, x, y: int) -> bool {
 	if !is_walkable(game, x, y) {return false}
 	if x == game.player.pos.x && y == game.player.pos.y {return false}

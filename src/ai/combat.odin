@@ -111,6 +111,7 @@ resolve_attack_player_on_enemy :: proc(
 
 	if enemy.hp <= 0 {
 		enemy.alive = false
+		enemy_occupancy_mark_dirty(game)
 		logger_debugf(
 			.Enemy,
 			"killed '%s' at (%v,%v) hp_was=%v kills=%v",

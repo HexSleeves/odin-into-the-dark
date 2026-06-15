@@ -101,6 +101,7 @@ tile_explored_idx :: gcore.tile_explored_idx
 tile_states_clear_visibility :: gcore.tile_states_clear_visibility
 is_walkable :: gcore.is_walkable
 enemy_at :: gcore.enemy_at
+enemy_occupancy_mark_dirty :: gcore.enemy_occupancy_mark_dirty
 item_at :: gcore.item_at
 item_display_name :: gcore.item_display_name
 enemy_display_name :: gcore.enemy_display_name

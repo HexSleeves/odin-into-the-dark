@@ -49,6 +49,7 @@ spawn_boss :: proc(content: ^Content_Manager, game: ^Game) {
 							boss := enemy_make_from_def(def, Vec2{bx, by})
 							boss.is_boss = true
 							append(&game.enemies, boss)
+							enemy_occupancy_mark_dirty(game)
 							logger_debugf(.Gen, "boss '%s' spawned at (%v,%v)", boss_id, bx, by)
 						}
 						return
@@ -99,6 +100,7 @@ spawn_monster_den :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def == nil {break}
 			append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+			enemy_occupancy_mark_dirty(game)
 			logger_debugf(.Enemy, "spawned '%s' at (%v,%v) den", def.id, x, y)
 			break
 		}

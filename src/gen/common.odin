@@ -25,6 +25,7 @@ CARDINAL_DY :: gcore.CARDINAL_DY
 pos_to_idx :: gcore.pos_to_idx
 is_walkable :: gcore.is_walkable
 enemy_at :: gcore.enemy_at
+enemy_occupancy_mark_dirty :: gcore.enemy_occupancy_mark_dirty
 item_at :: gcore.item_at
 enemy_make_from_def :: gcore.enemy_make_from_def
 item_make_from_def :: gcore.item_make_from_def

@@ -51,6 +51,7 @@ game_init :: proc(content: ^Content_Manager) -> ^Game {
 
 	game.rooms = make([dynamic]gcore.Room)
 	game.enemies = make([dynamic]Enemy)
+	enemy_occupancy_mark_dirty(game)
 	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]gcore.Light_Source)
 
@@ -94,6 +95,7 @@ game_reinit :: proc(content: ^Content_Manager, messages: ^Message_Manager, game:
 
 	game.rooms = make([dynamic]gcore.Room)
 	game.enemies = make([dynamic]Enemy)
+	enemy_occupancy_mark_dirty(game)
 	game.items = make([dynamic]Item)
 	game.light_sources = make([dynamic]gcore.Light_Source)
 

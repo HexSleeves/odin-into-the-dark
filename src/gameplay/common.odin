@@ -77,6 +77,7 @@ web_tile_at_idx :: gcore.web_tile_at_idx
 web_tile_set_idx :: gcore.web_tile_set_idx
 web_tiles_clear :: gcore.web_tiles_clear
 enemy_at :: gcore.enemy_at
+enemy_occupancy_mark_dirty :: gcore.enemy_occupancy_mark_dirty
 item_at :: gcore.item_at
 item_display_name :: gcore.item_display_name
 enemy_display_name :: gcore.enemy_display_name

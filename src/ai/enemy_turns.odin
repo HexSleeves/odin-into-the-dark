@@ -152,6 +152,7 @@ chase_act_once :: proc(
 
 	if best_pos != enemy.pos {
 		enemy.pos = best_pos
+		enemy_occupancy_mark_dirty(game)
 		enemy.energy -= move_cost
 		return true
 	}
@@ -196,6 +197,7 @@ wander_act_once :: proc(game: ^Game, enemy: ^Enemy, move_cost: int) -> bool {
 	}
 
 	enemy.pos = Vec2{nx, ny}
+	enemy_occupancy_mark_dirty(game)
 	enemy.energy -= move_cost
 	return true
 }

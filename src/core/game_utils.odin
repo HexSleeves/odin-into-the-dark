@@ -152,13 +152,57 @@ game_init_world :: proc(game: ^Game) {
 	game.map_height = eng.world_manager_height(game.world)
 }
 
-enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
-	for &enemy in game.enemies {
-		if enemy.alive && enemy.pos.x == x && enemy.pos.y == y {
-			return &enemy
+// enemy_occupancy_mark_dirty invalidates the occupancy grid so the next enemy_at
+// call rebuilds it. Call after any spawn/move/death/cleanup that can change which
+// alive enemy sits on a tile. Cheap (a single bool write); the actual rebuild is
+// deferred and amortized across the per-cell enemy_at scans in gen/ai/gameplay.
+enemy_occupancy_mark_dirty :: proc(game: ^Game) {
+	if game == nil {return}
+	game.enemy_occupancy_built = false
+}
+
+// enemy_occupancy_rebuild recomputes the occupancy grid from game.enemies.
+// Stores slot+1 for each alive, on-grid enemy; 0 means empty. To match the
+// first-match semantics of the old linear scan (lowest slot wins on ties), a
+// cell is only written if still empty.
+enemy_occupancy_rebuild :: proc(game: ^Game) {
+	if game == nil {return}
+	for i in 0 ..< len(game.enemy_occupancy) {
+		game.enemy_occupancy[i] = 0
+	}
+	for &enemy, slot in game.enemies {
+		if !enemy.alive {continue}
+		ex, ey := enemy.pos.x, enemy.pos.y
+		if ex < 0 || ex >= MAP_WIDTH || ey < 0 || ey >= MAP_HEIGHT {continue}
+		idx := pos_to_idx(ex, ey)
+		if game.enemy_occupancy[idx] == 0 {
+			game.enemy_occupancy[idx] = i32(slot) + 1
 		}
 	}
-	return nil
+	game.enemy_occupancy_built = true
+}
+
+// enemy_at returns the first alive enemy on tile (x,y), or nil. O(1) via the
+// occupancy grid (lazily rebuilt when not yet built). Behavior matches a linear
+// scan: dead enemies are ignored, off-grid queries return nil, and on ties the
+// lowest-slot enemy is returned. The `built` flag's zero value is false, so a
+// freshly zero-valued Game rebuilds on first use and needs no setup.
+enemy_at :: proc(game: ^Game, x, y: int) -> ^Enemy {
+	if game == nil {return nil}
+	if x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT {return nil}
+	if !game.enemy_occupancy_built {
+		enemy_occupancy_rebuild(game)
+	}
+	v := game.enemy_occupancy[pos_to_idx(x, y)]
+	if v == 0 {return nil}
+	slot := int(v) - 1
+	if slot < 0 || slot >= len(game.enemies) {return nil}
+	enemy := &game.enemies[slot]
+	// Defensive: the grid is rebuilt on dirty, but guard against a stale entry
+	// (e.g. a direct pos/alive mutation that skipped mark_dirty) so this stays a
+	// strict superset of the old scan's correctness.
+	if !enemy.alive || enemy.pos.x != x || enemy.pos.y != y {return nil}
+	return enemy
 }
 
 item_at :: proc(game: ^Game, x, y: int) -> ^Item {

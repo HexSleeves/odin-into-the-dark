@@ -150,6 +150,7 @@ damage_enemy_with_status :: proc(
 	enemy.hp -= STATUS_TICK_DAMAGE
 	if enemy.hp <= 0 {
 		enemy.alive = false
+		enemy_occupancy_mark_dirty(game)
 		game.kills += 1
 		add_message(
 			messages,

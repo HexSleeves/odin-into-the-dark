@@ -180,6 +180,7 @@ load_game_from_storage :: proc(
 		restored.status = data.enemy_status[i]
 		append(&game.enemies, restored)
 	}
+	gcore.enemy_occupancy_mark_dirty(game)
 
 	game.items = make([dynamic]Item)
 	for i in 0 ..< data.item_count {

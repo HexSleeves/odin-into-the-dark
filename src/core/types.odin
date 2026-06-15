@@ -320,6 +320,15 @@ Game :: struct {
 	// Dijkstra flow field is recomputed only when this is set (once per player
 	// input); cleared by compute_dijkstra_map. Need not persist in saves.
 	dijkstra_dirty:         bool,
+	// Enemy occupancy grid (P9): index = pos_to_idx, value = enemy slot + 1
+	// (0 = empty). Makes enemy_at O(1). Lazily (re)built by enemy_at whenever
+	// enemy_occupancy_built is false, so it can never desync from a linear scan.
+	// `built` is invalidated on every spawn/move/death/cleanup. Its zero value
+	// (false) means "needs rebuild", so a freshly zero-valued Game behaves
+	// exactly like the old linear scan with no setup required. Derived state —
+	// need not persist in saves.
+	enemy_occupancy:        [MAP_WIDTH * MAP_HEIGHT]i32,
+	enemy_occupancy_built:  bool,
 	// Player status effects (Poison/Burning/Frozen/Webbed turns remaining)
 	player_status:          Status_Turns,
 	boss_killed_this_turn:  bool,

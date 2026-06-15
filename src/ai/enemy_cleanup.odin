@@ -37,6 +37,7 @@ remove_dead_enemies :: proc(
 				cam_y,
 			)
 			unordered_remove(&game.enemies, i)
+			enemy_occupancy_mark_dirty(game)
 		} else {
 			i += 1
 		}

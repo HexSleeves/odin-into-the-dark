@@ -7,6 +7,7 @@ import eng "../engine"
 
 spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 	clear(&game.enemies)
+	enemy_occupancy_mark_dirty(game)
 
 	if len(game.rooms) >= 2 {
 		// Room-based spawning: skip room 0 (player's room), 1-2 enemies per room
@@ -24,6 +25,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 					def := content_manager_enemy_def_for_depth(content, game.depth)
 					if def != nil {
 						append(&game.enemies, enemy_make_from_def(def, pos))
+						enemy_occupancy_mark_dirty(game)
 						logger_debugf(.Enemy, "spawned '%s' at (%v,%v) room=%v", def.id, ex, ey, i)
 						total += 1
 					}
@@ -66,6 +68,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+				enemy_occupancy_mark_dirty(game)
 				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave route", def.id, x, y)
 				spawned += 1
 			}
@@ -84,6 +87,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, Vec2{x, y}))
+				enemy_occupancy_mark_dirty(game)
 				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave free", def.id, x, y)
 				spawned += 1
 			}
@@ -99,6 +103,7 @@ spawn_enemies :: proc(content: ^Content_Manager, game: ^Game) {
 			def := content_manager_enemy_def_for_depth(content, game.depth)
 			if def != nil {
 				append(&game.enemies, enemy_make_from_def(def, pos))
+				enemy_occupancy_mark_dirty(game)
 				logger_debugf(.Enemy, "spawned '%s' at (%v,%v) cave fallback", def.id, x, y)
 				spawned += 1
 			}
