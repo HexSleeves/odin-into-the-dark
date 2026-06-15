@@ -26,7 +26,6 @@ levelup_kills_for_level_is_inverse_of_level_for_kills :: proc(t: ^testing.T) {
 
 @(test)
 check_level_up_queues_a_menu_when_a_threshold_is_crossed :: proc(t: ^testing.T) {
-	if !LEVELUP_ENABLED {return}
 	g: Game
 	game_init_world(&g)
 	g.state = .Playing
@@ -42,7 +41,6 @@ check_level_up_queues_a_menu_when_a_threshold_is_crossed :: proc(t: ^testing.T) 
 
 @(test)
 check_level_up_does_nothing_below_threshold :: proc(t: ^testing.T) {
-	if !LEVELUP_ENABLED {return}
 	g: Game
 	game_init_world(&g)
 	g.state = .Playing

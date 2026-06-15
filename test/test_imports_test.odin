@@ -205,7 +205,6 @@ levelup_level_for_kills :: gcore.levelup_level_for_kills
 levelup_kills_for_level :: gcore.levelup_kills_for_level
 KILLS_PER_LEVEL :: gcore.KILLS_PER_LEVEL
 LEVELUP_BUFF_MAX_HP :: gcore.LEVELUP_BUFF_MAX_HP
-LEVELUP_ENABLED :: gcore.LEVELUP_ENABLED
 DETECTION_HEARING_RADIUS :: gcore.DETECTION_HEARING_RADIUS
 player_effective_light_radius :: gcore.player_effective_light_radius
 minimap_should_draw_enemy_dot :: renderer.minimap_should_draw_enemy_dot

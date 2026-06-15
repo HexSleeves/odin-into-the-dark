@@ -114,10 +114,10 @@ apply_shrine_buff :: proc(engine: ^eng.Engine, game: ^Game, buff: Shrine_Buff) {
 // ─── Milestone level-ups (D3) ─────────────────────────────────────────────────
 
 // check_level_up reconciles game.player_level with the kills-derived level. For
-// every level newly reached it queues a level-up menu and opens it. No-op when
-// LEVELUP_ENABLED is off. Pure-derivation procs live in gcore.
+// every level newly reached it queues a level-up menu and opens it.
+// Pure-derivation procs live in gcore.
 check_level_up :: proc(engine: ^eng.Engine, game: ^Game) {
-	if !gcore.LEVELUP_ENABLED || game == nil {return}
+	if game == nil {return}
 	derived := gcore.levelup_level_for_kills(game.kills)
 	if derived <= game.player_level {return}
 

@@ -45,12 +45,10 @@ BOSS_CAMERA_ZOOM :: f32(1.16)
 // ─── Kill progression ─────────────────────────────────────────────────────────
 KILLS_PER_MILESTONE :: 8 // kills between permanent buff awards
 
-// ─── Milestone level-ups (D3, feature-flagged) ────────────────────────────────
-// When LEVELUP_ENABLED is on (default), crossing a KILLS_PER_LEVEL threshold
-// queues a level-up the player resolves via a menu (no HP cost). player_level is
-// derived from persisted kills, so it needs no extra save field. Runtime `if`
-// gating (NOT `when`) so the flag matrix stays a single build.
-LEVELUP_ENABLED :: #config(LEVELUP_ENABLED, true)
+// ─── Milestone level-ups (D3) ─────────────────────────────────────────────────
+// Crossing a KILLS_PER_LEVEL threshold queues a level-up the player resolves via
+// a menu (no HP cost). player_level is derived from persisted kills, so it needs
+// no extra save field.
 KILLS_PER_LEVEL :: 8 // kills required to advance one level
 LEVELUP_BUFF_MAX_HP :: 5
 LEVELUP_BUFF_ATTACK :: 2

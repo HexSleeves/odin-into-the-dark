@@ -57,7 +57,6 @@ effective_defense :: gcore.effective_defense
 rand_room_interior :: gcore.rand_room_interior
 player_effective_light_radius :: gcore.player_effective_light_radius
 DETECTION_HEARING_RADIUS :: gcore.DETECTION_HEARING_RADIUS
-LEVELUP_ENABLED :: gcore.LEVELUP_ENABLED
 
 damage_roll :: gcore.damage_roll
 crit_roll :: gcore.crit_roll
