@@ -60,8 +60,11 @@ DETECTION_HEARING_RADIUS :: gcore.DETECTION_HEARING_RADIUS
 
 damage_roll :: gcore.damage_roll
 crit_roll :: gcore.crit_roll
+chance_roll :: gcore.chance_roll
 effective_crit_chance :: gcore.effective_crit_chance
 CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
+FROZEN_SKIP_ATTACK_CHANCE_PCT :: gcore.FROZEN_SKIP_ATTACK_CHANCE_PCT
+FROZEN_DAMAGE_PCT :: gcore.FROZEN_DAMAGE_PCT
 SLAM_BASE_DAMAGE :: gcore.SLAM_BASE_DAMAGE
 
 status_apply :: gcore.status_apply

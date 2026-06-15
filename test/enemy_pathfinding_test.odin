@@ -119,6 +119,9 @@ visible_enemy_moves_downhill_toward_player :: proc(t: ^testing.T) {
 
 @(test)
 visible_enemy_does_not_enter_occupied_tile_while_chasing :: proc(t: ^testing.T) {
+	// A chaser must never step ONTO a tile held by another enemy. With an open
+	// floor around it, the occupancy-aware chase routes the chaser into a free
+	// lane instead — but it can never land on the blocker's tile.
 	game: Game
 	path_test_fill_tiles(&game)
 	game.player.pos = Vec2{1, 1}
@@ -156,8 +159,70 @@ visible_enemy_does_not_enter_occupied_tile_while_chasing :: proc(t: ^testing.T) 
 	game.dijkstra_dirty = true
 	process_enemy_turns(&messages, &game)
 
-	testing.expect_value(t, game.enemies[0].pos, Vec2{4, 1})
+	// The blocker (no AP) never moves; the chaser never lands on its tile.
 	testing.expect_value(t, game.enemies[1].pos, Vec2{3, 1})
+	testing.expect(
+		t,
+		game.enemies[0].pos != game.enemies[1].pos,
+		"chaser must not occupy the blocker's tile",
+	)
+}
+
+@(test)
+chaser_routes_around_an_occupied_downhill_tile_instead_of_funneling :: proc(t: ^testing.T) {
+	// Single-file corridor mouth: the blocker sits on the chaser's only strictly-
+	// downhill tile. The occupancy-aware chase sidesteps into an adjacent open
+	// lane (a tile at most one step farther) so the pack fans out instead of
+	// stalling in a column behind the blocker.
+	game: Game
+	path_test_fill_tiles(&game)
+	game.player.pos = Vec2{1, 1}
+	game.player.hp = 20
+	game.player.max_hp = 20
+	game.enemies = make([dynamic]Enemy)
+	defer delete(game.enemies)
+	// Chaser with one round of AP.
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{4, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 100,
+			move_speed = 100,
+		},
+	)
+	// Stationary blocker parked on the chaser's only downhill tile (3,1).
+	append(
+		&game.enemies,
+		Enemy {
+			pos = Vec2{3, 1},
+			hp = 5,
+			max_hp = 5,
+			alive = true,
+			energy = 0,
+			quickness = 0,
+			move_speed = 100,
+		},
+	)
+	_ = tile_state_set(&game, 4, 1, true, true, 1)
+	messages := message_manager_make()
+
+	game.dijkstra_dirty = true
+	process_enemy_turns(&messages, &game)
+
+	// Blocker stays put; chaser must have MOVED (no longer stalled at (4,1)) and
+	// must have stepped to an adjacent lane, not onto the occupied tile.
+	testing.expect_value(t, game.enemies[1].pos, Vec2{3, 1})
+	moved := game.enemies[0].pos != Vec2{4, 1}
+	testing.expect(t, moved, "chaser must route around the blocker instead of stalling")
+	testing.expect(
+		t,
+		game.enemies[0].pos == Vec2{4, 0} || game.enemies[0].pos == Vec2{4, 2},
+		"chaser should sidestep into an adjacent open lane",
+	)
 }
 
 @(test)

@@ -133,25 +133,74 @@ chase_act_once :: proc(
 		return false
 	}
 
+	// Occupancy-aware step selection. The flow field alone funnels a whole pack
+	// onto the single lowest-distance tile of a corridor mouth: the lead enemy
+	// takes it and the rest stall directly behind, all stacked on one column,
+	// refusing to fan out. We scan cardinal neighbours and track:
+	//   - best_pos:    strictly-downhill UNOCCUPIED tile (the preferred move).
+	//   - ideal_dist:  best distance over ALL passable neighbours, occupied or
+	//                  not. If the strictly-best tile is occupied we are blocked
+	//                  at the front of a funnel by a pack member.
+	//   - detour_pos:  the UNOCCUPIED neighbour with the lowest distance, allowing
+	//                  a single sidestep (at most current_dist + 1 — never a full
+	//                  retreat). Used only when our ideal downhill tile is
+	//                  occupied, so a backed-up enemy fans out into an adjacent
+	//                  lane instead of spinning in place behind the blocker. On 4-
+	//                  connected maps a tile that is not strictly downhill is at
+	//                  best current_dist + 1, so this is exactly "one step
+	//                  sideways"; from the new lane the enemy resumes downhill
+	//                  next round, breaking the single-file funnel.
 	best_pos := enemy.pos
 	best_dist := current_dist
+	ideal_dist := current_dist
+	ideal_blocked := false
+	detour_pos := enemy.pos
+	detour_dist := DMAP_UNREACHABLE
 	for dir in 0 ..< 4 {
 		nx := enemy.pos.x + dx[dir]
 		ny := enemy.pos.y + dy[dir]
 		if nx < 0 || nx >= MAP_WIDTH || ny < 0 || ny >= MAP_HEIGHT {continue}
 		if !is_walkable(game, nx, ny) {continue}
-		if enemy_at(game, nx, ny) != nil {continue}
 		if nx == game.player.pos.x && ny == game.player.pos.y {continue}
 
 		n_dist := eng.engine_distance_map_get(&dmap, nx, ny)
+		occupied := enemy_at(game, nx, ny) != nil
+
+		// Track the globally-best neighbour distance (ignoring occupancy) so we
+		// can detect when our ideal downhill move is taken by another enemy.
+		if n_dist < ideal_dist {
+			ideal_dist = n_dist
+			ideal_blocked = occupied
+		}
+
+		if occupied {continue}
+
 		if n_dist < best_dist {
 			best_dist = n_dist
 			best_pos = Vec2{nx, ny}
 		}
+		// Best unoccupied sidestep candidate. Only used as a fallback when the
+		// ideal downhill tile is blocked. Capped at current_dist + 1 so the enemy
+		// may fan one lane to the side but never retreats outright.
+		if n_dist <= current_dist + 1 && n_dist < detour_dist {
+			detour_dist = n_dist
+			detour_pos = Vec2{nx, ny}
+		}
 	}
 
+	// Prefer the strictly-downhill unoccupied step.
 	if best_pos != enemy.pos {
 		enemy.pos = best_pos
+		enemy_occupancy_mark_dirty(game)
+		enemy.energy -= move_cost
+		return true
+	}
+
+	// No unoccupied downhill tile, but the ideal downhill tile is occupied by a
+	// pack member: sidestep around it via the best unoccupied lane (a tile no
+	// farther from the player than we are now) rather than stall in the funnel.
+	if ideal_blocked && detour_pos != enemy.pos {
+		enemy.pos = detour_pos
 		enemy_occupancy_mark_dirty(game)
 		enemy.energy -= move_cost
 		return true

@@ -29,6 +29,14 @@ crit_roll :: proc(chance_pct: int) -> bool {
 	return rand.int_max(100) < chance_pct
 }
 
+// chance_roll succeeds with the given percentage (0..100). General-purpose
+// percentage gate used by status-effect combat penalties (e.g. frozen skip).
+chance_roll :: proc(chance_pct: int) -> bool {
+	if chance_pct <= 0 {return false}
+	if chance_pct >= 100 {return true}
+	return rand.int_max(100) < chance_pct
+}
+
 // Player crit chance: unarmed base plus the equipped weapon's crit_chance.
 effective_crit_chance :: proc(game: ^Game) -> int {
 	bonus := 0

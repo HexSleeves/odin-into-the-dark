@@ -156,10 +156,26 @@ resolve_attack_enemy_on_player :: proc(
 	enemy: ^Enemy,
 	engine: ^eng.Engine = nil,
 ) {
+	// Frozen enemies fight sluggishly: a chance to lose the swing entirely, and
+	// any landed hit deals reduced damage (mirrors the movement penalty).
+	frozen := status_active(&enemy.status, .Frozen)
+	if frozen && chance_roll(FROZEN_SKIP_ATTACK_CHANCE_PCT) {
+		add_message(
+			messages,
+			game,
+			fmt.tprintf("The frozen %s is too sluggish to strike.", enemy_display_name(enemy)),
+			eng.Engine_Color{120, 190, 255, 255},
+		)
+		return
+	}
+
 	raw_damage := damage_roll(enemy.attack)
 	crit := crit_roll(enemy.crit_chance)
 	if crit {
 		raw_damage = raw_damage * CRIT_DAMAGE_MULT_PCT / 100
+	}
+	if frozen {
+		raw_damage = max(raw_damage * FROZEN_DAMAGE_PCT / 100, 1)
 	}
 	damage := max(raw_damage - effective_defense(game), 1)
 	game.player.hp = max(game.player.hp - damage, 0)

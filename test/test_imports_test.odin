@@ -114,9 +114,12 @@ effective_defense :: gcore.effective_defense
 damage_roll :: gcore.damage_roll
 damage_roll_bounds :: gcore.damage_roll_bounds
 crit_roll :: gcore.crit_roll
+chance_roll :: gcore.chance_roll
 effective_crit_chance :: gcore.effective_crit_chance
 BASE_CRIT_CHANCE_PCT :: gcore.BASE_CRIT_CHANCE_PCT
 CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
+FROZEN_SKIP_ATTACK_CHANCE_PCT :: gcore.FROZEN_SKIP_ATTACK_CHANCE_PCT
+FROZEN_DAMAGE_PCT :: gcore.FROZEN_DAMAGE_PCT
 DAMAGE_VARIANCE_MIN_PCT :: gcore.DAMAGE_VARIANCE_MIN_PCT
 DAMAGE_VARIANCE_MAX_PCT :: gcore.DAMAGE_VARIANCE_MAX_PCT
 effective_attack_cost :: gcore.effective_attack_cost

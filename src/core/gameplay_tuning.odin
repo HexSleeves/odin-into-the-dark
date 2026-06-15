@@ -19,6 +19,13 @@ DAMAGE_VARIANCE_MAX_PCT :: 125
 BASE_CRIT_CHANCE_PCT :: 5 // unarmed crit chance; weapons add crit_chance on top
 CRIT_DAMAGE_MULT_PCT :: 200 // crits deal 2x post-variance damage
 
+// ─── Frozen combat penalty ────────────────────────────────────────────────────
+// Frozen slows movement (double move cost) and also hampers attacking: a frozen
+// attacker has FROZEN_SKIP_ATTACK_CHANCE_PCT to lose its swing entirely, and any
+// landed hit deals only FROZEN_DAMAGE_PCT of the rolled damage (min 1).
+FROZEN_SKIP_ATTACK_CHANCE_PCT :: 33 // % chance a frozen attacker skips its swing
+FROZEN_DAMAGE_PCT :: 50 // landed frozen hits deal this % of rolled damage
+
 GAS_VENT_DAMAGE :: 3
 GAS_VENT_POISON_TURNS :: 5
 FIRE_VENT_DAMAGE :: 2
