@@ -144,6 +144,11 @@
     "ast_hash": "cfcef125d865d939a17cce617b62bdeb",
     "semantic_hash": "cfcef125d865d939a17cce617b62bdeb"
   },
+  "src/core/recipes.odin": {
+    "mtime": 1780891197.7244155,
+    "ast_hash": "d759d6385936bb3749f4cf7fba108282",
+    "semantic_hash": "d759d6385936bb3749f4cf7fba108282"
+  },
   "src/core/save_manager.odin": {
     "mtime": 1780891197.72341,
     "ast_hash": "682e92af864801d19a3afafd859d3ae9",
@@ -1080,8 +1085,8 @@
     "semantic_hash": ""
   },
   "scripts/build_karl2d_web.sh": {
-    "mtime": 1781536914.2251139,
-    "ast_hash": "208d37a6711cfb4c1b4ea0eb13ba3166",
+    "mtime": 1781024528.615347,
+    "ast_hash": "c4ab7b947408ce4de21e7f701878f058",
     "semantic_hash": ""
   },
   "scripts/bundle_macos.sh": {
@@ -1712,11 +1717,6 @@
   "scripts/finish_phases.js": {
     "mtime": 1781535064.7827935,
     "ast_hash": "7587579570add5e6316eb78569013098",
-    "semantic_hash": ""
-  },
-  "scripts/file_system_web.js": {
-    "mtime": 1781536857.7837834,
-    "ast_hash": "7580b59c9f3620e8a21e53a973fb45d4",
     "semantic_hash": ""
   }
 }

@@ -1,16 +1,16 @@
 # Graph Report - odin-into-the-dark  (2026-06-15)
 
 ## Corpus Check
-- 96 files · ~158,240 words
+- 95 files · ~157,534 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1881 nodes · 1546 edges · 440 communities (168 shown, 272 thin omitted)
+- 1873 nodes · 1537 edges · 433 communities (161 shown, 272 thin omitted)
 - Extraction: 86% EXTRACTED · 14% INFERRED · 0% AMBIGUOUS · INFERRED: 216 edges (avg confidence: 0.82)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `60b84286`
+- Built from commit: `ca25f886`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -445,13 +445,6 @@
 - [[_COMMUNITY_Community 430|Community 430]]
 - [[_COMMUNITY_Community 431|Community 431]]
 - [[_COMMUNITY_Community 432|Community 432]]
-- [[_COMMUNITY_Community 433|Community 433]]
-- [[_COMMUNITY_Community 434|Community 434]]
-- [[_COMMUNITY_Community 435|Community 435]]
-- [[_COMMUNITY_Community 436|Community 436]]
-- [[_COMMUNITY_Community 437|Community 437]]
-- [[_COMMUNITY_Community 438|Community 438]]
-- [[_COMMUNITY_Community 439|Community 439]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Per-item detail` - 25 edges
@@ -520,15 +513,15 @@
 - **Render-backend decoupling guard tests** — render_render_handlers_test_render_entry_uses_engine_render_backend_for_frame_operations, render_render_handlers_test_clay_renderer_and_particles_use_engine_render_backend, render_render_handlers_test_sprite_rendering_uses_engine_render_backend_for_texture_regions [INFERRED 0.75]
 - **Sprite atlas lifecycle and lookup tests** — render_sprite_manager_test_sprites_use_engine_texture_manager_for_tileset_lifetime, render_sprite_manager_test_sprites_cleanup_releases_json_owned_sprite_metadata_allocations, render_sprite_manager_test_sprite_lookup_covers_special_tiles_and_town_npcs [INFERRED 0.75]
 
-## Communities (440 total, 272 thin omitted)
+## Communities (433 total, 272 thin omitted)
 
 ### Community 0 - "Engine Core & Input Services"
-Cohesion: 0.25
-Nodes (8): Camera_Manager, Engine, Engine_Event, Engine_Event_Type, Event_Manager, Frame_Manager, frame_manager_allocator, Engine_Key
+Cohesion: 0.22
+Nodes (10): Camera_Manager, Engine, Engine_Config, Engine_Event, Engine_Event_Type, Event_Manager, Frame_Manager, frame_manager_allocator (+2 more)
 
 ### Community 1 - "Game Init & World Generation"
-Cohesion: 0.22
-Nodes (13): count_wall_neighbors, find_farthest_floor, find_nearest_floor, flood_fill_count, flood_fill_mark, generate_cave, generate_mixed, smooth_pass (+5 more)
+Cohesion: 0.06
+Nodes (44): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, can_place_item, generate_map, place_ancient_treasure (+36 more)
 
 ### Community 2 - "Combat, Audio & Content Loading"
 Cohesion: 0.06
@@ -547,8 +540,8 @@ Cohesion: 0.08
 Nodes (29): Content_Manager, content_manager_destroy, content_manager_enemy_def, content_manager_enemy_def_for_depth, content_manager_item_def, content_manager_pick_item_def, content_manager_pick_item_def_for_depth, Conversation_Def (+21 more)
 
 ### Community 6 - "Field of View & Lifecycle Cleanup"
-Cohesion: 0.15
-Nodes (14): item_make, cheat_add_item_to_inventory, cheat_apply, cheat_explore_map, cheat_find_descent, cheat_open_if_requested, update_viewing_cheats, handle_global_input (+6 more)
+Cohesion: 0.08
+Nodes (28): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, game_cleanup, game_destroy, restart_game, clear_visited_floors (+20 more)
 
 ### Community 7 - "Enemy AI & Pathfinding (tests)"
 Cohesion: 0.09
@@ -603,8 +596,8 @@ Cohesion: 0.22
 Nodes (9): player actions / turn flow (handle_player_action, tick_timed_effects, apply_current_tile_effects), fire_vent_tiles_are_walkable, footstep_sound_selection_matches_tile_material, frozen_status_doubles_player_movement_energy_cost, lethal_tile_hazard_uses_single_player_death_flow, locked_door_unlock_consumes_action_without_consuming_web_under_player, surface_descent_input_is_blocked_until_old_miner_quest_is_active, timed effects tick can kill player (poison) (+1 more)
 
 ### Community 20 - "Config & File System"
-Cohesion: 0.40
-Nodes (6): config_manager_load_env_file, config_manager_load_env_file_with_file_system, config_manager_load_env_text, engine_file_system_default (desktop), engine_file_system_is_valid, engine_file_system_or_default
+Cohesion: 0.29
+Nodes (8): config_manager_load_env_file, config_manager_load_env_file_with_file_system, config_manager_load_env_text, engine_file_system_default (desktop), Engine_File_System, engine_file_system_is_valid, engine_file_system_or_default, engine_file_system_default (web)
 
 ### Community 21 - "Engine Services (tests)"
 Cohesion: 0.25
@@ -883,8 +876,8 @@ Cohesion: 0.25
 Nodes (7): Cheat Menu (in-game), Checking Logs, Debug Run — Run the Game with Debug Flags, Default Debug Session, Save File Location, Useful Flag Combinations, With a Fixed Seed
 
 ### Community 350 - "Community 350"
-Cohesion: 0.18
-Nodes (11): action_input_binding_held, action_input_binding_pressed, action_input_held, action_input_manager_make, action_input_pressed, action_input_released, action_input_repeat, engine_input_backend_default (+3 more)
+Cohesion: 0.25
+Nodes (8): action_input_binding_held, action_input_held, action_input_manager_make, action_input_repeat, engine_input_backend_default, engine_input_backend_nil, engine_input_backend_or_default, engine_input_key_down
 
 ### Community 351 - "Community 351"
 Cohesion: 0.29
@@ -987,8 +980,8 @@ Cohesion: 0.17
 Nodes (12): R10 — Held movement keys produce diagonal moves in a cardinal-only roguelike · **Medium** · _verifier confirmed_, R11 — Escape hard-quits the process during play with no confirmation · **Medium**, R1 — (= C2) Unclamped deserialized counts · **High**., R2 — Load deletes the save before the restored game is validated · **Medium**, R3 — Migration size gate uses exact-equality on a fixed layout · **Medium**, R4 — NPC string pointers serialized raw into `Save_Floor` · **Medium (latent)**, R5 — Web build has no filesystem; saves/loads/autosaves silently no-op · **Medium** · _auditor said High; verifier downgraded (secondary target, graceful)_, R6 — Silent error swallowing · **Medium (cluster)** (+4 more)
 
 ### Community 380 - "Community 380"
-Cohesion: 0.25
-Nodes (8): Action_Input_Manager, Engine_Key_Binding, Engine_Repeat_State, Engine_Config, Engine_File_System, engine_file_system_default (web), Engine_Input_Backend, engine_input_backend_nil
+Cohesion: 0.67
+Nodes (3): Action_Input_Manager, Engine_Key_Binding, Engine_Repeat_State
 
 ### Community 388 - "Community 388"
 Cohesion: 0.10
@@ -1063,8 +1056,8 @@ Cohesion: 0.50
 Nodes (3): Loop Verifier (Checker), Verdict, What you verify
 
 ### Community 406 - "Community 406"
-Cohesion: 0.17
-Nodes (12): can_place_item, generate_map, place_ancient_treasure, spawn_items, can_place_event, pick_event_type, spawn_floor_event, spawn_anvil (+4 more)
+Cohesion: 0.50
+Nodes (4): action_input_binding_pressed, action_input_pressed, action_input_released, engine_input_key_pressed
 
 ### Community 409 - "Community 409"
 Cohesion: 0.18
@@ -1154,34 +1147,6 @@ Nodes (4): BATCHES, meta, RESULT_SCHEMA, results
 Cohesion: 0.40
 Nodes (4): meta, PHASES, RESULT_SCHEMA, results
 
-### Community 433 - "Community 433"
-Cohesion: 0.28
-Nodes (9): game_cleanup, game_destroy, restart_game, clear_visited_floors, ensure_floor_snapshot, restore_dynamic_array, restore_saved_floor, save_current_floor (+1 more)
-
-### Community 434 - "Community 434"
-Cohesion: 0.32
-Nodes (5): itdBase64ToBytes(), itdLoadString(), itdLsDecode(), itdLsKey(), itdStorageJsImports
-
-### Community 435 - "Community 435"
-Cohesion: 0.47
-Nodes (6): game_init, game_initial_state, game_next_seed, game_reinit, init_player_from_content, give_starter_gear
-
-### Community 436 - "Community 436"
-Cohesion: 0.40
-Nodes (6): find_vault_door_position, room_contains_point, room_perimeter_contains_point, seal_room_perimeter_for_vault, spawn_treasure_vault, vault_loot_def
-
-### Community 437 - "Community 437"
-Cohesion: 0.50
-Nodes (5): cast_light, compute_fov, is_opaque, OCTANT_MULTIPLIERS, cheat_set_depth
-
-### Community 438 - "Community 438"
-Cohesion: 0.50
-Nodes (4): carve_building, generate_town, set_wall, carve_rect
-
-### Community 439 - "Community 439"
-Cohesion: 0.67
-Nodes (3): mine_wall, mineable_tile_type, spawn_ore_veins
-
 ## Ambiguous Edges - Review These
 - `game_scene_render` → `game_scene_render`  [AMBIGUOUS]
   src/scene.odin · relation: references
@@ -1189,7 +1154,7 @@ Nodes (3): mine_wall, mineable_tile_type, spawn_ore_veins
   src/ai/enemy_factory.odin · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **1337 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1332 more)
+- **1336 isolated node(s):** `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA`, `GROUPS`, `auditTasks` (+1331 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **272 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -1200,13 +1165,13 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `enemy_make` and `Game_Audio (struct)`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `generate_map` connect `Community 406` to `Game Init & World Generation`, `Community 435`, `Community 436`, `Community 437`, `Community 438`, `Community 439`?**
+- **Why does `generate_map` connect `Game Init & World Generation` to `Field of View & Lifecycle Cleanup`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
-- **Why does `restart_game` connect `Community 433` to `Community 435`, `Community 437`?**
+- **Why does `Engine_Input_Backend` connect `Engine Core & Input Services` to `Community 380`, `Community 350`?**
+  _High betweenness centrality (0.001) - this node is a cross-community bridge._
+- **Why does `Engine_Config` connect `Engine Core & Input Services` to `Community 344`, `Config & File System`?**
   _High betweenness centrality (0.001) - this node is a cross-community bridge._
 - **What connects `meta`, `FINDINGS_SCHEMA`, `VERDICT_SCHEMA` to the rest of the system?**
-  _1337 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `Combat, Audio & Content Loading` be split into smaller, more focused modules?**
-  _Cohesion score 0.06097560975609756 - nodes in this community are weakly interconnected._
-- **Should `Game State & Title/Game-Over Flow` be split into smaller, more focused modules?**
-  _Cohesion score 0.06090808416389812 - nodes in this community are weakly interconnected._
+  _1336 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Game Init & World Generation` be split into smaller, more focused modules?**
+  _Cohesion score 0.05919661733615222 - nodes in this community are weakly interconnected._

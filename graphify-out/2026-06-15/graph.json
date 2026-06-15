@@ -967,86 +967,6 @@
       "norm_label": "bundle_macos.sh script"
     },
     {
-      "label": "file_system_web.js",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_file_system_web",
-      "community": 434,
-      "norm_label": "file_system_web.js"
-    },
-    {
-      "label": "setItdStorageWasmMemory()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L13",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_setitdstoragewasmmemory",
-      "community": 434,
-      "norm_label": "setitdstoragewasmmemory()"
-    },
-    {
-      "label": "itdLoadString()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L21",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdloadstring",
-      "community": 434,
-      "norm_label": "itdloadstring()"
-    },
-    {
-      "label": "itdLsKey()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L26",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdlskey",
-      "community": 434,
-      "norm_label": "itdlskey()"
-    },
-    {
-      "label": "itdBytesToBase64()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L32",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdbytestobase64",
-      "community": 434,
-      "norm_label": "itdbytestobase64()"
-    },
-    {
-      "label": "itdBase64ToBytes()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L41",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdbase64tobytes",
-      "community": 434,
-      "norm_label": "itdbase64tobytes()"
-    },
-    {
-      "label": "itdLsDecode()",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L50",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdlsdecode",
-      "community": 434,
-      "norm_label": "itdlsdecode()"
-    },
-    {
-      "label": "itdStorageJsImports",
-      "file_type": "code",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L67",
-      "_origin": "ast",
-      "id": "scripts_file_system_web_itdstoragejsimports",
-      "community": 434,
-      "norm_label": "itdstoragejsimports"
-    },
-    {
       "label": "finish_phases.js",
       "file_type": "code",
       "source_file": "scripts/finish_phases.js",
@@ -12497,7 +12417,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 350,
+      "community": 406,
       "norm_label": "action_input_pressed",
       "id": "engine_action_input_manager_action_input_pressed"
     },
@@ -12523,7 +12443,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 350,
+      "community": 406,
       "norm_label": "action_input_released",
       "id": "engine_action_input_manager_action_input_released"
     },
@@ -12549,7 +12469,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 350,
+      "community": 406,
       "norm_label": "action_input_binding_pressed",
       "id": "engine_action_input_manager_action_input_binding_pressed"
     },
@@ -13004,7 +12924,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 380,
+      "community": 0,
       "norm_label": "engine_config",
       "id": "engine_engine_engine_config"
     },
@@ -13225,7 +13145,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 380,
+      "community": 20,
       "norm_label": "engine_file_system",
       "id": "engine_file_system_engine_file_system"
     },
@@ -13277,7 +13197,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 380,
+      "community": 20,
       "norm_label": "engine_file_system_default (web)",
       "id": "engine_file_system_web_engine_file_system_default"
     },
@@ -13472,7 +13392,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 380,
+      "community": 0,
       "norm_label": "engine_input_backend",
       "id": "engine_input_backend_engine_input_backend"
     },
@@ -13511,7 +13431,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 380,
+      "community": 350,
       "norm_label": "engine_input_backend_nil",
       "id": "engine_input_backend_engine_input_backend_nil"
     },
@@ -13537,7 +13457,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 350,
+      "community": 406,
       "norm_label": "engine_input_key_pressed",
       "id": "engine_input_backend_engine_input_key_pressed"
     },
@@ -14434,7 +14354,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 437,
+      "community": 6,
       "norm_label": "compute_fov",
       "id": "gameplay_fov_compute_fov"
     },
@@ -14447,7 +14367,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 437,
+      "community": 6,
       "norm_label": "cast_light",
       "id": "gameplay_fov_cast_light"
     },
@@ -14460,7 +14380,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 437,
+      "community": 6,
       "norm_label": "is_opaque",
       "id": "gameplay_fov_is_opaque"
     },
@@ -14473,7 +14393,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 437,
+      "community": 6,
       "norm_label": "octant_multipliers",
       "id": "gameplay_fov_octant_multipliers"
     },
@@ -14486,7 +14406,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "game_next_seed",
       "id": "gameplay_game_lifecycle_game_next_seed"
     },
@@ -14499,7 +14419,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "game_initial_state",
       "id": "gameplay_game_lifecycle_game_initial_state"
     },
@@ -14512,7 +14432,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "game_init",
       "id": "gameplay_game_lifecycle_game_init"
     },
@@ -14525,7 +14445,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "game_reinit",
       "id": "gameplay_game_lifecycle_game_reinit"
     },
@@ -14538,7 +14458,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "init_player_from_content",
       "id": "gameplay_game_lifecycle_init_player_from_content"
     },
@@ -14564,7 +14484,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "game_cleanup",
       "id": "gameplay_game_lifecycle_game_cleanup"
     },
@@ -14577,7 +14497,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "game_destroy",
       "id": "gameplay_game_lifecycle_game_destroy"
     },
@@ -14590,7 +14510,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "restart_game",
       "id": "gameplay_game_lifecycle_restart_game"
     },
@@ -14603,7 +14523,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "can_place_item",
       "id": "gameplay_generation_can_place_item"
     },
@@ -14616,7 +14536,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_items",
       "id": "gameplay_generation_spawn_items"
     },
@@ -14629,7 +14549,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "saved_floor_destroy",
       "id": "gameplay_generation_saved_floor_destroy"
     },
@@ -14642,7 +14562,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "clear_visited_floors",
       "id": "gameplay_generation_clear_visited_floors"
     },
@@ -14655,7 +14575,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "ensure_floor_snapshot",
       "id": "gameplay_generation_ensure_floor_snapshot"
     },
@@ -14668,7 +14588,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "save_current_floor",
       "id": "gameplay_generation_save_current_floor"
     },
@@ -14681,7 +14601,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "restore_dynamic_array",
       "id": "gameplay_generation_restore_dynamic_array"
     },
@@ -14694,7 +14614,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 433,
+      "community": 6,
       "norm_label": "restore_saved_floor",
       "id": "gameplay_generation_restore_saved_floor"
     },
@@ -14707,7 +14627,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "generate_map",
       "id": "gameplay_generation_generate_map"
     },
@@ -14720,7 +14640,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "place_ancient_treasure",
       "id": "gameplay_generation_place_ancient_treasure"
     },
@@ -14798,7 +14718,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 435,
+      "community": 1,
       "norm_label": "give_starter_gear",
       "id": "gameplay_items_give_starter_gear"
     },
@@ -14837,7 +14757,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 439,
+      "community": 1,
       "norm_label": "mineable_tile_type",
       "id": "gameplay_mining_mineable_tile_type"
     },
@@ -14850,7 +14770,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 439,
+      "community": 1,
       "norm_label": "mine_wall",
       "id": "gameplay_mining_mine_wall"
     },
@@ -14902,7 +14822,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_floor_event",
       "id": "gen_generation_events_spawn_floor_event"
     },
@@ -14915,7 +14835,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "pick_event_type",
       "id": "gen_generation_events_pick_event_type"
     },
@@ -14928,7 +14848,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "can_place_event",
       "id": "gen_generation_events_can_place_event"
     },
@@ -14941,7 +14861,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_anvil",
       "id": "gen_generation_features_spawn_anvil"
     },
@@ -14954,7 +14874,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_boss",
       "id": "gen_generation_features_spawn_boss"
     },
@@ -14967,7 +14887,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_fountain",
       "id": "gen_generation_features_spawn_fountain"
     },
@@ -14980,7 +14900,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_monster_den",
       "id": "gen_generation_features_spawn_monster_den"
     },
@@ -14993,7 +14913,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 406,
+      "community": 1,
       "norm_label": "spawn_hazards",
       "id": "gen_generation_hazards_spawn_hazards"
     },
@@ -15006,7 +14926,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 439,
+      "community": 1,
       "norm_label": "spawn_ore_veins",
       "id": "gen_generation_ore_spawn_ore_veins"
     },
@@ -15019,7 +14939,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 438,
+      "community": 1,
       "norm_label": "generate_town",
       "id": "gen_generation_town_generate_town"
     },
@@ -15032,7 +14952,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 438,
+      "community": 1,
       "norm_label": "carve_building",
       "id": "gen_generation_town_carve_building"
     },
@@ -15045,7 +14965,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 438,
+      "community": 1,
       "norm_label": "set_wall",
       "id": "gen_generation_town_set_wall"
     },
@@ -15058,7 +14978,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "room_contains_point",
       "id": "gen_generation_vault_room_contains_point"
     },
@@ -15071,7 +14991,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "room_perimeter_contains_point",
       "id": "gen_generation_vault_room_perimeter_contains_point"
     },
@@ -15084,7 +15004,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "find_vault_door_position",
       "id": "gen_generation_vault_find_vault_door_position"
     },
@@ -15097,7 +15017,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "seal_room_perimeter_for_vault",
       "id": "gen_generation_vault_seal_room_perimeter_for_vault"
     },
@@ -15110,7 +15030,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "vault_loot_def",
       "id": "gen_generation_vault_vault_loot_def"
     },
@@ -15123,7 +15043,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 436,
+      "community": 1,
       "norm_label": "spawn_treasure_vault",
       "id": "gen_generation_vault_spawn_treasure_vault"
     },
@@ -15266,7 +15186,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 438,
+      "community": 1,
       "norm_label": "carve_rect",
       "id": "gen_mapgen_rooms_carve_rect"
     },
@@ -15357,7 +15277,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 437,
+      "community": 6,
       "norm_label": "cheat_set_depth",
       "id": "input_cheats_cheat_set_depth"
     },
@@ -22483,104 +22403,12 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L41",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdbase64tobytes",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L32",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdbytestobase64",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L21",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdloadstring",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L50",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdlsdecode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L26",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdlskey",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L67",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_itdstoragejsimports",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L13",
-      "weight": 1.0,
-      "source": "scripts_file_system_web",
-      "target": "scripts_file_system_web_setitdstoragewasmmemory",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L27",
-      "weight": 1.0,
-      "source": "scripts_file_system_web_itdlskey",
-      "target": "scripts_file_system_web_itdloadstring",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/file_system_web.js",
-      "source_location": "L61",
-      "weight": 1.0,
-      "source": "scripts_file_system_web_itdlsdecode",
-      "target": "scripts_file_system_web_itdbase64tobytes",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "scripts/finish_phases.js",
       "source_location": "L1",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_finish_phases",
-      "target": "scripts_finish_phases_meta"
+      "target": "scripts_finish_phases_meta",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22588,9 +22416,9 @@
       "source_file": "scripts/finish_phases.js",
       "source_location": "L40",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_finish_phases",
-      "target": "scripts_finish_phases_phases"
+      "target": "scripts_finish_phases_phases",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22598,9 +22426,9 @@
       "source_file": "scripts/finish_phases.js",
       "source_location": "L13",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_finish_phases",
-      "target": "scripts_finish_phases_result_schema"
+      "target": "scripts_finish_phases_result_schema",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22608,9 +22436,9 @@
       "source_file": "scripts/finish_phases.js",
       "source_location": "L52",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "scripts_finish_phases",
-      "target": "scripts_finish_phases_results"
+      "target": "scripts_finish_phases_results",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -38083,5 +37911,5 @@
       "source_file": "test/render/sprite_manager_test.odin"
     }
   ],
-  "built_at_commit": "60b84286dc767f99ceca0d36f4ea418999b60da7"
+  "built_at_commit": "ca25f8865ce3b65dffdb7ff08850b862069a2533"
 }
