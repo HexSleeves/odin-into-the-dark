@@ -41,8 +41,7 @@ HARD RULES:
 Return structured result. THIS BATCH:\n`
 
 const BATCHES = [
-  { id:'B1', phase:'core', subject:'refactor(core): remove dead constants, enum, and accessor',
-    task:`Items L-core-1, L-core-2, L-core-3, L-core-4 (files: core/content_ids.odin, core/directions.odin, core/game_utils.odin, core/types.odin). Delete the dead consts/enum/accessor per their removal_notes; grep-confirm zero live callers first.` },
+  // B1 (core dead consts/enum/accessor) already landed green in commit 9d47652 — removed (session restart orphaned the run after B1).
   { id:'B2', phase:'io-save_query', subject:'refactor(io): delete orphaned save_exists query module',
     task:`Item L-save-1: delete the orphaned src/io/save_query.odin (whole file) per removal_note. Confirm nothing imports/calls its procs. Remove any now-dead test referencing it.` },
   { id:'B3', phase:'render', subject:'refactor(render): drop superseded title-fx, color wrappers, and empty stubs',
