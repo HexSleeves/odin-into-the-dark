@@ -45,12 +45,60 @@ cp "${ODIN_ROOT}/core/sys/wasm/js/odin.js" "${OUT_DIR}/"
 cp "${KARL2D_DIR}/audio_backend_web_audio.js" "${OUT_DIR}/"
 cp "${KARL2D_DIR}/audio_backend_web_audio_processor.js" "${OUT_DIR}/"
 
-# Step 4: Copy or generate index.html
+# Step 3b: Copy the localStorage save-backend JS (foreign "itd_storage" module).
+cp "${SCRIPT_DIR}/file_system_web.js" "${OUT_DIR}/"
+
+# Step 4: Copy or generate index.html, then wire the storage backend.
 if [ ! -f "${OUT_DIR}/index.html" ]; then
     cp "${KARL2D_DIR}/build_web/web_entry_templates/index_template.html" "${OUT_DIR}/index.html"
     # Patch title
     sed -i.bak 's/Karl2D Web Build/Into the Depths/' "${OUT_DIR}/index.html"
     rm -f "${OUT_DIR}/index.html.bak"
+fi
+
+# Step 4b: Inject the storage backend wiring (idempotent).
+# 1) <script> tag right after the audio backend script.
+# 2) merge itdStorageJsImports into the WebAssembly import object.
+# 3) hand the WASM memory to the storage JS once exports are known.
+INDEX="${OUT_DIR}/index.html"
+if ! grep -q "file_system_web.js" "${INDEX}"; then
+    python3 - "${INDEX}" <<'PY'
+import sys
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as f:
+    html = f.read()
+
+# 1) script tag after the audio backend include
+audio_tag = '<script type="text/javascript" src="audio_backend_web_audio.js"></script>'
+storage_tag = '<script type="text/javascript" src="file_system_web.js"></script>'
+if audio_tag in html:
+    html = html.replace(audio_tag, audio_tag + "\n\t\t" + storage_tag, 1)
+else:
+    # Fall back to inserting before odin.js if audio tag layout changed.
+    odin_tag = '<script type="text/javascript" src="odin.js"></script>'
+    html = html.replace(odin_tag, storage_tag + "\n\t\t" + odin_tag, 1)
+
+# 2) merge imports right after the karl2d audio import merge.
+audio_merge = "imports = { ...imports, ...karl2dAudioJsImports };"
+storage_merge = "imports = { ...imports, ...itdStorageJsImports };"
+if audio_merge in html:
+    html = html.replace(audio_merge, audio_merge + "\n\t\t\t\t" + storage_merge, 1)
+else:
+    raise SystemExit("index template missing karl2d audio import merge; cannot wire storage")
+
+# 3) set storage WASM memory alongside the audio memory hook.
+audio_mem = "setKarl2dAudioWasmMemory(exports.memory);"
+storage_mem = "setItdStorageWasmMemory(exports.memory);"
+if audio_mem in html:
+    html = html.replace(audio_mem, audio_mem + "\n\t\t\t\t\t" + storage_mem, 1)
+else:
+    raise SystemExit("index template missing karl2d audio memory hook; cannot wire storage")
+
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+print("wired itd_storage localStorage backend into", path)
+PY
 fi
 
 echo "Web build complete: ${OUT_DIR}/"

@@ -24,6 +24,11 @@ game_engine_config :: proc() -> eng.Engine_Config {
 	config.render = gameio.karl2d_render_backend()
 	config.input = gameio.karl2d_input_backend()
 	config.texture = gameio.karl2d_texture_backend()
+	when ODIN_OS == .JS {
+		// Web saves persist through the browser's localStorage backend
+		// (src/engine/file_system_web.odin + scripts/file_system_web.js).
+		config.file_system = eng.engine_file_system_default()
+	}
 	when !NO_AUDIO {
 		config.audio = gameaudio.game_audio_backend(gameaudio.audio_state())
 	} else {
