@@ -63,10 +63,6 @@ tile_light_level_at :: proc(game: ^Game, x, y: int) -> f32 {
 	return tile_state_at(game, x, y).light_level
 }
 
-tile_light_level_idx :: proc(game: ^Game, idx: int) -> f32 {
-	return tile_state_at_idx(game, idx).light_level
-}
-
 tile_state_set :: proc(game: ^Game, x, y: int, visible, explored: bool, light_level: f32) -> bool {
 	if game == nil {return false}
 	return eng.tile_state_set(&game.tile_states, x, y, visible, explored, light_level)

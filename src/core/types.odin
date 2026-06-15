@@ -160,13 +160,6 @@ Inventory_Slot :: struct {
 
 // ─── Equipment ────────────────────────────────────────────────────────────────
 
-Equipment_Slot :: enum {
-	None,
-	Weapon,
-	Armor,
-	Helmet,
-}
-
 Equipment :: struct {
 	occupied: bool,
 	item:     Item,
