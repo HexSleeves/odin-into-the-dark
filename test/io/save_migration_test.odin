@@ -5,13 +5,13 @@ import "core:hash"
 import "core:mem"
 import "core:testing"
 
-// Legacy v2–v10 read support was intentionally dropped (pre-release; no shipped
-// save contract). Any non-v11 version must be rejected cleanly rather than
+// Legacy v2–v11 read support was intentionally dropped (pre-release; no shipped
+// save contract). Any non-v12 version must be rejected cleanly rather than
 // migrated, so a stale save can never be mem.copy'd into the current layout.
 @(test)
 load_save_data_rejects_unsupported_legacy_versions :: proc(t: ^testing.T) {
-	for old_version in u32(0) ..= u32(10) {
-		// Build a v11-sized buffer with a valid CRC, then stamp an old version.
+	for old_version in u32(0) ..= u32(11) {
+		// Build a v12-sized buffer with a valid CRC, then stamp an old version.
 		payload := new(Save_Data)
 		defer free(payload)
 		payload.depth = 3

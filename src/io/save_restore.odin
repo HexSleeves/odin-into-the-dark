@@ -20,11 +20,11 @@ read_and_decode_save :: proc(storage: ^eng.Storage_Manager, path: string) -> ^Sa
 	if len(buf) < size_of(Save_Header) {return nil}
 
 	// ── Validate header ──
-	// v11 is the only supported format: a full 12-byte header (magic + version + crc32).
+	// v12 is the only supported format: a full 12-byte header (magic + version + crc32).
 	header: Save_Header
 	mem.copy(&header, &buf[0], size_of(Save_Header))
 
-	// ── Deserialize current (v11) save data ──
+	// ── Deserialize current (v12) save data ──
 	data, data_ok := load_save_data(header, buf)
 	if !data_ok {return nil}
 	return data

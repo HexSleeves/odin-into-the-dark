@@ -194,10 +194,6 @@ floor_to_save :: proc(floor: ^Saved_Floor, result: ^Save_Floor) {
 	for i in 0 ..< result.room_count {
 		result.rooms[i] = floor.rooms[i]
 	}
-	result.light_source_count = min(len(floor.light_sources), MAX_SAVE_LIGHTS)
-	for i in 0 ..< result.light_source_count {
-		result.light_sources[i] = floor.light_sources[i]
-	}
 	result.palette = floor.palette
 	result.event_used = floor.event_used
 	result.npcs = floor.npcs
@@ -227,7 +223,6 @@ save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Sav
 	room_count := clamp(saved.room_count, 0, MAX_SAVE_ROOMS)
 	enemy_count := clamp(saved.enemy_count, 0, MAX_SAVE_ENEMIES)
 	item_count := clamp(saved.item_count, 0, MAX_SAVE_ITEMS)
-	light_count := clamp(saved.light_source_count, 0, MAX_SAVE_LIGHTS)
 
 	floor.rooms = make([dynamic]Room)
 	for i in 0 ..< room_count {
@@ -241,10 +236,9 @@ save_to_floor :: proc(content: ^Content_Manager, saved: ^Save_Floor, floor: ^Sav
 	for i in 0 ..< item_count {
 		append(&floor.items, save_to_item(content, &saved.items[i]))
 	}
+	// Light sources are no longer serialized (never populated); init empty so the
+	// restored runtime floor still owns a valid (empty) array.
 	floor.light_sources = make([dynamic]Light_Source)
-	for i in 0 ..< light_count {
-		append(&floor.light_sources, saved.light_sources[i])
-	}
 	floor.palette = saved.palette
 	floor.event_used = saved.event_used
 	floor.npcs = saved.npcs

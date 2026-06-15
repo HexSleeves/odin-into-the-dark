@@ -28,22 +28,17 @@ clamp_save_counts :: proc(data: ^Save_Data) {
 			0,
 			MAX_SAVE_ROOMS,
 		)
-		data.visited_floors[d].light_source_count = clamp(
-			data.visited_floors[d].light_source_count,
-			0,
-			MAX_SAVE_LIGHTS,
-		)
 	}
 }
 
-// load_save_data deserializes the current (v11) save format only. Legacy v2–v10
+// load_save_data deserializes the current (v12) save format only. Legacy v2–v11
 // read support was intentionally dropped (pre-release; no shipped save contract),
 // so any other version is rejected cleanly.
 load_save_data :: proc(header: Save_Header, buf: []u8) -> (data: ^Save_Data, ok: bool) {
 	if header.magic != SAVE_MAGIC {return nil, false}
 	if header.version != SAVE_VERSION {return nil, false}
 
-	// v11: full 12-byte header; payload starts at size_of(Save_Header).
+	// v12: full 12-byte header; payload starts at size_of(Save_Header).
 	current_data_offset :: size_of(Save_Header)
 
 	expected_size := size_of(Save_Header) + size_of(Save_Data)

@@ -6,15 +6,15 @@ import eng "../engine"
 // ─── Save Constants ───────────────────────────────────────────────────────────
 
 SAVE_FILE :: gcore.SAVE_FILE
-// v11 is the only supported on-disk format. Legacy v2–v10 read support was
+// v12 is the only supported on-disk format. Legacy v2–v11 read support was
 // intentionally dropped (pre-release; no shipped save contract to honor).
-SAVE_VERSION :: u32(11)
+// v12 dropped the never-populated per-floor Light_Source array from the layout.
+SAVE_VERSION :: u32(12)
 SAVE_MAGIC :: u32(0x44455054) // "DEPT"
 
 MAX_SAVE_ENEMIES :: 64
 MAX_SAVE_ITEMS :: 64
 MAX_SAVE_ROOMS :: 16
-MAX_SAVE_LIGHTS :: 16
 MAX_NAME_LEN :: 32
 
 // ─── Save-safe string (fixed buffer, no heap pointer) ─────────────────────────
@@ -78,24 +78,22 @@ Save_Equipment :: struct {
 
 
 Save_Floor :: struct {
-	tiles:              [MAP_WIDTH * MAP_HEIGHT]Tile,
-	web_tiles:          [MAP_WIDTH * MAP_HEIGHT]bool,
-	ore_veins:          [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
-	player_pos:         Vec2,
-	enemy_count:        int,
-	enemies:            [MAX_SAVE_ENEMIES]Save_Enemy,
-	item_count:         int,
-	items:              [MAX_SAVE_ITEMS]Save_Item,
-	room_count:         int,
-	rooms:              [MAX_SAVE_ROOMS]Room,
-	light_source_count: int,
-	light_sources:      [MAX_SAVE_LIGHTS]Light_Source,
-	palette:            gcore.Floor_Palette,
-	event_used:         bool,
-	npcs:               [gcore.MAX_NPCS]gcore.NPC,
-	npc_count:          int,
+	tiles:       [MAP_WIDTH * MAP_HEIGHT]Tile,
+	web_tiles:   [MAP_WIDTH * MAP_HEIGHT]bool,
+	ore_veins:   [MAP_WIDTH * MAP_HEIGHT]Save_Ore_Vein,
+	player_pos:  Vec2,
+	enemy_count: int,
+	enemies:     [MAX_SAVE_ENEMIES]Save_Enemy,
+	item_count:  int,
+	items:       [MAX_SAVE_ITEMS]Save_Item,
+	room_count:  int,
+	rooms:       [MAX_SAVE_ROOMS]Room,
+	palette:     gcore.Floor_Palette,
+	event_used:  bool,
+	npcs:        [gcore.MAX_NPCS]gcore.NPC,
+	npc_count:   int,
 	// Engine tile-state layer (visibility/exploration/light). LAST field.
-	tile_states:        [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
+	tile_states: [MAP_WIDTH * MAP_HEIGHT]eng.Tile_State,
 }
 // ─── File layout ──────────────────────────────────────────────────────────────
 
@@ -107,9 +105,10 @@ Save_Header :: struct {
 	crc32:   u32,
 }
 
-// Current save format (v11). v11 drops the dead Tile visibility/light fields and
-// instead serializes the engine tile-state layer through a dedicated trailing
-// tile_states array. Per-entity status effects live in player_status/enemy_status.
+// Current save format (v12). v12 drops the never-populated per-floor Light_Source
+// array. (v11 dropped the dead Tile visibility/light fields and instead serializes
+// the engine tile-state layer through a dedicated trailing tile_states array.)
+// Per-entity status effects live in player_status/enemy_status.
 Save_Data :: struct {
 	// Fixed-size tile arrays (Tile has no strings — safe)
 	tiles:                 [MAP_WIDTH * MAP_HEIGHT]Tile,

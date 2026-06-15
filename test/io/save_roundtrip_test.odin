@@ -6,15 +6,17 @@ import "core:hash"
 import "core:mem"
 import "core:testing"
 
-// ─── v11 layout invariants ──────────────────────────────────────────────────────
+// ─── v12 layout invariants ──────────────────────────────────────────────────────
 
 @(test)
-v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
-	// The v11 diet removed the dead Tile vis/explored/light fields and instead
-	// appends a dedicated tile_states array. D4 appended tutorial_flags (game-global
-	// onboarding hints) as Save_Data's trailing field, immediately after tile_states.
-	// (The dead per-floor Save_Floor.tutorial_flags symmetry field was removed; its
-	// trailing field is now tile_states itself.)
+v12_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) {
+	// v12 dropped the never-populated per-floor Light_Source array (light_source_count
+	// + light_sources) from Save_Floor, shifting the binary layout. The v11 diet had
+	// removed the dead Tile vis/explored/light fields and instead appends a dedicated
+	// tile_states array. D4 appended tutorial_flags (game-global onboarding hints) as
+	// Save_Data's trailing field, immediately after tile_states. (The dead per-floor
+	// Save_Floor.tutorial_flags symmetry field was removed; its trailing field is now
+	// tile_states itself.)
 	data_tail_size := size_of(Save_Data) - int(offset_of(Save_Data, tutorial_flags))
 
 	// tutorial_flags is a bit_set[Tutorial_Hint; u8]; the trailing span is at least
@@ -33,13 +35,22 @@ v11_save_data_layout_has_expected_byte_size_relationship :: proc(t: ^testing.T) 
 
 	// Save_Floor's trailing field is now tile_states (no per-floor tutorial_flags copy).
 	floor_tile_tail := size_of(Save_Floor) - int(offset_of(Save_Floor, tile_states))
-	testing.expect(t, floor_tile_tail > 0, "Save_Floor tile_states must carry the trailing engine layer")
+	testing.expect(
+		t,
+		floor_tile_tail > 0,
+		"Save_Floor tile_states must carry the trailing engine layer",
+	)
+
+	// v12: the per-floor Light_Source array is gone, so palette now sits immediately
+	// after the rooms array with no light_source_count/light_sources gap between them.
+	rooms_to_palette := int(offset_of(Save_Floor, palette)) - int(offset_of(Save_Floor, rooms))
+	testing.expect_value(t, rooms_to_palette, size_of([MAX_SAVE_ROOMS]Room))
 }
 
-// ─── v11 round-trip tests ───────────────────────────────────────────────────────
+// ─── v12 round-trip tests ───────────────────────────────────────────────────────
 
 @(test)
-v11_save_data_round_trips_correctly :: proc(t: ^testing.T) {
+v12_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 8
@@ -67,7 +78,7 @@ v11_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 
 	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "v11 round-trip must succeed")
+	testing.expect(t, ok, "v12 round-trip must succeed")
 	if data == nil {return}
 	defer free(data)
 
@@ -82,7 +93,7 @@ v11_save_data_round_trips_correctly :: proc(t: ^testing.T) {
 }
 
 @(test)
-tutorial_flags_survive_a_v11_save_and_restore_roundtrip :: proc(t: ^testing.T) {
+tutorial_flags_survive_a_v12_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 4
@@ -101,7 +112,7 @@ tutorial_flags_survive_a_v11_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 	mem.copy(&buf[0], &header, size_of(Save_Header))
 
 	data, ok := load_save_data(header, buf)
-	testing.expect(t, ok, "v11 round-trip must succeed")
+	testing.expect(t, ok, "v12 round-trip must succeed")
 	if data == nil {return}
 	defer free(data)
 
@@ -117,7 +128,7 @@ tutorial_flags_survive_a_v11_save_and_restore_roundtrip :: proc(t: ^testing.T) {
 }
 
 @(test)
-v11_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
+v12_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	payload.depth = 2
@@ -144,7 +155,7 @@ v11_save_data_is_rejected_when_crc_does_not_match_payload :: proc(t: ^testing.T)
 }
 
 @(test)
-v11_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
+v12_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -170,7 +181,7 @@ v11_save_data_is_rejected_when_buffer_is_truncated :: proc(t: ^testing.T) {
 }
 
 @(test)
-v11_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
+v12_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 
@@ -194,7 +205,7 @@ v11_save_data_is_rejected_when_buffer_is_oversized :: proc(t: ^testing.T) {
 }
 
 @(test)
-v11_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
+v12_save_data_clamps_enemy_and_item_counts_above_capacity :: proc(t: ^testing.T) {
 	payload := new(Save_Data)
 	defer free(payload)
 	// Set counts above their fixed-array capacities.
