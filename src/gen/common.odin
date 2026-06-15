@@ -18,7 +18,7 @@ Engine_Color :: eng.Engine_Color
 MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_DEPTH :: gcore.MAX_DEPTH
-ITEM_ID_VAULT_KEY :: "vault_key"
+ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
 CARDINAL_DX :: gcore.CARDINAL_DX
 CARDINAL_DY :: gcore.CARDINAL_DY
 
