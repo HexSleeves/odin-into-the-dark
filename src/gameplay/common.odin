@@ -103,17 +103,17 @@ content_manager_player_def :: gcore.content_manager_player_def
 palette_for_depth :: gcore.palette_for_depth
 
 // ─── Service accessors ────────────────────────────────────────────────────────
-game_engine_content_manager :: renderer.game_engine_content_manager
-game_engine_message_manager :: renderer.game_engine_message_manager
-game_engine_camera_manager :: renderer.game_engine_camera_manager
-game_engine_turn_manager :: renderer.game_engine_turn_manager
-game_engine_vfx_manager :: renderer.game_engine_vfx_manager
-game_engine_particle_manager :: renderer.game_engine_particle_manager
+game_engine_content_manager :: gcore.game_engine_content_manager
+game_engine_message_manager :: gcore.game_engine_message_manager
+game_engine_camera_manager :: gcore.game_engine_camera_manager
+game_engine_turn_manager :: gcore.game_engine_turn_manager
+game_engine_vfx_manager :: gcore.game_engine_vfx_manager
+game_engine_particle_manager :: gcore.game_engine_particle_manager
 game_engine_audio_manager :: proc(engine: ^Engine) -> ^Audio_Manager {
 	return eng.engine_audio_manager(engine)
 }
-game_camera_x :: renderer.game_camera_x
-game_camera_y :: renderer.game_camera_y
+game_camera_x :: gcore.game_camera_x
+game_camera_y :: gcore.game_camera_y
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 add_message :: gameui.add_message

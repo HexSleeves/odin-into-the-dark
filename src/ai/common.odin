@@ -47,8 +47,8 @@ enemy_display_name :: gcore.enemy_display_name
 game_grid :: gcore.game_grid
 add_message :: gameui.add_message
 play_sfx :: gameaudio.play_sfx
-game_engine_vfx_manager :: renderer.game_engine_vfx_manager
-game_engine_floating_text_manager :: renderer.game_engine_floating_text_manager
+game_engine_vfx_manager :: gcore.game_engine_vfx_manager
+game_engine_floating_text_manager :: gcore.game_engine_floating_text_manager
 logger_debugf :: gameio.logger_debugf
 
 effective_attack :: gcore.effective_attack
