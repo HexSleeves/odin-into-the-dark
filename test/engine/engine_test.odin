@@ -130,8 +130,6 @@ engine_run_uses_configured_platform_backend :: proc(t: ^testing.T) {
 	testing.expect_value(t, app_state.frame_index, 1)
 	testing.expect_value(t, app_state.delta_time, f32(0.125))
 	testing.expect_value(t, app_state.elapsed_time, f32(0.125))
-	testing.expect_value(t, app_state.event_count_in_update, 0)
-	testing.expect_value(t, app_state.event_count_in_render, 1)
 	testing.expect_value(t, app_state.render_count, 1)
 	testing.expect_value(t, app_state.shutdown_count, 1)
 	testing.expect_value(t, app_state.autosave_count, 1)
@@ -290,21 +288,19 @@ test_platform_window_should_close :: proc(ctx: rawptr) -> bool {
 }
 
 Test_Run_App_State :: struct {
-	init_count:            int,
-	update_count:          int,
-	render_count:          int,
-	shutdown_count:        int,
-	autosave_count:        int,
-	measured_width:        i32,
-	file_system_ctx:       rawptr,
-	input_ctx:             rawptr,
-	texture:               Engine_Texture,
-	texture_handle:        rawptr,
-	frame_index:           int,
-	delta_time:            f32,
-	elapsed_time:          f32,
-	event_count_in_update: int,
-	event_count_in_render: int,
+	init_count:      int,
+	update_count:    int,
+	render_count:    int,
+	shutdown_count:  int,
+	autosave_count:  int,
+	measured_width:  i32,
+	file_system_ctx: rawptr,
+	input_ctx:       rawptr,
+	texture:         Engine_Texture,
+	texture_handle:  rawptr,
+	frame_index:     int,
+	delta_time:      f32,
+	elapsed_time:    f32,
 }
 
 test_run_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {
@@ -314,7 +310,6 @@ test_run_app_init :: proc(engine: ^Engine, app: ^Game_App) -> bool {
 	state.file_system_ctx = fs.ctx
 	input := engine_input_backend(engine)
 	state.input_ctx = input.ctx
-	_ = event_manager_push(engine_event_manager(engine), engine_event_window_close_requested())
 	state.texture = engine_texture_load(engine, "assets/test.png")
 	state.texture_handle = state.texture.handle
 	return true
@@ -327,16 +322,12 @@ test_run_app_update :: proc(engine: ^Engine, app: ^Game_App) -> bool {
 	state.frame_index = frame_manager_index(frames^)
 	state.delta_time = frame_manager_delta_time(frames^)
 	state.elapsed_time = frame_manager_elapsed_time(frames^)
-	events := engine_event_manager(engine)
-	state.event_count_in_update = event_manager_count(events^)
-	_ = event_manager_push(events, engine_event_key_down(.W))
 	return false
 }
 
 test_run_app_render :: proc(engine: ^Engine, app: ^Game_App) {
 	state := cast(^Test_Run_App_State)app.state
 	state.render_count += 1
-	state.event_count_in_render = event_manager_count(engine_event_manager(engine)^)
 	engine_render_begin_frame(engine)
 	engine_render_clear(engine, engine_color_make(1, 2, 3, 4))
 	engine_render_begin_scissor(engine, 5, 6, 7, 8)

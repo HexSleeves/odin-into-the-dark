@@ -22,7 +22,6 @@ Engine :: struct {
 	services:         ^Engine_Services,
 	scene_manager:    Scene_Manager,
 	frame_manager:    Frame_Manager,
-	event_manager:    Event_Manager,
 	texture_manager:  Texture_Manager,
 	audio_manager:    Audio_Manager,
 	storage_manager:  Storage_Manager,
@@ -75,13 +74,6 @@ engine_frame_manager :: proc(engine: ^Engine) -> ^Frame_Manager {
 		return nil
 	}
 	return &engine.frame_manager
-}
-
-engine_event_manager :: proc(engine: ^Engine) -> ^Event_Manager {
-	if engine == nil {
-		return nil
-	}
-	return &engine.event_manager
 }
 
 engine_texture_manager :: proc(engine: ^Engine) -> ^Texture_Manager {
@@ -271,7 +263,6 @@ engine_step :: proc(state: ^Engine_State) -> bool {
 
 	frame_manager_begin(&state.engine.frame_manager, engine_input_frame_time(state.engine.input))
 	frame_manager_clear_quit(&state.engine.frame_manager)
-	event_manager_clear(&state.engine.event_manager)
 	audio_manager_update(&state.engine.audio_manager)
 
 	quit := false
