@@ -41,30 +41,6 @@ tile_state_at_idx :: proc(manager: Tile_State_Manager, index: int) -> Tile_State
 	return manager.states[index]
 }
 
-tile_state_visible :: proc(manager: Tile_State_Manager, x, y: int) -> bool {
-	return tile_state_at(manager, x, y).visible
-}
-
-tile_state_visible_idx :: proc(manager: Tile_State_Manager, index: int) -> bool {
-	return tile_state_at_idx(manager, index).visible
-}
-
-tile_state_explored :: proc(manager: Tile_State_Manager, x, y: int) -> bool {
-	return tile_state_at(manager, x, y).explored
-}
-
-tile_state_explored_idx :: proc(manager: Tile_State_Manager, index: int) -> bool {
-	return tile_state_at_idx(manager, index).explored
-}
-
-tile_state_light_level :: proc(manager: Tile_State_Manager, x, y: int) -> f32 {
-	return tile_state_at(manager, x, y).light_level
-}
-
-tile_state_light_level_idx :: proc(manager: Tile_State_Manager, index: int) -> f32 {
-	return tile_state_at_idx(manager, index).light_level
-}
-
 tile_state_set :: proc(
 	manager: ^Tile_State_Manager,
 	x, y: int,
@@ -101,40 +77,6 @@ tile_state_set_idx :: proc(
 		explored    = explored,
 		light_level = light_level,
 	}
-	return true
-}
-
-tile_state_set_visible :: proc(manager: ^Tile_State_Manager, x, y: int, visible: bool) -> bool {
-	if manager == nil ||
-	   !tile_state_manager_is_valid(manager^) ||
-	   !engine_grid_2d_contains(manager.grid, x, y) {
-		return false
-	}
-	manager.states[engine_grid_2d_index(manager.grid, x, y)].visible = visible
-	return true
-}
-
-tile_state_set_explored :: proc(manager: ^Tile_State_Manager, x, y: int, explored: bool) -> bool {
-	if manager == nil ||
-	   !tile_state_manager_is_valid(manager^) ||
-	   !engine_grid_2d_contains(manager.grid, x, y) {
-		return false
-	}
-	manager.states[engine_grid_2d_index(manager.grid, x, y)].explored = explored
-	return true
-}
-
-tile_state_set_light_level :: proc(
-	manager: ^Tile_State_Manager,
-	x, y: int,
-	light_level: f32,
-) -> bool {
-	if manager == nil ||
-	   !tile_state_manager_is_valid(manager^) ||
-	   !engine_grid_2d_contains(manager.grid, x, y) {
-		return false
-	}
-	manager.states[engine_grid_2d_index(manager.grid, x, y)].light_level = light_level
 	return true
 }
 
