@@ -5,6 +5,9 @@ PUBLIC_BUILD :: #config(PUBLIC_BUILD, false)
 when PUBLIC_BUILD {
 	#assert(!CHEATS_ENABLED, "Public builds must not enable CHEATS")
 }
+// DEBUG_OVERLAY compiles in the toggleable perf/debug overlay (F3) and the
+// per-frame tracking allocator. Defaults off so release builds are unaffected.
+DEBUG_OVERLAY :: #config(DEBUG_OVERLAY, false)
 NO_AUDIO :: #config(NO_AUDIO, false)
 NO_SPRITES :: #config(NO_SPRITES, false)
 SPRITES_REQUESTED :: #config(SPRITES, false)

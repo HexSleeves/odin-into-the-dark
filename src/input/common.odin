@@ -11,6 +11,7 @@ import gameui "../ui"
 // ─── Build flags (needed for `when` guards in this package) ───────────────────
 CHEATS_ENABLED :: #config(CHEATS, false)
 NO_SPRITES :: #config(NO_SPRITES, false)
+DEBUG_OVERLAY :: #config(DEBUG_OVERLAY, false)
 
 // ─── Core types ───────────────────────────────────────────────────────────────
 Game :: gcore.Game
@@ -109,6 +110,7 @@ spawn_pickup_particles :: renderer.spawn_pickup_particles
 spawn_death_particles :: renderer.spawn_death_particles
 
 // ─── IO helpers ───────────────────────────────────────────────────────────────
+perf_capture_set :: gameio.perf_capture_set
 save_manager_load_game :: gameio.save_manager_load_game
 save_manager_save_game :: gameio.save_manager_save_game
 save_manager_save_exists :: gameio.save_manager_save_exists

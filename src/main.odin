@@ -12,6 +12,10 @@ main :: proc() {
 		web_main_init()
 	} else {
 		// Desktop: blocking game loop.
+		when DEBUG_OVERLAY {
+			context.allocator = debug_tracking_install()
+			defer debug_tracking_report()
+		}
 		config := game_engine_config()
 		services := game_engine_services_config()
 		app := game_app_make()

@@ -116,6 +116,15 @@ handle_playing_hotkeys :: proc(
 		ui.show_minimap = !ui.show_minimap
 	}
 
+	when DEBUG_OVERLAY {
+		if action_pressed(im, .Debug_Overlay) {
+			ui.debug_overlay = !ui.debug_overlay
+			// Drive perf-timer capture from the overlay so channel timings populate
+			// only while the overlay is shown.
+			perf_capture_set(ui.debug_overlay)
+		}
+	}
+
 	if action_pressed(im, .Toggle_Audio) {
 		audio := game_engine_audio_manager(engine)
 		enabled := audio_manager_toggle(audio)

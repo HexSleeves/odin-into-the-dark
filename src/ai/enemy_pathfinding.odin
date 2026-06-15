@@ -1,9 +1,11 @@
 package ai
 
 import eng "../engine"
+import gameio "../io"
 
 
 compute_dijkstra_map :: proc(game: ^Game) {
+	gameio.perf_count_dijkstra_recompute()
 	dmap := eng.engine_distance_map_make(game.dijkstra_map[:], game_grid(game), DMAP_UNREACHABLE)
 
 	// Validate the map ONCE here; the BFS below already bounds-checks every

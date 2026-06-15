@@ -123,6 +123,9 @@ game_app_update :: proc(engine: ^eng.Engine, app: ^eng.Game_App) -> bool {
 	}
 
 	game := state.game
+	when DEBUG_OVERLAY {
+		debug_tracking_sample()
+	}
 	when !NO_AUDIO {
 		gameaudio.music_update(game)
 	}

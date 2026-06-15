@@ -19,6 +19,7 @@ Game_Action :: enum {
 	Load,
 	Toggle_Audio,
 	Cheat_Menu,
+	Debug_Overlay,
 	Toggle_Sprites,
 	Menu_Up,
 	Menu_Down,
@@ -82,6 +83,9 @@ input_default_bindings :: proc(im: ^Input_Manager) {
 	input_set_binding(im, .Toggle_Audio, {primary = .F1})
 	when CHEATS_ENABLED {
 		input_set_binding(im, .Cheat_Menu, {primary = .Grave})
+	}
+	when DEBUG_OVERLAY {
+		input_set_binding(im, .Debug_Overlay, {primary = .F3})
 	}
 	input_set_binding(im, .Toggle_Sprites, {primary = .F2})
 	input_set_binding(im, .Menu_Up, {primary = .W, alt = .Up})

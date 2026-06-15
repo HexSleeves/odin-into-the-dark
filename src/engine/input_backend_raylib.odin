@@ -115,6 +115,8 @@ engine_key_to_raylib :: proc(key: Engine_Key) -> rl.KeyboardKey {
 		return .F1
 	case .F2:
 		return .F2
+	case .F3:
+		return .F3
 	case .Enter:
 		return .ENTER
 	case .Space:

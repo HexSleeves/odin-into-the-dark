@@ -12,6 +12,24 @@ ui_manager_make_sets_defaults :: proc(t: ^testing.T) {
 	testing.expect(t, state.use_sprites)
 	testing.expect_value(t, state.inspect_slot, -1)
 	testing.expect_value(t, state.title_choice, 0)
+	testing.expect(t, !state.debug_overlay, "debug overlay should default to hidden")
+}
+
+@(test)
+ui_manager_debug_overlay_flag_toggles :: proc(t: ^testing.T) {
+	ui := ui_manager_make(true)
+	state := ui_manager_state(&ui)
+
+	testing.expect(t, !state.debug_overlay, "overlay starts hidden")
+	state.debug_overlay = !state.debug_overlay
+	testing.expect(t, state.debug_overlay, "overlay shows after first toggle")
+	state.debug_overlay = !state.debug_overlay
+	testing.expect(t, !state.debug_overlay, "overlay hides after second toggle")
+
+	// New-game reset must clear the overlay back to hidden.
+	state.debug_overlay = true
+	ui_manager_reset_for_new_game(&ui, true)
+	testing.expect(t, !state.debug_overlay, "new game reset should hide the overlay")
 }
 
 @(test)

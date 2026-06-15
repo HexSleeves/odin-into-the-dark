@@ -22,6 +22,7 @@ Engine_Key :: enum {
 	F9,
 	F1,
 	F2,
+	F3,
 	Enter,
 	Space,
 	N,

@@ -202,6 +202,7 @@ UI_State :: struct {
 	return_to_title: bool, // modal overlays should return to title instead of gameplay
 	cheat_choice:    int, // highlighted cheat menu row; only used in CHEATS builds
 	pause_choice:    int, // highlighted pause menu row (Resume / Quit to Title)
+	debug_overlay:   bool, // perf/debug overlay visible; only used in DEBUG_OVERLAY builds
 }
 
 // ─── Game State ───────────────────────────────────────────────────────────────

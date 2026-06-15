@@ -34,6 +34,7 @@ render_game :: proc(engine: ^eng.Engine, game: ^gcore.Game) {
 
 	clay_ui_begin_frame(engine)
 	clay_render_screen_ui(engine, game)
+	clay_render_debug_overlay(engine, game)
 	delta_time := f32(0)
 	frames := eng.engine_frame_manager(engine)
 	if frames != nil {

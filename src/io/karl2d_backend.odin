@@ -286,6 +286,8 @@ to_k2_key :: proc(key: eng.Engine_Key) -> k2.Keyboard_Key {
 		return .F1
 	case .F2:
 		return .F2
+	case .F3:
+		return .F3
 	case .Enter:
 		return .Enter
 	case .Space:
