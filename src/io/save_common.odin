@@ -27,8 +27,6 @@ MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
 MAX_INVENTORY :: gcore.MAX_INVENTORY
 MAX_DEPTH :: gcore.MAX_DEPTH
-DEATH_CAUSE_MAX_LEN :: gcore.DEATH_CAUSE_MAX_LEN
-BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 DEFAULT_ENEMY_DETECTION_RADIUS :: gcore.DEFAULT_ENEMY_DETECTION_RADIUS
 DEFAULT_ENEMY_MEMORY_TURNS :: gcore.DEFAULT_ENEMY_MEMORY_TURNS
 
@@ -46,7 +44,6 @@ ITEM_EFFECT_MATERIAL :: "material"
 content_manager_item_def :: gcore.content_manager_item_def
 content_manager_player_def :: gcore.content_manager_player_def
 content_manager_enemy_def :: gcore.content_manager_enemy_def
-item_display_name :: gcore.item_display_name
 tile_state_manager_import :: gcore.tile_state_manager_import
 tile_state_manager_export :: gcore.tile_state_manager_export
 game_init_world :: gcore.game_init_world
@@ -68,12 +65,9 @@ clear_messages :: proc(messages: ^Message_Manager) {
 	eng.message_manager_clear(messages)
 }
 
-saved_floor_destroy :: gcore.saved_floor_destroy
-clear_visited_floors :: gcore.clear_visited_floors
-
 game_cleanup :: proc(game: ^Game) {
 	if game == nil {return}
-	clear_visited_floors(game)
+	gcore.clear_visited_floors(game)
 	if game.rooms != nil {delete(game.rooms)}
 	if game.enemies != nil {delete(game.enemies)}
 	if game.items != nil {delete(game.items)}

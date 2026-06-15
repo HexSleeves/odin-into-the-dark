@@ -10,27 +10,17 @@ import gameui "../ui"
 
 // ─── Build flags (needed for `when` guards in this package) ───────────────────
 CHEATS_ENABLED :: #config(CHEATS, false)
-NO_AUDIO :: #config(NO_AUDIO, false)
 NO_SPRITES :: #config(NO_SPRITES, false)
 
 // ─── Core types ───────────────────────────────────────────────────────────────
 Game :: gcore.Game
-Player :: gcore.Player
-Enemy :: gcore.Enemy
-Item :: gcore.Item
 Vec2 :: gcore.Vec2
-Tile :: gcore.Tile
-Tile_Type :: gcore.Tile_Type
 Content_Manager :: gcore.Content_Manager
 Message_Manager :: eng.Message_Manager
 Engine :: eng.Engine
 UI_Manager :: gameui.UI_Manager
-UI_State :: gcore.UI_State
-Status_Kind :: gcore.Status_Kind
 status_active :: gcore.status_active
-Score_Manager :: renderer.Score_Manager
 Audio_Manager :: gameaudio.Audio_Manager
-Sound_Type :: gameaudio.Sound_Type
 when CHEATS_ENABLED {
 	Cheat_Command :: gcore.Cheat_Command
 }
@@ -43,7 +33,6 @@ MAX_DEPTH :: gcore.MAX_DEPTH
 SURFACE_DEPTH :: gcore.SURFACE_DEPTH
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
-TILE_SIZE :: gcore.TILE_SIZE
 ITEM_ID_VAULT_KEY :: gcore.ITEM_ID_VAULT_KEY
 TITLE_OPTION_COUNT :: gcore.TITLE_OPTION_COUNT
 TITLE_NEW_GAME :: gcore.TITLE_NEW_GAME
@@ -65,9 +54,7 @@ tile_state_at_idx :: gcore.tile_state_at_idx
 tile_state_set_idx :: gcore.tile_state_set_idx
 is_walkable :: gcore.is_walkable
 enemy_at :: gcore.enemy_at
-item_at :: gcore.item_at
 npc_at :: gcore.npc_at
-item_display_name :: gcore.item_display_name
 effective_attack_cost :: gcore.effective_attack_cost
 remove_item_from_inventory :: gcore.remove_item_from_inventory
 game_camera_update :: gcore.game_camera_update
@@ -109,17 +96,14 @@ game_engine_input_manager :: proc(engine: ^Engine) -> ^Input_Manager {
 
 // ─── UI helpers ───────────────────────────────────────────────────────────────
 add_message :: gameui.add_message
-clear_messages :: gameui.clear_messages
 ui_manager_state :: gameui.ui_manager_state
 
 // ─── Audio helpers ────────────────────────────────────────────────────────────
-play_sfx :: gameaudio.play_sfx
 audio_manager_play_sfx :: gameaudio.audio_manager_play_sfx
 audio_manager_toggle :: gameaudio.audio_manager_toggle
 audio_set_master_volume :: gameaudio.audio_set_master_volume
 
 // ─── Render helpers ───────────────────────────────────────────────────────────
-spawn_hit_particles :: renderer.spawn_hit_particles
 spawn_mine_particles :: renderer.spawn_mine_particles
 spawn_pickup_particles :: renderer.spawn_pickup_particles
 spawn_death_particles :: renderer.spawn_death_particles
@@ -128,7 +112,6 @@ spawn_death_particles :: renderer.spawn_death_particles
 save_manager_load_game :: gameio.save_manager_load_game
 save_manager_save_game :: gameio.save_manager_save_game
 save_manager_save_exists :: gameio.save_manager_save_exists
-logger_debugf :: gameio.logger_debugf
 
 // ─── Gameplay helpers ─────────────────────────────────────────────────────────
 start_conversation :: gp.start_conversation
@@ -153,6 +136,5 @@ try_craft :: gp.try_craft
 save_run_score :: gp.save_run_score
 compute_fov :: gp.compute_fov
 item_make :: gp.item_make
-apply_item_effect :: gp.apply_item_effect
 generate_map :: gp.generate_map
 restart_game :: gp.restart_game

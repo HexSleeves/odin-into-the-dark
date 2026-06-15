@@ -16,10 +16,8 @@ Engine :: eng.Engine
 
 MAP_WIDTH :: gcore.MAP_WIDTH
 MAP_HEIGHT :: gcore.MAP_HEIGHT
-TILE_SIZE :: gcore.TILE_SIZE
 BASE_ACTION_COST :: gcore.BASE_ACTION_COST
 BASE_MOVE_COST :: gcore.BASE_MOVE_COST
-BASE_AP_PER_ROUND :: gcore.BASE_AP_PER_ROUND
 DMAP_UNREACHABLE :: gcore.DMAP_UNREACHABLE
 DEATH_CAUSE_MAX_LEN :: gcore.DEATH_CAUSE_MAX_LEN
 CARDINAL_DX :: gcore.CARDINAL_DX
@@ -42,20 +40,16 @@ is_walkable :: gcore.is_walkable
 tile_at :: gcore.tile_at
 logger_warnf :: gameio.logger_warnf
 spawn_death_particles :: renderer.spawn_death_particles
-tile_visible_at :: gcore.tile_visible_at
 web_tile_at :: gcore.web_tile_at
 web_tile_set :: gcore.web_tile_set
 pos_to_idx :: gcore.pos_to_idx
 enemy_display_name :: gcore.enemy_display_name
-item_display_name :: gcore.item_display_name
 game_grid :: gcore.game_grid
 add_message :: gameui.add_message
-clear_messages :: gameui.clear_messages
 play_sfx :: gameaudio.play_sfx
 game_engine_vfx_manager :: renderer.game_engine_vfx_manager
 game_engine_floating_text_manager :: renderer.game_engine_floating_text_manager
 logger_debugf :: gameio.logger_debugf
-Game_Log_Channel :: gameio.Game_Log_Channel
 
 effective_attack :: gcore.effective_attack
 apply_kill_milestone_buff :: gcore.apply_kill_milestone_buff
@@ -71,8 +65,6 @@ effective_crit_chance :: gcore.effective_crit_chance
 CRIT_DAMAGE_MULT_PCT :: gcore.CRIT_DAMAGE_MULT_PCT
 SLAM_BASE_DAMAGE :: gcore.SLAM_BASE_DAMAGE
 
-Status_Kind :: gcore.Status_Kind
-Status_Turns :: gcore.Status_Turns
 status_apply :: gcore.status_apply
 status_active :: gcore.status_active
 

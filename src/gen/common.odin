@@ -11,7 +11,6 @@ Room :: gcore.Room
 Tile :: gcore.Tile
 Tile_Type :: gcore.Tile_Type
 Enemy :: gcore.Enemy
-Item :: gcore.Item
 Item_Def :: gcore.Item_Def
 Ore_Vein :: gcore.Ore_Vein
 Vec2 :: gcore.Vec2
@@ -24,21 +23,17 @@ CARDINAL_DX :: gcore.CARDINAL_DX
 CARDINAL_DY :: gcore.CARDINAL_DY
 
 pos_to_idx :: gcore.pos_to_idx
-idx_to_pos :: gcore.idx_to_pos
 is_walkable :: gcore.is_walkable
 enemy_at :: gcore.enemy_at
 item_at :: gcore.item_at
-web_tiles_clear :: gcore.web_tiles_clear
 enemy_make_from_def :: gcore.enemy_make_from_def
 item_make_from_def :: gcore.item_make_from_def
 content_manager_enemy_def :: gcore.content_manager_enemy_def
 content_manager_enemy_def_for_depth :: gcore.content_manager_enemy_def_for_depth
 content_manager_item_def :: gcore.content_manager_item_def
 content_manager_pick_item_def_for_depth :: gcore.content_manager_pick_item_def_for_depth
-content_manager_room_item_chance :: gcore.content_manager_room_item_chance
 palette_for_depth :: gcore.palette_for_depth
 
 logger_debugf :: gameio.logger_debugf
-Game_Log_Channel :: gameio.Game_Log_Channel
 rand_room_interior :: gcore.rand_room_interior
 rand_room_any :: gcore.rand_room_any
