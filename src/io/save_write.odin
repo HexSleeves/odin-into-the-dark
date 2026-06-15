@@ -98,15 +98,22 @@ save_game_to_storage :: proc(
 		item     = item_to_save(&game.equipped_helmet.item),
 	}
 
-	// ── Convert visited floor stack ──
+	// ── Convert visited floor stack into a length-prefixed list of PRESENT floors ──
+	// Only depths with a populated runtime floor are serialized (v14); absent depths
+	// cost nothing on disk. Each record is depth-tagged so restore can reconstruct
+	// the sparse visited_floors stack at the correct slots.
+	floor_records: [dynamic]Save_Floor_Record
+	defer delete(floor_records)
 	for depth in 0 ..< len(game.visited_floors) {
 		if game.visited_floors[depth] == nil {continue}
-		data.visited_floor_present[depth] = true
-		floor_to_save(game.visited_floors[depth], &data.visited_floors[depth])
+		rec: Save_Floor_Record
+		rec.depth = i32(depth)
+		floor_to_save(game.visited_floors[depth], &rec.floor)
 		floor_enemy_count := min(len(game.visited_floors[depth].enemies), MAX_SAVE_ENEMIES)
 		for i in 0 ..< floor_enemy_count {
-			data.floor_enemy_status[depth][i] = game.visited_floors[depth].enemies[i].status
+			rec.enemy_status[i] = game.visited_floors[depth].enemies[i].status
 		}
+		append(&floor_records, rec)
 	}
 
 	// ── Write dialogue persistent state ──
@@ -121,15 +128,27 @@ save_game_to_storage :: proc(
 		data.dlg_flag_lens[i] = game.dlg_flag_lens[i]
 	}
 
-	// ── Serialize header + data as raw bytes ──
-	// v10: header is Save_Header (12 bytes: magic + version + crc32).
-	total_size := size_of(Save_Header) + size_of(Save_Data)
+	// ── Serialize header + data + floor list as raw bytes ──
+	// header (12 bytes) | Save_Data | floor_count:u32 | floor_count × Save_Floor_Record
+	floor_count := u32(len(floor_records))
+	data_offset := size_of(Save_Header)
+	count_offset := data_offset + size_of(Save_Data)
+	floors_offset := count_offset + size_of(u32)
+	total_size := floors_offset + int(floor_count) * size_of(Save_Floor_Record)
 	buf := make([]u8, total_size)
 	defer delete(buf)
 
 	// Copy payload first so we can checksum it.
-	mem.copy(&buf[size_of(Save_Header)], data, size_of(Save_Data))
-	payload_bytes := buf[size_of(Save_Header):]
+	mem.copy(&buf[data_offset], data, size_of(Save_Data))
+	mem.copy(&buf[count_offset], &floor_count, size_of(u32))
+	if floor_count > 0 {
+		mem.copy(
+			&buf[floors_offset],
+			raw_data(floor_records),
+			int(floor_count) * size_of(Save_Floor_Record),
+		)
+	}
+	payload_bytes := buf[data_offset:]
 	checksum := hash.crc32(payload_bytes)
 
 	header := Save_Header {

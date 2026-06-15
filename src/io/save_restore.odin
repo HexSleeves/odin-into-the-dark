@@ -8,26 +8,33 @@ import gcore "../core"
 import eng "../engine"
 
 // read_and_decode_save reads one candidate path, validates its header, and
-// migrates/deserializes the payload into a freshly allocated Save_Data.
-// Returns nil on any failure so the caller can fall back to the next candidate.
+// deserializes the payload into a freshly allocated Save_Data plus the present
+// floor records. Returns ok=false on any failure so the caller can fall back to
+// the next candidate. On success the caller owns both `data` (free) and `floors`
+// (delete).
 @(private = "file")
-read_and_decode_save :: proc(storage: ^eng.Storage_Manager, path: string) -> ^Save_Data {
+read_and_decode_save :: proc(
+	storage: ^eng.Storage_Manager,
+	path: string,
+) -> (
+	data: ^Save_Data,
+	floors: []Save_Floor_Record,
+	ok: bool,
+) {
 	read_allocator := context.allocator
 	buf, read_ok := eng.storage_manager_read(storage, path, read_allocator)
-	if !read_ok {return nil}
+	if !read_ok {return nil, nil, false}
 	defer delete(buf, read_allocator)
 
-	if len(buf) < size_of(Save_Header) {return nil}
+	if len(buf) < size_of(Save_Header) {return nil, nil, false}
 
 	// ── Validate header ──
-	// v12 is the only supported format: a full 12-byte header (magic + version + crc32).
+	// v14 is the only supported format: a full 12-byte header (magic + version + crc32).
 	header: Save_Header
 	mem.copy(&header, &buf[0], size_of(Save_Header))
 
-	// ── Deserialize current (v12) save data ──
-	data, data_ok := load_save_data(header, buf)
-	if !data_ok {return nil}
-	return data
+	// ── Deserialize current (v14) save data + floor list ──
+	return load_save_data(header, buf)
 }
 
 load_game :: proc(
@@ -77,12 +84,20 @@ load_game_from_storage :: proc(
 	defer delete(tmp_path)
 
 	data: ^Save_Data
+	floors: []Save_Floor_Record
+	decoded := false
 	for candidate in ([]string{path, bak_path}) {
-		data = read_and_decode_save(storage, candidate)
-		if data != nil {break}
+		decoded_data, decoded_floors, decoded_ok := read_and_decode_save(storage, candidate)
+		if decoded_ok {
+			data = decoded_data
+			floors = decoded_floors
+			decoded = true
+			break
+		}
 	}
-	if data == nil {return false}
+	if !decoded {return false}
 	defer free(data)
+	defer delete(floors)
 	old_context := context
 	context.allocator = runtime.default_allocator()
 	defer {
@@ -136,14 +151,23 @@ load_game_from_storage :: proc(
 	if game.depth == gcore.SURFACE_DEPTH {
 		gcore.place_town_npcs(game)
 	}
-	for depth in 0 ..< len(data.visited_floor_present) {
-		if !data.visited_floor_present[depth] {continue}
+	// Reconstruct the sparse visited_floors stack from the length-prefixed floor
+	// list. Depth tags were range-validated during decode, so each record maps to a
+	// valid visited_floors slot. A duplicate depth (last-wins) leaks nothing: any
+	// prior floor at that slot is destroyed before the slot is overwritten.
+	for &rec in floors {
+		depth := int(rec.depth)
+		if game.visited_floors[depth] != nil {
+			gcore.saved_floor_destroy(game.visited_floors[depth])
+			free(game.visited_floors[depth], runtime.default_allocator())
+			game.visited_floors[depth] = nil
+		}
 		game.visited_floors[depth] = new(Saved_Floor, runtime.default_allocator())
 		if game.visited_floors[depth] != nil {
-			save_to_floor(content, &data.visited_floors[depth], game.visited_floors[depth])
+			save_to_floor(content, &rec.floor, game.visited_floors[depth])
 			floor_enemy_count := min(len(game.visited_floors[depth].enemies), MAX_SAVE_ENEMIES)
 			for i in 0 ..< floor_enemy_count {
-				game.visited_floors[depth].enemies[i].status = data.floor_enemy_status[depth][i]
+				game.visited_floors[depth].enemies[i].status = rec.enemy_status[i]
 			}
 		}
 	}

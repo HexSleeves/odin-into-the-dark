@@ -194,6 +194,89 @@ save_game_falls_back_to_direct_write_when_rename_is_unavailable :: proc(t: ^test
 }
 
 @(test)
+sparse_visited_floors_round_trip_end_to_end_at_correct_depths :: proc(t: ^testing.T) {
+	// Full save → load through the real serializer with a SPARSE set of present
+	// floors at non-contiguous depths. v14 writes only present floors as a
+	// length-prefixed list; restore must rebuild the visited_floors stack with each
+	// floor back at its original depth slot and absent depths left nil.
+	fs := Mem_File_System {
+		rename_avail = true,
+	}
+	defer mem_fs_destroy(&fs)
+	storage := eng.storage_manager_make(mem_fs_backend(&fs))
+
+	path := "save.dat"
+	game: Game
+	build_saveable_game(&game)
+	defer game_cleanup(&game)
+
+	// Populate present floors at depths 0, 4, and MAX_DEPTH (boundary). Depth 4 also
+	// matches game.depth so it overlaps the live floor's depth slot.
+	game.depth = 4
+	present := []int{0, 4, gcore.MAX_DEPTH}
+	for d in present {
+		floor := new(Saved_Floor, runtime.default_allocator())
+		floor.player_pos = Vec2{d + 1, d + 2}
+		floor.rooms = make([dynamic]Room)
+		floor.enemies = make([dynamic]Enemy)
+		floor.items = make([dynamic]Item)
+		floor.light_sources = make([dynamic]Light_Source)
+		// Tag a unique tile per floor so we can prove the right floor landed.
+		floor.tiles[d] = Tile {
+			type = .Wall,
+		}
+		game.visited_floors[d] = floor
+	}
+
+	turns := eng.turn_manager_make()
+	testing.expect(t, save_game_to_storage(&turns, &game, &storage, path))
+
+	content := gcore.content_manager_make()
+	defer gcore.content_manager_destroy(&content)
+	loaded: Game
+	defer game_cleanup(&loaded)
+	loaded_turns := eng.turn_manager_make()
+	camera := eng.camera_manager_make()
+	vfx := eng.vfx_manager_make()
+	ui := gameui.ui_manager_make(false)
+	messages := eng.message_manager_make()
+
+	testing.expect(
+		t,
+		load_game_from_storage(
+			&content,
+			&loaded_turns,
+			&camera,
+			&vfx,
+			&ui,
+			&messages,
+			&loaded,
+			&storage,
+			path,
+		),
+	)
+
+	// Present depths must be reconstructed at the right slots with the right payload.
+	for d in present {
+		f := loaded.visited_floors[d]
+		testing.expectf(t, f != nil, "depth %d floor must be restored", d)
+		if f == nil {continue}
+		testing.expect_value(t, f.player_pos, Vec2{d + 1, d + 2})
+		testing.expect_value(t, f.tiles[d].type, gcore.Tile_Type.Wall)
+	}
+
+	// Absent depths must stay nil — nothing was written for them.
+	for d in 0 ..= gcore.MAX_DEPTH {
+		is_present := false
+		for p in present {
+			if p == d {is_present = true; break}
+		}
+		if is_present {continue}
+		testing.expectf(t, loaded.visited_floors[d] == nil, "absent depth %d must stay nil", d)
+	}
+}
+
+@(test)
 load_game_recovers_from_backup_when_primary_save_is_corrupt :: proc(t: ^testing.T) {
 	fs := Mem_File_System {
 		rename_avail = true,

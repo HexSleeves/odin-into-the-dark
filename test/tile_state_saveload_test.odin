@@ -26,10 +26,11 @@ save_load_preserves_engine_tile_state_layer :: proc(t: ^testing.T) {
 
 	header: Save_Header
 	mem.copy(&header, &buf[0], size_of(Save_Header))
-	data, data_ok := load_save_data(header, buf)
+	data, floors, data_ok := load_save_data(header, buf)
 	testing.expect(t, data_ok)
 	if data_ok {
 		defer free(data)
+		defer delete(floors)
 		idx := pos_to_idx(2, 1)
 		// v11 serializes the engine tile-state layer via a dedicated array, not
 		// via mirrored Tile fields (which no longer exist).
