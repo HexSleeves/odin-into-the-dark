@@ -32,7 +32,10 @@ clay_render_messages :: proc(messages: ^eng.Message_Manager) {
 			},
 			padding = clay.Padding{left = 8, right = 8, top = 4, bottom = 4},
 			layoutDirection = .TopToBottom,
-			childGap = u16(MSG_LINE_HEIGHT - MSG_FONT_SIZE),
+			// No childGap: MSG_LINE_HEIGHT already spaces each line. A gap pushed 7
+			// lines (7*20 + 6*4 + 8 pad = 172px) past the 150px panel, clipping the
+			// newest line. 7*20 + 8 pad = 148px fits MSG_REGION_HEIGHT.
+			childGap = 0,
 		},
 		backgroundColor = clay_color(ui_pkg.SB_BG),
 		border = {color = clay_color(ui_pkg.SB_DIVIDER), width = {0, 0, 1, 0, 0}}, // top edge only
