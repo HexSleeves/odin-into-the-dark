@@ -84,11 +84,3 @@ mapgen_clear_to_walls :: proc(game: ^Game) {
 		game.tiles[i] = Tile{}
 	}
 }
-
-mapgen_floor_count :: proc(game: ^Game) -> int {
-	count := 0
-	for i in 0 ..< MAP_WIDTH * MAP_HEIGHT {
-		if game.tiles[i].type != .Wall {count += 1}
-	}
-	return count
-}

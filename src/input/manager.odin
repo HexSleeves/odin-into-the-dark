@@ -124,11 +124,6 @@ action_binding :: proc(im: ^Input_Manager, action: Game_Action) -> Key_Binding {
 	return im.bindings[int(action)]
 }
 
-action_binding_ptr :: proc(im: ^Input_Manager, action: Game_Action) -> ^Key_Binding {
-	if im == nil {return nil}
-	return &im.bindings[int(action)]
-}
-
 reset_repeats :: proc(im: ^Input_Manager) {
 	if im == nil {return}
 	for i in 0 ..< len(im.repeat) {

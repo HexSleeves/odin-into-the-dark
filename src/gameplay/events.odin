@@ -54,18 +54,6 @@ Shrine_Buff :: enum {
 
 SHRINE_BUFF_COUNT :: 3
 
-shrine_buff_label :: proc(buff: Shrine_Buff) -> string {
-	switch buff {
-	case .Max_HP:
-		return fmt.tprintf("+%d Max HP", gcore.SHRINE_BUFF_MAX_HP)
-	case .Attack:
-		return fmt.tprintf("+%d Attack", gcore.SHRINE_BUFF_ATTACK)
-	case .Light:
-		return fmt.tprintf("+%d Light Radius", gcore.SHRINE_BUFF_LIGHT)
-	}
-	return "???"
-}
-
 apply_shrine_buff :: proc(engine: ^eng.Engine, game: ^Game, buff: Shrine_Buff) {
 	messages := game_engine_message_manager(engine)
 	hp_cost := max(1, game.player.hp * gcore.SHRINE_HP_COST_PERCENT / 100)
